@@ -11,9 +11,14 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 )
 
-// NewApp creates the Fiber app.
-func NewApp() *fiber.App {
-	return fiber.New(fiber.Config{AppName: "MonAI API"})
+// NewApp creates the Fiber app. c.Bind() runs v on every decoded request, and
+// every error returned by a handler or middleware is written by NewErrorHandler.
+func NewApp(v *Validator, log *slog.Logger) *fiber.App {
+	return fiber.New(fiber.Config{
+		AppName:         "MonAI API",
+		StructValidator: v,
+		ErrorHandler:    NewErrorHandler(log),
+	})
 }
 
 // NewAPIRouter returns the /api/v1 group that feature routes register on.
