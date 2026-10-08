@@ -1,7 +1,10 @@
 package ai
 
-type Service struct{}
+type Service interface {
+}
 
-func NewService() *Service {
-	return &Service{}
+type service struct{}
+
+func NewService() Service {
+	return &service{}
 }

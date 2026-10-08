@@ -23,12 +23,12 @@ type JWTManager interface {
 }
 
 type jwtManager struct {
-	Config config.Config
+	cfg config.Config
 }
 
 func NewJWTManager(cfg config.Config) JWTManager {
 	return &jwtManager{
-		Config: cfg,
+		cfg: cfg,
 	}
 }
 

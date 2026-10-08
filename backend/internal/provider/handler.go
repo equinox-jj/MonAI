@@ -1,9 +1,12 @@
 package provider
 
-type Handler struct {
-	svc *Service
+type Handler interface {
 }
 
-func NewHandler(svc *Service) *Handler {
-	return &Handler{svc: svc}
+type handler struct {
+	svc Service
+}
+
+func NewHandler(svc Service) Handler {
+	return &handler{svc: svc}
 }

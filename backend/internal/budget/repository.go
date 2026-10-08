@@ -2,10 +2,13 @@ package budget
 
 import "gorm.io/gorm"
 
-type Repository struct {
+type Repository interface {
+}
+
+type repository struct {
 	db *gorm.DB
 }
 
-func NewRepository(db *gorm.DB) *Repository {
-	return &Repository{db: db}
+func NewRepository(db *gorm.DB) Repository {
+	return &repository{db: db}
 }
