@@ -1,0 +1,1903 @@
+openapi: 3.1.0
+info:
+  title: Expense Tracker API
+  version: 1.0.0
+  description: |
+    REST API for the Expense Tracker app (Go, Fiber, GORM, PostgreSQL, MinIO).
+
+    ## Response format
+    Every response has `success`, `message` and `data`.
+    - `meta` appears only on paginated lists.
+    - `error` appears only on failures, with `code` and, for validation errors, `fields`.
+    - The client decides success by HTTP status and shows localized text from `error.code`
+      and each field error's `code` and `params`. `message` is an English fallback.
+
+    ## Conventions
+    - Keys are snake_case; enums are UPPER_SNAKE_CASE.
+    - Money is an integer in whole rupiah.
+    - Dates are `YYYY-MM-DD`; timestamps are RFC 3339 in UTC; IDs are UUIDs.
+    - Empty lists return `data: []`. Optional fields are returned as `null`, not omitted.
+    - Requests for records owned by another user return `404 not_found`.
+
+    ## Authentication
+    `Authorization: Bearer <access_token>`. The token is a JWT (HS256) with `sub`, `iat`, `exp`;
+    default lifetime 7 days. Roles and permissions are not in the token; they are loaded
+    from the database on each request.
+
+    Reserved for a later release: `POST /auth/refresh`, `POST /auth/logout-all`.
+servers:
+  - url: http://localhost:8080/api/v1
+    description: Local development
+tags:
+  - name: Auth
+  - name: Me
+  - name: Wallets
+  - name: Categories
+  - name: Transactions
+  - name: Budgets
+  - name: Reports
+  - name: AI
+  - name: Payment Providers
+  - name: Admin - Payment Providers
+  - name: System
+security:
+  - bearerAuth: []
+
+paths:
+  # ---------------------------------------------------------------- Auth
+  /auth/register:
+    post:
+      tags: [Auth]
+      operationId: register
+      summary: Create an account
+      description: |
+        Creates the user with the default role, a default Cash wallet and the default
+        categories in one database transaction, and returns an access token.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/RegisterRequest' }
+      responses:
+        '201':
+          description: Account created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+              example:
+                success: true
+                message: Account created successfully.
+                data:
+                  access_token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+                  token_type: Bearer
+                  expires_in: 604800
+                  user:
+                    id: 2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11
+                    name: Joshua
+                    email: joshua@example.com
+                    avatar_url: null
+                    role: { slug: user, name: User }
+                    permissions: []
+                    created_at: '2026-10-08T12:30:00Z'
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      operationId: login
+      summary: Log in with email and password
+      description: Wrong email or password returns the same `invalid_credentials` error.
+      security: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/LoginRequest' }
+      responses:
+        '200':
+          description: Logged in
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401':
+          description: Invalid email or password
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                success: false
+                message: Invalid email or password.
+                data: null
+                error: { code: invalid_credentials }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- Me
+  /me:
+    get:
+      tags: [Me]
+      operationId: getMe
+      summary: Get the current user's profile, role and permissions
+      responses:
+        '200':
+          description: Current user
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MeResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    patch:
+      tags: [Me]
+      operationId: updateMe
+      summary: Update display name
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateMeRequest' }
+      responses:
+        '200':
+          description: Profile updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MeResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Me]
+      operationId: deleteMe
+      summary: Delete account and all data
+      description: |
+        Requires the current password. Deletes the user, wallets, categories, transactions,
+        budgets, the avatar and all receipt images. Fails with `last_admin` if this user is
+        the last holder of all admin permissions.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DeleteAccountRequest' }
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /me/avatar/upload-url:
+    post:
+      tags: [Me]
+      operationId: createAvatarUploadUrl
+      summary: Get a presigned URL to upload a profile picture
+      description: Max 2 MB; image/webp, image/jpeg or image/png. URL expires in 15 minutes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UploadUrlRequest' }
+      responses:
+        '200':
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploadUrlResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /me/avatar:
+    put:
+      tags: [Me]
+      operationId: confirmAvatar
+      summary: Confirm an uploaded profile picture
+      description: |
+        Checks that the object exists under `avatars/{user_id}/`, is an allowed type and
+        at most 2 MB, saves it on the user and deletes the previous avatar.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmUploadRequest' }
+      responses:
+        '200':
+          description: Avatar updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MeResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Me]
+      operationId: deleteAvatar
+      summary: Remove the profile picture
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- Wallets
+  /wallets:
+    get:
+      tags: [Wallets]
+      operationId: listWallets
+      summary: List wallets with calculated balances
+      description: Not paginated. Returns the total balance across non-archived wallets in `meta`.
+      parameters:
+        - name: include_archived
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Wallets
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletListResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [Wallets]
+      operationId: createWallet
+      summary: Create a wallet
+      description: |
+        When `provider_id` is set, `name` and `type` default to the provider's values.
+        `is_default: true` clears the previous default wallet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateWalletRequest' }
+      responses:
+        '201':
+          description: Wallet created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /wallets/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Wallets]
+      operationId: getWallet
+      summary: Get a wallet with its balance
+      responses:
+        '200':
+          description: Wallet
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    patch:
+      tags: [Wallets]
+      operationId: updateWallet
+      summary: Edit, set default, archive or unarchive a wallet
+      description: |
+        Business rule errors: `default_wallet_required` when archiving the default wallet
+        or setting `is_default: false` on it without choosing another default.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateWalletRequest' }
+      responses:
+        '200':
+          description: Wallet updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/WalletResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Wallets]
+      operationId: deleteWallet
+      summary: Delete a wallet with no transactions
+      description: |
+        Business rule errors: `wallet_has_transactions` (archive it instead),
+        `default_wallet_required` (it is the default wallet).
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- Categories
+  /categories:
+    get:
+      tags: [Categories]
+      operationId: listCategories
+      summary: List categories
+      description: Not paginated.
+      parameters:
+        - name: type
+          in: query
+          schema: { $ref: '#/components/schemas/CategoryType' }
+        - name: include_hidden
+          in: query
+          schema: { type: boolean, default: false }
+      responses:
+        '200':
+          description: Categories
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CategoryListResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [Categories]
+      operationId: createCategory
+      summary: Create a custom category
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateCategoryRequest' }
+      responses:
+        '201':
+          description: Category created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CategoryResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /categories/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Categories]
+      operationId: updateCategory
+      summary: Rename, restyle, hide or unhide a category
+      description: 'Business rule error: `system_category_locked` when hiding a system category.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateCategoryRequest' }
+      responses:
+        '200':
+          description: Category updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/CategoryResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Categories]
+      operationId: deleteCategory
+      summary: Delete a custom category
+      description: |
+        If the category has transactions, `move_to` is required: a category of the same type
+        owned by the user. Transactions are moved and the category deleted in one database
+        transaction. Business rule errors: `category_has_transactions` (no `move_to`),
+        `system_category_locked` (default or system category).
+      parameters:
+        - name: move_to
+          in: query
+          schema: { type: string, format: uuid }
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- Transactions
+  /transactions:
+    get:
+      tags: [Transactions]
+      operationId: listTransactions
+      summary: List transactions (cursor pagination)
+      description: |
+        Sorted by `date` DESC, then `id` DESC. Keep the same filters when requesting the
+        next page with `cursor`. An invalid cursor returns `400 invalid_cursor`.
+      parameters:
+        - name: month
+          in: query
+          description: Month to list, `YYYY-MM`. Defaults to the current month.
+          schema: { $ref: '#/components/schemas/Month' }
+        - name: wallet_id
+          in: query
+          description: Matches the source or destination wallet.
+          schema: { type: string, format: uuid }
+        - name: category_id
+          in: query
+          schema: { type: string, format: uuid }
+        - name: type
+          in: query
+          schema: { $ref: '#/components/schemas/TransactionType' }
+        - name: q
+          in: query
+          description: Case-insensitive search in note and merchant.
+          schema: { type: string, maxLength: 100 }
+        - $ref: '#/components/parameters/Cursor'
+        - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: Transactions
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransactionListResponse' }
+              example:
+                success: true
+                message: Transactions retrieved successfully.
+                data:
+                  - id: 8b2d4f0a-1c3e-4b5d-9f7a-0e1d2c3b4a59
+                    type: EXPENSE
+                    amount: 35000
+                    wallet_id: 5f3c9a1e-8b2d-4c7a-9e1f-2a6b8c4d0e17
+                    to_wallet_id: null
+                    category_id: 0c9e8d7b-6a5f-4e3d-8c2b-1a0f9e8d7c6b
+                    date: '2026-10-05'
+                    note: Makan siang
+                    merchant: null
+                    receipt_url: null
+                    source: QUICK_ADD
+                    created_at: '2026-10-05T05:12:00Z'
+                    updated_at: '2026-10-05T05:12:00Z'
+                meta:
+                  next_cursor: eyJkIjoiMjAyNi0xMC0wNSIsImkiOiI4YjJkIn0
+                  has_more: true
+                  limit: 20
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [Transactions]
+      operationId: createTransaction
+      summary: Create a transaction
+      description: |
+        Transfers require `to_wallet_id` (different from `wallet_id`) and no `category_id`.
+        Expense and income require `category_id` of the matching type and no `to_wallet_id`.
+        Wallets must belong to the user and not be archived. `date` must not be in the future.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateTransactionRequest' }
+            example:
+              type: EXPENSE
+              amount: 35000
+              wallet_id: 5f3c9a1e-8b2d-4c7a-9e1f-2a6b8c4d0e17
+              category_id: 0c9e8d7b-6a5f-4e3d-8c2b-1a0f9e8d7c6b
+              date: '2026-10-08'
+              note: Makan siang
+              source: QUICK_ADD
+      responses:
+        '201':
+          description: Transaction created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransactionResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /transactions/receipt-upload-url:
+    post:
+      tags: [Transactions]
+      operationId: createReceiptUploadUrl
+      summary: Get a presigned URL to upload a receipt photo
+      description: |
+        Max 5 MB; image/jpeg or image/webp. Pass the returned `object_key` as `receipt_key`
+        when creating or updating the transaction.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UploadUrlRequest' }
+      responses:
+        '200':
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploadUrlResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /transactions/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Transactions]
+      operationId: getTransaction
+      summary: Get a transaction
+      responses:
+        '200':
+          description: Transaction
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransactionResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    patch:
+      tags: [Transactions]
+      operationId: updateTransaction
+      summary: Edit a transaction
+      description: |
+        Any field can change, including `type`. The merged result must satisfy the same
+        rules as create. Send `null` to clear an optional field (for example `note`).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateTransactionRequest' }
+      responses:
+        '200':
+          description: Transaction updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransactionResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Transactions]
+      operationId: deleteTransaction
+      summary: Soft-delete a transaction
+      description: The transaction can be restored with `POST /transactions/{id}/restore`.
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /transactions/{id}/restore:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      tags: [Transactions]
+      operationId: restoreTransaction
+      summary: Undo a delete
+      description: |
+        Restores a soft-deleted transaction. Business rule error: `wallet_archived` if one of
+        its wallets was archived in the meantime.
+      responses:
+        '200':
+          description: Transaction restored
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/TransactionResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- Budgets
+  /budgets/{month}:
+    parameters:
+      - name: month
+        in: path
+        required: true
+        schema: { $ref: '#/components/schemas/Month' }
+    get:
+      tags: [Budgets]
+      operationId: getBudget
+      summary: Get the budget and progress for a month
+      description: Returns `404 not_found` when no budget is set for that month.
+      responses:
+        '200':
+          description: Budget
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BudgetResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    put:
+      tags: [Budgets]
+      operationId: setBudget
+      summary: Set or change the budget for a month
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/SetBudgetRequest' }
+      responses:
+        '200':
+          description: Budget saved
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/BudgetResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Budgets]
+      operationId: deleteBudget
+      summary: Remove the budget for a month
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- Reports
+  /reports/monthly:
+    get:
+      tags: [Reports]
+      operationId: getMonthlyReport
+      summary: Monthly totals, category breakdown and previous-month comparison
+      description: Calculated from non-deleted transactions. Transfers are excluded from income and expense.
+      parameters:
+        - name: month
+          in: query
+          required: true
+          schema: { $ref: '#/components/schemas/Month' }
+      responses:
+        '200':
+          description: Monthly report
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/MonthlyReportResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- AI
+  /ai/parse-transaction:
+    post:
+      tags: [AI]
+      operationId: parseTransaction
+      summary: Turn a quick-add phrase into transaction drafts
+      description: |
+        The server loads the user's wallets, categories and provider aliases, asks the AI model
+        for structured JSON, and validates every field. Invalid or unknown fields come back as
+        `null`. Nothing is saved; the client saves a draft with `POST /transactions` after
+        the user confirms. Rate-limited per user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ParseTransactionRequest' }
+            example:
+              text: makan siang 35rb pakai gopay
+              today: '2026-10-08'
+              timezone: Asia/Jakarta
+      responses:
+        '200':
+          description: Drafts
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParseTransactionResponse' }
+              example:
+                success: true
+                message: Drafts generated successfully.
+                data:
+                  drafts:
+                    - type: EXPENSE
+                      amount: 35000
+                      wallet_id: 5f3c9a1e-8b2d-4c7a-9e1f-2a6b8c4d0e17
+                      to_wallet_id: null
+                      category_id: 0c9e8d7b-6a5f-4e3d-8c2b-1a0f9e8d7c6b
+                      date: '2026-10-08'
+                      note: Makan siang
+                      merchant: null
+                      confidence: { type: 0.99, amount: 0.98, wallet: 0.95, category: 0.9, date: 0.99 }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/AiUnavailable' }
+
+  /ai/parse-receipt:
+    post:
+      tags: [AI]
+      operationId: parseReceipt
+      summary: Turn receipt OCR text into a transaction draft
+      description: |
+        The client runs OCR on the device and sends the recognized text. Nothing is saved.
+        Rate-limited per user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ParseReceiptRequest' }
+      responses:
+        '200':
+          description: Draft
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ParseReceiptResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+        '503': { $ref: '#/components/responses/AiUnavailable' }
+
+  # ---------------------------------------------------------------- Payment providers
+  /payment-providers:
+    get:
+      tags: [Payment Providers]
+      operationId: getProviderCatalog
+      summary: Public catalog of active payment providers
+      description: |
+        Not paginated. Returns an `ETag` based on the catalog version; send it back in
+        `If-None-Match` to get `304 Not Modified` when nothing changed.
+      security: []
+      parameters:
+        - name: If-None-Match
+          in: header
+          schema: { type: string }
+      responses:
+        '200':
+          description: Catalog
+          headers:
+            ETag:
+              schema: { type: string }
+              example: '"v12"'
+            Cache-Control:
+              schema: { type: string }
+              example: public, max-age=300
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ProviderCatalogResponse' }
+        '304':
+          description: Not modified
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /admin/payment-providers:
+    get:
+      tags: [Admin - Payment Providers]
+      operationId: adminListProviders
+      summary: List all providers, including inactive (offset pagination)
+      description: 'Requires permission `payment_provider.view`.'
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PerPage'
+        - name: q
+          in: query
+          description: Search by name or slug.
+          schema: { type: string, maxLength: 50 }
+        - name: status
+          in: query
+          schema: { type: string, enum: [ACTIVE, INACTIVE, ALL], default: ALL }
+        - name: type
+          in: query
+          schema: { $ref: '#/components/schemas/WalletType' }
+      responses:
+        '200':
+          description: Providers
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminProviderListResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    post:
+      tags: [Admin - Payment Providers]
+      operationId: adminCreateProvider
+      summary: Create a provider
+      description: |
+        Requires permission `payment_provider.create`. The slug is generated from the name
+        when omitted. Slug and aliases must be unique among non-deleted providers.
+        Increments the catalog version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateProviderRequest' }
+      responses:
+        '201':
+          description: Provider created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminProviderResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /admin/payment-providers/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Admin - Payment Providers]
+      operationId: adminGetProvider
+      summary: Get a provider
+      description: 'Requires permission `payment_provider.view`.'
+      responses:
+        '200':
+          description: Provider
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminProviderResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    patch:
+      tags: [Admin - Payment Providers]
+      operationId: adminUpdateProvider
+      summary: Edit a provider
+      description: |
+        Requires permission `payment_provider.update`. `aliases`, when sent, replaces the
+        whole list. Increments the catalog version.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UpdateProviderRequest' }
+      responses:
+        '200':
+          description: Provider updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminProviderResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '409': { $ref: '#/components/responses/Conflict' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+    delete:
+      tags: [Admin - Payment Providers]
+      operationId: adminDeleteProvider
+      summary: Soft-delete a provider
+      description: |
+        Requires permission `payment_provider.delete`. Removes the provider's aliases and
+        increments the catalog version. The logo stays in storage. Existing wallets keep
+        their own name and type. Business rule error: `system_provider_locked`.
+      responses:
+        '200': { $ref: '#/components/responses/Deleted' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /admin/payment-providers/{id}/status:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Admin - Payment Providers]
+      operationId: adminSetProviderStatus
+      summary: Activate or deactivate a provider
+      description: |
+        Requires permission `payment_provider.update`. Increments the catalog version.
+        Business rule error: `system_provider_locked`.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ProviderStatusRequest' }
+      responses:
+        '200':
+          description: Status updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminProviderResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/BusinessRule' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /admin/payment-providers/{id}/logo-upload-url:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    post:
+      tags: [Admin - Payment Providers]
+      operationId: adminCreateProviderLogoUploadUrl
+      summary: Get a presigned URL to upload a provider logo
+      description: 'Requires permission `payment_provider.update`. Max 512 KB; image/png, image/webp or image/svg+xml.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/UploadUrlRequest' }
+      responses:
+        '200':
+          description: Presigned upload URL
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/UploadUrlResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /admin/payment-providers/{id}/logo:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    put:
+      tags: [Admin - Payment Providers]
+      operationId: adminConfirmProviderLogo
+      summary: Confirm an uploaded provider logo
+      description: 'Requires permission `payment_provider.update`. Increments the catalog version.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ConfirmUploadRequest' }
+      responses:
+        '200':
+          description: Logo updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AdminProviderResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+        '404': { $ref: '#/components/responses/NotFound' }
+        '422': { $ref: '#/components/responses/ValidationFailed' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  # ---------------------------------------------------------------- System
+  /health:
+    get:
+      tags: [System]
+      operationId: health
+      summary: Liveness and database check
+      security: []
+      responses:
+        '200':
+          description: Healthy
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/HealthResponse' }
+        '503':
+          description: A dependency is down
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Cursor:
+      name: cursor
+      in: query
+      description: Opaque cursor from `meta.next_cursor`. Omit for the first page.
+      schema: { type: string }
+    Limit:
+      name: limit
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+    Page:
+      name: page
+      in: query
+      schema: { type: integer, minimum: 1, default: 1 }
+    PerPage:
+      name: per_page
+      in: query
+      schema: { type: integer, minimum: 1, maximum: 100, default: 20 }
+
+  responses:
+    Deleted:
+      description: Deleted
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/EmptyResponse' }
+          example:
+            success: true
+            message: Deleted successfully.
+            data: null
+    BadRequest:
+      description: Malformed request (invalid JSON, wrong types, invalid cursor)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: The request body is not valid JSON.
+            data: null
+            error: { code: invalid_request }
+    Unauthorized:
+      description: Missing, invalid or expired token
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: Authentication required.
+            data: null
+            error: { code: unauthorized }
+    Forbidden:
+      description: Missing permission
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: You do not have permission to perform this action.
+            data: null
+            error: { code: forbidden }
+    NotFound:
+      description: Not found, or owned by another user
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: Resource not found.
+            data: null
+            error: { code: not_found }
+    Conflict:
+      description: Duplicate value (email, wallet or category name, provider slug or alias)
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: A wallet with this name already exists.
+            data: null
+            error:
+              code: conflict
+              fields:
+                - field: name
+                  code: already_exists
+                  message: already exists
+    ValidationFailed:
+      description: One or more fields are invalid
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: Some fields are invalid.
+            data: null
+            error:
+              code: validation_failed
+              fields:
+                - field: amount
+                  code: min
+                  message: must be greater than 0
+                  params: { min: 1 }
+                - field: to_wallet_id
+                  code: not_equal
+                  message: must be different from wallet_id
+                  params: { other: wallet_id }
+    BusinessRule:
+      description: |
+        The request is valid but breaks a business rule. `error.code` is one of:
+        `wallet_has_transactions`, `default_wallet_required`, `wallet_archived`,
+        `category_has_transactions`, `system_category_locked`, `system_provider_locked`,
+        `last_admin`, `invalid_password`.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: This wallet has transactions. Archive it instead.
+            data: null
+            error: { code: wallet_has_transactions }
+    RateLimited:
+      description: Too many requests
+      headers:
+        Retry-After:
+          schema: { type: integer }
+          description: Seconds to wait before retrying
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: Too many requests. Please try again later.
+            data: null
+            error: { code: rate_limited }
+    AiUnavailable:
+      description: The AI provider failed, timed out or ran out of quota. The client falls back to its local parser.
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: AI parsing is temporarily unavailable.
+            data: null
+            error: { code: ai_unavailable }
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+          example:
+            success: false
+            message: Something went wrong.
+            data: null
+            error: { code: internal_error }
+
+  schemas:
+    # ------------------------------------------------ Envelope
+    SuccessBase:
+      type: object
+      required: [success, message]
+      properties:
+        success: { type: boolean, const: true }
+        message: { type: string, example: Retrieved successfully. }
+
+    EmptyResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { type: 'null' }
+
+    ErrorResponse:
+      type: object
+      required: [success, message, data, error]
+      properties:
+        success: { type: boolean, const: false }
+        message: { type: string }
+        data: { type: 'null' }
+        error: { $ref: '#/components/schemas/ApiError' }
+
+    ApiError:
+      type: object
+      required: [code]
+      properties:
+        code:
+          type: string
+          description: |
+            Stable machine-readable code: `invalid_request`, `invalid_cursor`,
+            `invalid_credentials`, `unauthorized`, `forbidden`, `not_found`, `conflict`,
+            `validation_failed`, a business rule code, `rate_limited`, `ai_unavailable`,
+            `internal_error`.
+          example: validation_failed
+        fields:
+          type: array
+          description: Present only for validation and conflict errors. A field may appear more than once.
+          items: { $ref: '#/components/schemas/FieldError' }
+
+    FieldError:
+      type: object
+      required: [field, code, message]
+      properties:
+        field:
+          type: string
+          description: JSON field name or path, e.g. `amount`, `items[0].amount`
+          example: amount
+        code:
+          type: string
+          description: |
+            `required`, `min`, `max`, `min_length`, `max_length`, `invalid_format`, `one_of`,
+            `not_equal`, `not_found`, `future_date`, `already_exists`, `requires_digit`,
+            `type_mismatch`, `archived`
+          example: min
+        message:
+          type: string
+          example: must be greater than 0
+        params:
+          type: object
+          additionalProperties: true
+          example: { min: 1 }
+
+    CursorMeta:
+      type: object
+      required: [next_cursor, has_more, limit]
+      properties:
+        next_cursor: { type: [string, 'null'] }
+        has_more: { type: boolean }
+        limit: { type: integer }
+
+    PageMeta:
+      type: object
+      required: [page, per_page, total, total_pages]
+      properties:
+        page: { type: integer }
+        per_page: { type: integer }
+        total: { type: integer, format: int64 }
+        total_pages: { type: integer }
+
+    # ------------------------------------------------ Shared types
+    Money:
+      type: integer
+      format: int64
+      description: Whole rupiah
+      example: 35000
+    Month:
+      type: string
+      pattern: '^[0-9]{4}-(0[1-9]|1[0-2])$'
+      example: 2026-10
+    Color:
+      type: [string, 'null']
+      pattern: '^#[0-9A-Fa-f]{6}$'
+      example: '#2E7D32'
+    WalletType:
+      type: string
+      enum: [CASH, BANK, E_WALLET, OTHER]
+    CategoryType:
+      type: string
+      enum: [EXPENSE, INCOME]
+    TransactionType:
+      type: string
+      enum: [EXPENSE, INCOME, TRANSFER]
+    TransactionSource:
+      type: string
+      enum: [MANUAL, QUICK_ADD, RECEIPT]
+
+    # ------------------------------------------------ Auth and Me
+    RegisterRequest:
+      type: object
+      required: [name, email, password]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100, example: Joshua }
+        email: { type: string, format: email, maxLength: 254, example: joshua@example.com }
+        password: { type: string, minLength: 8, maxLength: 72, example: s3cretPass }
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string }
+
+    AuthData:
+      type: object
+      required: [access_token, token_type, expires_in, user]
+      properties:
+        access_token: { type: string }
+        token_type: { type: string, const: Bearer }
+        expires_in: { type: integer, description: Seconds until expiry, example: 604800 }
+        user: { $ref: '#/components/schemas/Me' }
+
+    AuthResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/AuthData' }
+
+    RoleSummary:
+      type: object
+      required: [slug, name]
+      properties:
+        slug: { type: string, example: admin }
+        name: { type: string, example: Admin }
+
+    Me:
+      type: object
+      required: [id, name, email, avatar_url, role, permissions, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        email: { type: string, format: email }
+        avatar_url:
+          type: [string, 'null']
+          format: uri
+          description: Presigned GET URL, valid for 15 minutes
+        role: { $ref: '#/components/schemas/RoleSummary' }
+        permissions:
+          type: array
+          items: { type: string }
+          example: [payment_provider.view, payment_provider.create]
+        created_at: { type: string, format: date-time }
+
+    MeResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/Me' }
+
+    UpdateMeRequest:
+      type: object
+      required: [name]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+
+    DeleteAccountRequest:
+      type: object
+      required: [password]
+      properties:
+        password: { type: string }
+
+    # ------------------------------------------------ Uploads
+    UploadUrlRequest:
+      type: object
+      required: [content_type, size_bytes]
+      properties:
+        content_type:
+          type: string
+          enum: [image/jpeg, image/png, image/webp, image/svg+xml]
+          description: Allowed types depend on the endpoint
+        size_bytes: { type: integer, minimum: 1, example: 184320 }
+
+    UploadUrl:
+      type: object
+      required: [upload_url, method, headers, object_key, expires_in]
+      properties:
+        upload_url: { type: string, format: uri }
+        method: { type: string, const: PUT }
+        headers:
+          type: object
+          additionalProperties: { type: string }
+          example: { Content-Type: image/webp }
+        object_key: { type: string, example: avatars/2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11/7c1d.webp }
+        expires_in: { type: integer, example: 900 }
+
+    UploadUrlResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/UploadUrl' }
+
+    ConfirmUploadRequest:
+      type: object
+      required: [object_key]
+      properties:
+        object_key: { type: string, maxLength: 255 }
+
+    # ------------------------------------------------ Wallets
+    Wallet:
+      type: object
+      required: [id, provider_id, name, type, logo_url, initial_balance, current_balance, icon, color, is_default, is_archived, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        provider_id: { type: [string, 'null'], format: uuid }
+        name: { type: string, example: GoPay }
+        type: { $ref: '#/components/schemas/WalletType' }
+        logo_url:
+          type: [string, 'null']
+          format: uri
+          description: The provider's logo, or null for custom wallets and deleted providers
+        initial_balance: { $ref: '#/components/schemas/Money' }
+        current_balance:
+          $ref: '#/components/schemas/Money'
+          description: Calculated from transactions
+        icon: { type: [string, 'null'] }
+        color: { $ref: '#/components/schemas/Color' }
+        is_default: { type: boolean }
+        is_archived: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    WalletResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/Wallet' }
+
+    WalletListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data, meta]
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/Wallet' }
+            meta:
+              type: object
+              required: [total_balance]
+              properties:
+                total_balance:
+                  $ref: '#/components/schemas/Money'
+                  description: Sum of current balances of non-archived wallets
+
+    CreateWalletRequest:
+      type: object
+      properties:
+        provider_id: { type: [string, 'null'], format: uuid }
+        name:
+          type: string
+          minLength: 1
+          maxLength: 30
+          description: Required when `provider_id` is null
+        type:
+          $ref: '#/components/schemas/WalletType'
+          description: Required when `provider_id` is null
+        initial_balance:
+          type: integer
+          format: int64
+          minimum: 0
+          default: 0
+        icon: { type: [string, 'null'], maxLength: 50 }
+        color: { $ref: '#/components/schemas/Color' }
+        is_default: { type: boolean, default: false }
+
+    UpdateWalletRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 30 }
+        type: { $ref: '#/components/schemas/WalletType' }
+        initial_balance: { type: integer, format: int64, minimum: 0 }
+        icon: { type: [string, 'null'], maxLength: 50 }
+        color: { $ref: '#/components/schemas/Color' }
+        is_default:
+          type: boolean
+          description: Only `true` is accepted; set another wallet as default to change it
+        is_archived: { type: boolean }
+
+    # ------------------------------------------------ Categories
+    Category:
+      type: object
+      required: [id, name, type, icon, color, is_default, is_system, is_hidden, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string, example: Food }
+        type: { $ref: '#/components/schemas/CategoryType' }
+        icon: { type: [string, 'null'] }
+        color: { $ref: '#/components/schemas/Color' }
+        is_default: { type: boolean }
+        is_system: { type: boolean }
+        is_hidden: { type: boolean }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    CategoryResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/Category' }
+
+    CategoryListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/Category' }
+
+    CreateCategoryRequest:
+      type: object
+      required: [name, type]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 30 }
+        type: { $ref: '#/components/schemas/CategoryType' }
+        icon: { type: [string, 'null'], maxLength: 50 }
+        color: { $ref: '#/components/schemas/Color' }
+
+    UpdateCategoryRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 30 }
+        icon: { type: [string, 'null'], maxLength: 50 }
+        color: { $ref: '#/components/schemas/Color' }
+        is_hidden: { type: boolean }
+
+    # ------------------------------------------------ Transactions
+    Transaction:
+      type: object
+      required: [id, type, amount, wallet_id, to_wallet_id, category_id, date, note, merchant, receipt_url, source, created_at, updated_at]
+      properties:
+        id: { type: string, format: uuid }
+        type: { $ref: '#/components/schemas/TransactionType' }
+        amount: { $ref: '#/components/schemas/Money' }
+        wallet_id: { type: string, format: uuid }
+        to_wallet_id: { type: [string, 'null'], format: uuid }
+        category_id: { type: [string, 'null'], format: uuid }
+        date: { type: string, format: date }
+        note: { type: [string, 'null'] }
+        merchant: { type: [string, 'null'] }
+        receipt_url:
+          type: [string, 'null']
+          format: uri
+          description: Presigned GET URL, valid for 15 minutes
+        source: { $ref: '#/components/schemas/TransactionSource' }
+        created_at: { type: string, format: date-time }
+        updated_at: { type: string, format: date-time }
+
+    TransactionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/Transaction' }
+
+    TransactionListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data, meta]
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/Transaction' }
+            meta: { $ref: '#/components/schemas/CursorMeta' }
+
+    CreateTransactionRequest:
+      type: object
+      required: [type, amount, wallet_id, date]
+      properties:
+        type: { $ref: '#/components/schemas/TransactionType' }
+        amount:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 999999999999
+        wallet_id: { type: string, format: uuid }
+        to_wallet_id:
+          type: [string, 'null']
+          format: uuid
+          description: Required for TRANSFER, must be null otherwise
+        category_id:
+          type: [string, 'null']
+          format: uuid
+          description: Required for EXPENSE and INCOME, must be null for TRANSFER
+        date: { type: string, format: date }
+        note: { type: [string, 'null'], maxLength: 200 }
+        merchant: { type: [string, 'null'], maxLength: 100 }
+        receipt_key:
+          type: [string, 'null']
+          maxLength: 255
+          description: Object key from `POST /transactions/receipt-upload-url`
+        source:
+          $ref: '#/components/schemas/TransactionSource'
+          default: MANUAL
+
+    UpdateTransactionRequest:
+      type: object
+      minProperties: 1
+      properties:
+        type: { $ref: '#/components/schemas/TransactionType' }
+        amount:
+          type: integer
+          format: int64
+          minimum: 1
+          maximum: 999999999999
+        wallet_id: { type: string, format: uuid }
+        to_wallet_id: { type: [string, 'null'], format: uuid }
+        category_id: { type: [string, 'null'], format: uuid }
+        date: { type: string, format: date }
+        note: { type: [string, 'null'], maxLength: 200 }
+        merchant: { type: [string, 'null'], maxLength: 100 }
+        receipt_key: { type: [string, 'null'], maxLength: 255 }
+
+    # ------------------------------------------------ Budgets and reports
+    Budget:
+      type: object
+      required: [month, limit_amount, spent, remaining, progress_percent, status]
+      properties:
+        month: { $ref: '#/components/schemas/Month' }
+        limit_amount: { $ref: '#/components/schemas/Money' }
+        spent:
+          $ref: '#/components/schemas/Money'
+          description: Sum of non-deleted EXPENSE transactions in the month
+        remaining:
+          type: integer
+          format: int64
+          description: May be negative when over budget
+        progress_percent: { type: number, example: 80.0 }
+        status:
+          type: string
+          enum: [OK, WARNING, EXCEEDED]
+          description: WARNING from 80%, EXCEEDED above 100%
+
+    BudgetResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/Budget' }
+
+    SetBudgetRequest:
+      type: object
+      required: [limit_amount]
+      properties:
+        limit_amount:
+          type: integer
+          format: int64
+          minimum: 1
+
+    CategoryBreakdown:
+      type: object
+      required: [category_id, name, icon, color, amount, share_percent, previous_amount, change_percent]
+      properties:
+        category_id: { type: string, format: uuid }
+        name: { type: string }
+        icon: { type: [string, 'null'] }
+        color: { $ref: '#/components/schemas/Color' }
+        amount: { $ref: '#/components/schemas/Money' }
+        share_percent: { type: number, description: Share of the month's total expense }
+        previous_amount: { $ref: '#/components/schemas/Money' }
+        change_percent:
+          type: [number, 'null']
+          description: Null when the previous amount is 0
+
+    MonthlyReport:
+      type: object
+      required: [month, income_total, expense_total, net, previous, expense_change_percent, categories]
+      properties:
+        month: { $ref: '#/components/schemas/Month' }
+        income_total: { $ref: '#/components/schemas/Money' }
+        expense_total: { $ref: '#/components/schemas/Money' }
+        net:
+          type: integer
+          format: int64
+          description: income_total - expense_total
+        previous:
+          type: object
+          required: [month, income_total, expense_total]
+          properties:
+            month: { $ref: '#/components/schemas/Month' }
+            income_total: { $ref: '#/components/schemas/Money' }
+            expense_total: { $ref: '#/components/schemas/Money' }
+        expense_change_percent: { type: [number, 'null'] }
+        categories:
+          type: array
+          description: Expense categories, sorted by amount descending
+          items: { $ref: '#/components/schemas/CategoryBreakdown' }
+
+    MonthlyReportResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/MonthlyReport' }
+
+    # ------------------------------------------------ AI
+    ParseTransactionRequest:
+      type: object
+      required: [text, today, timezone]
+      properties:
+        text: { type: string, minLength: 1, maxLength: 300 }
+        today:
+          type: string
+          format: date
+          description: The user's local date, used for relative dates like "kemarin"
+        timezone: { type: string, example: Asia/Jakarta }
+
+    ParseReceiptRequest:
+      type: object
+      required: [ocr_text, today, timezone]
+      properties:
+        ocr_text: { type: string, minLength: 1, maxLength: 5000 }
+        today: { type: string, format: date }
+        timezone: { type: string, example: Asia/Jakarta }
+
+    DraftConfidence:
+      type: object
+      description: 0.0 to 1.0 per field. The client highlights fields below 0.7.
+      properties:
+        type: { type: number, minimum: 0, maximum: 1 }
+        amount: { type: number, minimum: 0, maximum: 1 }
+        wallet: { type: number, minimum: 0, maximum: 1 }
+        category: { type: number, minimum: 0, maximum: 1 }
+        date: { type: number, minimum: 0, maximum: 1 }
+
+    TransactionDraft:
+      type: object
+      description: Validated by the server. Unknown or invalid values are null.
+      required: [type, amount, wallet_id, to_wallet_id, category_id, date, note, merchant, confidence]
+      properties:
+        type:
+          oneOf:
+            - $ref: '#/components/schemas/TransactionType'
+            - type: 'null'
+        amount: { type: [integer, 'null'], format: int64 }
+        wallet_id: { type: [string, 'null'], format: uuid }
+        to_wallet_id: { type: [string, 'null'], format: uuid }
+        category_id: { type: [string, 'null'], format: uuid }
+        date: { type: [string, 'null'], format: date }
+        note: { type: [string, 'null'] }
+        merchant: { type: [string, 'null'] }
+        confidence: { $ref: '#/components/schemas/DraftConfidence' }
+
+    ReceiptItem:
+      type: object
+      required: [name, quantity, amount]
+      properties:
+        name: { type: string }
+        quantity: { type: [number, 'null'] }
+        amount: { type: [integer, 'null'], format: int64 }
+
+    ReceiptDraft:
+      allOf:
+        - $ref: '#/components/schemas/TransactionDraft'
+        - type: object
+          required: [items]
+          properties:
+            items:
+              type: array
+              items: { $ref: '#/components/schemas/ReceiptItem' }
+
+    ParseTransactionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [drafts]
+              properties:
+                drafts:
+                  type: array
+                  items: { $ref: '#/components/schemas/TransactionDraft' }
+
+    ParseReceiptResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [draft]
+              properties:
+                draft: { $ref: '#/components/schemas/ReceiptDraft' }
+
+    # ------------------------------------------------ Payment providers
+    PaymentProvider:
+      type: object
+      required: [id, slug, name, type, logo_url, aliases, sort_order]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string, example: gopay }
+        name: { type: string, example: GoPay }
+        type: { $ref: '#/components/schemas/WalletType' }
+        logo_url: { type: [string, 'null'], format: uri }
+        aliases:
+          type: array
+          items: { type: string }
+          example: [gopay, gpay, go-pay]
+        sort_order: { type: integer }
+
+    ProviderCatalog:
+      type: object
+      required: [version, providers]
+      properties:
+        version: { type: integer, format: int64, example: 12 }
+        providers:
+          type: array
+          items: { $ref: '#/components/schemas/PaymentProvider' }
+
+    ProviderCatalogResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/ProviderCatalog' }
+
+    AdminPaymentProvider:
+      allOf:
+        - $ref: '#/components/schemas/PaymentProvider'
+        - type: object
+          required: [is_active, is_system, created_by, updated_by, created_at, updated_at]
+          properties:
+            is_active: { type: boolean }
+            is_system: { type: boolean }
+            created_by: { type: [string, 'null'], format: uuid }
+            updated_by: { type: [string, 'null'], format: uuid }
+            created_at: { type: string, format: date-time }
+            updated_at: { type: string, format: date-time }
+
+    AdminProviderResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data: { $ref: '#/components/schemas/AdminPaymentProvider' }
+
+    AdminProviderListResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data, meta]
+          properties:
+            data:
+              type: array
+              items: { $ref: '#/components/schemas/AdminPaymentProvider' }
+            meta: { $ref: '#/components/schemas/PageMeta' }
+
+    CreateProviderRequest:
+      type: object
+      required: [name, type]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 50 }
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          maxLength: 50
+          description: Generated from the name when omitted
+        type: { $ref: '#/components/schemas/WalletType' }
+        aliases:
+          type: array
+          maxItems: 20
+          items: { type: string, minLength: 1, maxLength: 50 }
+          description: Stored lowercase; unique across all providers
+        sort_order: { type: integer, default: 0 }
+
+    UpdateProviderRequest:
+      type: object
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 50 }
+        slug:
+          type: string
+          pattern: '^[a-z0-9]+(-[a-z0-9]+)*$'
+          maxLength: 50
+        type: { $ref: '#/components/schemas/WalletType' }
+        aliases:
+          type: array
+          maxItems: 20
+          items: { type: string, minLength: 1, maxLength: 50 }
+        sort_order: { type: integer }
+
+    ProviderStatusRequest:
+      type: object
+      required: [is_active]
+      properties:
+        is_active: { type: boolean }
+
+    # ------------------------------------------------ System
+    HealthResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessBase'
+        - type: object
+          required: [data]
+          properties:
+            data:
+              type: object
+              required: [status, database, storage]
+              properties:
+                status: { type: string, example: ok }
+                database: { type: string, example: ok }
+                storage: { type: string, example: ok }
