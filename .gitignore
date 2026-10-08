@@ -2,4 +2,5 @@
 .env
 .idea/
 docs/
-.claude/
+.claude
+CLAUDE.md
