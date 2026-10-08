@@ -7,7 +7,8 @@ import (
 	"go.uber.org/fx/fxevent"
 )
 
-var Module = fx.Module("logger",
+var Module = fx.Module(
+	"logger",
 	fx.Provide(New),
 )
 

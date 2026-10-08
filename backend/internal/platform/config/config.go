@@ -118,5 +118,6 @@ func Load() (Config, error) {
 	if cfg.JWT.AccessTTL <= 0 {
 		return Config{}, errors.New("config: JWT_ACCESS_TTL must be positive")
 	}
+
 	return cfg, nil
 }

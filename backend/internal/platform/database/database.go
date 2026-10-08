@@ -16,12 +16,15 @@ func New(lc fx.Lifecycle, cfg config.Config) (*gorm.DB, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	sqlDB, err := db.DB()
 	if err != nil {
 		return nil, err
 	}
+
 	lc.Append(fx.Hook{
 		OnStop: func(context.Context) error { return sqlDB.Close() },
 	})
+	
 	return db, nil
 }

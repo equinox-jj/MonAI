@@ -30,12 +30,14 @@ func startServer(lc fx.Lifecycle, app *fiber.App, cfg config.Config, log *slog.L
 			if err != nil {
 				return err
 			}
+
 			log.Info("http server listening", "addr", ln.Addr().String())
 			go func() {
 				if err := app.Listener(ln, fiber.ListenConfig{DisableStartupMessage: true}); err != nil {
 					log.Error("http server stopped", "error", err)
 				}
 			}()
+			
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {
