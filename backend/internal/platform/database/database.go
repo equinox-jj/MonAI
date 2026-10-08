@@ -12,7 +12,7 @@ import (
 
 // New opens the PostgreSQL connection and closes it when the app stops.
 func New(lc fx.Lifecycle, cfg config.Config) (*gorm.DB, error) {
-	db, err := gorm.Open(postgres.Open(cfg.DatabaseURL), &gorm.Config{})
+	db, err := gorm.Open(postgres.Open(cfg.Postgres.DatabaseURL), &gorm.Config{})
 	if err != nil {
 		return nil, err
 	}

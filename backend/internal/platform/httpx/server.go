@@ -26,7 +26,7 @@ func NewAPIRouter(app *fiber.App) fiber.Router {
 func startServer(lc fx.Lifecycle, app *fiber.App, cfg config.Config, log *slog.Logger) {
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			ln, err := net.Listen("tcp", cfg.HTTPAddr)
+			ln, err := net.Listen("tcp", ":"+cfg.App.Port)
 			if err != nil {
 				return err
 			}
