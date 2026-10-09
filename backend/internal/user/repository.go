@@ -6,17 +6,13 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5/pgconn"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
 
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 )
 
-const (
-	pgUniqueViolation = "23505"
-	emailUniqueIndex  = "users_email_key"
-)
+const emailUniqueIndex = "users_email_key"
 
 type Repository interface {
 	// Create inserts u and fills its ID and timestamps.
@@ -42,7 +38,7 @@ func NewRepository(db *gorm.DB) Repository {
 
 func (r *repository) Create(ctx context.Context, u *User) error {
 	if err := database.Conn(ctx, r.db).Create(u).Error; err != nil {
-		if isEmailTaken(err) {
+		if database.IsUniqueViolation(err, emailUniqueIndex) {
 			return ErrEmailTaken
 		}
 
@@ -119,9 +115,4 @@ func notFound(err error) error {
 	}
 
 	return err
-}
-
-func isEmailTaken(err error) bool {
-	var pgErr *pgconn.PgError
-	return errors.As(err, &pgErr) && pgErr.Code == pgUniqueViolation && pgErr.ConstraintName == emailUniqueIndex
 }
