@@ -7,6 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
+	"github.com/equinox-jj/MonAI/backend/internal/category"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/security"
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
@@ -27,29 +28,32 @@ type Service interface {
 }
 
 type service struct {
-	users  user.Repository
-	me     user.Service
-	roles  rbac.Service
-	jwt    security.JWTManager
-	hasher security.PasswordHasher
-	tx     database.TxManager
+	users      user.Repository
+	me         user.Service
+	roles      rbac.Service
+	categories category.Service
+	jwt        security.JWTManager
+	hasher     security.PasswordHasher
+	tx         database.TxManager
 }
 
 func NewService(
 	users user.Repository,
 	me user.Service,
 	roles rbac.Service,
+	categories category.Service,
 	jwt security.JWTManager,
 	hasher security.PasswordHasher,
 	tx database.TxManager,
 ) Service {
 	return &service{
-		users:  users,
-		me:     me,
-		roles:  roles,
-		jwt:    jwt,
-		hasher: hasher,
-		tx:     tx,
+		users:      users,
+		me:         me,
+		roles:      roles,
+		categories: categories,
+		jwt:        jwt,
+		hasher:     hasher,
+		tx:         tx,
 	}
 }
 
@@ -81,8 +85,8 @@ func (s *service) Register(ctx context.Context, req RegisterRequest) (AuthRespon
 			return err
 		}
 
-		// TODO(phase 1b): seed default wallet and categories
-		return nil
+		// TODO(phase 1b): seed default wallet
+		return s.categories.SeedDefaults(ctx, u.ID)
 	})
 	if err != nil {
 		return AuthResponse{}, err

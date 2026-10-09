@@ -60,6 +60,16 @@ func NewValidator() *Validator {
 		return strings.ContainsFunc(fl.Field().String(), unicode.IsDigit)
 	})
 
+	// Validate an Optional by its inner value. Absent or null yields nil, so
+	// omitempty skips it.
+	v.RegisterCustomTypeFunc(func(f reflect.Value) any {
+		o := f.Interface().(Optional[*string])
+		if !o.Set || o.Value == nil {
+			return nil
+		}
+		return *o.Value
+	}, Optional[*string]{})
+
 	return &Validator{v: v}
 }
 
