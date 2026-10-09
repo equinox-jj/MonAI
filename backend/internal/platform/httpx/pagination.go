@@ -36,3 +36,10 @@ func NewPageMeta(page, perPage int, total int64) PageMeta {
 func (m PageMeta) Offset() int {
 	return (m.Page - 1) * m.PerPage
 }
+
+// CursorMeta is the spec's meta object for cursor-paginated lists.
+type CursorMeta struct {
+	NextCursor *string `json:"next_cursor"` // null on the last page
+	HasMore    bool    `json:"has_more"`
+	Limit      int     `json:"limit"`
+}
