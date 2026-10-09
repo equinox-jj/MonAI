@@ -22,6 +22,9 @@ type Service interface {
 	// HasPermission reports whether the role is granted code, from the
 	// per-role cache.
 	HasPermission(ctx context.Context, roleID int64, code string) (bool, error)
+	// UserHasPermission reports whether the user's role is granted code. It
+	// returns ErrUserNotFound when the user no longer exists.
+	UserHasPermission(ctx context.Context, userID uuid.UUID, code string) (bool, error)
 	// EnsureNotLastAdmin returns ErrLastAdmin when userID, holding roleID, is
 	// the only user whose role holds every permission. Call it inside
 	// TxManager.WithinTx together with the write that removes the role (e.g.
@@ -70,6 +73,15 @@ func (s *service) HasPermission(ctx context.Context, roleID int64, code string) 
 	_, ok := e.set[code]
 
 	return ok, nil
+}
+
+func (s *service) UserHasPermission(ctx context.Context, userID uuid.UUID, code string) (bool, error) {
+	roleID, err := s.repo.FindUserRoleID(ctx, userID)
+	if err != nil {
+		return false, err
+	}
+
+	return s.HasPermission(ctx, roleID, code)
 }
 
 func (s *service) EnsureNotLastAdmin(ctx context.Context, userID uuid.UUID, roleID int64) error {

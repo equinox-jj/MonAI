@@ -37,6 +37,9 @@ type Repository interface {
 	// TxManager.WithinTx to keep two concurrent removals from both passing the
 	// last_admin check.
 	CountFullAdminsExcept(ctx context.Context, userID uuid.UUID) (int64, error)
+	// FindUserRoleID returns the user's role ID, or ErrUserNotFound. It reads
+	// users directly because the user package already imports rbac.
+	FindUserRoleID(ctx context.Context, userID uuid.UUID) (int64, error)
 }
 
 type repository struct {
@@ -95,6 +98,20 @@ func (r *repository) CountFullAdminsExcept(ctx context.Context, userID uuid.UUID
 		Scan(&n).Error
 
 	return n, err
+}
+
+func (r *repository) FindUserRoleID(ctx context.Context, userID uuid.UUID) (int64, error) {
+	var roleIDs []int64
+	if err := database.Conn(ctx, r.db).
+		Raw(`SELECT role_id FROM users WHERE id = ?`, userID).
+		Scan(&roleIDs).Error; err != nil {
+		return 0, err
+	}
+	if len(roleIDs) == 0 {
+		return 0, ErrUserNotFound
+	}
+
+	return roleIDs[0], nil
 }
 
 func (r *repository) findRole(ctx context.Context, query string, args ...any) (*Role, error) {

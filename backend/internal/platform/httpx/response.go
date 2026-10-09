@@ -31,3 +31,19 @@ func write(c fiber.Ctx, status int, message string, data any) error {
 		Data:    data,
 	})
 }
+
+// pagedResponse is the success envelope of an offset-paginated list.
+type pagedResponse struct {
+	successResponse
+	Meta PageMeta `json:"meta"`
+}
+
+// Paginated writes a 200 success envelope with data and its page meta.
+func Paginated(c fiber.Ctx, message string, data any, meta PageMeta) error {
+	return c.Status(fiber.StatusOK).JSON(pagedResponse{
+		Success: true,
+		Message: message,
+		Data:    data,
+		Meta:    meta,
+	})
+}
