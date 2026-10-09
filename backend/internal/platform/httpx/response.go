@@ -64,3 +64,19 @@ func Paginated(c fiber.Ctx, message string, data any, meta PageMeta) error {
 		Meta:    meta,
 	})
 }
+
+// cursorResponse is the success envelope of a cursor-paginated list.
+type cursorResponse struct {
+	successResponse
+	Meta CursorMeta `json:"meta"`
+}
+
+// CursorPaginated writes a 200 success envelope with data and its cursor meta.
+func CursorPaginated(c fiber.Ctx, message string, data any, meta CursorMeta) error {
+	return c.Status(fiber.StatusOK).JSON(cursorResponse{
+		Success: true,
+		Message: message,
+		Data:    data,
+		Meta:    meta,
+	})
+}
