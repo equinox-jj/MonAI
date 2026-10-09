@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"strings"
 	"time"
 
 	"github.com/spf13/viper"
@@ -43,6 +44,9 @@ type MinIO struct {
 	UseSSL        bool   // MINIO_USE_SSL
 	BucketPrivate string // MINIO_BUCKET_PRIVATE
 	BucketPublic  string // MINIO_BUCKET_PUBLIC
+	// PublicURL is the base URL clients read the public bucket from. It
+	// defaults to MINIO_ENDPOINT with the scheme from MINIO_USE_SSL.
+	PublicURL string // MINIO_PUBLIC_URL
 }
 
 // JWT holds access token settings.
@@ -101,6 +105,7 @@ func Load() (Config, error) {
 			UseSSL:        v.GetBool("MINIO_USE_SSL"),
 			BucketPrivate: v.GetString("MINIO_BUCKET_PRIVATE"),
 			BucketPublic:  v.GetString("MINIO_BUCKET_PUBLIC"),
+			PublicURL:     strings.TrimRight(v.GetString("MINIO_PUBLIC_URL"), "/"),
 		},
 		JWT: JWT{
 			Secret:    v.GetString("JWT_SECRET"),
@@ -120,6 +125,13 @@ func Load() (Config, error) {
 	}
 	if cfg.MinIO.BucketPrivate == "" || cfg.MinIO.BucketPublic == "" {
 		return Config{}, errors.New("config: MINIO_BUCKET_PRIVATE and MINIO_BUCKET_PUBLIC are required")
+	}
+	if cfg.MinIO.PublicURL == "" {
+		scheme := "http"
+		if cfg.MinIO.UseSSL {
+			scheme = "https"
+		}
+		cfg.MinIO.PublicURL = scheme + "://" + cfg.MinIO.Endpoint
 	}
 	if len(cfg.JWT.Secret) < 32 {
 		return Config{}, errors.New("config: JWT_SECRET must be at least 32 characters")

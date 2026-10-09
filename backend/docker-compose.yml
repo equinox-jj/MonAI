@@ -69,6 +69,7 @@ services:
       APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: postgres://${POSTGRES_USER:-monai}:${POSTGRES_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
       MINIO_ENDPOINT: minio:9000
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:${MINIO_API_PORT:-9000}}
     ports:
       - "${API_PORT:-8080}:${API_PORT:-8080}"
     depends_on:

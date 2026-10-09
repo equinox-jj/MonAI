@@ -32,10 +32,13 @@ type Storage interface {
 	Delete(ctx context.Context, bucket, key string) error
 	// DeletePrefix removes every object under prefix (e.g. "receipts/{user_id}/").
 	DeletePrefix(ctx context.Context, bucket, prefix string) error
+	// PublicURL is the permanent URL of key in a public-read bucket.
+	PublicURL(bucket, key string) string
 }
 
 type minioStorage struct {
-	client *minio.Client
+	client    *minio.Client
+	publicURL string
 }
 
 // New connects to MinIO and, on start, fails if a configured bucket is missing.
@@ -64,7 +67,7 @@ func New(lc fx.Lifecycle, cfg config.Config) (Storage, error) {
 		},
 	})
 
-	return &minioStorage{client: client}, nil
+	return &minioStorage{client: client, publicURL: cfg.MinIO.PublicURL}, nil
 }
 
 func (s *minioStorage) PresignPut(ctx context.Context, bucket, key string, ttl time.Duration) (string, error) {
@@ -110,4 +113,8 @@ func (s *minioStorage) DeletePrefix(ctx context.Context, bucket, prefix string) 
 		}
 	}
 	return nil
+}
+
+func (s *minioStorage) PublicURL(bucket, key string) string {
+	return s.publicURL + "/" + bucket + "/" + key
 }
