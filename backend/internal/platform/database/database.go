@@ -25,6 +25,6 @@ func New(lc fx.Lifecycle, cfg config.Config) (*gorm.DB, error) {
 	lc.Append(fx.Hook{
 		OnStop: func(context.Context) error { return sqlDB.Close() },
 	})
-	
+
 	return db, nil
 }

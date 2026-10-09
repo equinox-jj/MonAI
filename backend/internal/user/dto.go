@@ -63,33 +63,3 @@ type UploadURLResponse struct {
 	ObjectKey string            `json:"object_key"`
 	ExpiresIn int               `json:"expires_in"` // seconds
 }
-
-// ---------------------------------------------------------------- Mappers
-
-// NewMeResponse maps a user to its API shape. avatarURL is the presigned GET URL
-// for u.AvatarKey (nil when the user has no avatar).
-func NewMeResponse(u *User, role RoleSummary, permissions []string, avatarURL *string) MeResponse {
-	if permissions == nil {
-		permissions = []string{}
-	}
-	return MeResponse{
-		ID:          u.ID,
-		Name:        u.Name,
-		Email:       u.Email,
-		AvatarURL:   avatarURL,
-		Role:        role,
-		Permissions: permissions,
-		CreatedAt:   u.CreatedAt.UTC(),
-	}
-}
-
-// NewUploadURLResponse builds the presigned upload response for a PUT URL.
-func NewUploadURLResponse(uploadURL, objectKey, contentType string, expiresIn time.Duration) UploadURLResponse {
-	return UploadURLResponse{
-		UploadURL: uploadURL,
-		Method:    "PUT",
-		Headers:   map[string]string{"Content-Type": contentType},
-		ObjectKey: objectKey,
-		ExpiresIn: int(expiresIn.Seconds()),
-	}
-}
