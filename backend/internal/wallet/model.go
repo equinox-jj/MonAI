@@ -32,3 +32,11 @@ type Wallet struct {
 }
 
 func (Wallet) TableName() string { return "wallets" }
+
+// Detail is a wallet with its calculated balance and the provider's logo key
+// (nil for custom wallets and deleted providers).
+type Detail struct {
+	Wallet         `gorm:"embedded"`
+	LogoKey        *string `gorm:"column:logo_key"`
+	CurrentBalance int64   `gorm:"column:current_balance"`
+}
