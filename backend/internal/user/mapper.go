@@ -6,14 +6,6 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 )
 
-// ToRoleSummary maps a role entity to the summary embedded in MeResponse.
-func ToRoleSummary(r *rbac.Role) RoleSummary {
-	return RoleSummary{
-		Slug: r.Slug,
-		Name: r.Name,
-	}
-}
-
 // ToMeResponse maps a user and its role to the API shape. permissions are the
 // role's permission codes (from the per-role cache), and avatarURL is the
 // presigned GET URL for u.AvatarKey (nil when the user has no avatar).
@@ -26,7 +18,7 @@ func ToMeResponse(u *User, role *rbac.Role, permissions []string, avatarURL *str
 		Name:        u.Name,
 		Email:       u.Email,
 		AvatarURL:   avatarURL,
-		Role:        ToRoleSummary(role),
+		Role:        rbac.ToRoleSummary(role),
 		Permissions: permissions,
 		CreatedAt:   u.CreatedAt.UTC(),
 	}

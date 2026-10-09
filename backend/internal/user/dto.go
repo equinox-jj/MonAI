@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 )
 
 // Avatar upload limits (ERD §storage: expense-private/avatars/{user_id}/…).
@@ -37,22 +39,16 @@ type ConfirmAvatarRequest struct {
 
 // ---------------------------------------------------------------- Responses
 
-// RoleSummary is the user's role as exposed in MeResponse.
-type RoleSummary struct {
-	Slug string `json:"slug"`
-	Name string `json:"name"`
-}
-
 // MeResponse is the current user's profile, role and permissions. It is the data
 // of GET/PATCH /me and PUT /me/avatar, and the user in the auth responses.
 type MeResponse struct {
-	ID          uuid.UUID   `json:"id"`
-	Name        string      `json:"name"`
-	Email       string      `json:"email"`
-	AvatarURL   *string     `json:"avatar_url"` // presigned GET URL, null when unset
-	Role        RoleSummary `json:"role"`
-	Permissions []string    `json:"permissions"`
-	CreatedAt   time.Time   `json:"created_at"`
+	ID          uuid.UUID        `json:"id"`
+	Name        string           `json:"name"`
+	Email       string           `json:"email"`
+	AvatarURL   *string          `json:"avatar_url"` // presigned GET URL, null when unset
+	Role        rbac.RoleSummary `json:"role"`
+	Permissions []string         `json:"permissions"`
+	CreatedAt   time.Time        `json:"created_at"`
 }
 
 // UploadURLResponse is a presigned PUT URL the client uploads the file to.
