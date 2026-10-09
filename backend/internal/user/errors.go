@@ -7,14 +7,13 @@ import (
 )
 
 var (
-	ErrNotFound   = httpx.ErrNotFound
-	ErrEmailTaken = httpx.ErrConflict.WithFields(httpx.FieldError{
-		Field:   "email",
-		Code:    "already_exists",
-		Message: "This email is already registered.",
-	})
-	ErrInvalidPassword = httpx.NewError(fiber.StatusUnprocessableEntity, "invalid_password",
-		"The password is incorrect.")
+	ErrNotFound        = httpx.ErrNotFound
+	ErrEmailTaken      = httpx.ErrConflict.WithMessage("Email already exists")
+	ErrInvalidPassword = httpx.NewError(
+		fiber.StatusUnprocessableEntity,
+		"invalid_password",
+		"The password is incorrect",
+	)
 
 	ErrNameBlank = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
 		Field:   "name",

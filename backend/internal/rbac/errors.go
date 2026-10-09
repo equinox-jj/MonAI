@@ -8,6 +8,9 @@ import (
 
 var (
 	ErrRoleNotFound = httpx.ErrNotFound
-	ErrLastAdmin    = httpx.NewError(fiber.StatusUnprocessableEntity, "last_admin",
-		"You are the last admin. Assign another admin first.")
+	ErrLastAdmin    = httpx.NewError(
+		fiber.StatusUnprocessableEntity,
+		"last_admin",
+		"You are the last admin. Assign another admin first",
+	)
 )

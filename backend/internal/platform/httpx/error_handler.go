@@ -83,7 +83,7 @@ func fromFiberError(fe *fiber.Error) *Error {
 		return ErrInvalidRequest
 	case fiber.StatusUnprocessableEntity:
 		// c.Bind().Body() returns this when the Content-Type is unsupported.
-		return ErrInvalidRequest.WithMessage("Content-Type must be application/json.")
+		return ErrInvalidRequest.WithMessage("Content-Type must be application/json")
 	case fiber.StatusUnauthorized:
 		return ErrUnauthorized
 	case fiber.StatusForbidden:
@@ -100,5 +100,5 @@ func fromFiberError(fe *fiber.Error) *Error {
 
 	// Other 4xx (405, 413, …): "Method Not Allowed" → method_not_allowed.
 	text := http.StatusText(fe.Code)
-	return NewError(fe.Code, strings.ToLower(strings.ReplaceAll(text, " ", "_")), text+".")
+	return NewError(fe.Code, strings.ToLower(strings.ReplaceAll(text, " ", "_")), text)
 }

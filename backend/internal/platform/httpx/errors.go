@@ -17,7 +17,7 @@ type Error struct {
 // NewError declares an API error, e.g.
 //
 //	var ErrHasTransactions = httpx.NewError(fiber.StatusUnprocessableEntity,
-//		"wallet_has_transactions", "This wallet has transactions. Archive it instead.")
+//		"wallet_has_transactions", "This wallet has transactions. Archive it instead")
 func NewError(status int, code, message string) *Error {
 	return &Error{Status: status, Code: code, Message: message}
 }
@@ -50,12 +50,12 @@ func (e *Error) WithMessage(message string) *Error {
 
 // Shared errors, one per generic error code in the API spec.
 var (
-	ErrInvalidRequest   = NewError(fiber.StatusBadRequest, "invalid_request", "The request body is not valid JSON.")
-	ErrUnauthorized     = NewError(fiber.StatusUnauthorized, "unauthorized", "Authentication required.")
-	ErrForbidden        = NewError(fiber.StatusForbidden, "forbidden", "You do not have permission to perform this action.")
-	ErrNotFound         = NewError(fiber.StatusNotFound, "not_found", "Resource not found.")
-	ErrConflict         = NewError(fiber.StatusConflict, "conflict", "This resource already exists.")
-	ErrValidationFailed = NewError(fiber.StatusUnprocessableEntity, "validation_failed", "Some fields are invalid.")
-	ErrRateLimited      = NewError(fiber.StatusTooManyRequests, "rate_limited", "Too many requests. Please try again later.")
-	ErrInternal         = NewError(fiber.StatusInternalServerError, "internal_error", "Something went wrong.")
+	ErrInvalidRequest   = NewError(fiber.StatusBadRequest, "invalid_request", "The request body is not valid JSON")
+	ErrUnauthorized     = NewError(fiber.StatusUnauthorized, "unauthorized", "Authentication required")
+	ErrForbidden        = NewError(fiber.StatusForbidden, "forbidden", "You do not have permission to perform this action")
+	ErrNotFound         = NewError(fiber.StatusNotFound, "not_found", "Resource not found")
+	ErrConflict         = NewError(fiber.StatusConflict, "conflict", "This resource already exists")
+	ErrValidationFailed = NewError(fiber.StatusUnprocessableEntity, "validation_failed", "Some fields are invalid")
+	ErrRateLimited      = NewError(fiber.StatusTooManyRequests, "rate_limited", "Too many requests. Please try again later")
+	ErrInternal         = NewError(fiber.StatusInternalServerError, "internal_error", "Something went wrong")
 )
