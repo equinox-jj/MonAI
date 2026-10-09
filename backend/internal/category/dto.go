@@ -12,8 +12,8 @@ import (
 
 // ListCategoriesQuery is the query of GET /categories.
 type ListCategoriesQuery struct {
-	Type          *Type `query:"type" validate:"omitempty,oneof=EXPENSE INCOME"`
-	IncludeHidden bool  `query:"include_hidden"`
+	Type          *Type `json:"type" query:"type" validate:"omitempty,oneof=EXPENSE INCOME"`
+	IncludeHidden bool  `json:"include_hidden" query:"include_hidden"`
 }
 
 // CreateCategoryRequest is the body of POST /categories.

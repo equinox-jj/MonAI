@@ -8,11 +8,7 @@ import (
 
 var (
 	ErrNotFound  = httpx.ErrNotFound
-	ErrNameTaken = httpx.ErrConflict.WithMessage("Category name already exists").WithFields(httpx.FieldError{
-		Field:   "name",
-		Code:    "already_exists",
-		Message: "is already used by another category of this type",
-	})
+	ErrNameTaken = httpx.ErrConflict.WithMessage("Category name already exists")
 
 	ErrSystemLocked = httpx.NewError(
 		fiber.StatusUnprocessableEntity,
