@@ -32,6 +32,23 @@ func write(c fiber.Ctx, status int, message string, data any) error {
 	})
 }
 
+// metaResponse is the success envelope of an unpaginated list with meta.
+type metaResponse struct {
+	successResponse
+	Meta any `json:"meta"`
+}
+
+// OKWithMeta writes a 200 success envelope with data and a non-pagination
+// meta (e.g. a list total).
+func OKWithMeta(c fiber.Ctx, message string, data, meta any) error {
+	return c.Status(fiber.StatusOK).JSON(metaResponse{
+		Success: true,
+		Message: message,
+		Data:    data,
+		Meta:    meta,
+	})
+}
+
 // pagedResponse is the success envelope of an offset-paginated list.
 type pagedResponse struct {
 	successResponse

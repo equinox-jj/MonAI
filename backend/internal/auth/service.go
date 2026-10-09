@@ -12,6 +12,7 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/security"
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 	"github.com/equinox-jj/MonAI/backend/internal/user"
+	"github.com/equinox-jj/MonAI/backend/internal/wallet"
 )
 
 // dummyHash is a cost-12 bcrypt hash of a random string. Login verifies
@@ -32,6 +33,7 @@ type service struct {
 	me         user.Service
 	roles      rbac.Service
 	categories category.Service
+	wallets    wallet.Service
 	jwt        security.JWTManager
 	hasher     security.PasswordHasher
 	tx         database.TxManager
@@ -42,6 +44,7 @@ func NewService(
 	me user.Service,
 	roles rbac.Service,
 	categories category.Service,
+	wallets wallet.Service,
 	jwt security.JWTManager,
 	hasher security.PasswordHasher,
 	tx database.TxManager,
@@ -51,6 +54,7 @@ func NewService(
 		me:         me,
 		roles:      roles,
 		categories: categories,
+		wallets:    wallets,
 		jwt:        jwt,
 		hasher:     hasher,
 		tx:         tx,
@@ -85,7 +89,9 @@ func (s *service) Register(ctx context.Context, req RegisterRequest) (AuthRespon
 			return err
 		}
 
-		// TODO(phase 1b): seed default wallet
+		if err := s.wallets.SeedDefault(ctx, u.ID); err != nil {
+			return err
+		}
 		return s.categories.SeedDefaults(ctx, u.ID)
 	})
 	if err != nil {
