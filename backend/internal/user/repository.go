@@ -45,8 +45,10 @@ func (r *repository) Create(ctx context.Context, u *User) error {
 		if isEmailTaken(err) {
 			return ErrEmailTaken
 		}
+
 		return err
 	}
+
 	return nil
 }
 
@@ -55,14 +57,18 @@ func (r *repository) FindByID(ctx context.Context, id uuid.UUID) (*User, error) 
 	if err := database.Conn(ctx, r.db).First(&u, "id = ?", id).Error; err != nil {
 		return nil, notFound(err)
 	}
+
 	return &u, nil
 }
 
 func (r *repository) FindByEmail(ctx context.Context, email string) (*User, error) {
 	var u User
-	if err := database.Conn(ctx, r.db).Where("lower(email) = lower(?)", email).First(&u).Error; err != nil {
+	if err := database.Conn(ctx, r.db).
+		Where("lower(email) = lower(?)", email).
+		First(&u).Error; err != nil {
 		return nil, notFound(err)
 	}
+
 	return &u, nil
 }
 
@@ -82,6 +88,7 @@ func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
 	if res.RowsAffected == 0 {
 		return ErrNotFound
 	}
+
 	return nil
 }
 
@@ -89,14 +96,20 @@ func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
 // returns the updated row.
 func (r *repository) update(ctx context.Context, id uuid.UUID, cols map[string]any) (*User, error) {
 	cols["updated_at"] = time.Now()
+
 	var u User
-	res := database.Conn(ctx, r.db).Model(&u).Clauses(clause.Returning{}).Where("id = ?", id).Updates(cols)
+	res := database.Conn(ctx, r.db).
+		Model(&u).
+		Clauses(clause.Returning{}).
+		Where("id = ?", id).
+		Updates(cols)
 	if res.Error != nil {
 		return nil, res.Error
 	}
 	if res.RowsAffected == 0 {
 		return nil, ErrNotFound
 	}
+
 	return &u, nil
 }
 
@@ -104,6 +117,7 @@ func notFound(err error) error {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return ErrNotFound
 	}
+
 	return err
 }
 
