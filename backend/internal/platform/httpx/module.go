@@ -8,6 +8,7 @@ var Module = fx.Module(
 		NewValidator,
 		NewApp,
 		NewAPIRouter,
+		NewRequireAuth,
 	),
 	fx.Invoke(startServer),
 )
