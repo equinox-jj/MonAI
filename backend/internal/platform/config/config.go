@@ -40,6 +40,7 @@ type MinIO struct {
 	RootUser      string // MINIO_ROOT_USER
 	RootPassword  string // MINIO_ROOT_PASSWORD
 	Endpoint      string // MINIO_ENDPOINT
+	UseSSL        bool   // MINIO_USE_SSL
 	BucketPrivate string // MINIO_BUCKET_PRIVATE
 	BucketPublic  string // MINIO_BUCKET_PUBLIC
 }
@@ -68,6 +69,7 @@ func Load() (Config, error) {
 
 	v.SetDefault("APP_ENV", "development")
 	v.SetDefault("API_PORT", "8080")
+	v.SetDefault("MINIO_USE_SSL", false)
 
 	if err := v.ReadInConfig(); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return Config{}, fmt.Errorf("config: read .env: %w", err)
@@ -96,6 +98,7 @@ func Load() (Config, error) {
 			RootUser:      v.GetString("MINIO_ROOT_USER"),
 			RootPassword:  v.GetString("MINIO_ROOT_PASSWORD"),
 			Endpoint:      v.GetString("MINIO_ENDPOINT"),
+			UseSSL:        v.GetBool("MINIO_USE_SSL"),
 			BucketPrivate: v.GetString("MINIO_BUCKET_PRIVATE"),
 			BucketPublic:  v.GetString("MINIO_BUCKET_PUBLIC"),
 		},
@@ -111,6 +114,12 @@ func Load() (Config, error) {
 	}
 	if cfg.Postgres.DatabaseURL == "" {
 		return Config{}, errors.New("config: DATABASE_URL is required")
+	}
+	if cfg.MinIO.Endpoint == "" || cfg.MinIO.RootUser == "" || cfg.MinIO.RootPassword == "" {
+		return Config{}, errors.New("config: MINIO_ENDPOINT, MINIO_ROOT_USER and MINIO_ROOT_PASSWORD are required")
+	}
+	if cfg.MinIO.BucketPrivate == "" || cfg.MinIO.BucketPublic == "" {
+		return Config{}, errors.New("config: MINIO_BUCKET_PRIVATE and MINIO_BUCKET_PUBLIC are required")
 	}
 	if len(cfg.JWT.Secret) < 32 {
 		return Config{}, errors.New("config: JWT_SECRET must be at least 32 characters")

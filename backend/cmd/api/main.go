@@ -11,6 +11,8 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/logger"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/security"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/storage"
 	"github.com/equinox-jj/MonAI/backend/internal/provider"
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 	"github.com/equinox-jj/MonAI/backend/internal/report"
@@ -32,6 +34,8 @@ func options() fx.Option {
 		config.Module,
 		logger.Module,
 		database.Module,
+		security.Module,
+		storage.Module,
 		httpx.Module,
 
 		// Features
