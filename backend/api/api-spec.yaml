@@ -1047,7 +1047,7 @@ components:
           schema: { $ref: '#/components/schemas/ErrorResponse' }
           example:
             success: false
-            message: The request body is not valid JSON
+            message: The request is malformed
             data: null
             error: { code: invalid_request }
     Unauthorized:

@@ -50,7 +50,7 @@ func (e *Error) WithMessage(message string) *Error {
 
 // Shared errors, one per generic error code in the API spec.
 var (
-	ErrInvalidRequest   = NewError(fiber.StatusBadRequest, "invalid_request", "The request body is not valid JSON")
+	ErrInvalidRequest   = NewError(fiber.StatusBadRequest, "invalid_request", "The request is malformed")
 	ErrUnauthorized     = NewError(fiber.StatusUnauthorized, "unauthorized", "Authentication required")
 	ErrForbidden        = NewError(fiber.StatusForbidden, "forbidden", "You do not have permission to perform this action")
 	ErrNotFound         = NewError(fiber.StatusNotFound, "not_found", "Resource not found")
