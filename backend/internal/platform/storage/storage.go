@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -40,8 +41,15 @@ type Storage interface {
 	Ping(ctx context.Context) error
 }
 
+// region is fixed so the presign client never looks up a bucket's location:
+// it points at the public host, which the API itself may not be able to reach.
+const region = "us-east-1"
+
 type minioStorage struct {
-	client    *minio.Client
+	client *minio.Client
+	// presigner signs URLs for the public host. SigV4 signs the host header, so
+	// a URL signed for the internal endpoint can't be rewritten afterwards.
+	presigner *minio.Client
 	publicURL string
 	buckets   []string
 }
@@ -49,22 +57,41 @@ type minioStorage struct {
 // New connects to MinIO and, on start, fails if a configured bucket is missing.
 // The buckets are created by minio-init in docker-compose.yml.
 func New(lc fx.Lifecycle, cfg config.Config) (Storage, error) {
-	client, err := minio.New(cfg.MinIO.Endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(cfg.MinIO.RootUser, cfg.MinIO.RootPassword, ""),
-		Secure: cfg.MinIO.UseSSL,
-	})
+	client, err := newClient(cfg, cfg.MinIO.Endpoint, cfg.MinIO.UseSSL)
 	if err != nil {
-		return nil, fmt.Errorf("storage: %w", err)
+		return nil, err
+	}
+
+	public, err := url.Parse(cfg.MinIO.PublicURL)
+	if err != nil || public.Host == "" {
+		return nil, fmt.Errorf("storage: invalid MINIO_PUBLIC_URL %q", cfg.MinIO.PublicURL)
+	}
+	presigner, err := newClient(cfg, public.Host, public.Scheme == "https")
+	if err != nil {
+		return nil, err
 	}
 
 	s := &minioStorage{
 		client:    client,
+		presigner: presigner,
 		publicURL: cfg.MinIO.PublicURL,
 		buckets:   []string{cfg.MinIO.BucketPrivate, cfg.MinIO.BucketPublic},
 	}
 	lc.Append(fx.Hook{OnStart: s.Ping})
 
 	return s, nil
+}
+
+func newClient(cfg config.Config, endpoint string, secure bool) (*minio.Client, error) {
+	client, err := minio.New(endpoint, &minio.Options{
+		Creds:  credentials.NewStaticV4(cfg.MinIO.RootUser, cfg.MinIO.RootPassword, ""),
+		Secure: secure,
+		Region: region,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("storage: %w", err)
+	}
+	return client, nil
 }
 
 func (s *minioStorage) Ping(ctx context.Context) error {
@@ -86,7 +113,7 @@ func (s *minioStorage) Put(ctx context.Context, bucket, key string, body io.Read
 }
 
 func (s *minioStorage) PresignGet(ctx context.Context, bucket, key string, ttl time.Duration) (string, error) {
-	u, err := s.client.PresignedGetObject(ctx, bucket, key, ttl, nil)
+	u, err := s.presigner.PresignedGetObject(ctx, bucket, key, ttl, nil)
 	if err != nil {
 		return "", err
 	}
