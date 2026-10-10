@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/equinox-jj/MonAI/backend/internal/platform/period"
 )
 
 type Service interface {
@@ -27,7 +29,7 @@ func NewService(repo Repository) Service {
 // A malformed month in Get and Delete is 404, like a malformed path UUID
 // (httpx.ParamUUID): it cannot match a budget.
 func (s *service) Get(ctx context.Context, userID uuid.UUID, month string) (BudgetResponse, error) {
-	from, to, err := monthRange(month)
+	from, to, err := period.Month(month)
 	if err != nil {
 		return BudgetResponse{}, ErrNotFound
 	}
@@ -41,7 +43,7 @@ func (s *service) Get(ctx context.Context, userID uuid.UUID, month string) (Budg
 }
 
 func (s *service) Set(ctx context.Context, userID uuid.UUID, month string, req SetBudgetRequest) (BudgetResponse, error) {
-	from, to, err := monthRange(month)
+	from, to, err := period.Month(month)
 	if err != nil {
 		return BudgetResponse{}, ErrMonthInvalid
 	}
@@ -58,7 +60,7 @@ func (s *service) Set(ctx context.Context, userID uuid.UUID, month string, req S
 }
 
 func (s *service) Delete(ctx context.Context, userID uuid.UUID, month string) error {
-	if _, _, err := monthRange(month); err != nil {
+	if _, _, err := period.Month(month); err != nil {
 		return ErrNotFound
 	}
 
@@ -73,15 +75,4 @@ func (s *service) toResponse(ctx context.Context, b *Budget, from, to time.Time)
 	}
 
 	return ToBudgetResponse(b, spent), nil
-}
-
-// monthRange returns the half-open date range [from, to) of a YYYY-MM month,
-// at UTC midnight so it compares with DATE values.
-func monthRange(month string) (from, to time.Time, err error) {
-	from, err = time.Parse("2006-01", month)
-	if err != nil {
-		return time.Time{}, time.Time{}, err
-	}
-
-	return from, from.AddDate(0, 1, 0), nil
 }
