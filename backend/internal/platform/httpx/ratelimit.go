@@ -27,3 +27,8 @@ func RateLimit(max int, window time.Duration, key KeyFunc) fiber.Handler {
 func ByIP(c fiber.Ctx) string {
 	return c.IP()
 }
+
+// ByUser keys requests by the authenticated user. Put it after RequireAuth.
+func ByUser(c fiber.Ctx) string {
+	return UserID(c).String()
+}

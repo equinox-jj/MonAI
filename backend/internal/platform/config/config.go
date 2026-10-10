@@ -57,9 +57,11 @@ type JWT struct {
 }
 
 // Gemini holds AI provider settings.
+// An empty APIKey disables the AI endpoints (503 ai_unavailable).
 type Gemini struct {
-	APIKey string // GEMINI_API_KEY
-	Model  string // GEMINI_MODEL
+	APIKey  string        // GEMINI_API_KEY
+	Model   string        // GEMINI_MODEL
+	Timeout time.Duration // GEMINI_TIMEOUT
 }
 
 // Load reads the config with Viper. Precedence is env vars, then a .env file
@@ -74,6 +76,8 @@ func Load() (Config, error) {
 	v.SetDefault("APP_ENV", "development")
 	v.SetDefault("API_PORT", "8080")
 	v.SetDefault("MINIO_USE_SSL", false)
+	v.SetDefault("GEMINI_MODEL", "gemini-flash-lite-latest")
+	v.SetDefault("GEMINI_TIMEOUT", "10s")
 
 	if err := v.ReadInConfig(); err != nil && !errors.Is(err, fs.ErrNotExist) {
 		return Config{}, fmt.Errorf("config: read .env: %w", err)
@@ -82,6 +86,10 @@ func Load() (Config, error) {
 	accessTTL, err := time.ParseDuration(v.GetString("JWT_ACCESS_TTL"))
 	if err != nil {
 		return Config{}, fmt.Errorf("config: invalid JWT_ACCESS_TTL: %w", err)
+	}
+	geminiTimeout, err := time.ParseDuration(v.GetString("GEMINI_TIMEOUT"))
+	if err != nil {
+		return Config{}, fmt.Errorf("config: invalid GEMINI_TIMEOUT: %w", err)
 	}
 
 	cfg := Config{
@@ -113,8 +121,9 @@ func Load() (Config, error) {
 			AccessTTL: accessTTL,
 		},
 		Gemini: Gemini{
-			APIKey: v.GetString("GEMINI_API_KEY"),
-			Model:  v.GetString("GEMINI_MODEL"),
+			APIKey:  v.GetString("GEMINI_API_KEY"),
+			Model:   v.GetString("GEMINI_MODEL"),
+			Timeout: geminiTimeout,
 		},
 	}
 	if cfg.Postgres.DatabaseURL == "" {
@@ -138,6 +147,9 @@ func Load() (Config, error) {
 	}
 	if cfg.JWT.AccessTTL <= 0 {
 		return Config{}, errors.New("config: JWT_ACCESS_TTL must be positive")
+	}
+	if cfg.Gemini.Timeout <= 0 {
+		return Config{}, errors.New("config: GEMINI_TIMEOUT must be positive")
 	}
 
 	return cfg, nil

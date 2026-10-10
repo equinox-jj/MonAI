@@ -4,6 +4,7 @@ import (
 	"go.uber.org/fx"
 
 	"github.com/equinox-jj/MonAI/backend/internal/ai"
+	"github.com/equinox-jj/MonAI/backend/internal/ai/gemini"
 	"github.com/equinox-jj/MonAI/backend/internal/auth"
 	"github.com/equinox-jj/MonAI/backend/internal/budget"
 	"github.com/equinox-jj/MonAI/backend/internal/category"
@@ -50,6 +51,7 @@ func options() fx.Option {
 		budget.Module,
 		report.Module,
 		provider.Module,
+		gemini.Module,
 		ai.Module,
 	)
 }
