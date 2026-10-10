@@ -34,11 +34,14 @@ type Storage interface {
 	DeletePrefix(ctx context.Context, bucket, prefix string) error
 	// PublicURL is the permanent URL of key in a public-read bucket.
 	PublicURL(bucket, key string) string
+	// Ping fails if MinIO is unreachable or a configured bucket is missing.
+	Ping(ctx context.Context) error
 }
 
 type minioStorage struct {
 	client    *minio.Client
 	publicURL string
+	buckets   []string
 }
 
 // New connects to MinIO and, on start, fails if a configured bucket is missing.
@@ -52,22 +55,27 @@ func New(lc fx.Lifecycle, cfg config.Config) (Storage, error) {
 		return nil, fmt.Errorf("storage: %w", err)
 	}
 
-	lc.Append(fx.Hook{
-		OnStart: func(ctx context.Context) error {
-			for _, bucket := range []string{cfg.MinIO.BucketPrivate, cfg.MinIO.BucketPublic} {
-				ok, err := client.BucketExists(ctx, bucket)
-				if err != nil {
-					return fmt.Errorf("storage: check bucket %q: %w", bucket, err)
-				}
-				if !ok {
-					return fmt.Errorf("storage: bucket %q does not exist", bucket)
-				}
-			}
-			return nil
-		},
-	})
+	s := &minioStorage{
+		client:    client,
+		publicURL: cfg.MinIO.PublicURL,
+		buckets:   []string{cfg.MinIO.BucketPrivate, cfg.MinIO.BucketPublic},
+	}
+	lc.Append(fx.Hook{OnStart: s.Ping})
 
-	return &minioStorage{client: client, publicURL: cfg.MinIO.PublicURL}, nil
+	return s, nil
+}
+
+func (s *minioStorage) Ping(ctx context.Context) error {
+	for _, bucket := range s.buckets {
+		ok, err := s.client.BucketExists(ctx, bucket)
+		if err != nil {
+			return fmt.Errorf("storage: check bucket %q: %w", bucket, err)
+		}
+		if !ok {
+			return fmt.Errorf("storage: bucket %q does not exist", bucket)
+		}
+	}
+	return nil
 }
 
 func (s *minioStorage) PresignPut(ctx context.Context, bucket, key string, ttl time.Duration) (string, error) {

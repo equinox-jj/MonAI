@@ -7,6 +7,7 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/auth"
 	"github.com/equinox-jj/MonAI/backend/internal/budget"
 	"github.com/equinox-jj/MonAI/backend/internal/category"
+	"github.com/equinox-jj/MonAI/backend/internal/health"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
@@ -39,6 +40,7 @@ func options() fx.Option {
 		httpx.Module,
 
 		// Features
+		health.Module,
 		rbac.Module,
 		auth.Module,
 		user.Module,

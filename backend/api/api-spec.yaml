@@ -998,6 +998,11 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                success: false
+                message: 'Unavailable: storage'
+                data: null
+                error: { code: service_unavailable }
 
 components:
   securitySchemes:
@@ -1200,7 +1205,7 @@ components:
             Stable machine-readable code: `invalid_request`, `invalid_cursor`,
             `invalid_credentials`, `unauthorized`, `forbidden`, `not_found`, `conflict`,
             `validation_failed`, a business rule code, `rate_limited`, `ai_unavailable`,
-            `internal_error`.
+            `service_unavailable`, `internal_error`.
           example: validation_failed
         fields:
           type: array
