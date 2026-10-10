@@ -20,4 +20,5 @@ var (
 		Code:    "required",
 		Message: "must not be blank",
 	})
+	ErrNoFields = httpx.ErrValidationFailed.WithMessage("At least one field is required")
 )

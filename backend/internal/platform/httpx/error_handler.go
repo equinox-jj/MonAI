@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/requestid"
 )
 
 // errorResponse is the spec's ErrorResponse envelope.
@@ -36,6 +37,7 @@ func NewErrorHandler(log *slog.Logger) fiber.ErrorHandler {
 		if e.Status >= fiber.StatusInternalServerError {
 			// Never log the body: it may hold passwords or financial data.
 			log.Error("request failed",
+				"request_id", requestid.FromContext(c),
 				"method", c.Method(),
 				"path", c.Path(),
 				"status", e.Status,

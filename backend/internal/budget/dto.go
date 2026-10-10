@@ -4,7 +4,7 @@ package budget
 
 // SetBudgetRequest is the body of PUT /budgets/{month}.
 type SetBudgetRequest struct {
-	LimitAmount int64 `json:"limit_amount" validate:"required,min=1"`
+	LimitAmount int64 `json:"limit_amount" validate:"required,min=1,max=999999999999999"`
 }
 
 // ---------------------------------------------------------------- Responses

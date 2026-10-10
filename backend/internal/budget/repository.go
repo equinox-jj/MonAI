@@ -2,7 +2,6 @@ package budget
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -39,7 +38,7 @@ func (r *repository) FindByMonth(ctx context.Context, userID uuid.UUID, month st
 	if err := database.Conn(ctx, r.db).
 		Where("user_id = ? AND month = ?", userID, month).
 		First(&b).Error; err != nil {
-		return nil, notFound(err)
+		return nil, database.NotFound(err, ErrNotFound)
 	}
 
 	return &b, nil
@@ -85,12 +84,4 @@ func (r *repository) SpentBetween(ctx context.Context, userID uuid.UUID, from, t
 		Scan(&spent).Error
 
 	return spent, err
-}
-
-func notFound(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrNotFound
-	}
-
-	return err
 }

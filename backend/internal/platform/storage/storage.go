@@ -31,6 +31,9 @@ type Storage interface {
 	PresignGet(ctx context.Context, bucket, key string, ttl time.Duration) (string, error)
 	// Stat returns ErrObjectNotFound when the key does not exist.
 	Stat(ctx context.Context, bucket, key string) (ObjectInfo, error)
+	// Copy copies srcKey to dstKey within bucket, server side. It returns
+	// ErrObjectNotFound when srcKey does not exist.
+	Copy(ctx context.Context, bucket, srcKey, dstKey string) error
 	// Delete is idempotent: a missing key is not an error.
 	Delete(ctx context.Context, bucket, key string) error
 	// DeletePrefix removes every object under prefix (e.g. "receipts/{user_id}/").
@@ -84,7 +87,7 @@ func New(lc fx.Lifecycle, cfg config.Config) (Storage, error) {
 
 func newClient(cfg config.Config, endpoint string, secure bool) (*minio.Client, error) {
 	client, err := minio.New(endpoint, &minio.Options{
-		Creds:  credentials.NewStaticV4(cfg.MinIO.RootUser, cfg.MinIO.RootPassword, ""),
+		Creds:  credentials.NewStaticV4(cfg.MinIO.AccessKey, cfg.MinIO.SecretKey, ""),
 		Secure: secure,
 		Region: region,
 	})
@@ -131,6 +134,17 @@ func (s *minioStorage) Stat(ctx context.Context, bucket, key string) (ObjectInfo
 	return ObjectInfo{Size: info.Size, ContentType: info.ContentType}, nil
 }
 
+func (s *minioStorage) Copy(ctx context.Context, bucket, srcKey, dstKey string) error {
+	_, err := s.client.CopyObject(ctx,
+		minio.CopyDestOptions{Bucket: bucket, Object: dstKey},
+		minio.CopySrcOptions{Bucket: bucket, Object: srcKey},
+	)
+	if minio.ToErrorResponse(err).Code == minio.NoSuchKey {
+		return ErrObjectNotFound
+	}
+	return err
+}
+
 func (s *minioStorage) Delete(ctx context.Context, bucket, key string) error {
 	return s.client.RemoveObject(ctx, bucket, key, minio.RemoveObjectOptions{})
 }
@@ -151,4 +165,16 @@ func (s *minioStorage) DeletePrefix(ctx context.Context, bucket, prefix string) 
 
 func (s *minioStorage) PublicURL(bucket, key string) string {
 	return s.publicURL + "/" + bucket + "/" + key
+}
+
+// NullablePublicURL returns a function mapping a nullable key in bucket to its
+// public URL, keeping nil as nil (for optional fields such as logo_url).
+func NullablePublicURL(store Storage, bucket string) func(key *string) *string {
+	return func(key *string) *string {
+		if key == nil {
+			return nil
+		}
+		url := store.PublicURL(bucket, *key)
+		return &url
+	}
 }

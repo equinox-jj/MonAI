@@ -20,11 +20,13 @@ info:
     - Requests for records owned by another user return `404 not_found`.
 
     ## Authentication
-    `Authorization: Bearer <access_token>`. The token is a JWT (HS256) with `sub`, `iat`, `exp`;
-    default lifetime 7 days. Roles and permissions are not in the token; they are loaded
-    from the database on each request.
+    `Authorization: Bearer <access_token>`. The token is a JWT (HS256) with `sub`, `ver`, `iat`,
+    `exp`; default lifetime 7 days. Roles and permissions are not in the token; they are loaded
+    from the database on each request. `ver` is the user's token version: `POST /auth/logout-all`
+    and `PUT /auth/password` increment it, which revokes every token issued before (401
+    `unauthorized`). A deleted user's tokens are also rejected with 401.
 
-    Reserved for a later release: `POST /auth/refresh`, `POST /auth/logout-all`.
+    Reserved for a later release: `POST /auth/refresh`.
 servers:
   - url: http://localhost:8080/api/v1
     description: Local development
@@ -77,6 +79,7 @@ paths:
                     name: Joshua
                     email: joshua@example.com
                     avatar_url: null
+                    timezone: Asia/Jakarta
                     role: { slug: user, name: User }
                     permissions: []
                     created_at: '2026-10-08T12:30:00Z'
@@ -128,6 +131,62 @@ paths:
         '429': { $ref: '#/components/responses/RateLimited' }
         '500': { $ref: '#/components/responses/InternalError' }
 
+  /auth/logout-all:
+    post:
+      tags: [Auth]
+      operationId: logoutAll
+      summary: Revoke every access token of the current user
+      description: |
+        Signs the user out on every device, this one included: all tokens issued before this
+        call are rejected with 401 `unauthorized`. Log in again to get a new token.
+      responses:
+        '200':
+          description: Tokens revoked
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmptyResponse' }
+              example:
+                success: true
+                message: Logged out from all devices.
+                data: null
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
+  /auth/password:
+    put:
+      tags: [Auth]
+      operationId: changePassword
+      summary: Change the password
+      description: |
+        Requires the current password (422 `invalid_password` when wrong). Revokes every token
+        issued before, so other devices are signed out, and returns a new token for this one.
+        Failed attempts are rate-limited per user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/ChangePasswordRequest' }
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AuthResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '422':
+          description: Validation failed, or `invalid_password`
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+              example:
+                success: false
+                message: The password is incorrect
+                data: null
+                error: { code: invalid_password }
+        '429': { $ref: '#/components/responses/RateLimited' }
+        '500': { $ref: '#/components/responses/InternalError' }
+
   # ---------------------------------------------------------------- Me
   /me:
     get:
@@ -145,7 +204,7 @@ paths:
     patch:
       tags: [Me]
       operationId: updateMe
-      summary: Update display name
+      summary: Update display name or timezone
       requestBody:
         required: true
         content:
@@ -168,7 +227,7 @@ paths:
       description: |
         Requires the current password. Deletes the user, wallets, categories, transactions,
         budgets, the avatar and all receipt images. Fails with `last_admin` if this user is
-        the last holder of all admin permissions.
+        the last holder of all admin permissions. Failed attempts are rate-limited per user.
       requestBody:
         required: true
         content:
@@ -179,6 +238,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '422': { $ref: '#/components/responses/BusinessRule' }
+        '429': { $ref: '#/components/responses/RateLimited' }
         '500': { $ref: '#/components/responses/InternalError' }
 
   /me/avatar:
@@ -190,6 +250,7 @@ paths:
         Max 2 MB; image/jpeg, image/png or image/webp, detected from the file bytes. Stores it
         under `avatars/{user_id}/`, saves it on the user and deletes the previous avatar.
         Fails with 422 on field `file`: `required`, `max_size` or `content_type`.
+        Rate-limited to 10 uploads per hour per user.
       requestBody:
         required: true
         content:
@@ -204,6 +265,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
         '500': { $ref: '#/components/responses/InternalError' }
     delete:
       tags: [Me]
@@ -499,8 +561,10 @@ paths:
       summary: Upload a receipt photo
       description: |
         Max 5 MB; image/jpeg or image/webp, detected from the file bytes. Pass the returned
-        `receipt_key` when creating or updating the transaction.
+        `receipt_key` when creating or updating the transaction within 24 hours: uploads no
+        transaction references by then are deleted.
         Fails with 422 on field `file`: `required`, `max_size` or `content_type`.
+        Rate-limited to 30 uploads per hour per user.
       requestBody:
         required: true
         content:
@@ -515,6 +579,7 @@ paths:
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
+        '429': { $ref: '#/components/responses/RateLimited' }
         '500': { $ref: '#/components/responses/InternalError' }
 
   /transactions/{id}:
@@ -943,6 +1008,7 @@ paths:
       tags: [System]
       operationId: health
       summary: Liveness and database check
+      description: Rate-limited to 60 requests per minute per client IP.
       security: []
       responses:
         '200':
@@ -950,6 +1016,7 @@ paths:
           content:
             application/json:
               schema: { $ref: '#/components/schemas/HealthResponse' }
+        '429': { $ref: '#/components/responses/RateLimited' }
         '503':
           description: A dependency is down
           content:
@@ -1278,7 +1345,7 @@ components:
 
     Me:
       type: object
-      required: [id, name, email, avatar_url, role, permissions, created_at]
+      required: [id, name, email, avatar_url, timezone, role, permissions, created_at]
       properties:
         id: { type: string, format: uuid }
         name: { type: string }
@@ -1287,6 +1354,12 @@ components:
           type: [string, 'null']
           format: uri
           description: Presigned GET URL, valid for 15 minutes
+        timezone:
+          type: string
+          example: Asia/Makassar
+          description: |
+            IANA timezone. Decides "today" for transaction dates (not in the future) and the
+            default month of `GET /transactions`. Defaults to `Asia/Jakarta`.
         role: { $ref: '#/components/schemas/RoleSummary' }
         permissions:
           type: array
@@ -1304,15 +1377,31 @@ components:
 
     UpdateMeRequest:
       type: object
-      required: [name]
+      minProperties: 1
       properties:
         name: { type: string, minLength: 1, maxLength: 100 }
+        timezone:
+          type: string
+          maxLength: 64
+          example: Asia/Jayapura
+          description: IANA timezone name (field error `invalid_format` when unknown)
 
     DeleteAccountRequest:
       type: object
       required: [password]
       properties:
         password: { type: string }
+
+    ChangePasswordRequest:
+      type: object
+      required: [current_password, new_password]
+      properties:
+        current_password: { type: string }
+        new_password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          description: Must differ from current_password (field error `not_equal`).
 
     # ------------------------------------------------ Uploads
     FileUploadRequest:
@@ -1328,7 +1417,7 @@ components:
       type: object
       required: [receipt_key]
       properties:
-        receipt_key: { type: string, example: receipts/2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11/7c1d.webp }
+        receipt_key: { type: string, example: receipts-pending/2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11/7c1d.webp }
 
     ReceiptUploadResponse:
       allOf:
@@ -1403,6 +1492,7 @@ components:
           type: integer
           format: int64
           minimum: 0
+          maximum: 999999999999999
           default: 0
         icon: { type: [string, 'null'], maxLength: 50 }
         color: { $ref: '#/components/schemas/Color' }
@@ -1414,7 +1504,7 @@ components:
       properties:
         name: { type: string, minLength: 1, maxLength: 30 }
         type: { $ref: '#/components/schemas/WalletType' }
-        initial_balance: { type: integer, format: int64, minimum: 0 }
+        initial_balance: { type: integer, format: int64, minimum: 0, maximum: 999999999999999 }
         icon: { type: [string, 'null'], maxLength: 50 }
         color: { $ref: '#/components/schemas/Color' }
         is_default:
@@ -1599,6 +1689,7 @@ components:
           type: integer
           format: int64
           minimum: 1
+          maximum: 999999999999999
 
     CategoryBreakdown:
       type: object
@@ -1820,7 +1911,7 @@ components:
           maxItems: 20
           items: { type: string, minLength: 1, maxLength: 50 }
           description: Stored lowercase; unique across all providers
-        sort_order: { type: integer, default: 0 }
+        sort_order: { type: integer, minimum: -2147483648, maximum: 2147483647, default: 0 }
 
     UpdateProviderRequest:
       type: object
@@ -1836,7 +1927,7 @@ components:
           type: array
           maxItems: 20
           items: { type: string, minLength: 1, maxLength: 50 }
-        sort_order: { type: integer }
+        sort_order: { type: integer, minimum: -2147483648, maximum: 2147483647 }
 
     ProviderStatusRequest:
       type: object

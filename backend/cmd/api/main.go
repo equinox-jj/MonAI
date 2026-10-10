@@ -1,6 +1,9 @@
 package main
 
 import (
+	// Embed the tz database so user timezones load in any container image.
+	_ "time/tzdata"
+
 	"go.uber.org/fx"
 
 	"github.com/equinox-jj/MonAI/backend/internal/ai"

@@ -22,7 +22,7 @@ type CreateWalletRequest struct {
 	ProviderID     *uuid.UUID `json:"provider_id"`
 	Name           *string    `json:"name" validate:"omitempty,min=1,max=30"`
 	Type           *Type      `json:"type" validate:"omitempty,oneof=CASH BANK E_WALLET OTHER"`
-	InitialBalance int64      `json:"initial_balance" validate:"min=0"`
+	InitialBalance int64      `json:"initial_balance" validate:"min=0,max=999999999999999"`
 	Icon           *string    `json:"icon" validate:"omitempty,max=50"`
 	Color          *string    `json:"color" validate:"omitempty,len=7,hexcolor"`
 	IsDefault      bool       `json:"is_default"`
@@ -33,7 +33,7 @@ type CreateWalletRequest struct {
 type UpdateWalletRequest struct {
 	Name           *string                 `json:"name" validate:"omitempty,min=1,max=30"`
 	Type           *Type                   `json:"type" validate:"omitempty,oneof=CASH BANK E_WALLET OTHER"`
-	InitialBalance *int64                  `json:"initial_balance" validate:"omitempty,min=0"`
+	InitialBalance *int64                  `json:"initial_balance" validate:"omitempty,min=0,max=999999999999999"`
 	Icon           httpx.Optional[*string] `json:"icon" validate:"omitempty,max=50"`
 	Color          httpx.Optional[*string] `json:"color" validate:"omitempty,len=7,hexcolor"`
 	IsDefault      *bool                   `json:"is_default"`

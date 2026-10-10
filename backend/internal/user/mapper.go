@@ -16,6 +16,7 @@ func ToMeResponse(u *User, role *rbac.Role, permissions []string, avatarURL *str
 		Name:        u.Name,
 		Email:       u.Email,
 		AvatarURL:   avatarURL,
+		Timezone:    u.Timezone,
 		Role:        rbac.ToRoleSummary(role),
 		Permissions: permissions,
 		CreatedAt:   u.CreatedAt.UTC(),

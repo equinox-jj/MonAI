@@ -32,19 +32,11 @@ func (s *service) Monthly(ctx context.Context, userID uuid.UUID, month string) (
 	}
 	prevFrom := from.AddDate(0, -1, 0)
 
-	cur, err := s.repo.Totals(ctx, userID, from, to)
+	cur, prev, err := s.repo.Totals(ctx, userID, prevFrom, from, to)
 	if err != nil {
 		return MonthlyReportResponse{}, err
 	}
-	prev, err := s.repo.Totals(ctx, userID, prevFrom, from)
-	if err != nil {
-		return MonthlyReportResponse{}, err
-	}
-	curCats, err := s.repo.ExpenseByCategory(ctx, userID, from, to)
-	if err != nil {
-		return MonthlyReportResponse{}, err
-	}
-	prevCats, err := s.repo.ExpenseByCategory(ctx, userID, prevFrom, from)
+	cats, err := s.repo.ExpenseByCategory(ctx, userID, prevFrom, from, to)
 	if err != nil {
 		return MonthlyReportResponse{}, err
 	}
@@ -60,40 +52,25 @@ func (s *service) Monthly(ctx context.Context, userID uuid.UUID, month string) (
 			ExpenseTotal: prev.Expense,
 		},
 		ExpenseChangePercent: change(cur.Expense, prev.Expense),
-		Categories:           breakdown(curCats, prevCats, cur.Expense),
+		Categories:           breakdown(cats, cur.Expense),
 	}, nil
 }
 
-// breakdown merges the current and previous month's category amounts, both
-// sorted by amount descending. Categories spent on only in the previous month
-// are appended with amount 0, which keeps the result sorted.
-func breakdown(cur, prev []CategoryAmount, expenseTotal int64) []CategoryBreakdown {
-	prevAmount := make(map[uuid.UUID]int64, len(prev))
-	for _, p := range prev {
-		prevAmount[p.CategoryID] = p.Amount
-	}
-
-	out := make([]CategoryBreakdown, 0, len(cur)+len(prev))
-	add := func(c CategoryAmount, amount, previous int64) {
-		out = append(out, CategoryBreakdown{
+// breakdown maps the category amounts, already in report order, adding each
+// category's share of the month's expenses and its change from the previous
+// month.
+func breakdown(cats []CategoryAmount, expenseTotal int64) []CategoryBreakdown {
+	out := make([]CategoryBreakdown, len(cats))
+	for i, c := range cats {
+		out[i] = CategoryBreakdown{
 			CategoryID:     c.CategoryID,
 			Name:           c.Name,
 			Icon:           c.Icon,
 			Color:          c.Color,
-			Amount:         amount,
-			SharePercent:   percent(amount, expenseTotal),
-			PreviousAmount: previous,
-			ChangePercent:  change(amount, previous),
-		})
-	}
-
-	for _, c := range cur {
-		add(c, c.Amount, prevAmount[c.CategoryID])
-		delete(prevAmount, c.CategoryID)
-	}
-	for _, p := range prev {
-		if _, ok := prevAmount[p.CategoryID]; ok {
-			add(p, 0, p.Amount)
+			Amount:         c.Amount,
+			SharePercent:   percent(c.Amount, expenseTotal),
+			PreviousAmount: c.PreviousAmount,
+			ChangePercent:  change(c.Amount, c.PreviousAmount),
 		}
 	}
 

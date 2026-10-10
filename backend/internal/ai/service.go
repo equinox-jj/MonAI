@@ -10,6 +10,7 @@ import (
 
 	"github.com/equinox-jj/MonAI/backend/internal/category"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/period"
 	"github.com/equinox-jj/MonAI/backend/internal/provider"
 	"github.com/equinox-jj/MonAI/backend/internal/wallet"
 )
@@ -30,6 +31,7 @@ type service struct {
 	providers  provider.Repository
 	timeout    time.Duration
 	now        func() time.Time
+	zones      period.Locations
 }
 
 func NewService(
@@ -92,7 +94,7 @@ func (s *service) prepare(ctx context.Context, userID uuid.UUID, text, today, ti
 		return ParseInput{}, allowed{}, err
 	}
 
-	ws, err := s.wallets.List(ctx, userID, false)
+	ws, err := s.wallets.ListActive(ctx, userID)
 	if err != nil {
 		return ParseInput{}, allowed{}, err
 	}
@@ -100,7 +102,7 @@ func (s *service) prepare(ctx context.Context, userID uuid.UUID, text, today, ti
 	if err != nil {
 		return ParseInput{}, allowed{}, err
 	}
-	aliases, err := s.aliases(ctx)
+	aliases, err := s.aliases(ctx, ws)
 	if err != nil {
 		return ParseInput{}, allowed{}, err
 	}
@@ -141,13 +143,12 @@ func (s *service) checkToday(today, timezone string) (time.Time, error) {
 	if err != nil {
 		return time.Time{}, ErrTodayOutOfRange
 	}
-	loc, err := time.LoadLocation(timezone)
+	loc, err := s.zones.Load(timezone)
 	if err != nil {
 		return time.Time{}, ErrTodayOutOfRange
 	}
 
-	y, m, d := s.now().In(loc).Date()
-	server := time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+	server := period.LocalDate(s.now(), loc)
 	if diff := day.Sub(server); diff > 24*time.Hour || diff < -24*time.Hour {
 		return time.Time{}, ErrTodayOutOfRange
 	}
@@ -155,21 +156,16 @@ func (s *service) checkToday(today, timezone string) (time.Time, error) {
 	return day, nil
 }
 
-// aliases maps each active provider to its aliases.
-func (s *service) aliases(ctx context.Context) (map[uuid.UUID][]string, error) {
-	ps, err := s.providers.ListActive(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	out := make(map[uuid.UUID][]string, len(ps))
-	for _, p := range ps {
-		for _, a := range p.Aliases {
-			out[p.ID] = append(out[p.ID], a.Alias)
+// aliases maps the active providers of ws to their aliases.
+func (s *service) aliases(ctx context.Context, ws []wallet.Wallet) (map[uuid.UUID][]string, error) {
+	ids := make([]uuid.UUID, 0, len(ws))
+	for _, w := range ws {
+		if w.ProviderID != nil {
+			ids = append(ids, *w.ProviderID)
 		}
 	}
 
-	return out, nil
+	return s.providers.ActiveAliases(ctx, ids)
 }
 
 // providerError keeps ErrUnavailable (503) and turns anything else into an

@@ -20,7 +20,7 @@ func encodeCursor(t *Transaction) string {
 		D: t.Date.Format(dateLayout),
 		I: t.ID,
 	})
-	
+
 	return base64.RawURLEncoding.EncodeToString(b)
 }
 

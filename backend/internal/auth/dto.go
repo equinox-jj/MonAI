@@ -21,6 +21,12 @@ type LoginRequest struct {
 	Password string `json:"password" validate:"required,min=8,max=72"`
 }
 
+// ChangePasswordRequest is the body of PUT /auth/password.
+type ChangePasswordRequest struct {
+	CurrentPassword string `json:"current_password" validate:"required"`
+	NewPassword     string `json:"new_password" validate:"required,min=8,max=72,nefield=CurrentPassword"`
+}
+
 // ---------------------------------------------------------------- Responses
 
 // AuthResponse is the data of register and login.

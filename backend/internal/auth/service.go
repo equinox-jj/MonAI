@@ -26,6 +26,11 @@ type Service interface {
 	// Login returns ErrInvalidCredentials for an unknown email and for a
 	// wrong password alike.
 	Login(ctx context.Context, req LoginRequest) (AuthResponse, error)
+	// LogoutAll revokes every token of the user, this one included.
+	LogoutAll(ctx context.Context, userID uuid.UUID) error
+	// ChangePassword checks the current password (user.ErrInvalidPassword),
+	// stores the new one, revokes every older token and returns a new one.
+	ChangePassword(ctx context.Context, userID uuid.UUID, req ChangePasswordRequest) (AuthResponse, error)
 }
 
 type service struct {
@@ -98,7 +103,7 @@ func (s *service) Register(ctx context.Context, req RegisterRequest) (AuthRespon
 		return AuthResponse{}, err
 	}
 
-	return s.issue(ctx, u.ID)
+	return s.issue(ctx, u)
 }
 
 func (s *service) Login(ctx context.Context, req LoginRequest) (AuthResponse, error) {
@@ -119,17 +124,48 @@ func (s *service) Login(ctx context.Context, req LoginRequest) (AuthResponse, er
 		return AuthResponse{}, ErrInvalidCredentials
 	}
 
-	return s.issue(ctx, u.ID)
+	return s.issue(ctx, u)
 }
 
-// issue signs an access token for userID and builds the auth response.
-func (s *service) issue(ctx context.Context, userID uuid.UUID) (AuthResponse, error) {
-	token, err := s.jwt.Issue(userID)
+func (s *service) LogoutAll(ctx context.Context, userID uuid.UUID) error {
+	return s.users.BumpTokenVersion(ctx, userID)
+}
+
+func (s *service) ChangePassword(ctx context.Context, userID uuid.UUID, req ChangePasswordRequest) (AuthResponse, error) {
+	u, err := s.users.FindByID(ctx, userID)
 	if err != nil {
 		return AuthResponse{}, err
 	}
 
-	me, err := s.me.GetMe(ctx, userID)
+	ok, err := s.hasher.Verify(u.PasswordHash, req.CurrentPassword)
+	if err != nil {
+		return AuthResponse{}, err
+	}
+	if !ok {
+		return AuthResponse{}, user.ErrInvalidPassword
+	}
+
+	hash, err := s.hasher.Hash(req.NewPassword)
+	if err != nil {
+		return AuthResponse{}, err
+	}
+
+	if u, err = s.users.UpdatePassword(ctx, userID, hash); err != nil {
+		return AuthResponse{}, err
+	}
+
+	return s.issue(ctx, u)
+}
+
+// issue signs an access token for u at its current token version and builds
+// the auth response.
+func (s *service) issue(ctx context.Context, u *user.User) (AuthResponse, error) {
+	token, err := s.jwt.Issue(u.ID, u.TokenVersion)
+	if err != nil {
+		return AuthResponse{}, err
+	}
+
+	me, err := s.me.GetMe(ctx, u.ID)
 	if err != nil {
 		return AuthResponse{}, err
 	}

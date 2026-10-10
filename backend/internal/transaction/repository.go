@@ -2,8 +2,6 @@ package transaction
 
 import (
 	"context"
-	"errors"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,10 +10,6 @@ import (
 
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 )
-
-// likeEscaper escapes LIKE wildcards with PostgreSQL's default escape
-// character, so a search term matches literally.
-var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
 
 // Cursor is the keyset position after which the next page starts: the last
 // row of the previous page. Encoding it as an opaque string is the service's
@@ -45,6 +39,9 @@ type Repository interface {
 	// FindByID returns ErrNotFound when the row is missing, soft-deleted or
 	// belongs to another user.
 	FindByID(ctx context.Context, userID, id uuid.UUID) (*Transaction, error)
+	// FindByIDForUpdate is FindByID that also locks the row until the
+	// transaction in ctx ends. Call it inside TxManager.WithinTx.
+	FindByIDForUpdate(ctx context.Context, userID, id uuid.UUID) (*Transaction, error)
 	// FindDeletedByID returns a soft-deleted transaction, or ErrNotFound when
 	// the row is missing, not deleted or belongs to another user.
 	FindDeletedByID(ctx context.Context, userID, id uuid.UUID) (*Transaction, error)
@@ -82,7 +79,7 @@ func (r *repository) List(ctx context.Context, userID uuid.UUID, filter ListFilt
 		q = q.Where("type = ?", *filter.Type)
 	}
 	if filter.Query != "" {
-		pattern := "%" + likeEscaper.Replace(filter.Query) + "%"
+		pattern := "%" + database.EscapeLike(filter.Query) + "%"
 		q = q.Where("(note ILIKE ? OR merchant ILIKE ?)", pattern, pattern)
 	}
 	if filter.After != nil {
@@ -99,11 +96,17 @@ func (r *repository) List(ctx context.Context, userID uuid.UUID, filter ListFilt
 }
 
 func (r *repository) FindByID(ctx context.Context, userID, id uuid.UUID) (*Transaction, error) {
+	return r.findByID(database.Conn(ctx, r.db), userID, id)
+}
+
+func (r *repository) FindByIDForUpdate(ctx context.Context, userID, id uuid.UUID) (*Transaction, error) {
+	return r.findByID(database.Conn(ctx, r.db).Clauses(database.ForUpdate), userID, id)
+}
+
+func (r *repository) findByID(db *gorm.DB, userID, id uuid.UUID) (*Transaction, error) {
 	var t Transaction
-	if err := database.Conn(ctx, r.db).
-		Where("id = ? AND user_id = ?", id, userID).
-		First(&t).Error; err != nil {
-		return nil, notFound(err)
+	if err := db.Where("id = ? AND user_id = ?", id, userID).First(&t).Error; err != nil {
+		return nil, database.NotFound(err, ErrNotFound)
 	}
 
 	return &t, nil
@@ -115,14 +118,14 @@ func (r *repository) FindDeletedByID(ctx context.Context, userID, id uuid.UUID) 
 		Unscoped().
 		Where("id = ? AND user_id = ? AND deleted_at IS NOT NULL", id, userID).
 		First(&t).Error; err != nil {
-		return nil, notFound(err)
+		return nil, database.NotFound(err, ErrNotFound)
 	}
 
 	return &t, nil
 }
 
 func (r *repository) Create(ctx context.Context, t *Transaction) error {
-	return database.Conn(ctx, r.db).Create(t).Error
+	return refViolation(database.Conn(ctx, r.db).Create(t).Error)
 }
 
 func (r *repository) Update(ctx context.Context, t *Transaction) error {
@@ -145,7 +148,7 @@ func (r *repository) Update(ctx context.Context, t *Transaction) error {
 			"updated_at":   time.Now(),
 		})
 	if res.Error != nil {
-		return res.Error
+		return refViolation(res.Error)
 	}
 	if res.RowsAffected == 0 {
 		return ErrNotFound
@@ -187,9 +190,17 @@ func (r *repository) Restore(ctx context.Context, userID, id uuid.UUID) (*Transa
 	return &t, nil
 }
 
-func notFound(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrNotFound
+// refViolation maps the owner FKs (migration 000012) to the field errors the
+// service returns. They only fire when a wallet or category is deleted between
+// the service's check and the write.
+func refViolation(err error) error {
+	switch {
+	case database.IsForeignKeyViolation(err, "transactions_wallet_owner_fkey"):
+		return ErrWalletInvalid
+	case database.IsForeignKeyViolation(err, "transactions_to_wallet_owner_fkey"):
+		return ErrToWalletInvalid
+	case database.IsForeignKeyViolation(err, "transactions_category_owner_fkey"):
+		return ErrCategoryInvalid
 	}
 
 	return err

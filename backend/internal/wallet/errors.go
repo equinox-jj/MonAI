@@ -9,6 +9,8 @@ import (
 var (
 	ErrNotFound  = httpx.ErrNotFound
 	ErrNameTaken = httpx.ErrConflict.WithMessage("Wallet name already exists")
+	// ErrDefaultRace is a concurrent request making another wallet the default.
+	ErrDefaultRace = httpx.ErrConflict.WithMessage("Another wallet was set as default at the same time. Try again")
 
 	ErrDefaultRequired = httpx.NewError(
 		fiber.StatusUnprocessableEntity,

@@ -4,8 +4,13 @@ import (
 	"context"
 	"log/slog"
 	"net"
+	"runtime/debug"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
+	"github.com/gofiber/fiber/v3/middleware/helmet"
+	"github.com/gofiber/fiber/v3/middleware/recover"
+	"github.com/gofiber/fiber/v3/middleware/requestid"
 	"go.uber.org/fx"
 
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
@@ -15,15 +20,55 @@ import (
 // receipts) to leave room for the multipart framing.
 const bodyLimit = 6 << 20
 
+// Connection timeouts. Without them a client can hold a connection open by
+// sending its request slowly (slowloris).
+const (
+	readTimeout  = 10 * time.Second
+	writeTimeout = 30 * time.Second
+	idleTimeout  = 60 * time.Second
+)
+
 // NewApp creates the Fiber app. c.Bind() runs v on every decoded request, and
 // every error returned by a handler or middleware is written by NewErrorHandler.
-func NewApp(v *Validator, log *slog.Logger) *fiber.App {
-	return fiber.New(fiber.Config{
+// Every request gets an X-Request-ID, security headers, and panic recovery.
+func NewApp(v *Validator, log *slog.Logger, cfg config.Config) *fiber.App {
+	fc := fiber.Config{
 		AppName:         "MonAI API",
 		StructValidator: v,
 		BodyLimit:       bodyLimit,
+		ReadTimeout:     readTimeout,
+		WriteTimeout:    writeTimeout,
+		IdleTimeout:     idleTimeout,
 		ErrorHandler:    NewErrorHandler(log),
-	})
+	}
+	// c.IP() (and so ByIP) reads X-Forwarded-For only from trusted proxies;
+	// otherwise any client could pick its own rate-limit key.
+	if len(cfg.App.TrustedProxies) > 0 {
+		fc.TrustProxy = true
+		fc.TrustProxyConfig = fiber.TrustProxyConfig{Proxies: cfg.App.TrustedProxies}
+		fc.ProxyHeader = fiber.HeaderXForwardedFor
+		fc.EnableIPValidation = true
+	}
+
+	app := fiber.New(fc)
+	app.Use(
+		requestid.New(),
+		recover.New(recover.Config{
+			EnableStackTrace: true,
+			StackTraceHandler: func(c fiber.Ctx, e any) {
+				log.Error("panic recovered",
+					"request_id", requestid.FromContext(c),
+					"method", c.Method(),
+					"path", c.Path(),
+					"panic", e,
+					"stack", string(debug.Stack()),
+				)
+			},
+		}),
+		helmet.New(),
+	)
+
+	return app
 }
 
 // NewAPIRouter returns the /api/v1 group that feature routes register on.

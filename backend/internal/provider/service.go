@@ -56,14 +56,21 @@ type Service interface {
 }
 
 type service struct {
-	repo   Repository
-	tx     database.TxManager
-	store  storage.Storage
-	bucket string
+	repo    Repository
+	tx      database.TxManager
+	store   storage.Storage
+	bucket  string      // public bucket holding logos
+	logoURL logoURLFunc // public URL of a logo key
 }
 
 func NewService(repo Repository, tx database.TxManager, store storage.Storage, cfg config.Config) Service {
-	return &service{repo: repo, tx: tx, store: store, bucket: cfg.MinIO.BucketPublic}
+	return &service{
+		repo:    repo,
+		tx:      tx,
+		store:   store,
+		bucket:  cfg.MinIO.BucketPublic,
+		logoURL: storage.NullablePublicURL(store, cfg.MinIO.BucketPublic),
+	}
 }
 
 func (s *service) CatalogVersion(ctx context.Context) (int64, error) {
@@ -232,7 +239,7 @@ func (s *service) SetStatus(ctx context.Context, actorID, id uuid.UUID, isActive
 
 func (s *service) Delete(ctx context.Context, id uuid.UUID) error {
 	return s.tx.WithinTx(ctx, func(ctx context.Context) error {
-		p, err := s.repo.FindByID(ctx, id)
+		p, err := s.repo.FindByIDForUpdate(ctx, id)
 		if err != nil {
 			return err
 		}
@@ -261,7 +268,7 @@ func (s *service) SetLogo(ctx context.Context, actorID, id uuid.UUID, f httpx.Fi
 		return AdminProviderResponse{}, err
 	}
 
-	key := logoPrefix(id) + uuid.NewString() + ext
+	key := storage.NewKey(storage.ProviderLogoPrefix(id), ext)
 	if err := s.store.Put(ctx, s.bucket, key, f.Body, f.Size, f.ContentType); err != nil {
 		return AdminProviderResponse{}, err
 	}
@@ -289,7 +296,7 @@ func (s *service) mutate(
 	var p *PaymentProvider
 	err := s.tx.WithinTx(ctx, func(ctx context.Context) error {
 		var err error
-		if p, err = s.repo.FindByID(ctx, id); err != nil {
+		if p, err = s.repo.FindByIDForUpdate(ctx, id); err != nil {
 			return err
 		}
 		if err := fn(ctx, p); err != nil {
@@ -307,18 +314,6 @@ func (s *service) mutate(
 	}
 
 	return ToAdminProviderResponse(p, s.logoURL), nil
-}
-
-func (s *service) logoURL(key *string) *string {
-	if key == nil {
-		return nil
-	}
-	url := s.store.PublicURL(s.bucket, *key)
-	return &url
-}
-
-func logoPrefix(id uuid.UUID) string {
-	return "providers/" + id.String() + "/"
 }
 
 // slugify derives a slug from a name: lowercase, runs of other characters

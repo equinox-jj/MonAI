@@ -17,9 +17,15 @@ const (
 
 // ---------------------------------------------------------------- Requests
 
-// UpdateMeRequest is the body of PATCH /me.
+// UpdateMeRequest is the body of PATCH /me. Absent fields are left unchanged.
 type UpdateMeRequest struct {
-	Name string `json:"name" validate:"required,min=1,max=100"`
+	Name     *string `json:"name" validate:"omitempty,min=1,max=100"`
+	Timezone *string `json:"timezone" validate:"omitempty,max=64,timezone"`
+}
+
+// empty reports whether no field was sent (spec: minProperties 1).
+func (r UpdateMeRequest) empty() bool {
+	return r.Name == nil && r.Timezone == nil
 }
 
 // DeleteAccountRequest is the body of DELETE /me.
@@ -36,6 +42,7 @@ type MeResponse struct {
 	Name        string           `json:"name"`
 	Email       string           `json:"email"`
 	AvatarURL   *string          `json:"avatar_url"` // presigned GET URL, null when unset
+	Timezone    string           `json:"timezone"`
 	Role        rbac.RoleSummary `json:"role"`
 	Permissions []string         `json:"permissions"`
 	CreatedAt   time.Time        `json:"created_at"`

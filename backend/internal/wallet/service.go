@@ -43,8 +43,7 @@ type service struct {
 	repo      Repository
 	providers provider.Repository
 	tx        database.TxManager
-	store     storage.Storage
-	bucket    string
+	logoURL   logoURLFunc // public URL of a provider logo key
 }
 
 func NewService(
@@ -58,8 +57,7 @@ func NewService(
 		repo:      repo,
 		providers: providers,
 		tx:        tx,
-		store:     store,
-		bucket:    cfg.MinIO.BucketPublic,
+		logoURL:   storage.NullablePublicURL(store, cfg.MinIO.BucketPublic),
 	}
 }
 
@@ -127,7 +125,7 @@ func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateWa
 
 	var resp WalletResponse
 	err := s.tx.WithinTx(ctx, func(ctx context.Context) error {
-		w, err := s.repo.FindByID(ctx, userID, id)
+		w, err := s.repo.FindByIDForUpdate(ctx, userID, id)
 		if err != nil {
 			return err
 		}
@@ -155,7 +153,7 @@ func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateWa
 
 func (s *service) Delete(ctx context.Context, userID, id uuid.UUID) error {
 	return s.tx.WithinTx(ctx, func(ctx context.Context) error {
-		w, err := s.repo.FindByID(ctx, userID, id)
+		w, err := s.repo.FindByIDForUpdate(ctx, userID, id)
 		if err != nil {
 			return err
 		}
@@ -287,15 +285,6 @@ func applyUpdate(w *Wallet, req UpdateWalletRequest) error {
 	}
 
 	return nil
-}
-
-// logoURL returns the public URL of a provider logo key, or nil.
-func (s *service) logoURL(key *string) *string {
-	if key == nil {
-		return nil
-	}
-	url := s.store.PublicURL(s.bucket, *key)
-	return &url
 }
 
 // truncate cuts s to at most n runes.

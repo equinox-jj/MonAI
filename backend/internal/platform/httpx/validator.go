@@ -9,6 +9,7 @@ import (
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/google/uuid"
 )
 
 // FieldError is one invalid field, shaped like the API spec's FieldError.
@@ -60,17 +61,24 @@ func NewValidator() *Validator {
 		return strings.ContainsFunc(fl.Field().String(), unicode.IsDigit)
 	})
 
-	// Validate an Optional by its inner value. Absent or null yields nil, so
-	// omitempty skips it.
+	// Every Optional type used in a request DTO must be registered here, or
+	// its validate tags are silently skipped.
+	registerOptional[string](v)
+	registerOptional[uuid.UUID](v)
+
+	return &Validator{v: v}
+}
+
+// registerOptional validates an Optional[*T] by its inner value. Absent or
+// null yields nil, so omitempty skips it.
+func registerOptional[T any](v *validator.Validate) {
 	v.RegisterCustomTypeFunc(func(f reflect.Value) any {
-		o := f.Interface().(Optional[*string])
+		o := f.Interface().(Optional[*T])
 		if !o.Set || o.Value == nil {
 			return nil
 		}
 		return *o.Value
-	}, Optional[*string]{})
-
-	return &Validator{v: v}
+	}, Optional[*T]{})
 }
 
 // Validate checks s against its `validate` tags. It returns *ValidationError for invalid

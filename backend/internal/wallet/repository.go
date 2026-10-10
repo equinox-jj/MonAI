@@ -2,7 +2,6 @@ package wallet
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -12,28 +11,42 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 )
 
-const nameUniqueIndex = "wallets_user_name"
+const (
+	nameUniqueIndex    = "wallets_user_name"
+	defaultUniqueIndex = "wallets_one_default"
+)
 
-// balanceSelect calculates the current balance from non-deleted transactions
-// (ERD §2.8).
-const balanceSelect = `w.*, p.logo_key,
-	w.initial_balance + COALESCE(SUM(CASE
-		WHEN t.type = 'INCOME'   AND t.wallet_id    = w.id THEN  t.amount
-		WHEN t.type = 'EXPENSE'  AND t.wallet_id    = w.id THEN -t.amount
-		WHEN t.type = 'TRANSFER' AND t.to_wallet_id = w.id THEN  t.amount
-		WHEN t.type = 'TRANSFER' AND t.wallet_id    = w.id THEN -t.amount
-		ELSE 0 END), 0) AS current_balance`
+// balanceJoin sums each wallet's movements from the user's non-deleted
+// transactions (ERD §2.8): income in, expense and transfers out on wallet_id,
+// transfers in on to_wallet_id. Both scans are scoped to the user, so they use
+// the transactions_user_date index instead of scanning every wallet's rows.
+const balanceJoin = `LEFT JOIN (
+		SELECT wallet_id, SUM(amount) AS delta FROM (
+			SELECT wallet_id, CASE WHEN type = 'INCOME' THEN amount ELSE -amount END AS amount
+			FROM transactions WHERE user_id = ? AND deleted_at IS NULL
+			UNION ALL
+			SELECT to_wallet_id, amount
+			FROM transactions WHERE user_id = ? AND type = 'TRANSFER' AND deleted_at IS NULL
+		) moves
+		GROUP BY wallet_id
+	) b ON b.wallet_id = w.id`
 
 type Repository interface {
 	// List returns the user's wallets with balances, default first, then
 	// archived last, then name (case-insensitive). It never returns nil.
 	List(ctx context.Context, userID uuid.UUID, includeArchived bool) ([]Detail, error)
+	// ListActive returns the user's non-archived wallets without balances,
+	// ordered by name. It never returns nil.
+	ListActive(ctx context.Context, userID uuid.UUID) ([]Wallet, error)
 	// FindDetailByID returns the wallet with its balance, or ErrNotFound when
 	// the row is missing or belongs to another user.
 	FindDetailByID(ctx context.Context, userID, id uuid.UUID) (*Detail, error)
 	// FindByID returns ErrNotFound when the row is missing or belongs to
 	// another user.
 	FindByID(ctx context.Context, userID, id uuid.UUID) (*Wallet, error)
+	// FindByIDForUpdate is FindByID that also locks the row until the
+	// transaction in ctx ends. Call it inside TxManager.WithinTx.
+	FindByIDForUpdate(ctx context.Context, userID, id uuid.UUID) (*Wallet, error)
 	// Create inserts w and fills its ID and timestamps. Used by POST /wallets
 	// and register seeding.
 	Create(ctx context.Context, w *Wallet) error
@@ -71,6 +84,18 @@ func (r *repository) List(ctx context.Context, userID uuid.UUID, includeArchived
 	return ds, nil
 }
 
+func (r *repository) ListActive(ctx context.Context, userID uuid.UUID) ([]Wallet, error) {
+	ws := []Wallet{}
+	if err := database.Conn(ctx, r.db).
+		Where("user_id = ? AND NOT is_archived", userID).
+		Order("lower(name)").
+		Find(&ws).Error; err != nil {
+		return nil, err
+	}
+
+	return ws, nil
+}
+
 func (r *repository) FindDetailByID(ctx context.Context, userID, id uuid.UUID) (*Detail, error) {
 	var d Detail
 	res := r.detailQuery(ctx, userID).Where("w.id = ?", id).Scan(&d)
@@ -85,11 +110,17 @@ func (r *repository) FindDetailByID(ctx context.Context, userID, id uuid.UUID) (
 }
 
 func (r *repository) FindByID(ctx context.Context, userID, id uuid.UUID) (*Wallet, error) {
+	return r.findByID(database.Conn(ctx, r.db), userID, id)
+}
+
+func (r *repository) FindByIDForUpdate(ctx context.Context, userID, id uuid.UUID) (*Wallet, error) {
+	return r.findByID(database.Conn(ctx, r.db).Clauses(database.ForUpdate), userID, id)
+}
+
+func (r *repository) findByID(db *gorm.DB, userID, id uuid.UUID) (*Wallet, error) {
 	var w Wallet
-	if err := database.Conn(ctx, r.db).
-		Where("id = ? AND user_id = ?", id, userID).
-		First(&w).Error; err != nil {
-		return nil, notFound(err)
+	if err := db.Where("id = ? AND user_id = ?", id, userID).First(&w).Error; err != nil {
+		return nil, database.NotFound(err, ErrNotFound)
 	}
 
 	return &w, nil
@@ -97,7 +128,7 @@ func (r *repository) FindByID(ctx context.Context, userID, id uuid.UUID) (*Walle
 
 func (r *repository) Create(ctx context.Context, w *Wallet) error {
 	if err := database.Conn(ctx, r.db).Create(w).Error; err != nil {
-		return nameTaken(err)
+		return uniqueViolation(err)
 	}
 
 	return nil
@@ -120,7 +151,7 @@ func (r *repository) Update(ctx context.Context, w *Wallet) error {
 			"updated_at":      time.Now(),
 		})
 	if res.Error != nil {
-		return nameTaken(res.Error)
+		return uniqueViolation(res.Error)
 	}
 	if res.RowsAffected == 0 {
 		return ErrNotFound
@@ -166,24 +197,19 @@ func (r *repository) HasTransactions(ctx context.Context, id uuid.UUID) (bool, e
 func (r *repository) detailQuery(ctx context.Context, userID uuid.UUID) *gorm.DB {
 	return database.Conn(ctx, r.db).
 		Table("wallets w").
-		Select(balanceSelect).
+		Select("w.*, p.logo_key, w.initial_balance + COALESCE(b.delta, 0) AS current_balance").
 		Joins("LEFT JOIN payment_providers p ON p.id = w.provider_id AND p.deleted_at IS NULL").
-		Joins("LEFT JOIN transactions t ON (t.wallet_id = w.id OR t.to_wallet_id = w.id) AND t.deleted_at IS NULL").
-		Where("w.user_id = ?", userID).
-		Group("w.id, p.logo_key")
+		Joins(balanceJoin, userID, userID).
+		Where("w.user_id = ?", userID)
 }
 
-func notFound(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrNotFound
-	}
-
-	return err
-}
-
-func nameTaken(err error) error {
-	if database.IsUniqueViolation(err, nameUniqueIndex) {
+// uniqueViolation maps the wallets unique indexes to domain errors.
+func uniqueViolation(err error) error {
+	switch {
+	case database.IsUniqueViolation(err, nameUniqueIndex):
 		return ErrNameTaken
+	case database.IsUniqueViolation(err, defaultUniqueIndex):
+		return ErrDefaultRace
 	}
 
 	return err

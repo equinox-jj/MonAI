@@ -3,6 +3,7 @@ package transaction
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strings"
 	"time"
@@ -13,14 +14,11 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/period"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/storage"
+	"github.com/equinox-jj/MonAI/backend/internal/user"
 	"github.com/equinox-jj/MonAI/backend/internal/wallet"
 )
-
-// userLocation is the timezone for "today" and the default month. Users have
-// no stored timezone yet, so the PRD default applies. Asia/Jakarta has no DST,
-// so a fixed zone avoids depending on tzdata.
-var userLocation = time.FixedZone("Asia/Jakarta", 7*60*60)
 
 // receiptRule limits receipt uploads and maps their types to key extensions.
 var receiptRule = httpx.FileRule{
@@ -49,8 +47,9 @@ type Service interface {
 	// Restore fails with ErrWalletArchived if one of the transaction's
 	// wallets was archived after the delete.
 	Restore(ctx context.Context, userID, id uuid.UUID) (TransactionResponse, error)
-	// UploadReceipt checks and stores f under the user's receipt prefix and
-	// returns its key for receipt_key.
+	// UploadReceipt checks and stores f under the user's pending receipt
+	// prefix and returns its key for receipt_key. Pending uploads that no
+	// transaction references expire after a day.
 	UploadReceipt(ctx context.Context, userID uuid.UUID, f httpx.File) (ReceiptUploadResponse, error)
 }
 
@@ -58,17 +57,20 @@ type service struct {
 	repo       Repository
 	wallets    wallet.Repository
 	categories category.Repository
+	users      user.Repository // for the user's timezone
 	tx         database.TxManager
 	store      storage.Storage
 	log        *slog.Logger
 	bucket     string // private bucket holding receipts
 	now        func() time.Time
+	zones      period.Locations
 }
 
 func NewService(
 	repo Repository,
 	wallets wallet.Repository,
 	categories category.Repository,
+	users user.Repository,
 	tx database.TxManager,
 	store storage.Storage,
 	log *slog.Logger,
@@ -78,6 +80,7 @@ func NewService(
 		repo:       repo,
 		wallets:    wallets,
 		categories: categories,
+		users:      users,
 		tx:         tx,
 		store:      store,
 		log:        log,
@@ -87,7 +90,7 @@ func NewService(
 }
 
 func (s *service) List(ctx context.Context, userID uuid.UUID, q ListTransactionsQuery) ([]TransactionResponse, httpx.CursorMeta, error) {
-	from, err := s.monthStart(q.Month)
+	from, err := s.monthStart(ctx, userID, q.Month)
 	if err != nil {
 		return nil, httpx.CursorMeta{}, err
 	}
@@ -145,7 +148,11 @@ func (s *service) Get(ctx context.Context, userID, id uuid.UUID) (TransactionRes
 }
 
 func (s *service) Create(ctx context.Context, userID uuid.UUID, req CreateTransactionRequest) (TransactionResponse, error) {
-	date, err := s.parseDate(req.Date)
+	today, err := s.today(ctx, userID)
+	if err != nil {
+		return TransactionResponse{}, err
+	}
+	date, err := parseDate(req.Date, today)
 	if err != nil {
 		return TransactionResponse{}, err
 	}
@@ -171,7 +178,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, req CreateTransa
 		return TransactionResponse{}, err
 	}
 	if t.ReceiptKey != nil {
-		if err := s.checkReceipt(ctx, userID, *t.ReceiptKey); err != nil {
+		if t.ReceiptKey, err = s.attachReceipt(ctx, userID, *t.ReceiptKey); err != nil {
 			return TransactionResponse{}, err
 		}
 	}
@@ -191,19 +198,23 @@ func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateTr
 	var t *Transaction
 	err := s.tx.WithinTx(ctx, func(ctx context.Context) error {
 		var err error
-		if t, err = s.repo.FindByID(ctx, userID, id); err != nil {
+		if t, err = s.repo.FindByIDForUpdate(ctx, userID, id); err != nil {
 			return err
 		}
 		prev := *t
 
-		if err := s.applyUpdate(t, req); err != nil {
+		today, err := s.today(ctx, userID)
+		if err != nil {
+			return err
+		}
+		if err := applyUpdate(t, req, today); err != nil {
 			return err
 		}
 		if err := s.checkRefs(ctx, t, &prev); err != nil {
 			return err
 		}
 		if t.ReceiptKey != nil && !equalPtr(t.ReceiptKey, prev.ReceiptKey) {
-			if err := s.checkReceipt(ctx, userID, *t.ReceiptKey); err != nil {
+			if t.ReceiptKey, err = s.attachReceipt(ctx, userID, *t.ReceiptKey); err != nil {
 				return err
 			}
 		}
@@ -259,7 +270,7 @@ func (s *service) UploadReceipt(ctx context.Context, userID uuid.UUID, f httpx.F
 		return ReceiptUploadResponse{}, err
 	}
 
-	key := receiptPrefix(userID) + uuid.NewString() + ext
+	key := storage.NewKey(storage.PendingReceiptPrefix(userID), ext)
 	if err := s.store.Put(ctx, s.bucket, key, f.Body, f.Size, f.ContentType); err != nil {
 		return ReceiptUploadResponse{}, err
 	}
@@ -267,8 +278,9 @@ func (s *service) UploadReceipt(ctx context.Context, userID uuid.UUID, f httpx.F
 	return ReceiptUploadResponse{ReceiptKey: key}, nil
 }
 
-// applyUpdate applies the fields present in req to t.
-func (s *service) applyUpdate(t *Transaction, req UpdateTransactionRequest) error {
+// applyUpdate applies the fields present in req to t. today is the user's
+// local date, for the date check.
+func applyUpdate(t *Transaction, req UpdateTransactionRequest, today time.Time) error {
 	if req.Type != nil {
 		t.Type = *req.Type
 	}
@@ -285,7 +297,7 @@ func (s *service) applyUpdate(t *Transaction, req UpdateTransactionRequest) erro
 		t.CategoryID = req.CategoryID.Value
 	}
 	if req.Date != nil {
-		date, err := s.parseDate(*req.Date)
+		date, err := parseDate(*req.Date, today)
 		if err != nil {
 			return err
 		}
@@ -383,13 +395,43 @@ func checkShape(t *Transaction) error {
 	return nil
 }
 
-// checkReceipt verifies that key is one of the user's uploaded receipts. Type
-// and size were checked by UploadReceipt.
-func (s *service) checkReceipt(ctx context.Context, userID uuid.UUID, key string) error {
-	if !isOwnReceiptKey(userID, key) {
-		return ErrReceiptKeyInvalid
+// attachReceipt returns the key to store for a receipt_key from the client.
+// A key from UploadReceipt is pending: the object is copied out of the
+// expiring pending prefix and the copy's key returned. A key already attached
+// to one of the user's transactions is kept as is (a receipt can be shared).
+// Type and size were checked by UploadReceipt.
+func (s *service) attachReceipt(ctx context.Context, userID uuid.UUID, key string) (*string, error) {
+	if _, ok := storage.ObjectName(storage.ReceiptPrefix(userID), key); ok {
+		if err := s.statReceipt(ctx, key); err != nil {
+			return nil, err
+		}
+		return &key, nil
 	}
 
+	name, ok := storage.ObjectName(storage.PendingReceiptPrefix(userID), key)
+	if !ok {
+		return nil, ErrReceiptKeyInvalid
+	}
+
+	attached := storage.ReceiptPrefix(userID) + name
+	err := s.store.Copy(ctx, s.bucket, key, attached)
+	if errors.Is(err, storage.ErrObjectNotFound) {
+		// A retried request may have attached it already.
+		if err := s.statReceipt(ctx, attached); err != nil {
+			return nil, err
+		}
+		return &attached, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	s.deleteObject(ctx, key)
+
+	return &attached, nil
+}
+
+// statReceipt returns ErrReceiptNotFound when no object has key.
+func (s *service) statReceipt(ctx context.Context, key string) error {
 	_, err := s.store.Stat(ctx, s.bucket, key)
 	if errors.Is(err, storage.ErrObjectNotFound) {
 		return ErrReceiptNotFound
@@ -398,14 +440,14 @@ func (s *service) checkReceipt(ctx context.Context, userID uuid.UUID, key string
 	return err
 }
 
-// parseDate parses a YYYY-MM-DD date and rejects dates after today in the
-// user's timezone.
-func (s *service) parseDate(v string) (time.Time, error) {
+// parseDate parses a YYYY-MM-DD date and rejects dates after today, the
+// user's local date.
+func parseDate(v string, today time.Time) (time.Time, error) {
 	d, err := time.Parse(dateLayout, v)
 	if err != nil {
 		return time.Time{}, ErrDateInvalid
 	}
-	if d.After(s.today()) {
+	if d.After(today) {
 		return time.Time{}, ErrDateInFuture
 	}
 
@@ -414,9 +456,13 @@ func (s *service) parseDate(v string) (time.Time, error) {
 
 // monthStart returns the first day of a YYYY-MM month, or of the current
 // month in the user's timezone when v is empty.
-func (s *service) monthStart(v string) (time.Time, error) {
+func (s *service) monthStart(ctx context.Context, userID uuid.UUID, v string) (time.Time, error) {
 	if v == "" {
-		y, m, _ := s.today().Date()
+		today, err := s.today(ctx, userID)
+		if err != nil {
+			return time.Time{}, err
+		}
+		y, m, _ := today.Date()
 		return time.Date(y, m, 1, 0, 0, 0, 0, time.UTC), nil
 	}
 
@@ -428,11 +474,19 @@ func (s *service) monthStart(v string) (time.Time, error) {
 	return d, nil
 }
 
-// today is the user's current local date at UTC midnight, comparable with
-// DATE values.
-func (s *service) today() time.Time {
-	y, m, d := s.now().In(userLocation).Date()
-	return time.Date(y, m, d, 0, 0, 0, 0, time.UTC)
+// today is the user's current local date in their stored timezone, at UTC
+// midnight so it compares with DATE values.
+func (s *service) today(ctx context.Context, userID uuid.UUID) (time.Time, error) {
+	name, err := s.users.Timezone(ctx, userID)
+	if err != nil {
+		return time.Time{}, err
+	}
+	loc, err := s.zones.Load(name)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("transaction: user timezone %q: %w", name, err)
+	}
+
+	return period.LocalDate(s.now(), loc), nil
 }
 
 // toResponse maps t with a presigned receipt URL.
@@ -455,15 +509,6 @@ func (s *service) deleteObject(ctx context.Context, key string) {
 	if err := s.store.Delete(ctx, s.bucket, key); err != nil {
 		s.log.ErrorContext(ctx, "transaction: delete object", "key", key, "error", err)
 	}
-}
-
-func receiptPrefix(userID uuid.UUID) string { return "receipts/" + userID.String() + "/" }
-
-// isOwnReceiptKey reports whether key is a single object directly under the
-// user's receipt prefix, rejecting path tricks such as "..".
-func isOwnReceiptKey(userID uuid.UUID, key string) bool {
-	name, ok := strings.CutPrefix(key, receiptPrefix(userID))
-	return ok && name != "" && !strings.ContainsAny(name, "/\\") && name != "." && name != ".."
 }
 
 // trimToNil trims s and turns a blank string into nil.

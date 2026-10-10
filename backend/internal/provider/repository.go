@@ -3,7 +3,6 @@ package provider
 import (
 	"context"
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -36,12 +35,18 @@ type Repository interface {
 	// ListActive returns the active providers with their aliases, ordered by
 	// sort_order, then name (case-insensitive). It never returns nil.
 	ListActive(ctx context.Context) ([]PaymentProvider, error)
+	// ActiveAliases returns the aliases of the given providers that are active,
+	// keyed by provider ID and sorted. Unknown or inactive IDs are left out.
+	ActiveAliases(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID][]string, error)
 	// List returns one page of providers, active and inactive, with their
 	// aliases, plus the total count matching filter. It never returns nil.
 	List(ctx context.Context, filter ListFilter) ([]PaymentProvider, int64, error)
 	// FindByID returns the provider with its aliases, or ErrNotFound when the
 	// row is missing or soft-deleted.
 	FindByID(ctx context.Context, id uuid.UUID) (*PaymentProvider, error)
+	// FindByIDForUpdate is FindByID that also locks the provider row until
+	// the transaction in ctx ends. Call it inside TxManager.WithinTx.
+	FindByIDForUpdate(ctx context.Context, id uuid.UUID) (*PaymentProvider, error)
 	// FindBySlug returns the provider with its aliases, or ErrNotFound when no
 	// non-deleted provider has slug. Register uses it for the Cash wallet.
 	FindBySlug(ctx context.Context, slug string) (*PaymentProvider, error)
@@ -84,6 +89,29 @@ func (r *repository) ListActive(ctx context.Context) ([]PaymentProvider, error) 
 	return normalizeAliases(ps), nil
 }
 
+func (r *repository) ActiveAliases(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID][]string, error) {
+	out := make(map[uuid.UUID][]string)
+	if len(ids) == 0 {
+		return out, nil
+	}
+
+	var rows []ProviderAlias
+	if err := database.Conn(ctx, r.db).
+		Table("provider_aliases a").
+		Select("a.alias, a.provider_id").
+		Joins("JOIN payment_providers p ON p.id = a.provider_id AND p.is_active AND p.deleted_at IS NULL").
+		Where("a.provider_id IN ?", ids).
+		Order("a.alias").
+		Scan(&rows).Error; err != nil {
+		return nil, err
+	}
+	for _, a := range rows {
+		out[a.ProviderID] = append(out[a.ProviderID], a.Alias)
+	}
+
+	return out, nil
+}
+
 func (r *repository) List(ctx context.Context, filter ListFilter) ([]PaymentProvider, int64, error) {
 	var total int64
 	if err := database.Conn(ctx, r.db).
@@ -107,11 +135,15 @@ func (r *repository) List(ctx context.Context, filter ListFilter) ([]PaymentProv
 }
 
 func (r *repository) FindByID(ctx context.Context, id uuid.UUID) (*PaymentProvider, error) {
-	return r.findOne(ctx, "id = ?", id)
+	return r.findOne(database.Conn(ctx, r.db), "id = ?", id)
+}
+
+func (r *repository) FindByIDForUpdate(ctx context.Context, id uuid.UUID) (*PaymentProvider, error) {
+	return r.findOne(database.Conn(ctx, r.db).Clauses(database.ForUpdate), "id = ?", id)
 }
 
 func (r *repository) FindBySlug(ctx context.Context, slug string) (*PaymentProvider, error) {
-	return r.findOne(ctx, "slug = ?", slug)
+	return r.findOne(database.Conn(ctx, r.db), "slug = ?", slug)
 }
 
 func (r *repository) Create(ctx context.Context, p *PaymentProvider) error {
@@ -213,10 +245,10 @@ func (r *repository) BumpCatalogVersion(ctx context.Context) error {
 	return nil
 }
 
-func (r *repository) findOne(ctx context.Context, query string, arg any) (*PaymentProvider, error) {
+func (r *repository) findOne(db *gorm.DB, query string, arg any) (*PaymentProvider, error) {
 	var p PaymentProvider
-	if err := withAliases(database.Conn(ctx, r.db)).Where(query, arg).First(&p).Error; err != nil {
-		return nil, notFound(err)
+	if err := withAliases(db).Where(query, arg).First(&p).Error; err != nil {
+		return nil, database.NotFound(err, ErrNotFound)
 	}
 	if p.Aliases == nil {
 		p.Aliases = []ProviderAlias{}
@@ -229,7 +261,7 @@ func (r *repository) findOne(ctx context.Context, query string, arg any) (*Payme
 // query.
 func (f ListFilter) scope(q *gorm.DB) *gorm.DB {
 	if f.Query != "" {
-		pattern := "%" + escapeLike(f.Query) + "%"
+		pattern := "%" + database.EscapeLike(f.Query) + "%"
 		q = q.Where("name ILIKE ? OR slug ILIKE ?", pattern, pattern)
 	}
 	if f.IsActive != nil {
@@ -257,21 +289,6 @@ func normalizeAliases(ps []PaymentProvider) []PaymentProvider {
 	}
 
 	return ps
-}
-
-var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
-
-// escapeLike escapes LIKE wildcards so user input matches literally.
-func escapeLike(s string) string {
-	return likeEscaper.Replace(s)
-}
-
-func notFound(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrNotFound
-	}
-
-	return err
 }
 
 func slugTaken(err error) error {

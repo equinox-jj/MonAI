@@ -31,7 +31,7 @@ type CreateProviderRequest struct {
 	Slug      *string  `json:"slug" validate:"omitempty,max=50"`
 	Type      Type     `json:"type" validate:"required,oneof=CASH BANK E_WALLET OTHER"`
 	Aliases   []string `json:"aliases" validate:"omitempty,max=20,dive,min=1,max=50"`
-	SortOrder int      `json:"sort_order"`
+	SortOrder int      `json:"sort_order" validate:"min=-2147483648,max=2147483647"`
 }
 
 // UpdateProviderRequest is the body of PATCH /admin/payment-providers/{id}.
@@ -41,7 +41,7 @@ type UpdateProviderRequest struct {
 	Slug      *string   `json:"slug" validate:"omitempty,max=50"`
 	Type      *Type     `json:"type" validate:"omitempty,oneof=CASH BANK E_WALLET OTHER"`
 	Aliases   *[]string `json:"aliases" validate:"omitempty,max=20,dive,min=1,max=50"`
-	SortOrder *int      `json:"sort_order"`
+	SortOrder *int      `json:"sort_order" validate:"omitempty,min=-2147483648,max=2147483647"`
 }
 
 // empty reports whether no field was sent (spec: minProperties 1).

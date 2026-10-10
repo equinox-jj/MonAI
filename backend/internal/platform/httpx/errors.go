@@ -41,6 +41,12 @@ func (e *Error) WithFields(fields ...FieldError) *Error {
 	return &c
 }
 
+// InvalidField is a 422 validation_failed error on one field, e.g.
+// InvalidField("date", "future_date", "must not be in the future").
+func InvalidField(field, code, message string) *Error {
+	return ErrValidationFailed.WithFields(FieldError{Field: field, Code: code, Message: message})
+}
+
 // WithMessage returns a copy of e with a more specific message.
 func (e *Error) WithMessage(message string) *Error {
 	c := *e

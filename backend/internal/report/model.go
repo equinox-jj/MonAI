@@ -8,11 +8,13 @@ type Totals struct {
 	Expense int64
 }
 
-// CategoryAmount is one expense category's sum for a date range.
+// CategoryAmount is one expense category's sum for the report month and for
+// the previous month.
 type CategoryAmount struct {
-	CategoryID uuid.UUID
-	Name       string
-	Icon       *string
-	Color      *string
-	Amount     int64
+	CategoryID     uuid.UUID
+	Name           string
+	Icon           *string
+	Color          *string
+	Amount         int64
+	PreviousAmount int64
 }

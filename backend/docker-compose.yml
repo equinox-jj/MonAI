@@ -9,8 +9,9 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-monai}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
       TZ: UTC
+    # Bound to localhost: reachable from this machine only.
     ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+      - "127.0.0.1:${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres-data:/var/lib/postgresql
     healthcheck:
@@ -25,12 +26,13 @@ services:
     restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env}
       MC_CONFIG_DIR: /tmp/.mc
+    # Bound to localhost; put a TLS proxy in front to serve files to devices.
     ports:
-      - "${MINIO_API_PORT:-9000}:9000"
-      - "${MINIO_CONSOLE_PORT:-9001}:9001"
+      - "127.0.0.1:${MINIO_API_PORT:-9000}:9000"
+      - "127.0.0.1:${MINIO_CONSOLE_PORT:-9001}:9001"
     volumes:
       - minio-data:/data
     healthcheck:
@@ -39,15 +41,19 @@ services:
       timeout: 5s
       retries: 10
 
-  # One-shot job: creates the buckets and makes expense-public readable.
+  # One-shot job: creates the buckets, makes expense-public readable, expires
+  # unattached receipt uploads after a day, and creates the API's own MinIO
+  # user, limited to the two buckets. Safe to rerun.
   minio-init:
     image: *minio-image
     depends_on:
       minio:
         condition: service_healthy
     environment:
-      MINIO_ROOT_USER: ${MINIO_ROOT_USER:-minioadmin}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:-minioadmin}
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER in .env}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD in .env}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?set MINIO_ACCESS_KEY in .env}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?set MINIO_SECRET_KEY in .env}
       MINIO_BUCKET_PRIVATE: ${MINIO_BUCKET_PRIVATE:-expense-private}
       MINIO_BUCKET_PUBLIC: ${MINIO_BUCKET_PUBLIC:-expense-public}
       MC_CONFIG_DIR: /tmp/.mc
@@ -59,6 +65,29 @@ services:
         mc mb --ignore-existing "local/$$MINIO_BUCKET_PRIVATE"
         mc mb --ignore-existing "local/$$MINIO_BUCKET_PUBLIC"
         mc anonymous set download "local/$$MINIO_BUCKET_PUBLIC"
+        # Must match storage.PendingReceiptsPrefix.
+        echo '{"Rules":[{"ID":"expire-pending-receipts","Status":"Enabled","Filter":{"Prefix":"receipts-pending/"},"Expiration":{"Days":1}}]}' \
+          | mc ilm import "local/$$MINIO_BUCKET_PRIVATE"
+        cat > /tmp/monai-api-policy.json <<JSON
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+              "Resource": ["arn:aws:s3:::$$MINIO_BUCKET_PRIVATE", "arn:aws:s3:::$$MINIO_BUCKET_PUBLIC"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+              "Resource": ["arn:aws:s3:::$$MINIO_BUCKET_PRIVATE/*", "arn:aws:s3:::$$MINIO_BUCKET_PUBLIC/*"]
+            }
+          ]
+        }
+        JSON
+        mc admin user add local "$$MINIO_ACCESS_KEY" "$$MINIO_SECRET_KEY"
+        mc admin policy create local monai-api /tmp/monai-api-policy.json
+        mc admin policy attach local monai-api --user "$$MINIO_ACCESS_KEY" || true
     restart: "no"
 
   api:
@@ -69,9 +98,11 @@ services:
       APP_ENV: ${APP_ENV:-development}
       DATABASE_URL: postgres://${POSTGRES_USER:-monai}:${POSTGRES_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
       MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
       MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:-http://localhost:${MINIO_API_PORT:-9000}}
     ports:
-      - "${API_PORT:-8080}:${API_PORT:-8080}"
+      - "127.0.0.1:${API_PORT:-8080}:${API_PORT:-8080}"
     depends_on:
       monai-db:
         condition: service_healthy

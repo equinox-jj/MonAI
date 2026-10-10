@@ -2,7 +2,6 @@ package category
 
 import (
 	"context"
-	"errors"
 	"time"
 
 	"github.com/google/uuid"
@@ -72,7 +71,7 @@ func (r *repository) FindByID(ctx context.Context, userID, id uuid.UUID) (*Categ
 	if err := database.Conn(ctx, r.db).
 		Where("id = ? AND user_id = ?", id, userID).
 		First(&c).Error; err != nil {
-		return nil, notFound(err)
+		return nil, database.NotFound(err, ErrNotFound)
 	}
 
 	return &c, nil
@@ -137,18 +136,16 @@ func (r *repository) HasTransactions(ctx context.Context, id uuid.UUID) (bool, e
 }
 
 func (r *repository) MoveTransactions(ctx context.Context, fromID, toID uuid.UUID) error {
-	return database.Conn(ctx, r.db).
+	err := database.Conn(ctx, r.db).
 		Table("transactions").
 		Where("category_id = ?", fromID).
 		Updates(map[string]any{
 			"category_id": toID,
 			"updated_at":  time.Now(),
 		}).Error
-}
-
-func notFound(err error) error {
-	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return ErrNotFound
+	// The target was deleted after the service checked it.
+	if database.IsForeignKeyViolation(err, "transactions_category_owner_fkey") {
+		return ErrMoveToInvalid
 	}
 
 	return err

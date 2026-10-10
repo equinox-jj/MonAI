@@ -4,7 +4,13 @@ import (
 	"context"
 
 	"gorm.io/gorm"
+	"gorm.io/gorm/clause"
 )
+
+// ForUpdate locks the selected rows until the transaction ends (SELECT ...
+// FOR UPDATE), so a read-modify-write inside WithinTx cannot lose a
+// concurrent update. Use it as db.Clauses(database.ForUpdate).
+var ForUpdate = clause.Locking{Strength: clause.LockingStrengthUpdate}
 
 type txKey struct{}
 

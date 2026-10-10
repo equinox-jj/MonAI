@@ -78,12 +78,20 @@ func (s *service) GetMe(ctx context.Context, userID uuid.UUID) (MeResponse, erro
 }
 
 func (s *service) UpdateMe(ctx context.Context, userID uuid.UUID, req UpdateMeRequest) (MeResponse, error) {
-	name := strings.TrimSpace(req.Name)
-	if name == "" {
-		return MeResponse{}, ErrNameBlank
+	if req.empty() {
+		return MeResponse{}, ErrNoFields
 	}
 
-	u, err := s.repo.UpdateName(ctx, userID, name)
+	var name *string
+	if req.Name != nil {
+		n := strings.TrimSpace(*req.Name)
+		if n == "" {
+			return MeResponse{}, ErrNameBlank
+		}
+		name = &n
+	}
+
+	u, err := s.repo.UpdateProfile(ctx, userID, name, req.Timezone)
 	if err != nil {
 		return MeResponse{}, err
 	}
@@ -120,7 +128,8 @@ func (s *service) DeleteAccount(ctx context.Context, userID uuid.UUID, req Delet
 
 	// The account is gone, so a storage failure only leaves orphaned objects
 	// and must not fail the request.
-	for _, prefix := range []string{avatarPrefix(u.ID), receiptPrefix(u.ID)} {
+	prefixes := []string{storage.AvatarPrefix(u.ID), storage.ReceiptPrefix(u.ID), storage.PendingReceiptPrefix(u.ID)}
+	for _, prefix := range prefixes {
 		if err := s.store.DeletePrefix(ctx, s.bucket, prefix); err != nil {
 			s.log.ErrorContext(ctx, "user: delete account objects", "user_id", u.ID, "prefix", prefix, "error", err)
 		}
@@ -140,7 +149,7 @@ func (s *service) SetAvatar(ctx context.Context, userID uuid.UUID, f httpx.File)
 		return MeResponse{}, err
 	}
 
-	key := avatarPrefix(userID) + uuid.NewString() + ext
+	key := storage.NewKey(storage.AvatarPrefix(userID), ext)
 	if err := s.store.Put(ctx, s.bucket, key, f.Body, f.Size, f.ContentType); err != nil {
 		return MeResponse{}, err
 	}
@@ -206,6 +215,3 @@ func (s *service) deleteObject(ctx context.Context, key string) {
 		s.log.ErrorContext(ctx, "user: delete object", "key", key, "error", err)
 	}
 }
-
-func avatarPrefix(userID uuid.UUID) string  { return "avatars/" + userID.String() + "/" }
-func receiptPrefix(userID uuid.UUID) string { return "receipts/" + userID.String() + "/" }
