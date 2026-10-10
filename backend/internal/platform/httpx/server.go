@@ -42,7 +42,7 @@ func startServer(lc fx.Lifecycle, app *fiber.App, cfg config.Config, log *slog.L
 					log.Error("http server stopped", "error", err)
 				}
 			}()
-			
+
 			return nil
 		},
 		OnStop: func(ctx context.Context) error {

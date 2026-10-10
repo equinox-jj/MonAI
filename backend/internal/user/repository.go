@@ -23,6 +23,7 @@ type Repository interface {
 	UpdateName(ctx context.Context, id uuid.UUID, name string) (*User, error)
 	// UpdateAvatarKey sets the avatar object key; nil clears it.
 	UpdateAvatarKey(ctx context.Context, id uuid.UUID, key *string) (*User, error)
+	UpdateRole(ctx context.Context, id uuid.UUID, roleID int64) (*User, error)
 	// Delete removes the user; their wallets, categories, transactions and
 	// budgets cascade in the DB.
 	Delete(ctx context.Context, id uuid.UUID) error
@@ -74,6 +75,10 @@ func (r *repository) UpdateName(ctx context.Context, id uuid.UUID, name string) 
 
 func (r *repository) UpdateAvatarKey(ctx context.Context, id uuid.UUID, key *string) (*User, error) {
 	return r.update(ctx, id, map[string]any{"avatar_key": key})
+}
+
+func (r *repository) UpdateRole(ctx context.Context, id uuid.UUID, roleID int64) (*User, error) {
+	return r.update(ctx, id, map[string]any{"role_id": roleID})
 }
 
 func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
