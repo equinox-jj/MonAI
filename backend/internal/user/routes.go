@@ -12,7 +12,6 @@ func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
 	me.Get("/", h.GetMe)
 	me.Patch("/", h.UpdateMe)
 	me.Delete("/", h.DeleteMe)
-	me.Post("/avatar/upload-url", h.CreateAvatarUploadURL)
-	me.Put("/avatar", h.ConfirmAvatar)
+	me.Put("/avatar", h.SetAvatar)
 	me.Delete("/avatar", h.DeleteAvatar)
 }

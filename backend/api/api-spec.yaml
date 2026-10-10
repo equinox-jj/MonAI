@@ -181,41 +181,20 @@ paths:
         '422': { $ref: '#/components/responses/BusinessRule' }
         '500': { $ref: '#/components/responses/InternalError' }
 
-  /me/avatar/upload-url:
-    post:
-      tags: [Me]
-      operationId: createAvatarUploadUrl
-      summary: Get a presigned URL to upload a profile picture
-      description: Max 2 MB; image/webp, image/jpeg or image/png. URL expires in 15 minutes.
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/UploadUrlRequest' }
-      responses:
-        '200':
-          description: Presigned upload URL
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/UploadUrlResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '422': { $ref: '#/components/responses/ValidationFailed' }
-        '500': { $ref: '#/components/responses/InternalError' }
-
   /me/avatar:
     put:
       tags: [Me]
-      operationId: confirmAvatar
-      summary: Confirm an uploaded profile picture
+      operationId: setAvatar
+      summary: Upload a profile picture
       description: |
-        Checks that the object exists under `avatars/{user_id}/`, is an allowed type and
-        at most 2 MB, saves it on the user and deletes the previous avatar.
+        Max 2 MB; image/jpeg, image/png or image/webp, detected from the file bytes. Stores it
+        under `avatars/{user_id}/`, saves it on the user and deletes the previous avatar.
+        Fails with 422 on field `file`: `required`, `max_size` or `content_type`.
       requestBody:
         required: true
         content:
-          application/json:
-            schema: { $ref: '#/components/schemas/ConfirmUploadRequest' }
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/FileUploadRequest' }
       responses:
         '200':
           description: Avatar updated
@@ -513,25 +492,26 @@ paths:
         '422': { $ref: '#/components/responses/ValidationFailed' }
         '500': { $ref: '#/components/responses/InternalError' }
 
-  /transactions/receipt-upload-url:
+  /transactions/receipt:
     post:
       tags: [Transactions]
-      operationId: createReceiptUploadUrl
-      summary: Get a presigned URL to upload a receipt photo
+      operationId: uploadReceipt
+      summary: Upload a receipt photo
       description: |
-        Max 5 MB; image/jpeg or image/webp. Pass the returned `object_key` as `receipt_key`
-        when creating or updating the transaction.
+        Max 5 MB; image/jpeg or image/webp, detected from the file bytes. Pass the returned
+        `receipt_key` when creating or updating the transaction.
+        Fails with 422 on field `file`: `required`, `max_size` or `content_type`.
       requestBody:
         required: true
         content:
-          application/json:
-            schema: { $ref: '#/components/schemas/UploadUrlRequest' }
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/FileUploadRequest' }
       responses:
         '200':
-          description: Presigned upload URL
+          description: Receipt stored
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/UploadUrlResponse' }
+              schema: { $ref: '#/components/schemas/ReceiptUploadResponse' }
         '400': { $ref: '#/components/responses/BadRequest' }
         '401': { $ref: '#/components/responses/Unauthorized' }
         '422': { $ref: '#/components/responses/ValidationFailed' }
@@ -928,45 +908,22 @@ paths:
         '422': { $ref: '#/components/responses/BusinessRule' }
         '500': { $ref: '#/components/responses/InternalError' }
 
-  /admin/payment-providers/{id}/logo-upload-url:
-    parameters:
-      - $ref: '#/components/parameters/IdPath'
-    post:
-      tags: [Admin - Payment Providers]
-      operationId: adminCreateProviderLogoUploadUrl
-      summary: Get a presigned URL to upload a provider logo
-      description: 'Requires permission `payment_provider.update`. Max 512 KB; image/png, image/webp or image/svg+xml.'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema: { $ref: '#/components/schemas/UploadUrlRequest' }
-      responses:
-        '200':
-          description: Presigned upload URL
-          content:
-            application/json:
-              schema: { $ref: '#/components/schemas/UploadUrlResponse' }
-        '400': { $ref: '#/components/responses/BadRequest' }
-        '401': { $ref: '#/components/responses/Unauthorized' }
-        '403': { $ref: '#/components/responses/Forbidden' }
-        '404': { $ref: '#/components/responses/NotFound' }
-        '422': { $ref: '#/components/responses/ValidationFailed' }
-        '500': { $ref: '#/components/responses/InternalError' }
-
   /admin/payment-providers/{id}/logo:
     parameters:
       - $ref: '#/components/parameters/IdPath'
     put:
       tags: [Admin - Payment Providers]
-      operationId: adminConfirmProviderLogo
-      summary: Confirm an uploaded provider logo
-      description: 'Requires permission `payment_provider.update`. Increments the catalog version.'
+      operationId: adminSetProviderLogo
+      summary: Upload a provider logo
+      description: |
+        Requires permission `payment_provider.update`. Max 512 KB; image/png or image/webp,
+        detected from the file bytes. Increments the catalog version; the previous logo stays
+        in storage. Fails with 422 on field `file`: `required`, `max_size` or `content_type`.
       requestBody:
         required: true
         content:
-          application/json:
-            schema: { $ref: '#/components/schemas/ConfirmUploadRequest' }
+          multipart/form-data:
+            schema: { $ref: '#/components/schemas/FileUploadRequest' }
       responses:
         '200':
           description: Logo updated
@@ -1358,42 +1315,28 @@ components:
         password: { type: string }
 
     # ------------------------------------------------ Uploads
-    UploadUrlRequest:
+    FileUploadRequest:
       type: object
-      required: [content_type, size_bytes]
+      required: [file]
       properties:
-        content_type:
+        file:
           type: string
-          enum: [image/jpeg, image/png, image/webp, image/svg+xml]
-          description: Allowed types depend on the endpoint
-        size_bytes: { type: integer, minimum: 1, example: 184320 }
+          format: binary
+          description: Allowed types and maximum size depend on the endpoint
 
-    UploadUrl:
+    ReceiptUpload:
       type: object
-      required: [upload_url, method, headers, object_key, expires_in]
+      required: [receipt_key]
       properties:
-        upload_url: { type: string, format: uri }
-        method: { type: string, const: PUT }
-        headers:
-          type: object
-          additionalProperties: { type: string }
-          example: { Content-Type: image/webp }
-        object_key: { type: string, example: avatars/2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11/7c1d.webp }
-        expires_in: { type: integer, example: 900 }
+        receipt_key: { type: string, example: receipts/2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11/7c1d.webp }
 
-    UploadUrlResponse:
+    ReceiptUploadResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessBase'
         - type: object
           required: [data]
           properties:
-            data: { $ref: '#/components/schemas/UploadUrl' }
-
-    ConfirmUploadRequest:
-      type: object
-      required: [object_key]
-      properties:
-        object_key: { type: string, maxLength: 255 }
+            data: { $ref: '#/components/schemas/ReceiptUpload' }
 
     # ------------------------------------------------ Wallets
     Wallet:
@@ -1597,7 +1540,7 @@ components:
         receipt_key:
           type: [string, 'null']
           maxLength: 255
-          description: Object key from `POST /transactions/receipt-upload-url`
+          description: Key returned by `POST /transactions/receipt`
         source:
           $ref: '#/components/schemas/TransactionSource'
           default: MANUAL

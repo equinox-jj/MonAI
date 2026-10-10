@@ -28,6 +28,5 @@ func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth, perm rbac
 	g.Patch("/:id", perm(rbac.PermProviderUpdate), h.Update)
 	g.Delete("/:id", perm(rbac.PermProviderDelete), h.Delete)
 	g.Patch("/:id/status", perm(rbac.PermProviderUpdate), h.SetStatus)
-	g.Post("/:id/logo-upload-url", perm(rbac.PermProviderUpdate), h.CreateLogoUploadURL)
-	g.Put("/:id/logo", perm(rbac.PermProviderUpdate), h.ConfirmLogo)
+	g.Put("/:id/logo", perm(rbac.PermProviderUpdate), h.SetLogo)
 }

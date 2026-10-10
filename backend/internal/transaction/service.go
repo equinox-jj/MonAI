@@ -22,11 +22,13 @@ import (
 // so a fixed zone avoids depending on tzdata.
 var userLocation = time.FixedZone("Asia/Jakarta", 7*60*60)
 
-// receiptExtensions lists the allowed receipt content types and the file
-// extension used in their object keys.
-var receiptExtensions = map[string]string{
-	"image/jpeg": ".jpg",
-	"image/webp": ".webp",
+// receiptRule limits receipt uploads and maps their types to key extensions.
+var receiptRule = httpx.FileRule{
+	MaxBytes: ReceiptMaxSizeBytes,
+	Types: map[string]string{
+		"image/jpeg": ".jpg",
+		"image/webp": ".webp",
+	},
 }
 
 type Service interface {
@@ -47,7 +49,9 @@ type Service interface {
 	// Restore fails with ErrWalletArchived if one of the transaction's
 	// wallets was archived after the delete.
 	Restore(ctx context.Context, userID, id uuid.UUID) (TransactionResponse, error)
-	CreateReceiptUploadURL(ctx context.Context, userID uuid.UUID, req ReceiptUploadURLRequest) (UploadURLResponse, error)
+	// UploadReceipt checks and stores f under the user's receipt prefix and
+	// returns its key for receipt_key.
+	UploadReceipt(ctx context.Context, userID uuid.UUID, f httpx.File) (ReceiptUploadResponse, error)
 }
 
 type service struct {
@@ -249,19 +253,18 @@ func (s *service) Restore(ctx context.Context, userID, id uuid.UUID) (Transactio
 	return s.toResponse(ctx, t)
 }
 
-func (s *service) CreateReceiptUploadURL(ctx context.Context, userID uuid.UUID, req ReceiptUploadURLRequest) (UploadURLResponse, error) {
-	ext, ok := receiptExtensions[req.ContentType]
-	if !ok {
-		return UploadURLResponse{}, ErrReceiptType
+func (s *service) UploadReceipt(ctx context.Context, userID uuid.UUID, f httpx.File) (ReceiptUploadResponse, error) {
+	ext, err := receiptRule.Check(f)
+	if err != nil {
+		return ReceiptUploadResponse{}, err
 	}
 
 	key := receiptPrefix(userID) + uuid.NewString() + ext
-	url, err := s.store.PresignPut(ctx, s.bucket, key, ReceiptURLExpiresIn)
-	if err != nil {
-		return UploadURLResponse{}, err
+	if err := s.store.Put(ctx, s.bucket, key, f.Body, f.Size, f.ContentType); err != nil {
+		return ReceiptUploadResponse{}, err
 	}
 
-	return ToUploadURLResponse(url, key, req.ContentType, ReceiptURLExpiresIn), nil
+	return ReceiptUploadResponse{ReceiptKey: key}, nil
 }
 
 // applyUpdate applies the fields present in req to t.
@@ -380,33 +383,19 @@ func checkShape(t *Transaction) error {
 	return nil
 }
 
-// checkReceipt verifies that key is the user's uploaded receipt with an
-// allowed type and size. A rejected object is deleted so it does not linger
-// in the bucket.
+// checkReceipt verifies that key is one of the user's uploaded receipts. Type
+// and size were checked by UploadReceipt.
 func (s *service) checkReceipt(ctx context.Context, userID uuid.UUID, key string) error {
 	if !isOwnReceiptKey(userID, key) {
 		return ErrReceiptKeyInvalid
 	}
 
-	info, err := s.store.Stat(ctx, s.bucket, key)
+	_, err := s.store.Stat(ctx, s.bucket, key)
 	if errors.Is(err, storage.ErrObjectNotFound) {
 		return ErrReceiptNotFound
 	}
-	if err != nil {
-		return err
-	}
 
-	var reject error
-	if _, ok := receiptExtensions[info.ContentType]; !ok {
-		reject = ErrReceiptType
-	} else if info.Size > ReceiptMaxSizeBytes {
-		reject = ErrReceiptTooLarge
-	}
-	if reject != nil {
-		s.deleteObject(ctx, key)
-	}
-
-	return reject
+	return err
 }
 
 // parseDate parses a YYYY-MM-DD date and rejects dates after today in the

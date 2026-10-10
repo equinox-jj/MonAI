@@ -10,8 +10,7 @@ type Handler interface {
 	GetMe(c fiber.Ctx) error
 	UpdateMe(c fiber.Ctx) error
 	DeleteMe(c fiber.Ctx) error
-	CreateAvatarUploadURL(c fiber.Ctx) error
-	ConfirmAvatar(c fiber.Ctx) error
+	SetAvatar(c fiber.Ctx) error
 	DeleteAvatar(c fiber.Ctx) error
 }
 
@@ -59,27 +58,14 @@ func (h *handler) DeleteMe(c fiber.Ctx) error {
 	return httpx.Deleted(c)
 }
 
-func (h *handler) CreateAvatarUploadURL(c fiber.Ctx) error {
-	var req AvatarUploadURLRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return err
-	}
-
-	resp, err := h.svc.CreateAvatarUploadURL(c.Context(), httpx.UserID(c), req)
+func (h *handler) SetAvatar(c fiber.Ctx) error {
+	f, err := httpx.FormFile(c)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	return httpx.OK(c, "Upload URL created successfully.", resp)
-}
-
-func (h *handler) ConfirmAvatar(c fiber.Ctx) error {
-	var req ConfirmAvatarRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return err
-	}
-
-	resp, err := h.svc.ConfirmAvatar(c.Context(), httpx.UserID(c), req)
+	resp, err := h.svc.SetAvatar(c.Context(), httpx.UserID(c), f)
 	if err != nil {
 		return err
 	}

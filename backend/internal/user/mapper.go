@@ -1,8 +1,6 @@
 package user
 
 import (
-	"time"
-
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 )
 
@@ -21,16 +19,5 @@ func ToMeResponse(u *User, role *rbac.Role, permissions []string, avatarURL *str
 		Role:        rbac.ToRoleSummary(role),
 		Permissions: permissions,
 		CreatedAt:   u.CreatedAt.UTC(),
-	}
-}
-
-// ToUploadURLResponse builds the presigned avatar upload response for a PUT URL.
-func ToUploadURLResponse(uploadURL, objectKey, contentType string, expiresIn time.Duration) UploadURLResponse {
-	return UploadURLResponse{
-		UploadURL: uploadURL,
-		Method:    "PUT",
-		Headers:   map[string]string{"Content-Type": contentType},
-		ObjectKey: objectKey,
-		ExpiresIn: int(expiresIn.Seconds()),
 	}
 }

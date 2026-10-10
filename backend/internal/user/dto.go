@@ -8,7 +8,8 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 )
 
-// Avatar upload limits (ERD §storage: expense-private/avatars/{user_id}/…).
+// Avatar limits (ERD §storage: expense-private/avatars/{user_id}/…).
+// AvatarURLExpiresIn is the lifetime of the presigned GET URL in MeResponse.
 const (
 	AvatarMaxSizeBytes = 2 * 1024 * 1024
 	AvatarURLExpiresIn = 15 * time.Minute
@@ -26,17 +27,6 @@ type DeleteAccountRequest struct {
 	Password string `json:"password" validate:"required"`
 }
 
-// AvatarUploadURLRequest is the body of POST /me/avatar/upload-url.
-type AvatarUploadURLRequest struct {
-	ContentType string `json:"content_type" validate:"required,oneof=image/jpeg image/png image/webp"`
-	SizeBytes   int64  `json:"size_bytes" validate:"required,min=1,max=2097152"`
-}
-
-// ConfirmAvatarRequest is the body of PUT /me/avatar.
-type ConfirmAvatarRequest struct {
-	ObjectKey string `json:"object_key" validate:"required,max=255"`
-}
-
 // ---------------------------------------------------------------- Responses
 
 // MeResponse is the current user's profile, role and permissions. It is the data
@@ -49,13 +39,4 @@ type MeResponse struct {
 	Role        rbac.RoleSummary `json:"role"`
 	Permissions []string         `json:"permissions"`
 	CreatedAt   time.Time        `json:"created_at"`
-}
-
-// UploadURLResponse is a presigned PUT URL the client uploads the file to.
-type UploadURLResponse struct {
-	UploadURL string            `json:"upload_url"`
-	Method    string            `json:"method"` // always PUT
-	Headers   map[string]string `json:"headers"`
-	ObjectKey string            `json:"object_key"`
-	ExpiresIn int               `json:"expires_in"` // seconds
 }

@@ -11,12 +11,17 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 )
 
+// bodyLimit caps request bodies. It is just above the largest upload (5 MB
+// receipts) to leave room for the multipart framing.
+const bodyLimit = 6 << 20
+
 // NewApp creates the Fiber app. c.Bind() runs v on every decoded request, and
 // every error returned by a handler or middleware is written by NewErrorHandler.
 func NewApp(v *Validator, log *slog.Logger) *fiber.App {
 	return fiber.New(fiber.Config{
 		AppName:         "MonAI API",
 		StructValidator: v,
+		BodyLimit:       bodyLimit,
 		ErrorHandler:    NewErrorHandler(log),
 	})
 }

@@ -21,8 +21,7 @@ type Handler interface {
 	Update(c fiber.Ctx) error
 	Delete(c fiber.Ctx) error
 	SetStatus(c fiber.Ctx) error
-	CreateLogoUploadURL(c fiber.Ctx) error
-	ConfirmLogo(c fiber.Ctx) error
+	SetLogo(c fiber.Ctx) error
 }
 
 type handler struct {
@@ -153,37 +152,19 @@ func (h *handler) SetStatus(c fiber.Ctx) error {
 	return httpx.OK(c, "Payment provider status updated successfully.", resp)
 }
 
-func (h *handler) CreateLogoUploadURL(c fiber.Ctx) error {
+func (h *handler) SetLogo(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	var req UploadURLRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return err
-	}
-
-	resp, err := h.svc.CreateLogoUploadURL(c.Context(), id, req)
+	f, err := httpx.FormFile(c)
 	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	return httpx.OK(c, "Upload URL created successfully.", resp)
-}
-
-func (h *handler) ConfirmLogo(c fiber.Ctx) error {
-	id, err := httpx.ParamUUID(c, "id")
-	if err != nil {
-		return err
-	}
-
-	var req ConfirmUploadRequest
-	if err := c.Bind().Body(&req); err != nil {
-		return err
-	}
-
-	resp, err := h.svc.ConfirmLogo(c.Context(), httpx.UserID(c), id, req)
+	resp, err := h.svc.SetLogo(c.Context(), httpx.UserID(c), id, f)
 	if err != nil {
 		return err
 	}

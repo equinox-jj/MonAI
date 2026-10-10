@@ -8,7 +8,8 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 )
 
-// Receipt upload limits (ERD §storage: expense-private/receipts/{user_id}/…).
+// Receipt limits (ERD §storage: expense-private/receipts/{user_id}/…).
+// ReceiptURLExpiresIn is the lifetime of the presigned GET receipt_url.
 const (
 	ReceiptMaxSizeBytes = 5 * 1024 * 1024
 	ReceiptURLExpiresIn = 15 * time.Minute
@@ -73,12 +74,6 @@ func (r UpdateTransactionRequest) empty() bool {
 		!r.Note.Set && !r.Merchant.Set && !r.ReceiptKey.Set
 }
 
-// ReceiptUploadURLRequest is the body of POST /transactions/receipt-upload-url.
-type ReceiptUploadURLRequest struct {
-	ContentType string `json:"content_type" validate:"required,oneof=image/jpeg image/webp"`
-	SizeBytes   int64  `json:"size_bytes" validate:"required,min=1,max=5242880"`
-}
-
 // ---------------------------------------------------------------- Responses
 
 // TransactionResponse is a transaction as returned by the API.
@@ -98,11 +93,8 @@ type TransactionResponse struct {
 	UpdatedAt  time.Time  `json:"updated_at"`
 }
 
-// UploadURLResponse is a presigned PUT URL the client uploads the file to.
-type UploadURLResponse struct {
-	UploadURL string            `json:"upload_url"`
-	Method    string            `json:"method"` // always PUT
-	Headers   map[string]string `json:"headers"`
-	ObjectKey string            `json:"object_key"`
-	ExpiresIn int               `json:"expires_in"` // seconds
+// ReceiptUploadResponse is the data of POST /transactions/receipt. The client
+// passes ReceiptKey as receipt_key when creating or updating a transaction.
+type ReceiptUploadResponse struct {
+	ReceiptKey string `json:"receipt_key"`
 }

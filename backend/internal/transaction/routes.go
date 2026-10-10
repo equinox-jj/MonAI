@@ -12,7 +12,7 @@ func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
 	g := r.Group("/transactions", fiber.Handler(auth))
 	g.Get("", h.List)
 	g.Post("", h.Create)
-	g.Post("/receipt-upload-url", h.CreateReceiptUploadURL) // before the /:id routes
+	g.Post("/receipt", h.UploadReceipt) // before the /:id routes
 	g.Get("/:id", h.Get)
 	g.Patch("/:id", h.Update)
 	g.Delete("/:id", h.Delete)

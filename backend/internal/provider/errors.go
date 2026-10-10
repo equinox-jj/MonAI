@@ -36,20 +36,4 @@ var (
 		Code:    "invalid",
 		Message: "must not contain blank aliases",
 	})
-	ErrContentType = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
-		Field:   "content_type",
-		Code:    "invalid",
-		Message: "must be image/png, image/webp or image/svg+xml",
-	})
-	ErrFileTooLarge = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
-		Field:   "size_bytes",
-		Code:    "max",
-		Message: "must be at most 524288",
-		Params:  map[string]any{"max": logoMaxBytes},
-	})
-	ErrObjectKeyInvalid = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
-		Field:   "object_key",
-		Code:    "invalid",
-		Message: "must be an uploaded logo of this provider within the size and type limits",
-	})
 )

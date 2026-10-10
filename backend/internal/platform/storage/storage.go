@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -15,7 +16,7 @@ import (
 
 var ErrObjectNotFound = errors.New("storage: object not found")
 
-// ObjectInfo is what features check when confirming an upload.
+// ObjectInfo describes a stored object.
 type ObjectInfo struct {
 	Size        int64
 	ContentType string
@@ -24,7 +25,8 @@ type ObjectInfo struct {
 // Storage is generic object storage. Key layout, size limits and allowed
 // content types belong to the features that call it.
 type Storage interface {
-	PresignPut(ctx context.Context, bucket, key string, ttl time.Duration) (string, error)
+	// Put stores body (exactly size bytes) under key with the given content type.
+	Put(ctx context.Context, bucket, key string, body io.Reader, size int64, contentType string) error
 	PresignGet(ctx context.Context, bucket, key string, ttl time.Duration) (string, error)
 	// Stat returns ErrObjectNotFound when the key does not exist.
 	Stat(ctx context.Context, bucket, key string) (ObjectInfo, error)
@@ -78,12 +80,9 @@ func (s *minioStorage) Ping(ctx context.Context) error {
 	return nil
 }
 
-func (s *minioStorage) PresignPut(ctx context.Context, bucket, key string, ttl time.Duration) (string, error) {
-	u, err := s.client.PresignedPutObject(ctx, bucket, key, ttl)
-	if err != nil {
-		return "", err
-	}
-	return u.String(), nil
+func (s *minioStorage) Put(ctx context.Context, bucket, key string, body io.Reader, size int64, contentType string) error {
+	_, err := s.client.PutObject(ctx, bucket, key, body, size, minio.PutObjectOptions{ContentType: contentType})
+	return err
 }
 
 func (s *minioStorage) PresignGet(ctx context.Context, bucket, key string, ttl time.Duration) (string, error) {

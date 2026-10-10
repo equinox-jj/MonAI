@@ -2,11 +2,9 @@ package provider
 
 import (
 	"context"
-	"errors"
 	"regexp"
 	"slices"
 	"strings"
-	"time"
 
 	"github.com/google/uuid"
 
@@ -16,17 +14,15 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/storage"
 )
 
-// Logo upload limits (ERD §7: expense-public, providers/{provider_id}/…).
-const (
-	logoMaxBytes  = 512 << 10
-	logoUploadTTL = 15 * time.Minute
-)
-
-// logoExtensions maps the allowed logo content types to their file extension.
-var logoExtensions = map[string]string{
-	"image/png":     "png",
-	"image/webp":    "webp",
-	"image/svg+xml": "svg",
+// logoRule limits logo uploads (ERD §7: expense-public,
+// providers/{provider_id}/…). SVG is not accepted: it can carry scripts and
+// is served from a public bucket.
+var logoRule = httpx.FileRule{
+	MaxBytes: 512 << 10,
+	Types: map[string]string{
+		"image/png":  ".png",
+		"image/webp": ".webp",
+	},
 }
 
 const slugMaxLen = 50
@@ -54,11 +50,9 @@ type Service interface {
 	// Delete soft-deletes a non-system provider and removes its aliases. The
 	// logo stays in storage.
 	Delete(ctx context.Context, id uuid.UUID) error
-	// CreateLogoUploadURL presigns a PUT for a new logo of the provider.
-	CreateLogoUploadURL(ctx context.Context, id uuid.UUID, req UploadURLRequest) (UploadURLResponse, error)
-	// ConfirmLogo checks the uploaded object and sets it as the provider's
-	// logo.
-	ConfirmLogo(ctx context.Context, actorID, id uuid.UUID, req ConfirmUploadRequest) (AdminProviderResponse, error)
+	// SetLogo checks and stores f and sets it as the provider's logo. The
+	// previous logo stays in storage.
+	SetLogo(ctx context.Context, actorID, id uuid.UUID, f httpx.File) (AdminProviderResponse, error)
 }
 
 type service struct {
@@ -256,55 +250,33 @@ func (s *service) Delete(ctx context.Context, id uuid.UUID) error {
 	})
 }
 
-func (s *service) CreateLogoUploadURL(ctx context.Context, id uuid.UUID, req UploadURLRequest) (UploadURLResponse, error) {
-	ext, ok := logoExtensions[req.ContentType]
-	if !ok {
-		return UploadURLResponse{}, ErrContentType
-	}
-	if req.SizeBytes > logoMaxBytes {
-		return UploadURLResponse{}, ErrFileTooLarge
-	}
-
-	if _, err := s.repo.FindByID(ctx, id); err != nil {
-		return UploadURLResponse{}, err
-	}
-
-	key := logoPrefix(id) + uuid.NewString() + "." + ext
-	url, err := s.store.PresignPut(ctx, s.bucket, key, logoUploadTTL)
-	if err != nil {
-		return UploadURLResponse{}, err
-	}
-
-	return UploadURLResponse{
-		UploadURL: url,
-		Method:    "PUT",
-		Headers:   map[string]string{"Content-Type": req.ContentType},
-		ObjectKey: key,
-		ExpiresIn: int(logoUploadTTL.Seconds()),
-	}, nil
-}
-
-func (s *service) ConfirmLogo(ctx context.Context, actorID, id uuid.UUID, req ConfirmUploadRequest) (AdminProviderResponse, error) {
-	if !strings.HasPrefix(req.ObjectKey, logoPrefix(id)) {
-		return AdminProviderResponse{}, ErrObjectKeyInvalid
-	}
-
-	// A presigned PUT does not enforce type or size, so check what landed.
-	info, err := s.store.Stat(ctx, s.bucket, req.ObjectKey)
-	if errors.Is(err, storage.ErrObjectNotFound) {
-		return AdminProviderResponse{}, ErrObjectKeyInvalid
-	}
+func (s *service) SetLogo(ctx context.Context, actorID, id uuid.UUID, f httpx.File) (AdminProviderResponse, error) {
+	ext, err := logoRule.Check(f)
 	if err != nil {
 		return AdminProviderResponse{}, err
 	}
-	if _, ok := logoExtensions[info.ContentType]; !ok || info.Size > logoMaxBytes {
-		return AdminProviderResponse{}, ErrObjectKeyInvalid
+
+	// Check the provider first so an unknown ID stores nothing.
+	if _, err := s.repo.FindByID(ctx, id); err != nil {
+		return AdminProviderResponse{}, err
 	}
 
-	return s.mutate(ctx, actorID, id, func(_ context.Context, p *PaymentProvider) error {
-		p.LogoKey = &req.ObjectKey
+	key := logoPrefix(id) + uuid.NewString() + ext
+	if err := s.store.Put(ctx, s.bucket, key, f.Body, f.Size, f.ContentType); err != nil {
+		return AdminProviderResponse{}, err
+	}
+
+	resp, err := s.mutate(ctx, actorID, id, func(_ context.Context, p *PaymentProvider) error {
+		p.LogoKey = &key
 		return nil
 	})
+	if err != nil {
+		// Best effort: the object is unreferenced, so a failure only leaves an orphan.
+		_ = s.store.Delete(ctx, s.bucket, key)
+		return AdminProviderResponse{}, err
+	}
+
+	return resp, nil
 }
 
 // mutate loads the provider, applies fn, then saves it as updated by actorID

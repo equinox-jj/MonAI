@@ -2,7 +2,6 @@ package user
 
 import (
 	"context"
-	"errors"
 	"log/slog"
 	"strings"
 
@@ -10,17 +9,20 @@ import (
 
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/security"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/storage"
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 )
 
-// avatarExtensions lists the allowed avatar content types and the file
-// extension used in their object keys.
-var avatarExtensions = map[string]string{
-	"image/jpeg": ".jpg",
-	"image/png":  ".png",
-	"image/webp": ".webp",
+// avatarRule limits avatar uploads and maps their types to key extensions.
+var avatarRule = httpx.FileRule{
+	MaxBytes: AvatarMaxSizeBytes,
+	Types: map[string]string{
+		"image/jpeg": ".jpg",
+		"image/png":  ".png",
+		"image/webp": ".webp",
+	},
 }
 
 type Service interface {
@@ -29,10 +31,9 @@ type Service interface {
 	// DeleteAccount checks the password, deletes the user (their data cascades
 	// in the DB) and then removes their avatar and receipt objects.
 	DeleteAccount(ctx context.Context, userID uuid.UUID, req DeleteAccountRequest) error
-	CreateAvatarUploadURL(ctx context.Context, userID uuid.UUID, req AvatarUploadURLRequest) (UploadURLResponse, error)
-	// ConfirmAvatar checks the uploaded object, saves it on the user and
-	// deletes the previous avatar.
-	ConfirmAvatar(ctx context.Context, userID uuid.UUID, req ConfirmAvatarRequest) (MeResponse, error)
+	// SetAvatar checks and stores f, saves it on the user and deletes the
+	// previous avatar.
+	SetAvatar(ctx context.Context, userID uuid.UUID, f httpx.File) (MeResponse, error)
 	// DeleteAvatar clears the avatar. It is a no-op when none is set.
 	DeleteAvatar(ctx context.Context, userID uuid.UUID) error
 }
@@ -128,28 +129,9 @@ func (s *service) DeleteAccount(ctx context.Context, userID uuid.UUID, req Delet
 	return nil
 }
 
-func (s *service) CreateAvatarUploadURL(ctx context.Context, userID uuid.UUID, req AvatarUploadURLRequest) (UploadURLResponse, error) {
-	ext, ok := avatarExtensions[req.ContentType]
-	if !ok {
-		return UploadURLResponse{}, ErrAvatarType
-	}
-
-	key := avatarPrefix(userID) + uuid.NewString() + ext
-	url, err := s.store.PresignPut(ctx, s.bucket, key, AvatarURLExpiresIn)
+func (s *service) SetAvatar(ctx context.Context, userID uuid.UUID, f httpx.File) (MeResponse, error) {
+	ext, err := avatarRule.Check(f)
 	if err != nil {
-		return UploadURLResponse{}, err
-	}
-
-	return ToUploadURLResponse(url, key, req.ContentType, AvatarURLExpiresIn), nil
-}
-
-func (s *service) ConfirmAvatar(ctx context.Context, userID uuid.UUID, req ConfirmAvatarRequest) (MeResponse, error) {
-	key := req.ObjectKey
-	if !isOwnAvatarKey(userID, key) {
-		return MeResponse{}, ErrAvatarKeyInvalid
-	}
-
-	if err := s.checkAvatarObject(ctx, key); err != nil {
 		return MeResponse{}, err
 	}
 
@@ -158,12 +140,18 @@ func (s *service) ConfirmAvatar(ctx context.Context, userID uuid.UUID, req Confi
 		return MeResponse{}, err
 	}
 
-	u, err := s.repo.UpdateAvatarKey(ctx, userID, &key)
-	if err != nil {
+	key := avatarPrefix(userID) + uuid.NewString() + ext
+	if err := s.store.Put(ctx, s.bucket, key, f.Body, f.Size, f.ContentType); err != nil {
 		return MeResponse{}, err
 	}
 
-	if prev.AvatarKey != nil && *prev.AvatarKey != key {
+	u, err := s.repo.UpdateAvatarKey(ctx, userID, &key)
+	if err != nil {
+		s.deleteObject(ctx, key)
+		return MeResponse{}, err
+	}
+
+	if prev.AvatarKey != nil {
 		s.deleteObject(ctx, *prev.AvatarKey)
 	}
 
@@ -185,30 +173,6 @@ func (s *service) DeleteAvatar(ctx context.Context, userID uuid.UUID) error {
 	s.deleteObject(ctx, *u.AvatarKey)
 
 	return nil
-}
-
-// checkAvatarObject verifies the uploaded object's type and size. A rejected
-// object is deleted so it does not linger in the bucket.
-func (s *service) checkAvatarObject(ctx context.Context, key string) error {
-	info, err := s.store.Stat(ctx, s.bucket, key)
-	if errors.Is(err, storage.ErrObjectNotFound) {
-		return ErrAvatarNotFound
-	}
-	if err != nil {
-		return err
-	}
-
-	var reject error
-	if _, ok := avatarExtensions[info.ContentType]; !ok {
-		reject = ErrAvatarType
-	} else if info.Size > AvatarMaxSizeBytes {
-		reject = ErrAvatarTooLarge
-	}
-	if reject != nil {
-		s.deleteObject(ctx, key)
-	}
-
-	return reject
 }
 
 // toMe loads the role, its permissions and a presigned avatar URL for u.
@@ -245,10 +209,3 @@ func (s *service) deleteObject(ctx context.Context, key string) {
 
 func avatarPrefix(userID uuid.UUID) string  { return "avatars/" + userID.String() + "/" }
 func receiptPrefix(userID uuid.UUID) string { return "receipts/" + userID.String() + "/" }
-
-// isOwnAvatarKey reports whether key is a single object directly under the
-// user's avatar prefix, rejecting path tricks such as "..".
-func isOwnAvatarKey(userID uuid.UUID, key string) bool {
-	name, ok := strings.CutPrefix(key, avatarPrefix(userID))
-	return ok && name != "" && !strings.ContainsAny(name, "/\\") && name != "." && name != ".."
-}

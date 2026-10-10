@@ -54,17 +54,6 @@ type ProviderStatusRequest struct {
 	IsActive *bool `json:"is_active" validate:"required"`
 }
 
-// UploadURLRequest is the body of POST /admin/payment-providers/{id}/logo-upload-url.
-type UploadURLRequest struct {
-	ContentType string `json:"content_type" validate:"required"`
-	SizeBytes   int64  `json:"size_bytes" validate:"required,min=1"`
-}
-
-// ConfirmUploadRequest is the body of PUT /admin/payment-providers/{id}/logo.
-type ConfirmUploadRequest struct {
-	ObjectKey string `json:"object_key" validate:"required,max=255"`
-}
-
 // ---------------------------------------------------------------- Responses
 
 // ProviderResponse is a provider in the public catalog.
@@ -93,13 +82,4 @@ type AdminProviderResponse struct {
 type ProviderCatalogResponse struct {
 	Version   int64              `json:"version"`
 	Providers []ProviderResponse `json:"providers"`
-}
-
-// UploadURLResponse is a presigned upload URL for the client to PUT to.
-type UploadURLResponse struct {
-	UploadURL string            `json:"upload_url"`
-	Method    string            `json:"method"`
-	Headers   map[string]string `json:"headers"`
-	ObjectKey string            `json:"object_key"`
-	ExpiresIn int               `json:"expires_in"`
 }

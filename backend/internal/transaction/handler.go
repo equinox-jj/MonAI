@@ -13,7 +13,7 @@ type Handler interface {
 	Update(c fiber.Ctx) error
 	Delete(c fiber.Ctx) error
 	Restore(c fiber.Ctx) error
-	CreateReceiptUploadURL(c fiber.Ctx) error
+	UploadReceipt(c fiber.Ctx) error
 }
 
 type handler struct {
@@ -112,16 +112,17 @@ func (h *handler) Restore(c fiber.Ctx) error {
 	return httpx.OK(c, "Transaction restored successfully.", resp)
 }
 
-func (h *handler) CreateReceiptUploadURL(c fiber.Ctx) error {
-	var req ReceiptUploadURLRequest
-	if err := c.Bind().Body(&req); err != nil {
+func (h *handler) UploadReceipt(c fiber.Ctx) error {
+	f, err := httpx.FormFile(c)
+	if err != nil {
 		return err
 	}
+	defer f.Close()
 
-	resp, err := h.svc.CreateReceiptUploadURL(c.Context(), httpx.UserID(c), req)
+	resp, err := h.svc.UploadReceipt(c.Context(), httpx.UserID(c), f)
 	if err != nil {
 		return err
 	}
 
-	return httpx.OK(c, "Upload URL created successfully.", resp)
+	return httpx.OK(c, "Receipt uploaded successfully.", resp)
 }
