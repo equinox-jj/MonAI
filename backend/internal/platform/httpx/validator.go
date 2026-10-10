@@ -45,15 +45,19 @@ type Validator struct {
 func NewValidator() *Validator {
 	v := validator.New(validator.WithRequiredStructEnabled())
 
+	// Fields are reported by the name the client sent: the json tag for
+	// bodies, else the query tag for query-only structs.
 	v.RegisterTagNameFunc(func(f reflect.StructField) string {
-		name, _, _ := strings.Cut(f.Tag.Get("json"), ",")
-		if name == "-" {
-			return ""
+		for _, tag := range []string{"json", "query"} {
+			name, _, _ := strings.Cut(f.Tag.Get(tag), ",")
+			if name == "-" {
+				return ""
+			}
+			if name != "" {
+				return name
+			}
 		}
-		if name == "" {
-			return f.Name
-		}
-		return name
+		return f.Name
 	})
 
 	// requires_digit: the string contains at least one digit (passwords).
