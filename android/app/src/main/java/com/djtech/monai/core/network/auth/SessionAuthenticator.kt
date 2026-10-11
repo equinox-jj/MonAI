@@ -18,8 +18,10 @@ class SessionAuthenticator @Inject constructor(
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
-        if (response.request.header(AuthInterceptor.AUTHORIZATION) != null) {
-            sessionExpiredHandler.onSessionExpired()
+        val rejectedToken = response.request.header(AuthInterceptor.AUTHORIZATION)
+            ?.removePrefix(AuthInterceptor.BEARER_PREFIX)
+        if (rejectedToken != null) {
+            sessionExpiredHandler.onSessionExpired(rejectedToken)
         }
         return null
     }

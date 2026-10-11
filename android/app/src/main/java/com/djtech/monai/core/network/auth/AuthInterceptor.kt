@@ -18,12 +18,13 @@ class AuthInterceptor @Inject constructor(
 
         return chain.proceed(
             request.newBuilder()
-                .header(AUTHORIZATION, "Bearer $token")
+                .header(AUTHORIZATION, "$BEARER_PREFIX$token")
                 .build(),
         )
     }
 
     internal companion object {
         const val AUTHORIZATION = "Authorization"
+        const val BEARER_PREFIX = "Bearer "
     }
 }

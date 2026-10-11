@@ -12,10 +12,10 @@ import org.junit.Test
 class SessionAuthenticatorTest {
 
     private val server = MockWebServer()
-    private var expiredCalls = 0
+    private val rejectedTokens = mutableListOf<String>()
 
     private val client = OkHttpClient.Builder()
-        .authenticator(SessionAuthenticator { expiredCalls++ })
+        .authenticator(SessionAuthenticator { rejectedTokens += it })
         .build()
 
     @Before
@@ -40,7 +40,7 @@ class SessionAuthenticatorTest {
         )
 
         assertEquals(401, code)
-        assertEquals(1, expiredCalls)
+        assertEquals(listOf("expired"), rejectedTokens)
         assertEquals(1, server.requestCount)
     }
 
@@ -52,7 +52,7 @@ class SessionAuthenticatorTest {
         val code = execute(Request.Builder().url(server.url("/auth/login")).build())
 
         assertEquals(401, code)
-        assertEquals(0, expiredCalls)
+        assertEquals(emptyList<String>(), rejectedTokens)
         assertEquals(1, server.requestCount)
     }
 

@@ -13,7 +13,8 @@ interface AppClock {
     fun now(): Instant
     fun zone(): ZoneId
 
-    fun today(): LocalDate = LocalDate.ofInstant(now(), zone())
+    // Not LocalDate.ofInstant: that is API 34+ and minSdk is 26.
+    fun today(): LocalDate = now().atZone(zone()).toLocalDate()
     fun currentMonth(): YearMonth = YearMonth.from(today())
 }
 

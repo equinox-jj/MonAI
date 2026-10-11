@@ -1,9 +1,10 @@
 package com.djtech.monai.core.network.auth
 
 /**
- * Called when the server rejects the stored token. Implementations clear the
- * token and the local cache, then send the user to Login.
+ * Called when the server rejects a token. Implementations clear it (only if it
+ * is still the stored one, since a new login may have replaced it while the
+ * request was in flight) and the local cache, then send the user to Login.
  */
 fun interface SessionExpiredHandler {
-    fun onSessionExpired()
+    fun onSessionExpired(rejectedToken: String)
 }
