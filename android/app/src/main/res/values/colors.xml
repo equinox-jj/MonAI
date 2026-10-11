@@ -7,4 +7,6 @@
     <color name="teal_700">#FF018786</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+    <!-- Indigo600, the design system primary. -->
+    <color name="splash_background">#FF4A45D6</color>
 </resources>

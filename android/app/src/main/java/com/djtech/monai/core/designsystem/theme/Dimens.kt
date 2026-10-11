@@ -82,6 +82,13 @@ data class MonAISizes(
     val navBar: Dp = 80.dp,
     val navIndicatorWidth: Dp = 64.dp,
     val navIndicatorHeight: Dp = 32.dp,
+    /** Medium-width (tablet portrait) navigation rail. */
+    val navRail: Dp = 80.dp,
+    val navRailIndicatorWidth: Dp = 56.dp,
+    /** Expanded-width (tablet landscape) permanent drawer. */
+    val navDrawer: Dp = 240.dp,
+    val navDrawerItem: Dp = 48.dp,
+    val navDrawerLogo: Dp = 32.dp,
     val fab: Dp = 56.dp,
     val avatarSmall: Dp = 32.dp,
     val avatarMedium: Dp = 40.dp,

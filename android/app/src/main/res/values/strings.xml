@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">MonAI</string>
+
+    <string name="nav_home">Home</string>
+    <string name="nav_transactions">Transactions</string>
+    <string name="nav_wallets">Wallets</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_add_transaction">Add transaction</string>
+    <string name="placeholder_welcome">Welcome</string>
 </resources>
