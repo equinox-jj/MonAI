@@ -80,10 +80,25 @@ fun MonAIStateMessage(
                 .background(container),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(icon, null, Modifier.size(MonAITheme.sizes.iconXxl), tint = content)
+            Icon(
+                icon,
+                null,
+                Modifier.size(MonAITheme.sizes.iconXxl),
+                tint = content,
+            )
         }
-        Text(title, style = MonAITheme.typography.titleMedium, color = colors.textPrimary, textAlign = TextAlign.Center)
-        Text(message, style = MonAITheme.typography.bodyMedium, color = colors.textSecondary, textAlign = TextAlign.Center)
+        Text(
+            title,
+            style = MonAITheme.typography.titleMedium,
+            color = colors.textPrimary,
+            textAlign = TextAlign.Center,
+        )
+        Text(
+            message,
+            style = MonAITheme.typography.bodyMedium,
+            color = colors.textSecondary,
+            textAlign = TextAlign.Center,
+        )
         if (actionLabel != null) {
             MonAIButton(
                 text = actionLabel,

@@ -58,14 +58,30 @@ class ApiErrorMapperTest {
 
         val error = mapper.map(httpException(404, body))
 
-        assertEquals(ApiError.Http(404, "not_found", "Resource not found", emptyList()), error)
+        assertEquals(
+            ApiError.Http(
+                404,
+                "not_found",
+                "Resource not found",
+                emptyList(),
+            ),
+            error,
+        )
     }
 
     @Test
     fun `falls back to the generic code for the status when the body is not the envelope`() {
         val error = mapper.map(httpException(502, "<html>Bad Gateway</html>"))
 
-        assertEquals(ApiError.Http(502, "internal_error", "", emptyList()), error)
+        assertEquals(
+            ApiError.Http(
+                502,
+                "internal_error",
+                "",
+                emptyList(),
+            ),
+            error,
+        )
     }
 
     @Test

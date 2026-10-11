@@ -25,7 +25,13 @@ class SystemAppClockTest {
 
     @Test
     fun `falls back to Jakarta when the device reports UTC`() {
-        for (zone in listOf("UTC", "GMT", "Etc/UTC", "Z")) {
+        val utcAliases = listOf(
+            "UTC",
+            "GMT",
+            "Etc/UTC",
+            "Z",
+        )
+        for (zone in utcAliases) {
             val clock = SystemAppClock(fixed) { ZoneId.of(zone) }
             assertEquals(zone, ZoneId.of("Asia/Jakarta"), clock.zone())
         }

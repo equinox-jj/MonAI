@@ -133,7 +133,12 @@ fun MonAIButton(
                 Spacer(Modifier.width(spec.iconGap))
             }
         }
-        Text(text = text, style = spec.textStyle, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(
+            text = text,
+            style = spec.textStyle,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
@@ -151,10 +156,34 @@ private fun MonAIButtonSize.spec(): ButtonSpec {
     val type = MonAITheme.typography
     val spacing = MonAITheme.spacing
     return when (this) {
-        MonAIButtonSize.Large -> ButtonSpec(sizes.buttonLarge, type.titleMedium, spacing.x6, sizes.iconLg, spacing.x2)
-        MonAIButtonSize.Medium -> ButtonSpec(sizes.buttonMedium, type.labelLarge, spacing.x5, sizes.iconLg, spacing.x1_5)
-        MonAIButtonSize.Compact -> ButtonSpec(sizes.touchTarget, type.labelLarge, spacing.x4, sizes.iconMd, spacing.x1_5)
-        MonAIButtonSize.Small -> ButtonSpec(sizes.buttonSmall, type.labelMedium, spacing.x3_5, sizes.iconSm, spacing.x1_5)
+        MonAIButtonSize.Large -> ButtonSpec(
+            sizes.buttonLarge,
+            type.titleMedium,
+            spacing.x6,
+            sizes.iconLg,
+            spacing.x2,
+        )
+        MonAIButtonSize.Medium -> ButtonSpec(
+            sizes.buttonMedium,
+            type.labelLarge,
+            spacing.x5,
+            sizes.iconLg,
+            spacing.x1_5,
+        )
+        MonAIButtonSize.Compact -> ButtonSpec(
+            sizes.touchTarget,
+            type.labelLarge,
+            spacing.x4,
+            sizes.iconMd,
+            spacing.x1_5,
+        )
+        MonAIButtonSize.Small -> ButtonSpec(
+            sizes.buttonSmall,
+            type.labelMedium,
+            spacing.x3_5,
+            sizes.iconSm,
+            spacing.x1_5,
+        )
     }
 }
 
@@ -221,24 +250,77 @@ private fun ButtonPreview() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             MonAIButton("Sign in", onClick = {}, modifier = Modifier.fillMaxWidth())
-            MonAIButton("Save expense", onClick = {}, leadingIcon = MonAIIcons.Check, modifier = Modifier.fillMaxWidth())
-            MonAIButton("Trying…", onClick = {}, size = MonAIButtonSize.Medium, loading = true)
+            MonAIButton(
+                "Save expense",
+                onClick = {},
+                leadingIcon = MonAIIcons.Check,
+                modifier = Modifier.fillMaxWidth(),
+            )
+            MonAIButton(
+                "Trying…",
+                onClick = {},
+                size = MonAIButtonSize.Medium,
+                loading = true,
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MonAIButton("New wallet", onClick = {}, variant = MonAIButtonVariant.Outlined, size = MonAIButtonSize.Medium, leadingIcon = MonAIIcons.Add)
+                MonAIButton(
+                    "New wallet",
+                    onClick = {},
+                    variant = MonAIButtonVariant.Outlined,
+                    size = MonAIButtonSize.Medium,
+                    leadingIcon = MonAIIcons.Add,
+                )
                 MonAIButton("Done", onClick = {}, size = MonAIButtonSize.Medium)
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
-                MonAIButton("Scan", onClick = {}, variant = MonAIButtonVariant.Tonal, size = MonAIButtonSize.Small, leadingIcon = MonAIIcons.DocumentScanner)
-                MonAIButton("Cancel", onClick = {}, variant = MonAIButtonVariant.Text, size = MonAIButtonSize.Compact)
-                MonAIButton("Delete", onClick = {}, variant = MonAIButtonVariant.Destructive, size = MonAIButtonSize.Compact)
+                MonAIButton(
+                    "Scan",
+                    onClick = {},
+                    variant = MonAIButtonVariant.Tonal,
+                    size = MonAIButtonSize.Small,
+                    leadingIcon = MonAIIcons.DocumentScanner,
+                )
+                MonAIButton(
+                    "Cancel",
+                    onClick = {},
+                    variant = MonAIButtonVariant.Text,
+                    size = MonAIButtonSize.Compact,
+                )
+                MonAIButton(
+                    "Delete",
+                    onClick = {},
+                    variant = MonAIButtonVariant.Destructive,
+                    size = MonAIButtonSize.Compact,
+                )
             }
-            MonAIButton("Disabled", onClick = {}, enabled = false, modifier = Modifier.fillMaxWidth())
+            MonAIButton(
+                "Disabled",
+                onClick = {},
+                enabled = false,
+                modifier = Modifier.fillMaxWidth(),
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MonAIIconButton(MonAIIcons.ArrowBack, "Back", onClick = {})
-                MonAIIconButton(MonAIIcons.Search, "Search", onClick = {}, style = MonAIIconButtonStyle.Surface)
-                MonAIIconButton(MonAIIcons.DocumentScanner, "Scan receipt", onClick = {}, style = MonAIIconButtonStyle.Tonal, size = 52.dp)
+                MonAIIconButton(
+                    MonAIIcons.Search,
+                    "Search",
+                    onClick = {},
+                    style = MonAIIconButtonStyle.Surface,
+                )
+                MonAIIconButton(
+                    MonAIIcons.DocumentScanner,
+                    "Scan receipt",
+                    onClick = {},
+                    style = MonAIIconButtonStyle.Tonal,
+                    size = 52.dp,
+                )
                 Box {
-                    MonAIIconButton(MonAIIcons.Delete, "Delete", onClick = {}, tint = MonAITheme.colors.error)
+                    MonAIIconButton(
+                        MonAIIcons.Delete,
+                        "Delete",
+                        onClick = {},
+                        tint = MonAITheme.colors.error,
+                    )
                 }
             }
         }

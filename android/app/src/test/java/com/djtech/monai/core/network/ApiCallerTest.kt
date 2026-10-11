@@ -31,7 +31,14 @@ class ApiCallerTest {
         }
 
         assertEquals(
-            ApiResult.Failure(ApiError.Http(429, "rate_limited", "Too many requests", emptyList())),
+            ApiResult.Failure(
+                ApiError.Http(
+                    429,
+                    "rate_limited",
+                    "Too many requests",
+                    emptyList(),
+                ),
+            ),
             result,
         )
     }

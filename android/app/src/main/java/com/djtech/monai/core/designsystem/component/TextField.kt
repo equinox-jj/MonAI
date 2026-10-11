@@ -133,17 +133,32 @@ fun MonAITextField(
                     horizontalArrangement = Arrangement.spacedBy(if (compact) spacing.x2 else spacing.x2_5),
                 ) {
                     if (leadingIcon != null) {
-                        Icon(leadingIcon, null, Modifier.size(sizes.iconLg), tint = colors.textTertiary)
+                        Icon(
+                            leadingIcon,
+                            null,
+                            Modifier.size(sizes.iconLg),
+                            tint = colors.textTertiary,
+                        )
                     }
                     Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                         if (value.isEmpty() && placeholder != null) {
-                            Text(placeholder, style = MonAITheme.typography.bodyLarge, color = colors.textDisabled, maxLines = 1)
+                            Text(
+                                placeholder,
+                                style = MonAITheme.typography.bodyLarge,
+                                color = colors.textDisabled,
+                                maxLines = 1,
+                            )
                         }
                         inner()
                     }
                     when {
                         trailing != null -> trailing()
-                        isError -> Icon(MonAIIcons.Error, null, Modifier.size(sizes.iconLg), tint = colors.error)
+                        isError -> Icon(
+                            MonAIIcons.Error,
+                            null,
+                            Modifier.size(sizes.iconLg),
+                            tint = colors.error,
+                        )
                     }
                 }
             },
@@ -201,7 +216,12 @@ private fun FieldSupportingText(text: String, tone: MonAIFieldTone) {
     }
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5)) {
         if (tone == MonAIFieldTone.Success) {
-            Icon(MonAIIcons.CheckCircle, null, Modifier.size(MonAITheme.sizes.iconSm), tint = color)
+            Icon(
+                MonAIIcons.CheckCircle,
+                null,
+                Modifier.size(MonAITheme.sizes.iconSm),
+                tint = color,
+            )
         }
         Text(text, style = MonAITheme.typography.bodySmall, color = color)
     }
@@ -230,10 +250,20 @@ fun MonAISearchField(
         keyboardActions = keyboardActions,
         decorationBox = { inner ->
             PillFrame(height = sizes.searchField) {
-                Icon(MonAIIcons.Search, null, Modifier.size(sizes.iconLg), tint = colors.textTertiary)
+                Icon(
+                    MonAIIcons.Search,
+                    null,
+                    Modifier.size(sizes.iconLg),
+                    tint = colors.textTertiary,
+                )
                 Box(Modifier.weight(1f), contentAlignment = Alignment.CenterStart) {
                     if (value.isEmpty()) {
-                        Text(placeholder, style = MonAITheme.typography.bodyLarge, color = colors.textTertiary, maxLines = 1)
+                        Text(
+                            placeholder,
+                            style = MonAITheme.typography.bodyLarge,
+                            color = colors.textTertiary,
+                            maxLines = 1,
+                        )
                     }
                     inner()
                 }
@@ -271,7 +301,12 @@ fun MonAIPillField(
             .clip(CircleShape)
             .clickable(role = Role.Button, onClick = onClick),
     ) {
-        Icon(leadingIcon, null, Modifier.size(MonAITheme.sizes.iconLg), tint = leadingIconTint)
+        Icon(
+            leadingIcon,
+            null,
+            Modifier.size(MonAITheme.sizes.iconLg),
+            tint = leadingIconTint,
+        )
         Text(
             text,
             modifier = Modifier.weight(1f),
@@ -334,7 +369,12 @@ fun MonAISelectField(
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2),
     ) {
         if (leadingIcon != null) {
-            Icon(leadingIcon, null, Modifier.size(sizes.iconLg), tint = colors.accent)
+            Icon(
+                leadingIcon,
+                null,
+                Modifier.size(sizes.iconLg),
+                tint = colors.accent,
+            )
         }
         Column(Modifier.weight(1f)) {
             if (label != null) {
@@ -349,7 +389,12 @@ fun MonAISelectField(
             )
         }
         if (showChevron) {
-            Icon(MonAIIcons.ExpandMore, null, Modifier.size(sizes.iconMd), tint = colors.textTertiary)
+            Icon(
+                MonAIIcons.ExpandMore,
+                null,
+                Modifier.size(sizes.iconMd),
+                tint = colors.textTertiary,
+            )
         }
     }
 }
@@ -364,7 +409,12 @@ private fun TextFieldPreview() {
                 .padding(24.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MonAITextField(value = "joshua@example.com", onValueChange = {}, label = "Email", leadingIcon = MonAIIcons.Mail)
+            MonAITextField(
+                value = "joshua@example.com",
+                onValueChange = {},
+                label = "Email",
+                leadingIcon = MonAIIcons.Mail,
+            )
             MonAITextField(
                 value = "joshua@example.com",
                 onValueChange = {},
@@ -373,15 +423,44 @@ private fun TextFieldPreview() {
                 tone = MonAIFieldTone.Error,
                 supportingText = "This email already has an account.",
             )
-            MonAIPasswordField(value = "secretpass", onValueChange = {}, label = "Password", supportingText = "At least 8 characters", tone = MonAIFieldTone.Success)
-            MonAITextField(value = "", onValueChange = {}, placeholder = "Add a note (optional)", leadingIcon = MonAIIcons.EditNote, compact = true)
+            MonAIPasswordField(
+                value = "secretpass",
+                onValueChange = {},
+                label = "Password",
+                supportingText = "At least 8 characters",
+                tone = MonAIFieldTone.Success,
+            )
+            MonAITextField(
+                value = "",
+                onValueChange = {},
+                placeholder = "Add a note (optional)",
+                leadingIcon = MonAIIcons.EditNote,
+                compact = true,
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MonAISelectField("BCA Tabungan", onClick = {}, leadingIcon = MonAIIcons.AccountBalance, showChevron = true, modifier = Modifier.weight(1f))
-                MonAISelectField("Today, 10 Oct", onClick = {}, leadingIcon = MonAIIcons.CalendarToday, modifier = Modifier.weight(1f))
+                MonAISelectField(
+                    "BCA Tabungan",
+                    onClick = {},
+                    leadingIcon = MonAIIcons.AccountBalance,
+                    showChevron = true,
+                    modifier = Modifier.weight(1f),
+                )
+                MonAISelectField(
+                    "Today, 10 Oct",
+                    onClick = {},
+                    leadingIcon = MonAIIcons.CalendarToday,
+                    modifier = Modifier.weight(1f),
+                )
             }
             MonAISelectField("GoPay", onClick = {}, label = "To")
             MonAISearchField(value = "", onValueChange = {}, placeholder = "Search note or merchant")
-            MonAIPillField("makan siang 35rb pakai gopay", MonAIIcons.AutoAwesome, onClick = {}, leadingIconTint = MonAITheme.colors.accent, height = 52.dp)
+            MonAIPillField(
+                "makan siang 35rb pakai gopay",
+                MonAIIcons.AutoAwesome,
+                onClick = {},
+                leadingIconTint = MonAITheme.colors.accent,
+                height = 52.dp,
+            )
         }
     }
 }

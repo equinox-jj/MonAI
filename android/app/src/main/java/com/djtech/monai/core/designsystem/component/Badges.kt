@@ -64,7 +64,12 @@ fun MonAIPill(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
     ) {
-        if (icon != null) Icon(icon, null, Modifier.size(MonAITheme.sizes.iconXs), tint = contentColor)
+        if (icon != null) Icon(
+            icon,
+            null,
+            Modifier.size(MonAITheme.sizes.iconXs),
+            tint = contentColor,
+        )
         Text(text, style = MonAITheme.typography.labelMedium, color = contentColor)
     }
 }
@@ -78,7 +83,13 @@ fun MonAIDirectionPill(text: String, direction: MoneyDirection, modifier: Modifi
         MoneyDirection.Income -> colors.incomeContainer to if (colors.isDark) colors.income else colors.successText
         MoneyDirection.Transfer -> colors.primaryContainer to colors.onPrimaryContainer
     }
-    MonAIPill(text, modifier, icon = direction.arrowIcon(), containerColor = container, contentColor = content)
+    MonAIPill(
+        text,
+        modifier,
+        icon = direction.arrowIcon(),
+        containerColor = container,
+        contentColor = content,
+    )
 }
 
 /** Initials on a light-indigo circle. Font size scales with [size] (44dp → 15sp, 64dp → 22sp). */

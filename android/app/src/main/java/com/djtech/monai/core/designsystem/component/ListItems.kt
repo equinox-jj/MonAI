@@ -56,7 +56,12 @@ fun MonAICategoryIcon(
             .background(CategoryColors.tint(color, dark)),
         contentAlignment = Alignment.Center,
     ) {
-        Icon(icon, null, Modifier.size(iconSize), tint = CategoryColors.content(color, dark))
+        Icon(
+            icon,
+            null,
+            Modifier.size(iconSize),
+            tint = CategoryColors.content(color, dark),
+        )
     }
 }
 
@@ -93,7 +98,13 @@ fun MonAIAmountText(
     modifier: Modifier = Modifier,
     style: TextStyle = MonAITheme.extendedTypography.amount,
 ) {
-    Text(amount, modifier = modifier, style = style, color = direction.color(), maxLines = 1)
+    Text(
+        amount,
+        modifier = modifier,
+        style = style,
+        color = direction.color(),
+        maxLines = 1,
+    )
 }
 
 /**
@@ -122,9 +133,21 @@ fun MonAIListItem(
         ) {
             leading?.invoke()
             Column(Modifier.weight(1f)) {
-                Text(title, style = MonAITheme.typography.titleMedium, color = colors.textPrimary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                Text(
+                    title,
+                    style = MonAITheme.typography.titleMedium,
+                    color = colors.textPrimary,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
                 if (supporting != null) {
-                    Text(supporting, style = MonAITheme.typography.bodySmall, color = colors.textTertiary, maxLines = 1, overflow = TextOverflow.Ellipsis)
+                    Text(
+                        supporting,
+                        style = MonAITheme.typography.bodySmall,
+                        color = colors.textTertiary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
                 }
             }
             trailing?.invoke()
@@ -165,9 +188,19 @@ fun MonAITransactionRow(
                 MonAIAmountText(amount, direction)
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1)) {
                     if (hasReceipt) {
-                        Icon(MonAIIcons.AttachFile, receiptContentDescription, Modifier.size(MonAITheme.sizes.iconSm), tint = MonAITheme.colors.textTertiary)
+                        Icon(
+                            MonAIIcons.AttachFile,
+                            receiptContentDescription,
+                            Modifier.size(MonAITheme.sizes.iconSm),
+                            tint = MonAITheme.colors.textTertiary,
+                        )
                     }
-                    Icon(direction.arrowIcon(), null, Modifier.size(MonAITheme.sizes.iconSm), tint = direction.color())
+                    Icon(
+                        direction.arrowIcon(),
+                        null,
+                        Modifier.size(MonAITheme.sizes.iconSm),
+                        tint = direction.color(),
+                    )
                 }
             }
         },
@@ -198,7 +231,12 @@ fun MonAISettingsGroup(
             content = content,
         )
         if (footer != null) {
-            Text(footer, Modifier.padding(start = spacing.x1), style = MonAITheme.typography.bodySmall, color = colors.textTertiary)
+            Text(
+                footer,
+                Modifier.padding(start = spacing.x1),
+                style = MonAITheme.typography.bodySmall,
+                color = colors.textTertiary,
+            )
         }
     }
 }
@@ -241,7 +279,12 @@ fun MonAISettingsRow(
                 overflow = TextOverflow.Ellipsis,
             )
             if (value != null) {
-                Text(value, style = MonAITheme.extendedTypography.bodyCompact, color = colors.textTertiary, maxLines = 1)
+                Text(
+                    value,
+                    style = MonAITheme.extendedTypography.bodyCompact,
+                    color = colors.textTertiary,
+                    maxLines = 1,
+                )
             }
             if (showChevron) {
                 Icon(MonAIIcons.ChevronRight, null, tint = colors.textDisabled)
@@ -313,14 +356,56 @@ private fun ListItemsPreview() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             MonAICard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(0.dp), verticalArrangement = Arrangement.Top) {
-                MonAITransactionRow("Makan siang", "Food · GoPay · 12:40", "−Rp 35.000", MoneyDirection.Expense, MonAIIcons.Restaurant, Color(0xFFF97316))
-                MonAITransactionRow("Belanja bulanan", "Shopping · BCA · Yesterday", "−Rp 187.500", MoneyDirection.Expense, MonAIIcons.ShoppingBag, Color(0xFFEC4899), hasReceipt = true)
-                MonAITransactionRow("Gaji", "Salary · BCA · 1 Oct", "+Rp 8.500.000", MoneyDirection.Income, MonAIIcons.Payments, Color(0xFF14B8A6))
-                MonAITransactionRow("Top up GoPay", "Transfer · BCA → GoPay", "Rp 500.000", MoneyDirection.Transfer, MonAIIcons.SwapHoriz, MonAITheme.colors.primary, showDivider = false)
+                MonAITransactionRow(
+                    "Makan siang",
+                    "Food · GoPay · 12:40",
+                    "−Rp 35.000",
+                    MoneyDirection.Expense,
+                    MonAIIcons.Restaurant,
+                    Color(0xFFF97316),
+                )
+                MonAITransactionRow(
+                    "Belanja bulanan",
+                    "Shopping · BCA · Yesterday",
+                    "−Rp 187.500",
+                    MoneyDirection.Expense,
+                    MonAIIcons.ShoppingBag,
+                    Color(0xFFEC4899),
+                    hasReceipt = true,
+                )
+                MonAITransactionRow(
+                    "Gaji",
+                    "Salary · BCA · 1 Oct",
+                    "+Rp 8.500.000",
+                    MoneyDirection.Income,
+                    MonAIIcons.Payments,
+                    Color(0xFF14B8A6),
+                )
+                MonAITransactionRow(
+                    "Top up GoPay",
+                    "Transfer · BCA → GoPay",
+                    "Rp 500.000",
+                    MoneyDirection.Transfer,
+                    MonAIIcons.SwapHoriz,
+                    MonAITheme.colors.primary,
+                    showDivider = false,
+                )
             }
             MonAISettingsGroup("Money", footer = "Only people with provider permissions see this section.") {
-                MonAISettingsRow("Monthly budget", MonAIIcons.Savings, onClick = {}, value = "Rp 3 jt")
-                MonAISettingsRow("Delete account", MonAIIcons.PersonRemove, onClick = {}, destructive = true, showChevron = false, showDivider = false)
+                MonAISettingsRow(
+                    "Monthly budget",
+                    MonAIIcons.Savings,
+                    onClick = {},
+                    value = "Rp 3 jt",
+                )
+                MonAISettingsRow(
+                    "Delete account",
+                    MonAIIcons.PersonRemove,
+                    onClick = {},
+                    destructive = true,
+                    showChevron = false,
+                    showDivider = false,
+                )
             }
             MonAIRadioOption(
                 title = "BCA Tabungan",
@@ -330,7 +415,12 @@ private fun ListItemsPreview() {
                 onClick = {},
                 leading = { MonAIMonogram("BCA", containerColor = MonAITheme.colors.primary, contentColor = Color.White) },
             )
-            MonAIRadioOption(title = "GoPay", subtitle = "Rp 1.185.000", selected = false, onClick = {})
+            MonAIRadioOption(
+                title = "GoPay",
+                subtitle = "Rp 1.185.000",
+                selected = false,
+                onClick = {},
+            )
         }
     }
 }

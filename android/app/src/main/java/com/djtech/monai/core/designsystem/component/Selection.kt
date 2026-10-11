@@ -59,9 +59,19 @@ fun MonAIFilterChip(
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1),
     ) {
         val content = if (selected) colors.onPrimaryContainer else colors.iconStrong
-        if (selected) Icon(MonAIIcons.Check, null, Modifier.size(sizes.iconSm), tint = content)
+        if (selected) Icon(
+            MonAIIcons.Check,
+            null,
+            Modifier.size(sizes.iconSm),
+            tint = content,
+        )
         Text(label, style = MonAITheme.typography.labelMedium, color = content)
-        if (hasDropdown) Icon(MonAIIcons.ExpandMore, null, Modifier.size(sizes.iconSm), tint = content)
+        if (hasDropdown) Icon(
+            MonAIIcons.ExpandMore,
+            null,
+            Modifier.size(sizes.iconSm),
+            tint = content,
+        )
     }
 }
 
@@ -96,7 +106,12 @@ fun MonAICategoryChip(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
     ) {
-        MonAICategoryIcon(icon, color, size = sizes.avatarSmall, iconSize = sizes.iconMd)
+        MonAICategoryIcon(
+            icon,
+            color,
+            size = sizes.avatarSmall,
+            iconSize = sizes.iconMd,
+        )
         Text(label, style = MonAITheme.extendedTypography.bodyCompact.copy(fontWeight = MonAITheme.typography.labelMedium.fontWeight), color = colors.textPrimary)
     }
 }
@@ -181,11 +196,28 @@ private fun SelectionPreview() {
             MonAISegmentedControl(transactionTypeSegments("Expense", "Income", "Transfer"), selectedIndex = 0, onSelect = {})
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MonAIFilterChip("All types", selected = true, onClick = {})
-                MonAIFilterChip("Wallet", selected = false, onClick = {}, hasDropdown = true)
+                MonAIFilterChip(
+                    "Wallet",
+                    selected = false,
+                    onClick = {},
+                    hasDropdown = true,
+                )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                MonAICategoryChip("Food", MonAIIcons.Restaurant, Color(0xFFF97316), selected = true, onClick = {})
-                MonAICategoryChip("Transport", MonAIIcons.DirectionsCar, Color(0xFF0EA5E9), selected = false, onClick = {})
+                MonAICategoryChip(
+                    "Food",
+                    MonAIIcons.Restaurant,
+                    Color(0xFFF97316),
+                    selected = true,
+                    onClick = {},
+                )
+                MonAICategoryChip(
+                    "Transport",
+                    MonAIIcons.DirectionsCar,
+                    Color(0xFF0EA5E9),
+                    selected = false,
+                    onClick = {},
+                )
             }
         }
     }

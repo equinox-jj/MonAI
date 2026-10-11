@@ -50,16 +50,41 @@ import com.djtech.monai.core.designsystem.theme.MonAITheme
 
 enum class MonAIAlertTone { Info, Success, Warning, Error }
 
-private data class ToneColors(val container: Color, val border: Color?, val icon: Color, val content: Color)
+private data class ToneColors(
+    val container: Color,
+    val border: Color?,
+    val icon: Color,
+    val content: Color,
+)
 
 @Composable
 private fun MonAIAlertTone.colors(): ToneColors {
     val c = MonAITheme.colors
     return when (this) {
-        MonAIAlertTone.Info -> ToneColors(c.primaryContainer, null, c.accent, c.onPrimaryContainer)
-        MonAIAlertTone.Success -> ToneColors(c.incomeContainer, null, c.success, c.successText)
-        MonAIAlertTone.Warning -> ToneColors(c.warningContainer, c.warningContainerBorder, c.warning, c.onWarningContainer)
-        MonAIAlertTone.Error -> ToneColors(c.errorContainer, c.errorContainerBorder, c.error, c.onErrorContainer)
+        MonAIAlertTone.Info -> ToneColors(
+            c.primaryContainer,
+            null,
+            c.accent,
+            c.onPrimaryContainer,
+        )
+        MonAIAlertTone.Success -> ToneColors(
+            c.incomeContainer,
+            null,
+            c.success,
+            c.successText,
+        )
+        MonAIAlertTone.Warning -> ToneColors(
+            c.warningContainer,
+            c.warningContainerBorder,
+            c.warning,
+            c.onWarningContainer,
+        )
+        MonAIAlertTone.Error -> ToneColors(
+            c.errorContainer,
+            c.errorContainerBorder,
+            c.error,
+            c.onErrorContainer,
+        )
     }
 }
 
@@ -91,7 +116,12 @@ fun MonAIInlineAlert(
             .semantics { if (tone == MonAIAlertTone.Error) liveRegion = LiveRegionMode.Assertive },
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2_5),
     ) {
-        Icon(icon, null, Modifier.size(MonAITheme.sizes.iconLg), tint = t.icon)
+        Icon(
+            icon,
+            null,
+            Modifier.size(MonAITheme.sizes.iconLg),
+            tint = t.icon,
+        )
         Text(message, style = MonAITheme.extendedTypography.bodyCompact, color = t.content)
     }
 }
@@ -119,7 +149,12 @@ fun MonAIStatusStrip(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2),
         ) {
-            Icon(icon, null, Modifier.size(MonAITheme.sizes.iconMd), tint = t.icon)
+            Icon(
+                icon,
+                null,
+                Modifier.size(MonAITheme.sizes.iconMd),
+                tint = t.icon,
+            )
             Text(
                 text = buildAnnotatedString {
                     withStyle(SpanStyle(fontWeight = FontWeight.SemiBold)) { append(title) }
@@ -160,8 +195,18 @@ fun MonAISnackbar(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2_5),
     ) {
-        if (icon != null) Icon(icon, null, Modifier.size(MonAITheme.sizes.iconLg), tint = iconTint)
-        Text(message, Modifier.weight(1f), style = MonAITheme.typography.bodyMedium, color = colors.onInverseSurface)
+        if (icon != null) Icon(
+            icon,
+            null,
+            Modifier.size(MonAITheme.sizes.iconLg),
+            tint = iconTint,
+        )
+        Text(
+            message,
+            Modifier.weight(1f),
+            style = MonAITheme.typography.bodyMedium,
+            color = colors.onInverseSurface,
+        )
         if (actionLabel != null) {
             TextButton(onClick = onAction, shape = RoundedCornerShape(MonAITheme.radius.sm), modifier = Modifier.height(MonAITheme.sizes.touchTarget)) {
                 Text(actionLabel, style = MonAITheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = colors.inverseAccent)
@@ -245,7 +290,12 @@ fun MonAIAlertDialog(
                 horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2, Alignment.End),
             ) {
                 if (dismissLabel != null) {
-                    MonAIButton(dismissLabel, onDismissRequest, variant = MonAIButtonVariant.Text, size = MonAIButtonSize.Compact)
+                    MonAIButton(
+                        dismissLabel,
+                        onDismissRequest,
+                        variant = MonAIButtonVariant.Text,
+                        size = MonAIButtonSize.Compact,
+                    )
                 }
                 MonAIButton(
                     confirmLabel,

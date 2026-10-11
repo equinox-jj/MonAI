@@ -29,7 +29,16 @@ class KeystoreTokenCipher(private val keyAlias: String) : TokenCipher {
     override fun decrypt(ciphertext: String): String? = runCatching {
         val bytes = Base64.getDecoder().decode(ciphertext)
         val cipher = Cipher.getInstance(TRANSFORMATION).apply {
-            init(Cipher.DECRYPT_MODE, key(), GCMParameterSpec(TAG_BITS, bytes, 0, IV_BYTES))
+            init(
+                Cipher.DECRYPT_MODE,
+                key(),
+                GCMParameterSpec(
+                    TAG_BITS,
+                    bytes,
+                    0,
+                    IV_BYTES,
+                ),
+            )
         }
         String(cipher.doFinal(bytes, IV_BYTES, bytes.size - IV_BYTES), Charsets.UTF_8)
     }.getOrNull()

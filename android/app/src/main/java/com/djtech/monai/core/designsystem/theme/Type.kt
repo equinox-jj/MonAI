@@ -14,7 +14,13 @@ import com.djtech.monai.R
 
 /** Plus Jakarta Sans, bundled as one variable font (wght 200–800). */
 val PlusJakartaSans = FontFamily(
-    listOf(FontWeight.Normal, FontWeight.Medium, FontWeight.SemiBold, FontWeight.Bold, FontWeight.ExtraBold)
+    listOf(
+        FontWeight.Normal,
+        FontWeight.Medium,
+        FontWeight.SemiBold,
+        FontWeight.Bold,
+        FontWeight.ExtraBold,
+    )
         .map { weight ->
             Font(
                 resId = R.font.plus_jakarta_sans,
@@ -65,11 +71,36 @@ private fun style(
  * | labelSmall     | 11/16 SB  | Nav labels, badges                       |
  */
 val MonAITypography = Typography(
-    displayLarge = style(40, 48, FontWeight.Bold, (-0.5).sp),
-    displayMedium = style(36, 44, FontWeight.Bold, (-0.5).sp),
-    displaySmall = style(32, 40, FontWeight.Bold, (-0.5).sp),
-    headlineLarge = style(28, 36, FontWeight.Bold, (-0.25).sp),
-    headlineMedium = style(24, 32, FontWeight.Bold, (-0.25).sp),
+    displayLarge = style(
+        40,
+        48,
+        FontWeight.Bold,
+        (-0.5).sp,
+    ),
+    displayMedium = style(
+        36,
+        44,
+        FontWeight.Bold,
+        (-0.5).sp,
+    ),
+    displaySmall = style(
+        32,
+        40,
+        FontWeight.Bold,
+        (-0.5).sp,
+    ),
+    headlineLarge = style(
+        28,
+        36,
+        FontWeight.Bold,
+        (-0.25).sp,
+    ),
+    headlineMedium = style(
+        24,
+        32,
+        FontWeight.Bold,
+        (-0.25).sp,
+    ),
     headlineSmall = style(20, 28, FontWeight.SemiBold),
     titleLarge = style(18, 26, FontWeight.SemiBold),
     titleMedium = style(16, 24, FontWeight.SemiBold),
@@ -102,7 +133,12 @@ val MonAIExtendedTypographyDefaults = MonAIExtendedTypography(
     amountMedium = style(20, 28, FontWeight.Bold).tabular(),
     amount = style(16, 24, FontWeight.SemiBold).tabular(),
     bodyCompact = style(13, 18, FontWeight.Normal),
-    overline = style(12, 16, FontWeight.SemiBold, 0.4.sp),
+    overline = style(
+        12,
+        16,
+        FontWeight.SemiBold,
+        0.4.sp,
+    ),
 )
 
 /** Tabular figures, so digits line up in amounts. */

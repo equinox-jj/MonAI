@@ -62,9 +62,24 @@ fun MonAICard(
         Column(Modifier.padding(contentPadding), verticalArrangement = verticalArrangement, content = content)
     }
     if (onClick != null) {
-        Surface(onClick = onClick, modifier = modifier, shape = shape, color = colors.surface, contentColor = colors.textPrimary, border = border, content = body)
+        Surface(
+            onClick = onClick,
+            modifier = modifier,
+            shape = shape,
+            color = colors.surface,
+            contentColor = colors.textPrimary,
+            border = border,
+            content = body,
+        )
     } else {
-        Surface(modifier = modifier, shape = shape, color = colors.surface, contentColor = colors.textPrimary, border = border, content = body)
+        Surface(
+            modifier = modifier,
+            shape = shape,
+            color = colors.surface,
+            contentColor = colors.textPrimary,
+            border = border,
+            content = body,
+        )
     }
 }
 
@@ -90,7 +105,12 @@ fun MonAIGradientCard(
         modifier = modifier
             .then(
                 if (elevated && !MonAITheme.colors.isDark) {
-                    Modifier.shadow(12.dp, shape, ambientColor = glow, spotColor = glow)
+                    Modifier.shadow(
+                        12.dp,
+                        shape,
+                        ambientColor = glow,
+                        spotColor = glow,
+                    )
                 } else {
                     Modifier
                 },
@@ -150,7 +170,12 @@ fun MonAITopBar(
     ) {
         when (navigation) {
             MonAITopBarNavigation.Back -> MonAIIconButton(MonAIIcons.ArrowBack, navigationContentDescription, onNavigationClick)
-            MonAITopBarNavigation.Close -> MonAIIconButton(MonAIIcons.Close, navigationContentDescription, onNavigationClick, tint = MonAITheme.colors.textSecondary)
+            MonAITopBarNavigation.Close -> MonAIIconButton(
+                MonAIIcons.Close,
+                navigationContentDescription,
+                onNavigationClick,
+                tint = MonAITheme.colors.textSecondary,
+            )
             MonAITopBarNavigation.None -> Box(Modifier.padding(start = MonAITheme.spacing.x2_5))
         }
         Text(
@@ -231,7 +256,12 @@ fun MonAITextLink(
     ) {
         Text(text, style = style, color = MonAITheme.colors.accent)
         if (trailingIcon != null) {
-            Icon(trailingIcon, null, Modifier.size(MonAITheme.sizes.iconMd), tint = MonAITheme.colors.accent)
+            Icon(
+                trailingIcon,
+                null,
+                Modifier.size(MonAITheme.sizes.iconMd),
+                tint = MonAITheme.colors.accent,
+            )
         }
     }
 }
@@ -253,11 +283,22 @@ private fun SurfacesPreview() {
         ) {
             MonAITopBar("Transaction", windowInsets = WindowInsets(0)) {
                 MonAIIconButton(MonAIIcons.Edit, "Edit", onClick = {})
-                MonAIIconButton(MonAIIcons.Delete, "Delete", onClick = {}, tint = MonAITheme.colors.error)
+                MonAIIconButton(
+                    MonAIIcons.Delete,
+                    "Delete",
+                    onClick = {},
+                    tint = MonAITheme.colors.error,
+                )
             }
             Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 MonAIScreenTitle("Wallets") {
-                    MonAIButton("Add wallet", onClick = {}, variant = MonAIButtonVariant.Tonal, size = MonAIButtonSize.Small, leadingIcon = MonAIIcons.Add)
+                    MonAIButton(
+                        "Add wallet",
+                        onClick = {},
+                        variant = MonAIButtonVariant.Tonal,
+                        size = MonAIButtonSize.Small,
+                        leadingIcon = MonAIIcons.Add,
+                    )
                 }
                 MonAIGradientCard(Modifier.fillMaxWidth()) {
                     Text("Total balance · 4 wallets", style = MonAITheme.typography.labelLarge, color = MonAITheme.colors.onGradientMuted)

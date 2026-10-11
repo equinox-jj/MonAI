@@ -52,11 +52,23 @@ internal fun MainShell(modifier: Modifier = Modifier) {
     when (navLayoutFor(windowWidth)) {
         NavLayout.BottomBar -> Column(modifier.fillMaxSize()) {
             content(Modifier.weight(1f))
-            MonAIBottomBar(items, selectedIndex, onItemClick, onAddClick, addLabel)
+            MonAIBottomBar(
+                items,
+                selectedIndex,
+                onItemClick,
+                onAddClick,
+                addLabel,
+            )
         }
 
         NavLayout.Rail -> Row(modifier.fillMaxSize()) {
-            MonAINavigationRail(items, selectedIndex, onItemClick, onAddClick, addLabel)
+            MonAINavigationRail(
+                items,
+                selectedIndex,
+                onItemClick,
+                onAddClick,
+                addLabel,
+            )
             content(Modifier.weight(1f))
         }
 

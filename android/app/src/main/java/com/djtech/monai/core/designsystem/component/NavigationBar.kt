@@ -158,7 +158,18 @@ private fun AddButton(onClick: () -> Unit, contentDescription: String, enabled: 
         modifier = Modifier
             .offset(y = (-15).dp)
             .size(sizes.fab + 8.dp)
-            .then(if (enabled && !colors.isDark) Modifier.shadow(8.dp, CircleShape, ambientColor = glow, spotColor = glow) else Modifier)
+            .then(
+                if (enabled && !colors.isDark) {
+                    Modifier.shadow(
+                        8.dp,
+                        CircleShape,
+                        ambientColor = glow,
+                        spotColor = glow,
+                    )
+                } else {
+                    Modifier
+                },
+            )
             .clip(CircleShape)
             .background(if (enabled) colors.primary else colors.disabledContainer)
             .border(4.dp, colors.background, CircleShape)
@@ -299,7 +310,12 @@ fun MonAINavigationDrawer(
                         .background(colors.primary),
                     contentAlignment = Alignment.Center,
                 ) {
-                    Icon(MonAIIcons.AccountBalanceWallet, null, Modifier.size(sizes.iconLg), tint = colors.onPrimary)
+                    Icon(
+                        MonAIIcons.AccountBalanceWallet,
+                        null,
+                        Modifier.size(sizes.iconLg),
+                        tint = colors.onPrimary,
+                    )
                 }
                 Text(
                     text = title,
@@ -350,7 +366,12 @@ private fun DrawerItem(item: MonAINavItem, selected: Boolean, onClick: () -> Uni
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x3),
     ) {
         Icon(if (selected) item.selectedIcon else item.icon, contentDescription = null, tint = content)
-        Text(item.label, style = MonAITheme.typography.labelLarge, color = content, maxLines = 1)
+        Text(
+            item.label,
+            style = MonAITheme.typography.labelLarge,
+            color = content,
+            maxLines = 1,
+        )
     }
 }
 
@@ -367,7 +388,18 @@ private fun AddSquareButton(
     val glow = colors.primary.copy(alpha = 0.3f)
     Box(
         modifier = modifier
-            .then(if (enabled && !colors.isDark) Modifier.shadow(6.dp, shape, ambientColor = glow, spotColor = glow) else Modifier)
+            .then(
+                if (enabled && !colors.isDark) {
+                    Modifier.shadow(
+                        6.dp,
+                        shape,
+                        ambientColor = glow,
+                        spotColor = glow,
+                    )
+                } else {
+                    Modifier
+                },
+            )
             .clip(shape)
             .background(if (enabled) colors.primary else colors.disabledContainer)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick),
@@ -413,8 +445,21 @@ private fun BottomBarPreview() {
             verticalArrangement = Arrangement.spacedBy(24.dp),
         ) {
             Box(Modifier.height(16.dp))
-            MonAIBottomBar(monAIMainNavItems(), selectedIndex = 0, onItemClick = {}, onAddClick = {}, addContentDescription = "Add transaction")
-            MonAIBottomBar(monAIMainNavItems(), selectedIndex = 1, onItemClick = {}, onAddClick = {}, addContentDescription = "Add transaction", addEnabled = false)
+            MonAIBottomBar(
+                monAIMainNavItems(),
+                selectedIndex = 0,
+                onItemClick = {},
+                onAddClick = {},
+                addContentDescription = "Add transaction",
+            )
+            MonAIBottomBar(
+                monAIMainNavItems(),
+                selectedIndex = 1,
+                onItemClick = {},
+                onAddClick = {},
+                addContentDescription = "Add transaction",
+                addEnabled = false,
+            )
         }
     }
 }
@@ -428,9 +473,22 @@ private fun RailAndDrawerPreview() {
                 .height(480.dp)
                 .background(MonAITheme.colors.background),
         ) {
-            MonAINavigationRail(monAIMainNavItems(), selectedIndex = 0, onItemClick = {}, onAddClick = {}, addContentDescription = "Add transaction")
+            MonAINavigationRail(
+                monAIMainNavItems(),
+                selectedIndex = 0,
+                onItemClick = {},
+                onAddClick = {},
+                addContentDescription = "Add transaction",
+            )
             Box(Modifier.width(24.dp))
-            MonAINavigationDrawer("MonAI", monAIMainNavItems(), selectedIndex = 1, onItemClick = {}, onAddClick = {}, addLabel = "Add transaction")
+            MonAINavigationDrawer(
+                "MonAI",
+                monAIMainNavItems(),
+                selectedIndex = 1,
+                onItemClick = {},
+                onAddClick = {},
+                addLabel = "Add transaction",
+            )
         }
     }
 }
