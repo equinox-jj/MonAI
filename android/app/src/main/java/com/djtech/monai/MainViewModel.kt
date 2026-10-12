@@ -7,7 +7,7 @@ import com.djtech.monai.core.common.flow.WhileUiSubscribed
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore
-import com.djtech.monai.feature.auth.domain.repository.AuthRepository
+import com.djtech.monai.feature.auth.domain.usecase.ExpireSessionIfDueUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -31,7 +31,7 @@ data class MainState(
 class MainViewModel @Inject constructor(
     private val sessionStore: SessionStore,
     onboardingStore: OnboardingStore,
-    private val authRepository: AuthRepository,
+    private val expireSessionIfDue: ExpireSessionIfDueUseCase,
 ) : ViewModel() {
     // combine waits for both stores, so the splash also covers the onboarding read.
     val state: StateFlow<MainState> =
@@ -40,7 +40,7 @@ class MainViewModel @Inject constructor(
 
     /** The app came to the foreground: a token past its expiry is expired now, not on the next 401. */
     fun onAppForegrounded() {
-        viewModelScope.launch { authRepository.expireSessionIfDue() }
+        viewModelScope.launch { expireSessionIfDue() }
     }
 
     /** The user dismissed the session-expired dialog: move on to the signed-out graph. */

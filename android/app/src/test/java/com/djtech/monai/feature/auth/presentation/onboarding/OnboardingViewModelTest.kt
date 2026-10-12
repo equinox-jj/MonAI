@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
 import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
 import com.djtech.monai.core.datastore.OnboardingStore
+import com.djtech.monai.feature.auth.presentation.onboarding.model.OnboardingPage
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch

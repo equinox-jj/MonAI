@@ -29,8 +29,6 @@ import androidx.compose.ui.unit.sp
 import com.djtech.monai.R
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
-import com.djtech.monai.feature.auth.presentation.onboarding.SampleExpenseCard
-import com.djtech.monai.feature.auth.presentation.onboarding.SamplePromptCard
 
 private val HeroPadding = 64.dp
 private val HeadlineMaxWidth = 460.dp
@@ -104,8 +102,8 @@ internal fun AuthHeroPanel(modifier: Modifier = Modifier) {
                 Modifier.widthIn(max = SamplesMaxWidth),
                 verticalArrangement = Arrangement.spacedBy(spacing.x3),
             ) {
-                SamplePromptCard()
-                SampleExpenseCard()
+                AuthSamplePromptCard()
+                AuthSampleExpenseCard()
             }
         }
     }

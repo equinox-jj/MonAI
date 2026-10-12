@@ -7,6 +7,7 @@ import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore
+import com.djtech.monai.feature.auth.domain.usecase.ExpireSessionIfDueUseCase
 import com.djtech.monai.feature.auth.domain.usecase.FakeAuthRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
@@ -28,7 +29,7 @@ class MainViewModelTest {
 
     @Test
     fun `is loading until the stored session is read`() = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = subscribed(MainViewModel(store(), onboardingStore, authRepository))
+        val viewModel = subscribed(MainViewModel(store(), onboardingStore, ExpireSessionIfDueUseCase(authRepository)))
 
         assertEquals(SessionState.Loading, viewModel.state.value.sessionState)
         assertTrue(viewModel.state.value.isLoading)
@@ -40,7 +41,7 @@ class MainViewModelTest {
     @Test
     fun `follows sign in and sign out`() = runTest(mainDispatcherRule.dispatcher) {
         val store = store()
-        val viewModel = subscribed(MainViewModel(store, onboardingStore, authRepository))
+        val viewModel = subscribed(MainViewModel(store, onboardingStore, ExpireSessionIfDueUseCase(authRepository)))
 
         store.saveToken("token-1")
         advanceUntilIdle()
@@ -54,7 +55,7 @@ class MainViewModelTest {
     @Test
     fun `an expired session signs out once acknowledged`() = runTest(mainDispatcherRule.dispatcher) {
         val store = store()
-        val viewModel = subscribed(MainViewModel(store, onboardingStore, authRepository))
+        val viewModel = subscribed(MainViewModel(store, onboardingStore, ExpireSessionIfDueUseCase(authRepository)))
         store.saveToken("token-1")
 
         store.clearIfCurrent("token-1")
@@ -68,7 +69,7 @@ class MainViewModelTest {
 
     @Test
     fun `reports onboarding as completed once it is marked`() = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = subscribed(MainViewModel(store(), onboardingStore, authRepository))
+        val viewModel = subscribed(MainViewModel(store(), onboardingStore, ExpireSessionIfDueUseCase(authRepository)))
         advanceUntilIdle()
         assertFalse(viewModel.state.value.onboardingCompleted)
 
@@ -82,7 +83,7 @@ class MainViewModelTest {
 
     @Test
     fun `coming to the foreground expires an overdue session`() = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = MainViewModel(store(), onboardingStore, authRepository)
+        val viewModel = MainViewModel(store(), onboardingStore, ExpireSessionIfDueUseCase(authRepository))
 
         viewModel.onAppForegrounded()
         advanceUntilIdle()

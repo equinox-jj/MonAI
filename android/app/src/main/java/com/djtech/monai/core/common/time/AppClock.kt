@@ -3,6 +3,7 @@ package com.djtech.monai.core.common.time
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -16,6 +17,9 @@ interface AppClock {
     // Not LocalDate.ofInstant: that is API 34+ and minSdk is 26.
     fun today(): LocalDate = now().atZone(zone()).toLocalDate()
     fun currentMonth(): YearMonth = YearMonth.from(today())
+
+    /** The wall-clock time in [zone], e.g. for a time-of-day greeting. */
+    fun localTime(): LocalTime = now().atZone(zone()).toLocalTime()
 }
 
 private val JAKARTA: ZoneId = ZoneId.of("Asia/Jakarta")

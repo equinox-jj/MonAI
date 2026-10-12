@@ -10,6 +10,9 @@ interface WalletRepository {
     /** Wallets that are not archived, default first, then by name. */
     fun observeWallets(): Flow<List<Wallet>>
 
+    /** Every wallet, archived ones included, in the same order. For labelling transactions by wallet id. */
+    fun observeAllWallets(): Flow<List<Wallet>>
+
     /** One wallet, archived or not; null when it isn't cached. */
     fun observeWallet(id: String): Flow<Wallet?>
 

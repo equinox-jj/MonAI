@@ -19,6 +19,7 @@ import com.djtech.monai.core.designsystem.component.MonAIBottomBar
 import com.djtech.monai.core.designsystem.component.MonAINavigationDrawer
 import com.djtech.monai.core.designsystem.component.MonAINavigationRail
 import com.djtech.monai.core.designsystem.component.monAIMainNavItems
+import com.djtech.monai.feature.home.presentation.home.HomeRoute
 
 private enum class NavLayout { BottomBar, Rail, Drawer }
 
@@ -93,7 +94,7 @@ private fun MainNavDisplay(navigator: MainNavigator, modifier: Modifier = Modifi
             backStack = navigator.backStack,
             onBack = navigator::goBack,
             entryProvider = entryProvider {
-                entry<HomeRoute> { PlaceholderScreen(stringResource(R.string.nav_home)) }
+                entry<HomeRoute> { HomeRoute(onNavigate = navigator::openFromHome) }
                 entry<TransactionsRoute> { PlaceholderScreen(stringResource(R.string.nav_transactions)) }
                 entry<WalletsRoute> { PlaceholderScreen(stringResource(R.string.nav_wallets)) }
                 entry<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }

@@ -33,6 +33,10 @@ class ApiWalletRepository @Inject constructor(
         entities.filterNot(WalletEntity::isArchived).map(WalletEntity::asModel)
     }
 
+    override fun observeAllWallets(): Flow<List<Wallet>> = walletDao.observeAll().map { entities ->
+        entities.map(WalletEntity::asModel)
+    }
+
     override fun observeWallet(id: String): Flow<Wallet?> = walletDao.observe(id).map { it?.asModel() }
 
     override suspend fun refresh(): WalletResult<Unit> {

@@ -5,6 +5,7 @@ import org.junit.Test
 import java.time.Clock
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.ZoneOffset
@@ -43,6 +44,13 @@ class SystemAppClockTest {
 
         assertEquals(LocalDate.of(2026, 11, 1), clock.today())
         assertEquals(YearMonth.of(2026, 11), clock.currentMonth())
+    }
+
+    @Test
+    fun `localTime follows the zone`() {
+        val clock = SystemAppClock(fixed) { ZoneId.of("Asia/Jakarta") }
+
+        assertEquals(LocalTime.of(1, 30), clock.localTime())
     }
 
     @Test

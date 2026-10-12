@@ -85,6 +85,21 @@ class ApiWalletRepositoryTest {
     }
 
     @Test
+    fun `observeAllWallets keeps archived wallets in the same order`() = runTest {
+        val dao = FakeWalletDao(
+            listOf(
+                entity(id = "a", name = "Cash"),
+                entity(id = "b", name = "BCA", isDefault = true),
+                entity(id = "c", name = "Dana", isArchived = true),
+            ),
+        )
+
+        val wallets = repository(dao).observeAllWallets().first()
+
+        assertEquals(listOf("b", "a", "c"), wallets.map(Wallet::id))
+    }
+
+    @Test
     fun `observeWallet finds an archived wallet by id`() = runTest {
         val dao = FakeWalletDao(listOf(entity(id = "c", name = "Dana", isArchived = true)))
 

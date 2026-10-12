@@ -1,9 +1,7 @@
 package com.djtech.monai.feature.auth.presentation.onboarding
 
 import androidx.compose.runtime.Immutable
-
-/** The onboarding pages, in order. */
-enum class OnboardingPage { Capture, Wallets, Insights }
+import com.djtech.monai.feature.auth.presentation.onboarding.model.OnboardingPage
 
 @Immutable
 data class OnboardingState(val page: Int = 0) {

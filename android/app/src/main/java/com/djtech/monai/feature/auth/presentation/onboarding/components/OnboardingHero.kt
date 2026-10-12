@@ -1,4 +1,4 @@
-package com.djtech.monai.feature.auth.presentation.onboarding
+package com.djtech.monai.feature.auth.presentation.onboarding.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,14 +22,12 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -39,27 +36,26 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.djtech.monai.R
-import com.djtech.monai.core.common.format.MoneySign
 import com.djtech.monai.core.common.format.formatRupiah
-import com.djtech.monai.core.common.format.formatRupiahSigned
-import com.djtech.monai.core.designsystem.component.MonAIAmountText
-import com.djtech.monai.core.designsystem.component.MonAICategoryIcon
 import com.djtech.monai.core.designsystem.component.MonAIMonogram
 import com.djtech.monai.core.designsystem.component.MonAIPill
 import com.djtech.monai.core.designsystem.component.MonAIProgressBar
-import com.djtech.monai.core.designsystem.component.MoneyDirection
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.CategoryColors
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.designsystem.theme.WalletGradients
 import com.djtech.monai.core.designsystem.theme.tabular
+import com.djtech.monai.feature.auth.presentation.common.AuthIllustrationCard
+import com.djtech.monai.feature.auth.presentation.common.AuthIllustrationRow
+import com.djtech.monai.feature.auth.presentation.common.AuthSampleExpenseCard
+import com.djtech.monai.feature.auth.presentation.common.AuthSamplePromptCard
+import com.djtech.monai.feature.auth.presentation.common.SampleFoodColor
+import com.djtech.monai.feature.auth.presentation.onboarding.model.OnboardingPage
 
 // Sample data drawn in the illustrations. Category colors are the server's default category hexes.
-private val FoodColor = CategoryColors.parse("#F97316")
 private val BillsColor = CategoryColors.parse("#8B5CF6")
 private val TransportColor = CategoryColors.parse("#0EA5E9")
 
-private const val SampleExpense = 35_000L
 private const val BcaBalance = 8_250_000L
 private const val GoPayBalance = 1_185_000L
 private const val CashBalance = 450_000L
@@ -67,7 +63,6 @@ private const val BudgetLeft = 585_000L
 
 private val BreakdownLabelWidth = 64.dp
 private val BreakdownPercentWidth = 32.dp
-private val IllustrationElevation = 12.dp
 
 /** The indigo panel at the top of each page. The illustration is decorative, so it is hidden from TalkBack. */
 @Composable
@@ -183,50 +178,19 @@ private fun SkipButton(onClick: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/** A white card floating on the gradient. */
-@Composable
-private fun IllustrationCard(
-    shape: Shape,
-    modifier: Modifier = Modifier,
-    contentPadding: PaddingValues = PaddingValues(
-        horizontal = MonAITheme.spacing.x4,
-        vertical = MonAITheme.spacing.x3_5,
-    ),
-    content: @Composable () -> Unit,
-) {
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = shape,
-        color = MonAITheme.colors.surface,
-        contentColor = MonAITheme.colors.textPrimary,
-        shadowElevation = IllustrationElevation,
-    ) {
-        Box(Modifier.padding(contentPadding)) { content() }
-    }
-}
-
-@Composable
-private fun IllustrationRow(content: @Composable RowScope.() -> Unit) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x3),
-        content = content,
-    )
-}
-
 /** Page 1: a typed sentence becomes a categorised expense. */
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CaptureIllustration() {
     val spacing = MonAITheme.spacing
-    SamplePromptCard()
+    AuthSamplePromptCard()
     Icon(
         MonAIIcons.South,
         null,
         Modifier.size(MonAITheme.sizes.iconXl),
         tint = MonAITheme.colors.highlight,
     )
-    SampleExpenseCard()
+    AuthSampleExpenseCard()
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(spacing.x2, Alignment.CenterHorizontally),
         verticalArrangement = Arrangement.spacedBy(spacing.x2),
@@ -239,60 +203,6 @@ private fun CaptureIllustration() {
             "OVO",
             "DANA",
         ).forEach { MonAIPill(it) }
-    }
-}
-
-/** The sample quick-add sentence. Also drawn in the tablet auth hero. */
-@Composable
-internal fun SamplePromptCard(modifier: Modifier = Modifier) {
-    val colors = MonAITheme.colors
-    val spacing = MonAITheme.spacing
-    IllustrationCard(
-        CircleShape,
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = spacing.x4, vertical = spacing.x3),
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(spacing.x2_5),
-        ) {
-            Icon(
-                MonAIIcons.AutoAwesome,
-                null,
-                Modifier.size(MonAITheme.sizes.iconLg),
-                tint = colors.accent,
-            )
-            Text(
-                stringResource(R.string.onboarding_sample_prompt),
-                style = MonAITheme.typography.bodyMedium.copy(fontWeight = FontWeight.Medium),
-                color = colors.iconStrong,
-            )
-        }
-    }
-}
-
-/** The expense the sample sentence becomes. Also drawn in the tablet auth hero. */
-@Composable
-internal fun SampleExpenseCard(modifier: Modifier = Modifier) {
-    IllustrationCard(RoundedCornerShape(MonAITheme.radius.xl), modifier = modifier) {
-        IllustrationRow {
-            MonAICategoryIcon(MonAIIcons.Restaurant, FoodColor)
-            Column(Modifier.weight(1f)) {
-                Text(
-                    stringResource(R.string.onboarding_sample_title),
-                    style = MonAITheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-                )
-                Text(
-                    stringResource(R.string.onboarding_sample_meta),
-                    style = MonAITheme.typography.bodySmall,
-                    color = MonAITheme.colors.textTertiary,
-                )
-            }
-            MonAIAmountText(
-                formatRupiahSigned(SampleExpense, MoneySign.Negative),
-                MoneyDirection.Expense,
-            )
-        }
     }
 }
 
@@ -354,7 +264,7 @@ private fun WalletRow(
     indent: Dp,
 ) {
     val labelStyle = MonAITheme.typography.labelLarge
-    IllustrationCard(
+    AuthIllustrationCard(
         RoundedCornerShape(MonAITheme.radius.lg),
         modifier = Modifier.padding(start = indent),
         contentPadding = PaddingValues(
@@ -362,7 +272,7 @@ private fun WalletRow(
             vertical = MonAITheme.spacing.x3,
         ),
     ) {
-        IllustrationRow {
+        AuthIllustrationRow {
             MonAIMonogram(
                 monogram,
                 containerColor = monogramColor,
@@ -382,7 +292,7 @@ private fun InsightsIllustration() {
     val spacing = MonAITheme.spacing
     val type = MonAITheme.typography
     val cardShape = RoundedCornerShape(MonAITheme.radius.xl)
-    IllustrationCard(cardShape) {
+    AuthIllustrationCard(cardShape) {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.x2_5)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
@@ -404,12 +314,12 @@ private fun InsightsIllustration() {
             )
         }
     }
-    IllustrationCard(cardShape) {
+    AuthIllustrationCard(cardShape) {
         Column(verticalArrangement = Arrangement.spacedBy(spacing.x2)) {
             Text(stringResource(R.string.onboarding_sample_breakdown), style = type.labelLarge)
             BreakdownRow(
                 stringResource(R.string.onboarding_sample_food),
-                FoodColor,
+                SampleFoodColor,
                 fill = 1f,
                 percent = 36,
             )
