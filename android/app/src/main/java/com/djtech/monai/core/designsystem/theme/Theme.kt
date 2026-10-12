@@ -12,7 +12,8 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 
 private val LocalMonAIColors = staticCompositionLocalOf { LightMonAIColors }
-private val LocalMonAIExtendedTypography = staticCompositionLocalOf { MonAIExtendedTypographyDefaults }
+private val LocalMonAIExtendedTypography =
+    staticCompositionLocalOf { MonAIExtendedTypographyDefaults }
 private val LocalMonAISpacing = staticCompositionLocalOf { MonAISpacing() }
 private val LocalMonAIRadius = staticCompositionLocalOf { MonAIRadius() }
 private val LocalMonAISizes = staticCompositionLocalOf { MonAISizes() }

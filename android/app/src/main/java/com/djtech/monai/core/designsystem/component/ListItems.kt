@@ -186,7 +186,10 @@ fun MonAITransactionRow(
         trailing = {
             Column(horizontalAlignment = Alignment.End) {
                 MonAIAmountText(amount, direction)
-                Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1)) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1),
+                ) {
                     if (hasReceipt) {
                         Icon(
                             MonAIIcons.AttachFile,
@@ -329,8 +332,17 @@ fun MonAIRadioOption(
     ) {
         leading?.invoke(this)
         Column(Modifier.weight(1f)) {
-            Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5)) {
-                Text(title, style = MonAITheme.typography.titleSmall.copy(fontWeight = MonAITheme.typography.titleMedium.fontWeight), color = colors.textPrimary)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
+            ) {
+                Text(
+                    title,
+                    style = MonAITheme.typography.titleSmall.copy(
+                        fontWeight = MonAITheme.typography.titleMedium.fontWeight,
+                    ),
+                    color = colors.textPrimary,
+                )
                 if (tag != null) MonAITag(tag)
             }
             if (subtitle != null) {
@@ -355,7 +367,11 @@ private fun ListItemsPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MonAICard(Modifier.fillMaxWidth(), contentPadding = PaddingValues(0.dp), verticalArrangement = Arrangement.Top) {
+            MonAICard(
+                Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(0.dp),
+                verticalArrangement = Arrangement.Top,
+            ) {
                 MonAITransactionRow(
                     "Makan siang",
                     "Food · GoPay · 12:40",
@@ -391,7 +407,10 @@ private fun ListItemsPreview() {
                     showDivider = false,
                 )
             }
-            MonAISettingsGroup("Money", footer = "Only people with provider permissions see this section.") {
+            MonAISettingsGroup(
+                "Money",
+                footer = "Only people with provider permissions see this section."
+            ) {
                 MonAISettingsRow(
                     "Monthly budget",
                     MonAIIcons.Savings,
@@ -413,7 +432,13 @@ private fun ListItemsPreview() {
                 tag = "DEFAULT",
                 selected = true,
                 onClick = {},
-                leading = { MonAIMonogram("BCA", containerColor = MonAITheme.colors.primary, contentColor = Color.White) },
+                leading = {
+                    MonAIMonogram(
+                        "BCA",
+                        containerColor = MonAITheme.colors.primary,
+                        contentColor = Color.White,
+                    )
+                },
             )
             MonAIRadioOption(
                 title = "GoPay",

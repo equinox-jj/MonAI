@@ -59,7 +59,11 @@ fun MonAICard(
     val shape = RoundedCornerShape(MonAITheme.radius.lg)
     val border = BorderStroke(MonAITheme.sizes.border, colors.border)
     val body: @Composable () -> Unit = {
-        Column(Modifier.padding(contentPadding), verticalArrangement = verticalArrangement, content = content)
+        Column(
+            Modifier.padding(contentPadding),
+            verticalArrangement = verticalArrangement,
+            content = content
+        )
     }
     if (onClick != null) {
         Surface(
@@ -117,7 +121,12 @@ fun MonAIGradientCard(
             )
             .clip(shape)
             .background(brush)
-            .then(if (onClick != null) Modifier.clickable(role = Role.Button, onClick = onClick) else Modifier),
+            .then(
+                if (onClick != null) Modifier.clickable(
+                    role = Role.Button,
+                    onClick = onClick
+                ) else Modifier
+            ),
     ) {
         if (decorated) {
             Box(
@@ -169,13 +178,19 @@ fun MonAITopBar(
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1),
     ) {
         when (navigation) {
-            MonAITopBarNavigation.Back -> MonAIIconButton(MonAIIcons.ArrowBack, navigationContentDescription, onNavigationClick)
+            MonAITopBarNavigation.Back -> MonAIIconButton(
+                MonAIIcons.ArrowBack,
+                navigationContentDescription,
+                onNavigationClick,
+            )
+
             MonAITopBarNavigation.Close -> MonAIIconButton(
                 MonAIIcons.Close,
                 navigationContentDescription,
                 onNavigationClick,
                 tint = MonAITheme.colors.textSecondary,
             )
+
             MonAITopBarNavigation.None -> Box(Modifier.padding(start = MonAITheme.spacing.x2_5))
         }
         Text(
@@ -268,7 +283,11 @@ fun MonAITextLink(
 
 @Composable
 fun MonAIDivider(modifier: Modifier = Modifier) {
-    HorizontalDivider(modifier = modifier, thickness = MonAITheme.sizes.border, color = MonAITheme.colors.divider)
+    HorizontalDivider(
+        modifier = modifier,
+        thickness = MonAITheme.sizes.border,
+        color = MonAITheme.colors.divider
+    )
 }
 
 @PreviewLightDark
@@ -290,7 +309,10 @@ private fun SurfacesPreview() {
                     tint = MonAITheme.colors.error,
                 )
             }
-            Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
+            Column(
+                Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
                 MonAIScreenTitle("Wallets") {
                     MonAIButton(
                         "Add wallet",
@@ -301,14 +323,22 @@ private fun SurfacesPreview() {
                     )
                 }
                 MonAIGradientCard(Modifier.fillMaxWidth()) {
-                    Text("Total balance · 4 wallets", style = MonAITheme.typography.labelLarge, color = MonAITheme.colors.onGradientMuted)
+                    Text(
+                        "Total balance · 4 wallets",
+                        style = MonAITheme.typography.labelLarge,
+                        color = MonAITheme.colors.onGradientMuted,
+                    )
                     Text("Rp 12.450.000", style = MonAITheme.typography.displayMedium)
                 }
                 MonAISectionHeader("Wallets", actionLabel = "See all")
                 MonAICard(Modifier.fillMaxWidth(), onClick = {}) {
                     Text("October budget", style = MonAITheme.typography.titleMedium)
                     MonAIDivider()
-                    Text("21 days left", style = MonAITheme.typography.bodySmall, color = MonAITheme.colors.textTertiary)
+                    Text(
+                        "21 days left",
+                        style = MonAITheme.typography.bodySmall,
+                        color = MonAITheme.colors.textTertiary,
+                    )
                 }
             }
         }

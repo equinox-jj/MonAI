@@ -67,18 +67,21 @@ private fun MonAIAlertTone.colors(): ToneColors {
             c.accent,
             c.onPrimaryContainer,
         )
+
         MonAIAlertTone.Success -> ToneColors(
             c.incomeContainer,
             null,
             c.success,
             c.successText,
         )
+
         MonAIAlertTone.Warning -> ToneColors(
             c.warningContainer,
             c.warningContainerBorder,
             c.warning,
             c.onWarningContainer,
         )
+
         MonAIAlertTone.Error -> ToneColors(
             c.errorContainer,
             c.errorContainerBorder,
@@ -111,7 +114,13 @@ fun MonAIInlineAlert(
             .fillMaxWidth()
             .clip(shape)
             .background(t.container)
-            .then(if (t.border != null) Modifier.border(MonAITheme.sizes.border, t.border, shape) else Modifier)
+            .then(
+                if (t.border != null) Modifier.border(
+                    MonAITheme.sizes.border,
+                    t.border,
+                    shape
+                ) else Modifier
+            )
             .padding(MonAITheme.spacing.x3)
             .semantics { if (tone == MonAIAlertTone.Error) liveRegion = LiveRegionMode.Assertive },
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2_5),
@@ -138,7 +147,12 @@ fun MonAIStatusStrip(
     val t = tone.colors()
     val borderColor = t.border ?: t.container
     Column(modifier.fillMaxWidth()) {
-        Box(Modifier.fillMaxWidth().height(MonAITheme.sizes.border).background(borderColor))
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(MonAITheme.sizes.border)
+                .background(borderColor)
+        )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -164,7 +178,12 @@ fun MonAIStatusStrip(
                 color = t.content,
             )
         }
-        Box(Modifier.fillMaxWidth().height(MonAITheme.sizes.border).background(borderColor))
+        Box(
+            Modifier
+                .fillMaxWidth()
+                .height(MonAITheme.sizes.border)
+                .background(borderColor)
+        )
     }
 }
 
@@ -208,8 +227,16 @@ fun MonAISnackbar(
             color = colors.onInverseSurface,
         )
         if (actionLabel != null) {
-            TextButton(onClick = onAction, shape = RoundedCornerShape(MonAITheme.radius.sm), modifier = Modifier.height(MonAITheme.sizes.touchTarget)) {
-                Text(actionLabel, style = MonAITheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold), color = colors.inverseAccent)
+            TextButton(
+                onClick = onAction,
+                shape = RoundedCornerShape(MonAITheme.radius.sm),
+                modifier = Modifier.height(MonAITheme.sizes.touchTarget),
+            ) {
+                Text(
+                    actionLabel,
+                    style = MonAITheme.typography.labelLarge.copy(fontWeight = FontWeight.Bold),
+                    color = colors.inverseAccent,
+                )
             }
         }
     }
@@ -231,7 +258,10 @@ data class MonAISnackbarVisuals(
  */
 @Composable
 fun MonAISnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {
-    SnackbarHost(hostState, modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal)) { data: SnackbarData ->
+    SnackbarHost(
+        hostState,
+        modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal)
+    ) { data: SnackbarData ->
         MonAISnackbar(
             message = data.visuals.message,
             icon = (data.visuals as? MonAISnackbarVisuals)?.icon,
@@ -326,7 +356,10 @@ fun MonAIBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
         sheetState = sheetState,
-        shape = RoundedCornerShape(topStart = MonAITheme.radius.xxl, topEnd = MonAITheme.radius.xxl),
+        shape = RoundedCornerShape(
+            topStart = MonAITheme.radius.xxl,
+            topEnd = MonAITheme.radius.xxl
+        ),
         containerColor = colors.surface,
         contentColor = colors.textPrimary,
         scrimColor = colors.scrim,
@@ -367,8 +400,14 @@ private fun FeedbackPreview() {
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             MonAIStatusStrip("You're offline", detail = "Showing saved data")
-            Column(Modifier.padding(horizontal = 16.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                MonAIInlineAlert("Email or password is incorrect. Check them and try again.", tone = MonAIAlertTone.Error)
+            Column(
+                Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                MonAIInlineAlert(
+                    "Email or password is incorrect. Check them and try again.",
+                    tone = MonAIAlertTone.Error,
+                )
                 MonAIInlineAlert("We'll set up a Cash wallet and starter categories for you.")
                 MonAISnackbar("Connect to the internet to add or edit.", icon = MonAIIcons.CloudOff)
                 MonAISnackbar("Transaction deleted", actionLabel = "Undo")

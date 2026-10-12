@@ -43,7 +43,15 @@ class TransactionDaoTest {
             ),
         )
 
-        assertEquals(listOf("b", "c", "a", "d"), list().map { it.id })
+        assertEquals(
+            listOf(
+                "b",
+                "c",
+                "a",
+                "d",
+            ),
+            list().map { it.id },
+        )
     }
 
     @Test

@@ -128,7 +128,10 @@ fun MonAITextField(
                         .clip(shape)
                         .background(colors.surfaceSunken)
                         .border(borderWidth, borderColor, shape)
-                        .padding(start = if (compact) spacing.x3 else spacing.x3_5, end = if (trailing != null) spacing.x1 else spacing.x3_5),
+                        .padding(
+                            start = if (compact) spacing.x3 else spacing.x3_5,
+                            end = if (trailing != null) spacing.x1 else spacing.x3_5,
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(if (compact) spacing.x2 else spacing.x2_5),
                 ) {
@@ -214,7 +217,10 @@ private fun FieldSupportingText(text: String, tone: MonAIFieldTone) {
         MonAIFieldTone.Error -> colors.errorText
         MonAIFieldTone.Success -> colors.successText
     }
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
+    ) {
         if (tone == MonAIFieldTone.Success) {
             Icon(
                 MonAIIcons.CheckCircle,
@@ -378,7 +384,11 @@ fun MonAISelectField(
         }
         Column(Modifier.weight(1f)) {
             if (label != null) {
-                Text(label, style = MonAITheme.typography.labelSmall.copy(fontWeight = FontWeight.Normal), color = colors.textTertiary)
+                Text(
+                    label,
+                    style = MonAITheme.typography.labelSmall.copy(fontWeight = FontWeight.Normal),
+                    color = colors.textTertiary,
+                )
             }
             Text(
                 value,
@@ -453,7 +463,11 @@ private fun TextFieldPreview() {
                 )
             }
             MonAISelectField("GoPay", onClick = {}, label = "To")
-            MonAISearchField(value = "", onValueChange = {}, placeholder = "Search note or merchant")
+            MonAISearchField(
+                value = "",
+                onValueChange = {},
+                placeholder = "Search note or merchant"
+            )
             MonAIPillField(
                 "makan siang 35rb pakai gopay",
                 MonAIIcons.AutoAwesome,

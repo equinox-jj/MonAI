@@ -29,7 +29,9 @@ class MainNavigator(
     val backStack: List<NavKey>
         get() {
             val home = stack(TopLevelDestination.Home)
-            return if (currentTabState == TopLevelDestination.Home) home.toList() else home + stack(currentTabState)
+            return if (currentTabState == TopLevelDestination.Home) home.toList() else home + stack(
+                currentTabState
+            )
         }
 
     /** Selecting the tab already shown pops it to its root. */
@@ -50,7 +52,8 @@ class MainNavigator(
         val stack = stack(currentTabState)
         when {
             stack.size > 1 -> stack.removeAt(stack.lastIndex)
-            currentTabState != TopLevelDestination.Home -> currentTabState = TopLevelDestination.Home
+            currentTabState != TopLevelDestination.Home -> currentTabState =
+                TopLevelDestination.Home
         }
     }
 

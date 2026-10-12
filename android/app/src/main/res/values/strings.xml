@@ -6,5 +6,36 @@
     <string name="nav_wallets">Wallets</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_add_transaction">Add transaction</string>
-    <string name="placeholder_welcome">Welcome</string>
+    <string name="placeholder_register">Create account</string>
+    <string name="placeholder_sign_in">Sign in</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_capture_title">Every rupiah, every wallet, in seconds.</string>
+    <string name="onboarding_capture_body">Type it the way you\'d say it or snap the receipt. We\'ll sort cash, bank and e-wallets for you.</string>
+    <string name="onboarding_wallets_title">All your wallets, one total.</string>
+    <string name="onboarding_wallets_body">Add BCA, GoPay, OVO, cash and more. Move money between them and every balance stays right.</string>
+    <string name="onboarding_insights_title">See where it went. Stay on budget.</string>
+    <string name="onboarding_insights_body">Set one monthly limit and get a clear report that compares each month with the last.</string>
+    <string name="onboarding_step">Step %1$d of %2$d</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_back">Back</string>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_create_account">Create free account</string>
+    <string name="onboarding_sign_in">I already have an account</string>
+
+    <!-- Onboarding illustrations: sample data, hidden from accessibility services. -->
+    <string name="onboarding_sample_prompt">makan siang 35rb pakai gopay</string>
+    <string name="onboarding_sample_title">Makan siang</string>
+    <string name="onboarding_sample_meta">Food · GoPay · Today</string>
+    <string name="onboarding_sample_bca">BCA Tabungan</string>
+    <string name="onboarding_sample_gopay">GoPay</string>
+    <string name="onboarding_sample_cash">Cash</string>
+    <string name="onboarding_sample_total">Total</string>
+    <string name="onboarding_sample_budget">October budget</string>
+    <string name="onboarding_sample_budget_left">%1$s left · 21 days to go</string>
+    <string name="onboarding_sample_breakdown">Where it went</string>
+    <string name="onboarding_sample_food">Food</string>
+    <string name="onboarding_sample_bills">Bills</string>
+    <string name="onboarding_sample_transport">Transport</string>
+    <string name="onboarding_sample_comparison">10% less than September</string>
 </resources>

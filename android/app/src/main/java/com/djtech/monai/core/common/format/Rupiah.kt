@@ -42,7 +42,8 @@ private val COMPACT_UNITS = listOf(
 fun formatRupiahCompact(amount: Long): String {
     val sign = if (amount < 0) MINUS else ""
     val abs = amount.absoluteValue
-    val (unit, suffix) = COMPACT_UNITS.firstOrNull { abs >= it.first } ?: return formatRupiah(amount)
+    val (unit, suffix) = COMPACT_UNITS.firstOrNull { abs >= it.first }
+        ?: return formatRupiah(amount)
     val whole = abs / unit
     val tenth = (abs % unit) / (unit / 10)
     val number = formatThousands(whole) + if (tenth > 0) ",$tenth" else ""

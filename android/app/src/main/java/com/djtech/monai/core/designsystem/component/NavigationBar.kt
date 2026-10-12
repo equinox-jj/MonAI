@@ -11,18 +11,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.safeDrawing
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
@@ -95,7 +95,8 @@ fun MonAIBottomBar(
                 .selectableGroup(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            items.take(half).forEachIndexed { i, item -> NavItem(item, i == selectedIndex) { onItemClick(i) } }
+            items.take(half)
+                .forEachIndexed { i, item -> NavItem(item, i == selectedIndex) { onItemClick(i) } }
             Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                 AddButton(onAddClick, addContentDescription, addEnabled)
             }
@@ -124,7 +125,10 @@ private fun RowScope.NavItem(item: MonAINavItem, selected: Boolean, onClick: () 
                 indication = ripple(bounded = false, radius = sizes.navIndicatorWidth / 2),
             ),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1, Alignment.CenterVertically),
+        verticalArrangement = Arrangement.spacedBy(
+            MonAITheme.spacing.x1,
+            Alignment.CenterVertically
+        ),
     ) {
         Box(
             Modifier
@@ -207,7 +211,9 @@ fun MonAINavigationRail(
                 .width(sizes.navRail - sizes.border)
                 .fillMaxHeight()
                 .background(colors.surface)
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start))
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start),
+                )
                 .padding(vertical = MonAITheme.spacing.x6)
                 .selectableGroup(),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -221,9 +227,18 @@ fun MonAINavigationRail(
                     .size(sizes.fab)
                     .semantics { contentDescription = addContentDescription },
             ) {
-                Icon(MonAIIcons.Add, contentDescription = null, modifier = Modifier.size(sizes.iconXl))
+                Icon(
+                    MonAIIcons.Add,
+                    contentDescription = null,
+                    modifier = Modifier.size(sizes.iconXl)
+                )
             }
-            items.forEachIndexed { i, item -> RailItem(item, i == selectedIndex) { onItemClick(i) } }
+            items.forEachIndexed { i, item ->
+                RailItem(
+                    item,
+                    i == selectedIndex
+                ) { onItemClick(i) }
+            }
         }
         VerticalBorder()
     }
@@ -293,13 +308,19 @@ fun MonAINavigationDrawer(
                 .width(sizes.navDrawer - sizes.border)
                 .fillMaxHeight()
                 .background(colors.surface)
-                .windowInsetsPadding(WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start))
+                .windowInsetsPadding(
+                    WindowInsets.safeDrawing.only(WindowInsetsSides.Vertical + WindowInsetsSides.Start),
+                )
                 .padding(vertical = spacing.x6, horizontal = spacing.x4)
                 .selectableGroup(),
             verticalArrangement = Arrangement.spacedBy(spacing.x1),
         ) {
             Row(
-                modifier = Modifier.padding(start = spacing.x2, end = spacing.x2, bottom = spacing.x5),
+                modifier = Modifier.padding(
+                    start = spacing.x2,
+                    end = spacing.x2,
+                    bottom = spacing.x5
+                ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.x2_5),
             ) {
@@ -341,10 +362,18 @@ fun MonAINavigationDrawer(
                     horizontalArrangement = Arrangement.spacedBy(spacing.x2_5),
                 ) {
                     Icon(MonAIIcons.Add, contentDescription = null)
-                    Text(addLabel, style = MonAITheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold))
+                    Text(
+                        addLabel,
+                        style = MonAITheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                    )
                 }
             }
-            items.forEachIndexed { i, item -> DrawerItem(item, i == selectedIndex) { onItemClick(i) } }
+            items.forEachIndexed { i, item ->
+                DrawerItem(
+                    item,
+                    i == selectedIndex
+                ) { onItemClick(i) }
+            }
         }
         VerticalBorder()
     }
@@ -365,7 +394,11 @@ private fun DrawerItem(item: MonAINavItem, selected: Boolean, onClick: () -> Uni
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x3),
     ) {
-        Icon(if (selected) item.selectedIcon else item.icon, contentDescription = null, tint = content)
+        Icon(
+            if (selected) item.selectedIcon else item.icon,
+            contentDescription = null,
+            tint = content
+        )
         Text(
             item.label,
             style = MonAITheme.typography.labelLarge,

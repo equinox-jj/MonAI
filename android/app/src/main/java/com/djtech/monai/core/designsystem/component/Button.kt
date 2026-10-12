@@ -71,6 +71,7 @@ enum class MonAIButtonSize {
 /**
  * The design's pill button.
  *
+ * @param trailingIcon an icon after the label, e.g. the arrow on an onboarding "Next".
  * @param loading shows a spinner in place of [leadingIcon] and blocks clicks, keeping the
  *   enabled colors (the "Trying…" state on error screens).
  */
@@ -82,6 +83,7 @@ fun MonAIButton(
     variant: MonAIButtonVariant = MonAIButtonVariant.Primary,
     size: MonAIButtonSize = MonAIButtonSize.Large,
     leadingIcon: ImageVector? = null,
+    trailingIcon: ImageVector? = null,
     enabled: Boolean = true,
     loading: Boolean = false,
 ) {
@@ -97,12 +99,15 @@ fun MonAIButton(
     }
     val filled = variant != MonAIButtonVariant.Outlined && variant != MonAIButtonVariant.Text
     // While loading, keep the enabled look; only a real disable greys the button out.
-    val disabledContainer = if (loading) container else if (filled) colors.disabledContainer else Color.Transparent
+    val disabledContainer =
+        if (loading) container else if (filled) colors.disabledContainer else Color.Transparent
     val disabledContent = if (loading) content else colors.disabledContent
 
     Button(
         onClick = onClick,
-        modifier = modifier.height(spec.height).defaultMinSize(minWidth = sizes.touchTarget),
+        modifier = modifier
+            .height(spec.height)
+            .defaultMinSize(minWidth = sizes.touchTarget),
         enabled = enabled && !loading,
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
@@ -128,8 +133,13 @@ fun MonAIButton(
                 )
                 Spacer(Modifier.width(spec.iconGap))
             }
+
             leadingIcon != null -> {
-                Icon(leadingIcon, contentDescription = null, modifier = Modifier.size(spec.iconSize))
+                Icon(
+                    leadingIcon,
+                    contentDescription = null,
+                    modifier = Modifier.size(spec.iconSize)
+                )
                 Spacer(Modifier.width(spec.iconGap))
             }
         }
@@ -139,6 +149,10 @@ fun MonAIButton(
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
         )
+        if (trailingIcon != null) {
+            Spacer(Modifier.width(spec.iconGap))
+            Icon(trailingIcon, contentDescription = null, modifier = Modifier.size(spec.iconSize))
+        }
     }
 }
 
@@ -163,6 +177,7 @@ private fun MonAIButtonSize.spec(): ButtonSpec {
             sizes.iconLg,
             spacing.x2,
         )
+
         MonAIButtonSize.Medium -> ButtonSpec(
             sizes.buttonMedium,
             type.labelLarge,
@@ -170,6 +185,7 @@ private fun MonAIButtonSize.spec(): ButtonSpec {
             sizes.iconLg,
             spacing.x1_5,
         )
+
         MonAIButtonSize.Compact -> ButtonSpec(
             sizes.touchTarget,
             type.labelLarge,
@@ -177,6 +193,7 @@ private fun MonAIButtonSize.spec(): ButtonSpec {
             sizes.iconMd,
             spacing.x1_5,
         )
+
         MonAIButtonSize.Small -> ButtonSpec(
             sizes.buttonSmall,
             type.labelMedium,
@@ -272,7 +289,10 @@ private fun ButtonPreview() {
                 )
                 MonAIButton("Done", onClick = {}, size = MonAIButtonSize.Medium)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 MonAIButton(
                     "Scan",
                     onClick = {},

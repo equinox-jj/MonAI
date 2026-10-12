@@ -136,7 +136,11 @@ fun MonAIMonogram(
     ) {
         Text(
             text = text,
-            style = MonAITheme.typography.labelSmall.copy(fontSize = 10.sp, lineHeight = 12.sp, fontWeight = FontWeight.ExtraBold),
+            style = MonAITheme.typography.labelSmall.copy(
+                fontSize = 10.sp,
+                lineHeight = 12.sp,
+                fontWeight = FontWeight.ExtraBold,
+            ),
             color = contentColor,
             maxLines = 1,
         )
@@ -153,16 +157,26 @@ private fun BadgesPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 MonAITag("Admin")
                 MonAIPill("Default")
                 MonAIDirectionPill("Expense", MoneyDirection.Expense)
                 MonAIDirectionPill("Income", MoneyDirection.Income)
             }
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 MonAIAvatar("JP")
                 MonAIAvatar("JP", size = 64.dp)
-                MonAIMonogram("BCA", containerColor = MonAITheme.colors.primary, contentColor = Color.White)
+                MonAIMonogram(
+                    "BCA",
+                    containerColor = MonAITheme.colors.primary,
+                    contentColor = Color.White
+                )
                 MonAIPill("Cash", icon = MonAIIcons.Check)
             }
         }

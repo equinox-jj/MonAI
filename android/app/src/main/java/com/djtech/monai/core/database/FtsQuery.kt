@@ -1,7 +1,12 @@
 package com.djtech.monai.core.database
 
 // Uppercase only: FTS treats lowercase "or"/"and" as plain words.
-private val FTS_OPERATORS = setOf("AND", "OR", "NOT", "NEAR")
+private val FTS_OPERATORS = setOf(
+    "AND",
+    "OR",
+    "NOT",
+    "NEAR",
+)
 
 /**
  * Turns free text into an FTS4 MATCH expression that prefix-matches every word, so "kopi ken"

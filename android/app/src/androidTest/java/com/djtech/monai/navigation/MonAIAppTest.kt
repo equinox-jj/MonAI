@@ -9,22 +9,27 @@ import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isSelectable
-import androidx.compose.ui.test.junit4.v2.createComposeRule
+import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.djtech.monai.HiltTestActivity
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
-@RunWith(AndroidJUnit4::class)
+// Screens get their ViewModels from hiltViewModel(), so the app runs in a Hilt activity.
+@HiltAndroidTest
 class MonAIAppTest {
 
-    @get:Rule
-    val compose = createComposeRule()
+    @get:Rule(order = 0)
+    val hilt = HiltAndroidRule(this)
+
+    @get:Rule(order = 1)
+    val compose = createAndroidComposeRule<HiltTestActivity>()
 
     private var sessionState by mutableStateOf<SessionState>(SessionState.Loading)
 
@@ -33,13 +38,15 @@ class MonAIAppTest {
         compose.setContent { MonAITheme { MonAIApp(sessionState) } }
     }
 
+    private fun welcome() = compose.onNodeWithText(WELCOME_TITLE)
+
     private fun tab(label: String) = compose.onNode(hasText(label) and isSelectable())
 
     @Test
     fun loadingShowsNeitherGraph() {
         setContent(SessionState.Loading)
 
-        compose.onNodeWithText("Welcome").assertDoesNotExist()
+        welcome().assertDoesNotExist()
         tab("Home").assertDoesNotExist()
     }
 
@@ -47,8 +54,31 @@ class MonAIAppTest {
     fun signedOutShowsTheAuthGraph() {
         setContent(SessionState.SignedOut)
 
-        compose.onNodeWithText("Welcome").assertIsDisplayed()
+        welcome().assertIsDisplayed()
         tab("Home").assertDoesNotExist()
+    }
+
+    @Test
+    fun skipOpensRegister() {
+        setContent(SessionState.SignedOut)
+
+        compose.onNodeWithText("Skip").performClick()
+
+        compose.onNodeWithText("Create account").assertIsDisplayed()
+        welcome().assertDoesNotExist()
+    }
+
+    @Test
+    fun alreadyHavingAnAccountOpensSignIn() {
+        setContent(SessionState.SignedOut)
+        // The account actions are on the last page: the first page's Next link, then the middle page's button.
+        compose.onNodeWithText("Next").performClick()
+        compose.onNodeWithText("Next").performClick()
+
+        compose.onNodeWithText("I already have an account").performClick()
+
+        compose.onNodeWithText("Sign in").assertIsDisplayed()
+        welcome().assertDoesNotExist()
     }
 
     @Test
@@ -77,7 +107,7 @@ class MonAIAppTest {
 
         sessionState = SessionState.SignedOut
 
-        compose.onNodeWithText("Welcome").assertIsDisplayed()
+        welcome().assertIsDisplayed()
         tab("Home").assertDoesNotExist()
     }
 
@@ -91,5 +121,9 @@ class MonAIAppTest {
         sessionState = SessionState.SignedIn
 
         tab("Home").assertIsSelected()
+    }
+
+    private companion object {
+        const val WELCOME_TITLE = "Every rupiah, every wallet, in seconds."
     }
 }

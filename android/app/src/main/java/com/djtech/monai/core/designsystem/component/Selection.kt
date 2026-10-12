@@ -52,7 +52,11 @@ fun MonAIFilterChip(
             .height(sizes.filterChip)
             .clip(shape)
             .background(if (selected) colors.primaryContainer else colors.surface)
-            .border(sizes.border, if (selected) colors.primaryContainerBorder else colors.borderStrong, shape)
+            .border(
+                sizes.border,
+                if (selected) colors.primaryContainerBorder else colors.borderStrong,
+                shape
+            )
             .toggleable(value = selected, role = Role.Checkbox, onValueChange = { onClick() })
             .padding(horizontal = MonAITheme.spacing.x2_5),
         verticalAlignment = Alignment.CenterVertically,
@@ -112,7 +116,13 @@ fun MonAICategoryChip(
             size = sizes.avatarSmall,
             iconSize = sizes.iconMd,
         )
-        Text(label, style = MonAITheme.extendedTypography.bodyCompact.copy(fontWeight = MonAITheme.typography.labelMedium.fontWeight), color = colors.textPrimary)
+        Text(
+            label,
+            style = MonAITheme.extendedTypography.bodyCompact.copy(
+                fontWeight = MonAITheme.typography.labelMedium.fontWeight,
+            ),
+            color = colors.textPrimary,
+        )
     }
 }
 
@@ -160,10 +170,18 @@ fun MonAISegmentedControl(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxHeight()
-                    .then(if (selected && !colors.isDark) Modifier.shadow(1.dp, CircleShape) else Modifier)
+                    .then(
+                        if (selected && !colors.isDark) Modifier.shadow(
+                            1.dp,
+                            CircleShape
+                        ) else Modifier
+                    )
                     .clip(CircleShape)
                     .background(container)
-                    .selectable(selected = selected, role = Role.Tab, onClick = { onSelect(index) }),
+                    .selectable(
+                        selected = selected,
+                        role = Role.Tab,
+                        onClick = { onSelect(index) }),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(segment.label, style = MonAITheme.typography.labelLarge, color = content)
@@ -193,7 +211,11 @@ private fun SelectionPreview() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MonAISegmentedControl(transactionTypeSegments("Expense", "Income", "Transfer"), selectedIndex = 0, onSelect = {})
+            MonAISegmentedControl(
+                transactionTypeSegments("Expense", "Income", "Transfer"),
+                selectedIndex = 0,
+                onSelect = {},
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 MonAIFilterChip("All types", selected = true, onClick = {})
                 MonAIFilterChip(

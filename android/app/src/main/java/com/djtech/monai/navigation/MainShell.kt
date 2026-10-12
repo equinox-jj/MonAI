@@ -79,7 +79,7 @@ internal fun MainShell(modifier: Modifier = Modifier) {
                 selectedIndex,
                 onItemClick,
                 onAddClick,
-                addLabel
+                addLabel,
             )
             content(Modifier.weight(1f))
         }

@@ -1,7 +1,9 @@
 package com.djtech.monai.core.designsystem.component
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
@@ -69,7 +71,9 @@ fun MonAIStateMessage(
         colors.primaryContainer to colors.accent
     }
     Column(
-        modifier = modifier.semantics { if (tone == MonAIAlertTone.Error) liveRegion = LiveRegionMode.Polite },
+        modifier = modifier.semantics {
+            if (tone == MonAIAlertTone.Error) liveRegion = LiveRegionMode.Polite
+        },
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x3),
     ) {
@@ -110,7 +114,13 @@ fun MonAIStateMessage(
             )
         }
         if (secondaryActionLabel != null) {
-            MonAITextLink(secondaryActionLabel, onSecondaryAction, style = MonAITheme.extendedTypography.bodyCompact.copy(fontWeight = MonAITheme.typography.labelLarge.fontWeight))
+            MonAITextLink(
+                secondaryActionLabel,
+                onSecondaryAction,
+                style = MonAITheme.extendedTypography.bodyCompact.copy(
+                    fontWeight = MonAITheme.typography.labelLarge.fontWeight,
+                ),
+            )
         }
         if (footnote != null) {
             Text(footnote, style = MonAITheme.typography.bodySmall, color = colors.textDisabled)
@@ -193,7 +203,7 @@ fun MonAIProgressBar(
     }
 }
 
-/** Onboarding step dots: the current step is a 24dp bar. */
+/** Onboarding step dots: the current step is a 24dp bar. Steps animate between dot and bar. */
 @Composable
 fun MonAIPageIndicator(
     pageCount: Int,
@@ -202,11 +212,17 @@ fun MonAIPageIndicator(
 ) {
     Row(modifier, horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5)) {
         repeat(pageCount) { index ->
+            val selected = index == currentPage
+            val width by animateDpAsState(if (selected) 24.dp else 6.dp, label = "indicatorWidth")
+            val color by animateColorAsState(
+                if (selected) MonAITheme.colors.primary else MonAITheme.colors.borderStrong,
+                label = "indicatorColor",
+            )
             Box(
                 Modifier
-                    .size(width = if (index == currentPage) 24.dp else 6.dp, height = 6.dp)
+                    .size(width = width, height = 6.dp)
                     .clip(CircleShape)
-                    .background(if (index == currentPage) MonAITheme.colors.primary else MonAITheme.colors.borderStrong),
+                    .background(color),
             )
         }
     }
@@ -243,7 +259,10 @@ private fun StatesPreview() {
             )
             MonAIProgressBar(0.8f, color = MonAITheme.colors.warning)
             MonAIPageIndicator(pageCount = 3, currentPage = 0)
-            Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 MonAISkeleton(40.dp, width = 40.dp, shape = CircleShape)
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {
                     MonAISkeleton(14.dp, Modifier.fillMaxWidth(0.6f))
