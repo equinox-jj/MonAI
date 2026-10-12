@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
 import com.djtech.monai.core.common.flow.WhileUiSubscribed
+import com.djtech.monai.core.common.format.initialsOf
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.ui.UiText
@@ -22,7 +23,6 @@ import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCa
 import com.djtech.monai.feature.categories.domain.usecase.RefreshCategoriesUseCase
 import com.djtech.monai.feature.home.presentation.home.mapper.daysLeftInMonth
 import com.djtech.monai.feature.home.presentation.home.mapper.greetingFor
-import com.djtech.monai.feature.home.presentation.home.mapper.initialsOf
 import com.djtech.monai.feature.home.presentation.home.mapper.toRecent
 import com.djtech.monai.feature.home.presentation.home.mapper.toSpendingSlices
 import com.djtech.monai.feature.home.presentation.home.mapper.toSummary

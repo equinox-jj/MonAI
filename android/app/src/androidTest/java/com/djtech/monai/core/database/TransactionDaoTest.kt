@@ -2,6 +2,7 @@ package com.djtech.monai.core.database
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.djtech.monai.core.database.dao.TransactionDao
+import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
 import com.djtech.monai.core.model.TransactionType
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -10,6 +11,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.time.Instant
 import java.time.LocalDate
 
 @RunWith(AndroidJUnit4::class)
@@ -221,6 +223,42 @@ class TransactionDaoTest {
 
         assertEquals(emptyList<String>(), list().map { it.id })
         assertEquals(listOf("sept"), september().map { it.id })
+    }
+
+    @Test
+    fun replaceQueryPageOnlyReplacesTheRowsTheFilteredListShowsAndSavesTheCursor() = runTest {
+        dao.upsertAll(
+            listOf(
+                transaction("stale-bca", walletId = "bca"),
+                transaction("cash", walletId = "cash"),
+                transaction("sept-bca", walletId = "bca", date = LocalDate.of(2026, 9, 30)),
+            ),
+        )
+        val key = TransactionRemoteKeyEntity("2026-10|bca||", "next", Instant.EPOCH)
+
+        dao.replaceQueryPage(
+            from = october.first,
+            to = october.second,
+            walletId = "bca",
+            categoryId = null,
+            type = null,
+            transactions = listOf(transaction("fresh-bca", walletId = "bca")),
+            key = key,
+        )
+
+        assertEquals(setOf("fresh-bca", "cash"), list().map { it.id }.toSet())
+        assertEquals(listOf("sept-bca"), september().map { it.id })
+        assertEquals(key, dao.remoteKey(key.queryKey))
+    }
+
+    @Test
+    fun appendQueryPageAddsRowsAndMovesTheCursor() = runTest {
+        dao.upsertRemoteKey(TransactionRemoteKeyEntity("k", "c1", Instant.EPOCH))
+
+        dao.appendQueryPage(listOf(transaction("older")), TransactionRemoteKeyEntity("k", null, Instant.EPOCH))
+
+        assertEquals(listOf("older"), list().map { it.id })
+        assertEquals(null, dao.remoteKey("k")?.nextCursor)
     }
 
     private suspend fun september() = dao.pagingSource(

@@ -16,6 +16,10 @@ class FakeReportRepository(vararg reports: MonthlyReport) : ReportRepository {
 
     override fun observeMonthlyReport(month: YearMonth): Flow<MonthlyReport?> = reports.map { it[month] }
 
+    override fun observeCachedExpenseTotals(year: Int): Flow<Map<YearMonth, Long>> = reports.map { all ->
+        all.filterKeys { it.year == year }.mapValues { it.value.expenseTotal }
+    }
+
     override suspend fun refreshMonthlyReport(month: YearMonth): ReportResult<Unit> {
         refreshedMonths += month
         return refreshResult

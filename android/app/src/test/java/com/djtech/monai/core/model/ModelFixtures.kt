@@ -45,15 +45,22 @@ fun wallet(
     updatedAt = CREATED,
 )
 
-fun category(id: String, name: String = id, icon: String? = null, color: String? = null) = Category(
+fun category(
+    id: String,
+    name: String = id,
+    icon: String? = null,
+    color: String? = null,
+    type: CategoryType = CategoryType.EXPENSE,
+    isHidden: Boolean = false,
+) = Category(
     id = id,
     name = name,
-    type = CategoryType.EXPENSE,
+    type = type,
     icon = icon,
     color = color,
     isDefault = true,
     isSystem = false,
-    isHidden = false,
+    isHidden = isHidden,
     createdAt = CREATED,
     updatedAt = CREATED,
 )
@@ -68,6 +75,8 @@ fun transaction(
     categoryId: String? = "food",
     note: String? = null,
     merchant: String? = null,
+    receiptUrl: String? = null,
+    source: TransactionSource = TransactionSource.MANUAL,
     createdAt: Instant = NOW,
 ) = Transaction(
     id = id,
@@ -79,8 +88,8 @@ fun transaction(
     date = date,
     note = note,
     merchant = merchant,
-    receiptUrl = null,
-    source = TransactionSource.MANUAL,
+    receiptUrl = receiptUrl,
+    source = source,
     createdAt = createdAt,
     updatedAt = createdAt,
 )

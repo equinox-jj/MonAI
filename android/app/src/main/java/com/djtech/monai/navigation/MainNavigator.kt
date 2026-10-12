@@ -48,6 +48,12 @@ class MainNavigator(
         stack(currentTabState).add(key)
     }
 
+    /** Pops the current tab's top entries while [predicate] holds, never its root. */
+    fun popWhile(predicate: (NavKey) -> Boolean) {
+        val stack = stack(currentTabState)
+        while (stack.size > 1 && predicate(stack.last())) stack.removeAt(stack.lastIndex)
+    }
+
     fun goBack() {
         val stack = stack(currentTabState)
         when {

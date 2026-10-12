@@ -27,3 +27,14 @@ data object WalletsRoute : NavKey
 
 @Serializable
 data object SettingsRoute : NavKey
+
+@Serializable
+data class TransactionDetailRoute(val id: String) : NavKey
+
+/** [id] is the transaction to edit; null adds one. */
+@Serializable
+data class TransactionFormRoute(val id: String? = null) : NavKey
+
+/** [month] is `YYYY-MM`, the month to search first; null for the current one. */
+@Serializable
+data class TransactionSearchRoute(val month: String? = null) : NavKey

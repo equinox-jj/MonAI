@@ -80,6 +80,20 @@ class ApiReportRepositoryTest {
     }
 
     @Test
+    fun `observeCachedExpenseTotals lists the year's cached months only`() = runTest {
+        cache(OCTOBER_REPORT)
+        cache(OCTOBER_REPORT.copy(month = YearMonth.of(2026, 3), expenseTotal = 1_900_000))
+        cache(OCTOBER_REPORT.copy(month = YearMonth.of(2025, 12), expenseTotal = 1_800_000))
+
+        val totals = repository().observeCachedExpenseTotals(2026).first()
+
+        assertEquals(
+            mapOf(YearMonth.of(2026, 3) to 1_900_000L, OCTOBER to OCTOBER_REPORT.expenseTotal),
+            totals,
+        )
+    }
+
+    @Test
     fun `refresh offline fails with a network error and keeps the cache`() = runTest {
         cache(OCTOBER_REPORT)
         val repository = repository()

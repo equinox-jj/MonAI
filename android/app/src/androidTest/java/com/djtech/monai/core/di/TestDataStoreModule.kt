@@ -34,7 +34,8 @@ object TestDataStoreModule {
     fun provideAppDataStore(): DataStore<Preferences> = InMemoryDataStore()
 }
 
-private class InMemoryDataStore : DataStore<Preferences> {
+/** A Preferences DataStore kept in memory. */
+internal class InMemoryDataStore : DataStore<Preferences> {
     private val state = MutableStateFlow(emptyPreferences())
     private val lock = Mutex()
 

@@ -18,6 +18,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.djtech.monai.R
 import com.djtech.monai.core.common.format.formatRupiah
+import com.djtech.monai.core.common.format.walletMonogram
 import com.djtech.monai.core.designsystem.component.MonAIGradientCard
 import com.djtech.monai.core.designsystem.component.MonAIMonogram
 import com.djtech.monai.core.designsystem.component.MonAIPill
@@ -30,7 +31,6 @@ import com.djtech.monai.core.model.WalletType
 import com.djtech.monai.feature.home.presentation.home.HomeDestination
 import com.djtech.monai.feature.home.presentation.home.HomeIntent
 import com.djtech.monai.feature.home.presentation.home.HomeTestTags
-import com.djtech.monai.feature.home.presentation.home.mapper.walletMonogram
 
 /** "Wallets" with a horizontal row of cards that runs to the screen edge. */
 @Composable

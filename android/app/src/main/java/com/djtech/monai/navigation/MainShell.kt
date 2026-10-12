@@ -1,41 +1,52 @@
 package com.djtech.monai.navigation
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalWindowInfo
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.djtech.monai.R
 import com.djtech.monai.core.designsystem.component.MonAIBottomBar
 import com.djtech.monai.core.designsystem.component.MonAINavigationDrawer
 import com.djtech.monai.core.designsystem.component.MonAINavigationRail
+import com.djtech.monai.core.designsystem.component.MonAIWidthClass
+import com.djtech.monai.core.designsystem.component.currentWidthClass
 import com.djtech.monai.core.designsystem.component.monAIMainNavItems
+import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.home.presentation.home.HomeRoute
+import com.djtech.monai.feature.transactions.presentation.search.SearchRoute
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.TransactionDetailRoute
+import com.djtech.monai.feature.transactions.presentation.transactionform.TransactionFormRoute
+import com.djtech.monai.feature.transactions.presentation.transactions.TransactionsRoute
+import com.djtech.monai.feature.transactions.presentation.undodelete.UndoDeleteRoute
 
-private enum class NavLayout { BottomBar, Rail, Drawer }
+/** The add/edit side sheet's width on a wide screen. */
+private val SideSheetWidth = 440.dp
 
-/** Material window-size breakpoints: phone, tablet portrait (rail), tablet landscape (drawer). */
-private fun navLayoutFor(width: Dp): NavLayout = when {
-    width >= 840.dp -> NavLayout.Drawer
-    width >= 600.dp -> NavLayout.Rail
-    else -> NavLayout.BottomBar
-}
-
-/** The signed-in app: tab navigation around the current destination. */
+/**
+ * The signed-in app: tab navigation around the current destination. Phones get a bottom bar,
+ * tablet portrait a rail and tablet landscape a drawer.
+ */
 @Composable
 internal fun MainShell(modifier: Modifier = Modifier) {
     val navigator = rememberMainNavigator()
-    val windowWidth =
-        with(LocalDensity.current) { LocalWindowInfo.current.containerSize.width.toDp() }
+    val widthClass = currentWidthClass()
     val items = monAIMainNavItems(
         home = stringResource(R.string.nav_home),
         transactions = stringResource(R.string.nav_transactions),
@@ -45,24 +56,26 @@ internal fun MainShell(modifier: Modifier = Modifier) {
     val selectedIndex = navigator.currentTab.ordinal
     val onItemClick =
         remember(navigator) { { index: Int -> navigator.selectTab(TopLevelDestination.entries[index]) } }
-    // Quick add is not built yet.
-    val onAddClick = {}
+    val onAddClick = remember(navigator) { { navigator.navigate(TransactionFormRoute()) } }
     val addLabel = stringResource(R.string.nav_add_transaction)
-    val content = @Composable { modifier: Modifier -> MainNavDisplay(navigator, modifier) }
+    val content = @Composable { modifier: Modifier -> MainNavDisplay(navigator, widthClass, modifier) }
 
-    when (navLayoutFor(windowWidth)) {
-        NavLayout.BottomBar -> Column(modifier.fillMaxSize()) {
+    when (widthClass) {
+        MonAIWidthClass.Compact -> Column(modifier.fillMaxSize()) {
             content(Modifier.weight(1f))
-            MonAIBottomBar(
-                items,
-                selectedIndex,
-                onItemClick,
-                onAddClick,
-                addLabel,
-            )
+            // Detail, form and search take the whole phone screen.
+            if (!navigator.backStack.last().isFullScreen()) {
+                MonAIBottomBar(
+                    items,
+                    selectedIndex,
+                    onItemClick,
+                    onAddClick,
+                    addLabel,
+                )
+            }
         }
 
-        NavLayout.Rail -> Row(modifier.fillMaxSize()) {
+        MonAIWidthClass.Medium -> Row(modifier.fillMaxSize()) {
             MonAINavigationRail(
                 items,
                 selectedIndex,
@@ -73,7 +86,7 @@ internal fun MainShell(modifier: Modifier = Modifier) {
             content(Modifier.weight(1f))
         }
 
-        NavLayout.Drawer -> Row(modifier.fillMaxSize()) {
+        MonAIWidthClass.Expanded -> Row(modifier.fillMaxSize()) {
             MonAINavigationDrawer(
                 stringResource(R.string.app_name),
                 items,
@@ -88,17 +101,99 @@ internal fun MainShell(modifier: Modifier = Modifier) {
 }
 
 @Composable
-private fun MainNavDisplay(navigator: MainNavigator, modifier: Modifier = Modifier) {
+private fun MainNavDisplay(
+    navigator: MainNavigator,
+    widthClass: MonAIWidthClass,
+    modifier: Modifier = Modifier,
+) {
+    val isExpanded = widthClass == MonAIWidthClass.Expanded
+    // On a wide screen the form opens as a side sheet over what is behind it.
+    val formMetadata = if (isExpanded) {
+        DialogSceneStrategy.dialog(DialogProperties(usePlatformDefaultWidth = false))
+    } else {
+        emptyMap()
+    }
+    val openTransaction = { id: String -> navigator.navigate(TransactionDetailRoute(id)) }
+    val editTransaction = { id: String -> navigator.navigate(TransactionFormRoute(id)) }
     Box(modifier) {
         NavDisplay(
             backStack = navigator.backStack,
             onBack = navigator::goBack,
+            // Scopes each entry's ViewModel to the entry, so it is cleared when the entry is popped.
+            entryDecorators = listOf(
+                rememberSaveableStateHolderNavEntryDecorator(),
+                rememberViewModelStoreNavEntryDecorator(),
+            ),
+            sceneStrategies = listOf(DialogSceneStrategy()),
             entryProvider = entryProvider {
                 entry<HomeRoute> { HomeRoute(onNavigate = navigator::openFromHome) }
-                entry<TransactionsRoute> { PlaceholderScreen(stringResource(R.string.nav_transactions)) }
+                entry<TransactionsRoute> {
+                    TransactionsRoute(
+                        onNavigate = navigator::openFromTransactions,
+                        detailPane = { id, paneModifier ->
+                            TransactionDetailRoute(
+                                transactionId = id,
+                                onBack = {},
+                                onEdit = editTransaction,
+                                modifier = paneModifier,
+                                isPane = true,
+                            )
+                        },
+                    )
+                }
+                entry<TransactionDetailRoute> { key ->
+                    TransactionDetailRoute(
+                        transactionId = key.id,
+                        onBack = navigator::goBack,
+                        onEdit = editTransaction,
+                    )
+                }
+                entry<TransactionFormRoute>(metadata = formMetadata) { key ->
+                    TransactionFormEntry(
+                        transactionId = key.id,
+                        asSideSheet = isExpanded,
+                        onClose = navigator::goBack,
+                        onDeleted = navigator::closeDeletedTransaction,
+                    )
+                }
+                entry<TransactionSearchRoute> { key ->
+                    SearchRoute(
+                        initialMonth = key.month,
+                        onBack = navigator::goBack,
+                        onOpenTransaction = openTransaction,
+                    )
+                }
                 entry<WalletsRoute> { PlaceholderScreen(stringResource(R.string.nav_wallets)) }
                 entry<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }
             },
+        )
+        UndoDeleteRoute(Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+/** The add/edit form, full screen, or as an end-aligned sheet when [asSideSheet]. */
+@Composable
+private fun TransactionFormEntry(
+    transactionId: String?,
+    asSideSheet: Boolean,
+    onClose: () -> Unit,
+    onDeleted: (String) -> Unit,
+) {
+    if (!asSideSheet) {
+        TransactionFormRoute(transactionId, onClose, onDeleted)
+        return
+    }
+    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
+        TransactionFormRoute(
+            transactionId = transactionId,
+            onClose = onClose,
+            onDeleted = onDeleted,
+            modifier = Modifier
+                .width(SideSheetWidth)
+                .fillMaxHeight()
+                .clip(RoundedCornerShape(topStart = MonAITheme.radius.xxl, bottomStart = MonAITheme.radius.xxl))
+                .background(MonAITheme.colors.surface),
+            isSideSheet = true,
         )
     }
 }

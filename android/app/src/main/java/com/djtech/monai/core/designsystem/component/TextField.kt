@@ -45,6 +45,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -288,6 +289,7 @@ fun MonAISearchField(
     placeholder: String,
     modifier: Modifier = Modifier,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    clearContentDescription: String = "Clear search",
 ) {
     val colors = MonAITheme.colors
     val spacing = MonAITheme.spacing
@@ -299,7 +301,7 @@ fun MonAISearchField(
         singleLine = true,
         textStyle = MonAITheme.typography.bodyLarge.copy(color = colors.textPrimary),
         cursorBrush = SolidColor(colors.focus),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text, imeAction = ImeAction.Search),
         keyboardActions = keyboardActions,
         decorationBox = { inner ->
             PillFrame(height = sizes.searchField) {
@@ -323,7 +325,7 @@ fun MonAISearchField(
                 if (value.isNotEmpty()) {
                     MonAIIconButton(
                         icon = MonAIIcons.Close,
-                        contentDescription = "Clear search",
+                        contentDescription = clearContentDescription,
                         onClick = { onValueChange("") },
                         size = sizes.buttonSmall,
                         iconSize = sizes.iconLg,

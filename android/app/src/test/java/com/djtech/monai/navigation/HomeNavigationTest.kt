@@ -15,13 +15,23 @@ class HomeNavigationTest {
     )
 
     @Test
-    fun `search and see-all transactions open the transactions tab`() {
-        navigator.openFromHome(HomeDestination.Search)
-        assertEquals(TopLevelDestination.Transactions, navigator.currentTab)
-
-        navigator.selectTab(TopLevelDestination.Home)
+    fun `see-all transactions opens the transactions tab`() {
         navigator.openFromHome(HomeDestination.Transactions)
+
         assertEquals(TopLevelDestination.Transactions, navigator.currentTab)
+    }
+
+    @Test
+    fun `search, a recent transaction and add open on top of home`() {
+        navigator.openFromHome(HomeDestination.Search)
+        navigator.openFromHome(HomeDestination.TransactionDetail("t1"))
+        navigator.openFromHome(HomeDestination.AddTransaction)
+
+        assertEquals(TopLevelDestination.Home, navigator.currentTab)
+        assertEquals(
+            listOf(HomeRoute, TransactionSearchRoute(), TransactionDetailRoute("t1"), TransactionFormRoute()),
+            navigator.backStack,
+        )
     }
 
     @Test
@@ -43,8 +53,6 @@ class HomeNavigationTest {
             HomeDestination.AddWallet,
             HomeDestination.Budget,
             HomeDestination.Report,
-            HomeDestination.TransactionDetail("t1"),
-            HomeDestination.AddTransaction,
         )
 
         unbuilt.forEach(navigator::openFromHome)

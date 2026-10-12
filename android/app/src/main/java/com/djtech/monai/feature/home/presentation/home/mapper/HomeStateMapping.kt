@@ -24,26 +24,6 @@ internal fun greetingFor(time: LocalTime): Greeting = when (time.hour) {
     else -> Greeting.EVENING
 }
 
-/** `JP` for "Joshua Putra Jeremia": the first letters of the first two words. */
-internal fun initialsOf(name: String): String =
-    name.trim().split(WHITESPACE).filter(String::isNotEmpty).take(2)
-        .joinToString("") { it.first().uppercase() }
-
-/**
- * The wallet card's logo stand-in: `BCA` for "BCA Tabungan", `GP` for "GoPay", `BJ` for "Bank Jago".
- * Provider logos replace it once images load.
- */
-internal fun walletMonogram(name: String): String {
-    val words = name.trim().split(WHITESPACE).filter(String::isNotEmpty)
-    val first = words.firstOrNull() ?: return ""
-    if (first.length <= 3) return first.uppercase()
-    if (words.size > 1) return initialsOf(name)
-    val capitals = first.filter(Char::isUpperCase)
-    return if (capitals.length >= 2) capitals.take(2) else first.take(2).uppercase()
-}
-
-private val WHITESPACE = Regex("\\s+")
-
 /** Slices the spending card shows, "Others" included. */
 internal const val MAX_SPENDING_SLICES = 5
 

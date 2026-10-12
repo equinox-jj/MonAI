@@ -70,6 +70,17 @@ class MonthlyReportDaoTest {
         assertEquals(emptyList<CategoryBreakdown>(), categories)
     }
 
+    @Test
+    fun observeBetweenListsTheCachedMonthsOfTheRangeInOrder() = runTest {
+        dao.save(report())
+        dao.save(report().copy(month = YearMonth.of(2026, 3)))
+        dao.save(report().copy(month = YearMonth.of(2025, 12)))
+
+        val months = dao.observeBetween(YearMonth.of(2026, 1), YearMonth.of(2026, 12)).first().map { it.month }
+
+        assertEquals(listOf(YearMonth.of(2026, 3), october), months)
+    }
+
     private suspend fun MonthlyReportDao.save(report: MonthlyReport) =
         replace(report.asEntity(), report.categoryEntities())
 

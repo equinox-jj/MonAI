@@ -2,6 +2,8 @@ package com.djtech.monai.core.database
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.djtech.monai.core.database.entity.PaymentProviderCatalogEntity
+import com.djtech.monai.core.datastore.SearchHistoryStore
+import com.djtech.monai.core.di.InMemoryDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -29,7 +31,7 @@ class RoomLocalCacheTest {
     }
 
     @Test
-    fun clearEmptiesEveryTableIncludingTheSearchIndex() = runTest {
+    fun clearEmptiesEveryTableIncludingTheSearchIndexAndTheSearchHistory() = runTest {
         val october = YearMonth.of(2026, 10)
         database.walletDao().upsertAll(listOf(wallet("cash")))
         database.categoryDao().upsertAll(listOf(category("food")))
@@ -39,8 +41,11 @@ class RoomLocalCacheTest {
         database.paymentProviderDao()
             .replaceCatalog(PaymentProviderCatalogEntity(version = 1, etag = null), emptyList())
 
-        RoomLocalCache(database).clear()
+        val searchHistory = SearchHistoryStore(InMemoryDataStore()).apply { add("kopi") }
 
+        RoomLocalCache(database, searchHistory).clear()
+
+        assertEquals(emptyList<String>(), searchHistory.recentSearches.first())
         assertEquals(0, database.walletDao().observeAll().first().size)
         assertEquals(0, database.categoryDao().observeAll().first().size)
         assertNull(database.budgetDao().observe(october).first())

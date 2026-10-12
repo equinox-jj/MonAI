@@ -33,6 +33,10 @@ class ApiReportRepository @Inject constructor(
     override fun observeMonthlyReport(month: YearMonth): Flow<MonthlyReport?> =
         monthlyReportDao.observe(month).map { it?.asModel() }
 
+    override fun observeCachedExpenseTotals(year: Int): Flow<Map<YearMonth, Long>> =
+        monthlyReportDao.observeBetween(YearMonth.of(year, 1), YearMonth.of(year, 12))
+            .map { reports -> reports.associate { it.month to it.expenseTotal } }
+
     override suspend fun refreshMonthlyReport(month: YearMonth): ReportResult<Unit> {
         // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
         val result = apiCaller.callRaw { reportApiService.getMonthlyReport(month.toApiString()).data.asModel() }

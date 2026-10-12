@@ -1,9 +1,9 @@
-package com.djtech.monai.feature.home.presentation.home.mapper
+package com.djtech.monai.core.common.format
 
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
-class HomeStateMappingTest {
+class MonogramsTest {
 
     @Test
     fun `a short first word is the monogram`() {

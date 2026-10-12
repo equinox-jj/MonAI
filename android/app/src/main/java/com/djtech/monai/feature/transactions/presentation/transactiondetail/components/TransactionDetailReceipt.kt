@@ -1,0 +1,75 @@
+package com.djtech.monai.feature.transactions.presentation.transactiondetail.components
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import coil3.compose.AsyncImage
+import com.djtech.monai.R
+import com.djtech.monai.core.designsystem.component.MonAIButton
+import com.djtech.monai.core.designsystem.component.MonAIButtonSize
+import com.djtech.monai.core.designsystem.component.MonAIButtonVariant
+import com.djtech.monai.core.designsystem.component.MonAICard
+import com.djtech.monai.core.designsystem.theme.MonAITheme
+
+/** The attached receipt's thumbnail; View opens it full screen. */
+@Composable
+internal fun TransactionDetailReceipt(
+    receiptUrl: String,
+    onView: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val colors = MonAITheme.colors
+    val thumbShape = RoundedCornerShape(MonAITheme.radius.sm)
+    MonAICard(
+        modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(MonAITheme.spacing.x3),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x3),
+        ) {
+            AsyncImage(
+                model = receiptUrl,
+                contentDescription = null,
+                modifier = Modifier
+                    .size(width = 64.dp, height = 84.dp)
+                    .clip(thumbShape)
+                    .background(colors.surfaceSunken)
+                    .border(MonAITheme.sizes.border, colors.border, thumbShape),
+                contentScale = ContentScale.Crop,
+            )
+            Column(Modifier.weight(1f)) {
+                Text(
+                    stringResource(R.string.transaction_detail_receipt),
+                    style = MonAITheme.typography.labelLarge,
+                    color = colors.textPrimary,
+                )
+                Text(
+                    stringResource(R.string.transaction_detail_receipt_meta),
+                    style = MonAITheme.typography.bodySmall,
+                    color = colors.textTertiary,
+                )
+            }
+            MonAIButton(
+                stringResource(R.string.transaction_detail_receipt_view),
+                onView,
+                variant = MonAIButtonVariant.Outlined,
+                size = MonAIButtonSize.Small,
+            )
+        }
+    }
+}

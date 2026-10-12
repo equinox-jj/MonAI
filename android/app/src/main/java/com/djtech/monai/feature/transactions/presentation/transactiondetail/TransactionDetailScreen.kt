@@ -1,0 +1,227 @@
+package com.djtech.monai.feature.transactions.presentation.transactiondetail
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.djtech.monai.R
+import com.djtech.monai.core.common.ui.CollectEffects
+import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.designsystem.component.MonAIAlertTone
+import com.djtech.monai.core.designsystem.component.MonAIIconButton
+import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
+import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
+import com.djtech.monai.core.designsystem.component.MonAIStateMessage
+import com.djtech.monai.core.designsystem.component.MonAITopBar
+import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.icon.MonAIIcons
+import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailActions
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailFields
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailHero
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailReceipt
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailReceiptViewer
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.preview.TransactionDetailPreviewData
+import kotlinx.coroutines.launch
+
+/**
+ * @param isPane shown beside the list on a wide screen: no back button, and the status bar
+ *   inset is the list's concern.
+ */
+@Composable
+fun TransactionDetailRoute(
+    transactionId: String,
+    onBack: () -> Unit,
+    onEdit: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    isPane: Boolean = false,
+    viewModel: TransactionDetailViewModel =
+        hiltViewModel<TransactionDetailViewModel, TransactionDetailViewModel.Factory>(key = transactionId) {
+            it.create(transactionId)
+        },
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    CollectEffects(viewModel.effects) { effect ->
+        when (effect) {
+            TransactionDetailEffect.NavigateBack -> onBack()
+            is TransactionDetailEffect.OpenEdit -> onEdit(effect.id)
+            is TransactionDetailEffect.ShowMessage -> scope.launch {
+                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
+            }
+        }
+    }
+    TransactionDetailScreen(
+        state,
+        viewModel::onIntent,
+        modifier,
+        isPane = isPane,
+        snackbarHostState = snackbarHostState,
+    )
+}
+
+@Composable
+fun TransactionDetailScreen(
+    state: TransactionDetailState,
+    onIntent: (TransactionDetailIntent) -> Unit,
+    modifier: Modifier = Modifier,
+    isPane: Boolean = false,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
+) {
+    val transaction = state.transaction
+    Box(
+        modifier
+            .fillMaxSize()
+            .background(MonAITheme.colors.background),
+    ) {
+        Column(Modifier.fillMaxSize()) {
+            MonAITopBar(
+                title = stringResource(R.string.transaction_detail_title),
+                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
+                onNavigationClick = { onIntent(TransactionDetailIntent.Back) },
+                navigationContentDescription = stringResource(R.string.transaction_detail_back),
+                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+            ) {
+                if (transaction != null) {
+                    MonAIIconButton(
+                        MonAIIcons.Edit,
+                        stringResource(R.string.transaction_detail_edit_description),
+                        onClick = { onIntent(TransactionDetailIntent.Edit) },
+                    )
+                    MonAIIconButton(
+                        MonAIIcons.Delete,
+                        stringResource(R.string.transaction_detail_delete_description),
+                        onClick = { onIntent(TransactionDetailIntent.Delete) },
+                        tint = MonAITheme.colors.error,
+                        enabled = !state.isDeleting,
+                    )
+                }
+            }
+            when {
+                transaction != null -> DetailContent(state, onIntent, Modifier.weight(1f))
+                state.loadError != null -> DetailError(state.loadError, isPane, onIntent, Modifier.weight(1f))
+                else -> {
+                    val description = stringResource(R.string.transaction_detail_loading)
+                    Box(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .semantics { contentDescription = description },
+                        contentAlignment = Alignment.Center,
+                    ) { CircularProgressIndicator() }
+                }
+            }
+        }
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+    }
+    val receiptUrl = transaction?.receiptUrl
+    if (state.isReceiptOpen && receiptUrl != null) {
+        TransactionDetailReceiptViewer(receiptUrl, onClose = { onIntent(TransactionDetailIntent.CloseReceipt) })
+    }
+}
+
+@Composable
+private fun DetailContent(
+    state: TransactionDetailState,
+    onIntent: (TransactionDetailIntent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val transaction = state.transaction ?: return
+    Column(
+        modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(horizontal = MonAITheme.spacing.screenHorizontal)
+            .padding(bottom = MonAITheme.spacing.x6),
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Column(
+            Modifier
+                .weight(1f)
+                .widthIn(max = 560.dp)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x4),
+        ) {
+            TransactionDetailHero(transaction, state.lookups)
+            TransactionDetailFields(transaction, state.lookups, state.today)
+            transaction.receiptUrl?.let { url ->
+                TransactionDetailReceipt(url, onView = { onIntent(TransactionDetailIntent.OpenReceipt) })
+            }
+        }
+        TransactionDetailActions(
+            isDeleting = state.isDeleting,
+            onDelete = { onIntent(TransactionDetailIntent.Delete) },
+            onEdit = { onIntent(TransactionDetailIntent.Edit) },
+            modifier = Modifier
+                .widthIn(max = 560.dp)
+                .padding(top = MonAITheme.spacing.x4),
+        )
+    }
+}
+
+@Composable
+private fun DetailError(
+    message: UiText,
+    isPane: Boolean,
+    onIntent: (TransactionDetailIntent) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier
+            .fillMaxWidth()
+            .padding(horizontal = MonAITheme.spacing.x10),
+        contentAlignment = Alignment.Center,
+    ) {
+        MonAIStateMessage(
+            icon = MonAIIcons.Error,
+            title = stringResource(R.string.transaction_detail_error_title),
+            message = message.asString(),
+            tone = MonAIAlertTone.Error,
+            actionLabel = stringResource(R.string.transaction_try_again),
+            actionIcon = MonAIIcons.Refresh,
+            onAction = { onIntent(TransactionDetailIntent.Retry) },
+            secondaryActionLabel = if (isPane) null else stringResource(R.string.transaction_detail_back),
+            onSecondaryAction = { onIntent(TransactionDetailIntent.Back) },
+        )
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun TransactionDetailPreview() {
+    MonAITheme { TransactionDetailScreen(TransactionDetailPreviewData.shopping, onIntent = {}) }
+}
+
+@Preview
+@Composable
+private fun TransactionDetailTransferPreview() {
+    MonAITheme { TransactionDetailScreen(TransactionDetailPreviewData.transfer, onIntent = {}) }
+}

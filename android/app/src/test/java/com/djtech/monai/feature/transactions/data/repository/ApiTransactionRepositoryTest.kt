@@ -1,9 +1,12 @@
 package com.djtech.monai.feature.transactions.data.repository
 
 import com.djtech.monai.core.common.log.RecordingErrorLogger
+import androidx.paging.testing.asSnapshot
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.database.FakeTransactionDao
 import com.djtech.monai.core.database.entity.TransactionEntity
+import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.TransactionSource
@@ -13,6 +16,14 @@ import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.transactions.data.remote.TransactionApiService
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
+import com.djtech.monai.feature.transactions.domain.model.TransactionField
+import com.djtech.monai.feature.transactions.domain.model.TransactionFieldError
+import com.djtech.monai.feature.transactions.domain.model.TransactionFieldIssue
+import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
+import com.djtech.monai.feature.transactions.domain.model.TransactionInput
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
@@ -181,6 +192,241 @@ class ApiTransactionRepositoryTest {
         assertSame(failure, errorLogger.errors.single())
     }
 
+    @Test
+    fun `observeDailyNets sums each day's income minus expenses, ignoring transfers`() = runTest {
+        val dao = FakeTransactionDao(
+            listOf(
+                entity(id = "lunch", date = LocalDate.of(2026, 10, 5)),
+                entity(id = "salary", date = LocalDate.of(2026, 10, 5))
+                    .copy(type = TransactionType.INCOME, amount = 50_000),
+                entity(id = "top-up", date = LocalDate.of(2026, 10, 5)).copy(type = TransactionType.TRANSFER),
+                entity(id = "coffee", date = LocalDate.of(2026, 10, 6)),
+                entity(id = "sept", date = LocalDate.of(2026, 9, 30)),
+            ),
+        )
+
+        val nets = repository(dao).observeDailyNets(OCTOBER, TransactionFilter()).first()
+
+        assertEquals(mapOf(LocalDate.of(2026, 10, 5) to 40_000L, LocalDate.of(2026, 10, 6) to -10_000L), nets)
+    }
+
+    @Test
+    fun `createTransaction posts the input and caches what the server returns`() = runTest {
+        val dao = FakeTransactionDao()
+        server.enqueue(MockResponse(code = 201, body = envelope(LUNCH_JSON)))
+
+        val result = repository(dao).createTransaction(
+            TransactionInput(
+                type = TransactionType.EXPENSE,
+                amount = 35_000,
+                walletId = "w1",
+                toWalletId = null,
+                categoryId = "c1",
+                date = LocalDate.of(2026, 10, 12),
+                note = "Makan siang",
+            ),
+        )
+
+        assertEquals(Outcome.Success(LUNCH), result)
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/v1/transactions", request.url.encodedPath)
+        assertEquals(
+            """{"type":"EXPENSE","amount":35000,"wallet_id":"w1","category_id":"c1","date":"2026-10-12",""" +
+                """"note":"Makan siang","source":"MANUAL"}""",
+            request.body?.utf8(),
+        )
+        assertEquals(listOf(LUNCH), dao.transactions.map { it.asModel() })
+    }
+
+    @Test
+    fun `createTransaction maps the server's field errors`() = runTest {
+        server.enqueue(
+            MockResponse(
+                code = 422,
+                body = """
+                    {"success":false,"message":"Invalid","data":null,"error":{"code":"validation_failed","fields":[
+                      {"field":"date","code":"future_date","message":"must not be in the future"},
+                      {"field":"to_wallet_id","code":"not_equal","message":"must differ",
+                       "params":{"other":"wallet_id"}},
+                      {"field":"category_id","code":"something_new","message":"?"}
+                    ]}}
+                """.trimIndent(),
+            ),
+        )
+
+        val result = repository(FakeTransactionDao()).createTransaction(TRANSFER_INPUT)
+
+        assertEquals(
+            Outcome.Failure(
+                TransactionError.InvalidFields(
+                    listOf(
+                        TransactionFieldError(TransactionField.DATE, TransactionFieldIssue.FUTURE_DATE),
+                        TransactionFieldError(TransactionField.TO_WALLET, TransactionFieldIssue.SAME_WALLET),
+                        TransactionFieldError(TransactionField.CATEGORY, TransactionFieldIssue.INVALID),
+                    ),
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `createTransaction still succeeds and logs when the cache cannot be written`() = runTest {
+        val failure = IOException("disk full")
+        val dao = FakeTransactionDao().apply { this.failure = failure }
+        server.enqueue(MockResponse(code = 201, body = envelope(LUNCH_JSON)))
+
+        val result = repository(dao).createTransaction(TRANSFER_INPUT)
+
+        assertEquals(Outcome.Success(LUNCH), result)
+        assertSame(failure, errorLogger.errors.single())
+    }
+
+    @Test
+    fun `updateTransaction patches every field and sends nulls so cleared fields are cleared`() = runTest {
+        val dao = FakeTransactionDao()
+        server.enqueue(MockResponse(code = 200, body = envelope(TOP_UP_JSON)))
+
+        val result = repository(dao).updateTransaction(TOP_UP.id, TRANSFER_INPUT)
+
+        assertEquals(Outcome.Success(TOP_UP), result)
+        val request = server.takeRequest()
+        assertEquals("PATCH", request.method)
+        assertEquals("/api/v1/transactions/${TOP_UP.id}", request.url.encodedPath)
+        assertEquals("application/json", request.headers["Content-Type"]?.substringBefore(';'))
+        assertEquals(
+            """{"type":"TRANSFER","amount":500000,"wallet_id":"bca","to_wallet_id":"gopay","category_id":null,""" +
+                """"date":"2026-10-10","note":null,"merchant":null}""",
+            request.body?.utf8(),
+        )
+        assertEquals(listOf(TOP_UP), dao.transactions.map { it.asModel() })
+    }
+
+    @Test
+    fun `deleteTransaction drops it from the cache and announces it for undo`() = runTest {
+        val dao = FakeTransactionDao(listOf(LUNCH.asEntity()))
+        val repository = repository(dao)
+        val deleted = mutableListOf<Transaction>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { repository.deletions.toList(deleted) }
+        server.enqueue(MockResponse(code = 200, body = DELETED_BODY))
+
+        val result = repository.deleteTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Success(LUNCH), result)
+        val request = server.takeRequest()
+        assertEquals("DELETE", request.method)
+        assertEquals("/api/v1/transactions/${LUNCH.id}", request.url.encodedPath)
+        assertEquals(emptyList<TransactionEntity>(), dao.transactions)
+        assertEquals(listOf(LUNCH), deleted)
+    }
+
+    @Test
+    fun `deleteTransaction treats one the server no longer has as deleted`() = runTest {
+        val dao = FakeTransactionDao(listOf(LUNCH.asEntity()))
+        server.enqueue(MockResponse(code = 404, body = errorBody("not_found")))
+
+        val result = repository(dao).deleteTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Success(LUNCH), result)
+        assertEquals(emptyList<TransactionEntity>(), dao.transactions)
+    }
+
+    @Test
+    fun `deleteTransaction offline fails and keeps the cache`() = runTest {
+        val dao = FakeTransactionDao(listOf(LUNCH.asEntity()))
+        val repository = repository(dao)
+        server.close()
+
+        val result = repository.deleteTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Failure(TransactionError.Network), result)
+        assertEquals(listOf(LUNCH), dao.transactions.map { it.asModel() })
+    }
+
+    @Test
+    fun `restoreTransaction caches the restored transaction`() = runTest {
+        val dao = FakeTransactionDao()
+        server.enqueue(MockResponse(code = 200, body = envelope(LUNCH_JSON)))
+
+        val result = repository(dao).restoreTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Success(LUNCH), result)
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/v1/transactions/${LUNCH.id}/restore", request.url.encodedPath)
+        assertEquals(listOf(LUNCH), dao.transactions.map { it.asModel() })
+    }
+
+    @Test
+    fun `restoreTransaction fails as wallet archived when a wallet was archived after the delete`() = runTest {
+        server.enqueue(MockResponse(code = 422, body = errorBody("wallet_archived")))
+
+        val result = repository(FakeTransactionDao()).restoreTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Failure(TransactionError.WalletArchived), result)
+    }
+
+    @Test
+    fun `refreshTransaction caches the transaction`() = runTest {
+        val dao = FakeTransactionDao()
+        server.enqueue(MockResponse(code = 200, body = envelope(LUNCH_JSON)))
+
+        val result = repository(dao).refreshTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Success(Unit), result)
+        assertEquals("/api/v1/transactions/${LUNCH.id}", server.takeRequest().url.encodedPath)
+        assertEquals(LUNCH, repository(dao).observeTransaction(LUNCH.id).first())
+    }
+
+    @Test
+    fun `refreshTransaction drops a transaction the server no longer has`() = runTest {
+        val dao = FakeTransactionDao(listOf(LUNCH.asEntity()))
+        server.enqueue(MockResponse(code = 404, body = errorBody("not_found")))
+
+        val result = repository(dao).refreshTransaction(LUNCH.id)
+
+        assertEquals(Outcome.Failure(TransactionError.NotFound), result)
+        assertEquals(emptyList<TransactionEntity>(), dao.transactions)
+    }
+
+    @Test
+    fun `searchTransactions pages the month's matches from the API with the filters and caches them`() = runTest {
+        val dao = FakeTransactionDao()
+        server.enqueue(MockResponse(code = 200, body = transactionsBody(LUNCH_JSON, hasMore = true)))
+        server.enqueue(MockResponse(code = 200, body = transactionsBody(TOP_UP_JSON, hasMore = false)))
+        val filter = TransactionFilter(walletId = "w1", type = TransactionType.EXPENSE)
+
+        val results = repository(dao).searchTransactions("makan", OCTOBER, filter).asSnapshot {
+            scrollTo(index = 1)
+        }
+
+        assertEquals(listOf(LUNCH, TOP_UP), results)
+        val first = server.takeRequest().url
+        assertEquals("makan", first.queryParameter("q"))
+        assertEquals("2026-10", first.queryParameter("month"))
+        assertEquals("w1", first.queryParameter("wallet_id"))
+        assertEquals("EXPENSE", first.queryParameter("type"))
+        assertEquals(null, first.queryParameter("category_id"))
+        assertEquals(null, first.queryParameter("cursor"))
+        assertEquals("eyJkIjoiMjAyNi0xMC0xMCJ9", server.takeRequest().url.queryParameter("cursor"))
+        assertEquals(listOf(LUNCH, TOP_UP), dao.transactions.map { it.asModel() })
+    }
+
+    @Test
+    fun `searchCachedTransactions finds nothing without searchable words`() = runTest {
+        val results = repository(FakeTransactionDao())
+            .searchCachedTransactions(" -* ", TransactionFilter())
+            .asSnapshot()
+
+        assertEquals(emptyList<Transaction>(), results)
+    }
+
+    private fun envelope(data: String) = """{"success":true,"message":"OK","data":$data}"""
+
+    private fun errorBody(code: String) =
+        """{"success":false,"message":"Failed","data":null,"error":{"code":"$code"}}"""
+
     private fun repository(dao: FakeTransactionDao): ApiTransactionRepository {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
@@ -192,6 +438,7 @@ class ApiTransactionRepositoryTest {
             transactionApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             transactionDao = dao,
+            clock = FixedAppClock(Instant.parse("2026-10-12T06:00:00Z")),
             errorLogger = errorLogger,
         )
     }
@@ -227,6 +474,18 @@ class ApiTransactionRepositoryTest {
     private companion object {
         val OCTOBER: YearMonth = YearMonth.of(2026, 10)
         val CREATED_AT: Instant = Instant.parse("2026-10-01T03:00:00Z")
+
+        const val DELETED_BODY = """{"success":true,"message":"Deleted successfully.","data":null}"""
+
+        val TRANSFER_INPUT = TransactionInput(
+            type = TransactionType.TRANSFER,
+            amount = 500_000,
+            walletId = "bca",
+            toWalletId = "gopay",
+            categoryId = null,
+            date = LocalDate.of(2026, 10, 10),
+            note = null,
+        )
 
         val LUNCH = Transaction(
             id = "8b2d4f0a-1c3e-4b5d-9f7a-0e1d2c3b4a59",

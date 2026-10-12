@@ -5,7 +5,9 @@ import androidx.room3.Dao
 import androidx.room3.Query
 import androidx.room3.Transaction
 import androidx.room3.Upsert
+import com.djtech.monai.core.database.entity.DailyNet
 import com.djtech.monai.core.database.entity.TransactionEntity
+import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
 import com.djtech.monai.core.model.TransactionType
 import kotlinx.coroutines.flow.Flow
 import java.time.LocalDate
@@ -57,6 +59,26 @@ interface TransactionDao {
         type: TransactionType?,
     ): PagingSource<Int, TransactionEntity>
 
+    /** Each cached day's net for the list's day headers. Same filters as [pagingSource]. */
+    @Query(
+        """
+        SELECT date, SUM(CASE type WHEN 'INCOME' THEN amount WHEN 'EXPENSE' THEN -amount ELSE 0 END) AS net
+        FROM transactions
+        WHERE date BETWEEN :from AND :to
+          AND (:walletId IS NULL OR wallet_id = :walletId OR to_wallet_id = :walletId)
+          AND (:categoryId IS NULL OR category_id = :categoryId)
+          AND (:type IS NULL OR type = :type)
+        GROUP BY date
+        """,
+    )
+    fun observeDailyNets(
+        from: LocalDate,
+        to: LocalDate,
+        walletId: String?,
+        categoryId: String?,
+        type: TransactionType?,
+    ): Flow<List<DailyNet>>
+
     @Query("SELECT * FROM transactions WHERE id = :id")
     fun observe(id: String): Flow<TransactionEntity?>
 
@@ -77,6 +99,62 @@ interface TransactionDao {
     /** Drops rows up to [to] that sort at or before the ([date], [id]) key in list order. */
     @Query("DELETE FROM transactions WHERE date <= :to AND (date > :date OR (date = :date AND id >= :id))")
     suspend fun deleteFromKey(date: LocalDate, id: String, to: LocalDate)
+
+    /** Drops the rows of a date range that a filtered list shows, before its RemoteMediator refresh re-fills them. */
+    @Query(
+        """
+        DELETE FROM transactions
+        WHERE date BETWEEN :from AND :to
+          AND (:walletId IS NULL OR wallet_id = :walletId OR to_wallet_id = :walletId)
+          AND (:categoryId IS NULL OR category_id = :categoryId)
+          AND (:type IS NULL OR type = :type)
+        """,
+    )
+    suspend fun deleteMatching(
+        from: LocalDate,
+        to: LocalDate,
+        walletId: String?,
+        categoryId: String?,
+        type: TransactionType?,
+    )
+
+    @Query("SELECT * FROM transaction_remote_keys WHERE query_key = :queryKey")
+    suspend fun remoteKey(queryKey: String): TransactionRemoteKeyEntity?
+
+    @Upsert
+    suspend fun upsertRemoteKey(key: TransactionRemoteKeyEntity)
+
+    /**
+     * A RemoteMediator refresh: replaces what the list's query covers with its first page and
+     * saves where the next page starts, in one transaction so the list never shows a gap.
+     */
+    @Transaction
+    suspend fun replaceQueryPage(
+        from: LocalDate,
+        to: LocalDate,
+        walletId: String?,
+        categoryId: String?,
+        type: TransactionType?,
+        transactions: List<TransactionEntity>,
+        key: TransactionRemoteKeyEntity,
+    ) {
+        deleteMatching(
+            from,
+            to,
+            walletId,
+            categoryId,
+            type,
+        )
+        upsertAll(transactions)
+        upsertRemoteKey(key)
+    }
+
+    /** A RemoteMediator append: adds the next page and moves the cursor on. */
+    @Transaction
+    suspend fun appendQueryPage(transactions: List<TransactionEntity>, key: TransactionRemoteKeyEntity) {
+        upsertAll(transactions)
+        upsertRemoteKey(key)
+    }
 
     /**
      * Swaps in the first page of `GET /transactions` for the range. Only what the page covers is

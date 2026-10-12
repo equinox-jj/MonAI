@@ -90,4 +90,14 @@ class MainNavigatorTest {
 
     private data object Detail : NavKey
     private data object Detail2 : NavKey
+
+    @Test
+    fun `popWhile pops matching entries but never the tab root`() {
+        navigator.selectTab(TopLevelDestination.Transactions)
+        navigator.navigate(Detail)
+
+        navigator.popWhile { true }
+
+        assertEquals(listOf(HomeRoute, TransactionsRoute), navigator.backStack)
+    }
 }

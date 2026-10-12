@@ -2,7 +2,9 @@ package com.djtech.monai.core.database
 
 import androidx.paging.PagingSource
 import com.djtech.monai.core.database.dao.TransactionDao
+import com.djtech.monai.core.database.entity.DailyNet
 import com.djtech.monai.core.database.entity.TransactionEntity
+import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
 import com.djtech.monai.core.model.TransactionType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,6 +23,8 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
 
     val transactions: List<TransactionEntity> get() = rows.value.values.sorted()
 
+    val remoteKeys = mutableMapOf<String, TransactionRemoteKeyEntity>()
+
     override fun pagingSource(
         from: LocalDate,
         to: LocalDate,
@@ -37,6 +41,24 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
         categoryId: String?,
         type: TransactionType?,
     ): PagingSource<Int, TransactionEntity> = error("Not faked")
+
+    override fun observeDailyNets(
+        from: LocalDate,
+        to: LocalDate,
+        walletId: String?,
+        categoryId: String?,
+        type: TransactionType?,
+    ): Flow<List<DailyNet>> = rows.map { all ->
+        all.values
+            .filter { row ->
+                row.date in from..to &&
+                    (walletId == null || row.walletId == walletId || row.toWalletId == walletId) &&
+                    (categoryId == null || row.categoryId == categoryId) &&
+                    (type == null || row.type == type)
+            }
+            .groupBy { it.date }
+            .map { (date, rows) -> DailyNet(date, rows.sumOf { it.signedAmount() }) }
+    }
 
     override fun observe(id: String): Flow<TransactionEntity?> = rows.map { it[id] }
 
@@ -64,6 +86,36 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
             val atOrAfterKey = row.date > date || (row.date == date && row.id >= id)
             !(row.date <= to && atOrAfterKey)
         }
+    }
+
+    override suspend fun deleteMatching(
+        from: LocalDate,
+        to: LocalDate,
+        walletId: String?,
+        categoryId: String?,
+        type: TransactionType?,
+    ) {
+        failure?.let { throw it }
+        rows.value = rows.value.filterValues { row ->
+            val matches = row.date in from..to &&
+                (walletId == null || row.walletId == walletId || row.toWalletId == walletId) &&
+                (categoryId == null || row.categoryId == categoryId) &&
+                (type == null || row.type == type)
+            !matches
+        }
+    }
+
+    override suspend fun remoteKey(queryKey: String): TransactionRemoteKeyEntity? = remoteKeys[queryKey]
+
+    override suspend fun upsertRemoteKey(key: TransactionRemoteKeyEntity) {
+        failure?.let { throw it }
+        remoteKeys[key.queryKey] = key
+    }
+
+    private fun TransactionEntity.signedAmount(): Long = when (type) {
+        TransactionType.INCOME -> amount
+        TransactionType.EXPENSE -> -amount
+        TransactionType.TRANSFER -> 0
     }
 
     private fun Collection<TransactionEntity>.sorted(): List<TransactionEntity> =

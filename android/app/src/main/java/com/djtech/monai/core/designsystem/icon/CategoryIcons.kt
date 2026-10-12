@@ -21,5 +21,6 @@ fun categoryIcon(name: String?): ImageVector = when (name) {
     "savings" -> MonAIIcons.Savings
     "inventory_2" -> MonAIIcons.Inventory2
     "account_balance" -> MonAIIcons.AccountBalance
+    "work" -> MonAIIcons.Work
     else -> MonAIIcons.Category
 }

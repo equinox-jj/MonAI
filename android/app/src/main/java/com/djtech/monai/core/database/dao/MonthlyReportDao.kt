@@ -18,6 +18,10 @@ interface MonthlyReportDao {
     @Query("SELECT * FROM monthly_reports WHERE month = :month")
     fun observe(month: YearMonth): Flow<MonthlyReportWithCategories?>
 
+    /** Reports cached for the months from [from] to [to], without their breakdowns. */
+    @Query("SELECT * FROM monthly_reports WHERE month BETWEEN :from AND :to ORDER BY month")
+    fun observeBetween(from: YearMonth, to: YearMonth): Flow<List<MonthlyReportEntity>>
+
     @Upsert
     suspend fun upsertReport(report: MonthlyReportEntity)
 
