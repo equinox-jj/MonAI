@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.djtech.monai.core.database.entity.BudgetEntity
 import com.djtech.monai.core.database.entity.CategoryEntity
 import com.djtech.monai.core.database.entity.TransactionEntity
+import com.djtech.monai.core.database.entity.UserEntity
 import com.djtech.monai.core.database.entity.WalletEntity
 import com.djtech.monai.core.model.BudgetStatus
 import com.djtech.monai.core.model.CategoryType
@@ -103,4 +104,16 @@ fun budget(month: YearMonth) = BudgetEntity(
     remaining = 600_000,
     progressPercent = 80.0,
     status = BudgetStatus.WARNING,
+)
+
+fun user(id: String, name: String = "Joshua") = UserEntity(
+    id = id,
+    name = name,
+    email = "$id@example.com",
+    avatarUrl = null,
+    timezone = "Asia/Jakarta",
+    roleSlug = "user",
+    roleName = "User",
+    permissions = listOf("payment_provider.view"),
+    createdAt = CREATED,
 )

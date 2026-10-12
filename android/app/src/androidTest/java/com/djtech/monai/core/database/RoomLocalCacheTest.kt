@@ -35,6 +35,7 @@ class RoomLocalCacheTest {
         database.categoryDao().upsertAll(listOf(category("food")))
         database.transactionDao().upsertAll(listOf(transaction("t1", note = "kopi")))
         database.budgetDao().upsert(budget(october))
+        database.userDao().replace(user("u1"))
         database.paymentProviderDao()
             .replaceCatalog(PaymentProviderCatalogEntity(version = 1, etag = null), emptyList())
 
@@ -43,6 +44,7 @@ class RoomLocalCacheTest {
         assertEquals(0, database.walletDao().observeAll().first().size)
         assertEquals(0, database.categoryDao().observeAll().first().size)
         assertNull(database.budgetDao().observe(october).first())
+        assertNull(database.userDao().observe().first())
         assertNull(database.paymentProviderDao().catalogMeta())
         val transactions = database.transactionDao().searchPagingSource(
             match = "kopi*",

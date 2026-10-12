@@ -17,7 +17,7 @@ import org.junit.runner.RunWith
 import java.time.Instant
 import java.time.YearMonth
 
-/** Wallets, categories, budgets, the provider catalog and remote keys. */
+/** Wallets, categories, budgets, the signed-in user, the provider catalog and remote keys. */
 @RunWith(AndroidJUnit4::class)
 class CacheDaoTest {
 
@@ -58,6 +58,29 @@ class CacheDaoTest {
             listOf("after", "new"),
             dao.observeAll().first().map { it.name },
         )
+    }
+
+    @Test
+    fun userKeepsEveryField() = runTest {
+        val dao = database.userDao()
+        val joshua = user("u1").copy(
+            avatarUrl = "https://cdn.example.com/a.png",
+            permissions = listOf("payment_provider.view", "payment_provider.create"),
+        )
+
+        dao.replace(joshua)
+
+        assertEquals(joshua, dao.observe().first())
+    }
+
+    @Test
+    fun replaceUserKeepsOnlyTheLatestOne() = runTest {
+        val dao = database.userDao()
+        dao.replace(user("previous-account"))
+
+        dao.replace(user("u1", name = "Joshua P"))
+
+        assertEquals(user("u1", name = "Joshua P"), dao.observe().first())
     }
 
     @Test

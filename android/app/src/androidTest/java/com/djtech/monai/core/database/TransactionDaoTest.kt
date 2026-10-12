@@ -3,6 +3,7 @@ package com.djtech.monai.core.database
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.djtech.monai.core.database.dao.TransactionDao
 import com.djtech.monai.core.model.TransactionType
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -148,6 +149,87 @@ class TransactionDaoTest {
             ).loadAll().map { it.id },
         )
     }
+
+    @Test
+    fun observeRecentListsTheNewestOfOneMonth() = runTest {
+        dao.upsertAll(
+            listOf(
+                transaction("a", date = LocalDate.of(2026, 10, 5)),
+                transaction("c", date = LocalDate.of(2026, 10, 5)),
+                transaction("b", date = LocalDate.of(2026, 10, 31)),
+                transaction("d", date = LocalDate.of(2026, 10, 1)),
+                transaction("nov", date = LocalDate.of(2026, 11, 1)),
+            ),
+        )
+
+        val recent = dao.observeRecent(october.first, october.second, limit = 3).first()
+
+        assertEquals(listOf("b", "c", "a"), recent.map { it.id })
+    }
+
+    @Test
+    fun replaceRecentWithTheWholeMonthDropsWhatTheServerNoLongerHas() = runTest {
+        dao.upsertAll(
+            listOf(
+                transaction("deleted", date = LocalDate.of(2026, 10, 2)),
+                transaction("kept", date = LocalDate.of(2026, 10, 3)),
+                transaction("sept", date = LocalDate.of(2026, 9, 30)),
+            ),
+        )
+
+        dao.replaceRecent(
+            october.first,
+            october.second,
+            listOf(transaction("kept", date = LocalDate.of(2026, 10, 3))),
+            hasMore = false,
+        )
+
+        assertEquals(listOf("kept"), list().map { it.id })
+        assertEquals(listOf("sept"), september().map { it.id })
+    }
+
+    @Test
+    fun replaceRecentWithAPartialPageOnlyReplacesWhatThePageCovers() = runTest {
+        dao.upsertAll(
+            listOf(
+                transaction("deleted-newer", date = LocalDate.of(2026, 10, 20)),
+                transaction("x", date = LocalDate.of(2026, 10, 10)),
+                // Same day as the page's oldest row but sorts after it, so the page didn't cover it.
+                transaction("a-older", date = LocalDate.of(2026, 10, 10)),
+                transaction("older", date = LocalDate.of(2026, 10, 2)),
+            ),
+        )
+
+        dao.replaceRecent(
+            october.first,
+            october.second,
+            listOf(
+                transaction("new", date = LocalDate.of(2026, 10, 25)),
+                transaction("x", date = LocalDate.of(2026, 10, 10)),
+            ),
+            hasMore = true,
+        )
+
+        assertEquals(listOf("new", "x", "a-older", "older"), list().map { it.id })
+    }
+
+    @Test
+    fun replaceRecentWithAnEmptyMonthClearsIt() = runTest {
+        dao.upsertAll(listOf(transaction("deleted"), transaction("sept", date = LocalDate.of(2026, 9, 30))))
+
+        dao.replaceRecent(october.first, october.second, emptyList(), hasMore = false)
+
+        assertEquals(emptyList<String>(), list().map { it.id })
+        assertEquals(listOf("sept"), september().map { it.id })
+    }
+
+    private suspend fun september() = dao.pagingSource(
+        from = LocalDate.of(2026, 9, 1),
+        to = LocalDate.of(2026, 9, 30),
+        walletId = null,
+        categoryId = null,
+        type = null,
+    ).loadAll()
 
     private suspend fun list(
         walletId: String? = null,

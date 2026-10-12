@@ -11,6 +11,7 @@ import com.djtech.monai.core.database.dao.MonthlyReportDao
 import com.djtech.monai.core.database.dao.PaymentProviderDao
 import com.djtech.monai.core.database.dao.TransactionDao
 import com.djtech.monai.core.database.dao.TransactionRemoteKeyDao
+import com.djtech.monai.core.database.dao.UserDao
 import com.djtech.monai.core.database.dao.WalletDao
 import com.djtech.monai.core.database.entity.BudgetEntity
 import com.djtech.monai.core.database.entity.CategoryEntity
@@ -21,6 +22,7 @@ import com.djtech.monai.core.database.entity.ReportCategoryEntity
 import com.djtech.monai.core.database.entity.TransactionEntity
 import com.djtech.monai.core.database.entity.TransactionFtsEntity
 import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
+import com.djtech.monai.core.database.entity.UserEntity
 import com.djtech.monai.core.database.entity.WalletEntity
 
 /**
@@ -39,8 +41,9 @@ import com.djtech.monai.core.database.entity.WalletEntity
         PaymentProviderCatalogEntity::class,
         MonthlyReportEntity::class,
         ReportCategoryEntity::class,
+        UserEntity::class,
     ],
-    version = 1,
+    version = 2,
     exportSchema = true,
 )
 @ColumnTypeConverters(Converters::class)
@@ -53,6 +56,7 @@ abstract class MonAIDatabase : RoomDatabase() {
     abstract fun budgetDao(): BudgetDao
     abstract fun paymentProviderDao(): PaymentProviderDao
     abstract fun monthlyReportDao(): MonthlyReportDao
+    abstract fun userDao(): UserDao
 
     companion object {
         const val NAME = "monai.db"

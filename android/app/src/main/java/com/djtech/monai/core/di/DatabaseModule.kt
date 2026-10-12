@@ -63,4 +63,7 @@ object DatabaseModule {
 
     @Provides
     fun provideMonthlyReportDao(database: MonAIDatabase) = database.monthlyReportDao()
+
+    @Provides
+    fun provideUserDao(database: MonAIDatabase) = database.userDao()
 }
