@@ -12,6 +12,17 @@ data class ApiResponse<T>(
     val data: T,
 )
 
+/**
+ * Success envelope with `data: null` (deletes, logout-all). Read it with
+ * [com.djtech.monai.core.network.ApiCaller.callRaw]: Retrofit drops the nullability
+ * of `ApiResponse<Unit?>`, so that type cannot parse a null `data`.
+ */
+@Serializable
+data class EmptyResponse(
+    val success: Boolean,
+    val message: String,
+)
+
 /** Success envelope of an offset-paginated list. */
 @Serializable
 data class PagedResponse<T>(

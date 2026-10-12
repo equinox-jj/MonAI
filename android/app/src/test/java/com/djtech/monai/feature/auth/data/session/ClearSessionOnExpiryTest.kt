@@ -1,4 +1,4 @@
-package com.djtech.monai.feature.auth.data
+package com.djtech.monai.feature.auth.data.session
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import com.djtech.monai.core.database.FakeLocalCache

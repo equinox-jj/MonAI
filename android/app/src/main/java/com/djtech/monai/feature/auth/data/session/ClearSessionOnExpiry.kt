@@ -1,4 +1,4 @@
-package com.djtech.monai.feature.auth.data
+package com.djtech.monai.feature.auth.data.session
 
 import com.djtech.monai.core.common.dispatcher.ApplicationScope
 import com.djtech.monai.core.database.LocalCache
