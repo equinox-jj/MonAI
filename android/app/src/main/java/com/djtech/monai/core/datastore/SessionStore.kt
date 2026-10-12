@@ -74,9 +74,14 @@ class SessionStore @Inject constructor(
 
     suspend fun clear() = writeLock.withLock { removeToken() }
 
-    /** Clears [token] only if it is still the stored one; a newer login wins. */
-    suspend fun clearIfCurrent(token: String) = writeLock.withLock {
-        if (loadIfNeeded() == token) removeToken()
+    /**
+     * Clears [token] only if it is still the stored one; a newer login wins.
+     * Returns whether it was cleared.
+     */
+    suspend fun clearIfCurrent(token: String): Boolean = writeLock.withLock {
+        val isCurrent = loadIfNeeded() == token
+        if (isCurrent) removeToken()
+        isCurrent
     }
 
     private suspend fun removeToken() {

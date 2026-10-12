@@ -24,22 +24,25 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class DataStoreModule {
+abstract class DataStoreBindsModule {
 
     @Binds
     abstract fun bindTokenCipher(cipher: KeystoreTokenCipher): TokenCipher
 
     @Binds
     abstract fun bindAccessTokenProvider(store: SessionStore): AccessTokenProvider
+}
 
-    companion object {
-        @Provides
-        @Singleton
-        fun provideSessionDataStore(
-            @ApplicationContext context: Context,
-            @Dispatcher(MonAIDispatcher.IO) ioDispatcher: CoroutineDispatcher,
-        ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
-            scope = CoroutineScope(ioDispatcher + SupervisorJob()),
-        ) { context.preferencesDataStoreFile("session") }
-    }
+@Module
+@InstallIn(SingletonComponent::class)
+object DataStoreModule {
+
+    @Provides
+    @Singleton
+    fun provideSessionDataStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(MonAIDispatcher.IO) ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        scope = CoroutineScope(ioDispatcher + SupervisorJob()),
+    ) { context.preferencesDataStoreFile("session") }
 }

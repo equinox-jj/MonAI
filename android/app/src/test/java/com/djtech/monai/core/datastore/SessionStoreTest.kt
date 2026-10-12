@@ -14,8 +14,10 @@ import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNotEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -105,8 +107,7 @@ class SessionStoreTest {
         val store = store()
         store.saveToken("token-1")
 
-        store.clearIfCurrent("token-1")
-
+        assertTrue(store.clearIfCurrent("token-1"))
         assertEquals(SessionState.SignedOut, store.awaitLoaded())
         assertNull(store.accessToken())
     }
@@ -117,8 +118,7 @@ class SessionStoreTest {
         val store = store()
         store.saveToken("token-2")
 
-        store.clearIfCurrent("token-1")
-
+        assertFalse(store.clearIfCurrent("token-1"))
         assertEquals(SessionState.SignedIn, store.awaitLoaded())
         assertEquals("token-2", store.accessToken())
     }
