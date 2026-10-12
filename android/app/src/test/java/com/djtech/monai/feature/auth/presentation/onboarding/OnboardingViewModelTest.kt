@@ -2,6 +2,8 @@ package com.djtech.monai.feature.auth.presentation.onboarding
 
 import androidx.lifecycle.SavedStateHandle
 import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
+import com.djtech.monai.core.datastore.OnboardingStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -16,7 +18,8 @@ class OnboardingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val savedState = SavedStateHandle()
-    private val viewModel = OnboardingViewModel(savedState)
+    private val onboardingStore = OnboardingStore(InMemoryPreferencesDataStore())
+    private val viewModel = OnboardingViewModel(savedState, onboardingStore)
 
     private val page get() = viewModel.state.value.page
 
@@ -92,10 +95,31 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `paging does not complete onboarding`() = runTest(mainDispatcherRule.dispatcher) {
+        viewModel.onIntent(OnboardingIntent.Next)
+        viewModel.onIntent(OnboardingIntent.Next)
+
+        assertFalse(onboardingStore.isCompleted.first())
+    }
+
+    @Test
+    fun `leaving for register or sign in completes onboarding`() = runTest(mainDispatcherRule.dispatcher) {
+        for (intent in listOf(OnboardingIntent.Skip, OnboardingIntent.CreateAccount, OnboardingIntent.SignIn)) {
+            val store = OnboardingStore(InMemoryPreferencesDataStore())
+            val viewModel = OnboardingViewModel(SavedStateHandle(), store)
+
+            viewModel.onIntent(intent)
+            viewModel.effects.first()
+
+            assertTrue("$intent", store.isCompleted.first())
+        }
+    }
+
+    @Test
     fun `the page survives process death`() {
         viewModel.onIntent(OnboardingIntent.Next)
 
-        val restored = OnboardingViewModel(savedState)
+        val restored = OnboardingViewModel(savedState, onboardingStore)
 
         assertEquals(1, restored.state.value.page)
     }

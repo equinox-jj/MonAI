@@ -1,18 +1,43 @@
 package com.djtech.monai
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.flow.WhileUiSubscribed
+import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+/**
+ * @param onboardingCompleted onboarding was finished once, so the auth graph opens on Sign in.
+ */
+@Immutable
+data class MainState(
+    val sessionState: SessionState = SessionState.Loading,
+    val onboardingCompleted: Boolean = false,
+) {
+    val isLoading: Boolean get() = sessionState == SessionState.Loading
+}
 
 /** Drives the app root: the splash stays up while Loading, then auth or main is shown. */
 @HiltViewModel
-class MainViewModel @Inject constructor(sessionStore: SessionStore) : ViewModel() {
-    val sessionState: StateFlow<SessionState> = sessionStore.sessionState
-        .stateIn(viewModelScope, WhileUiSubscribed, SessionState.Loading)
+class MainViewModel @Inject constructor(
+    private val sessionStore: SessionStore,
+    onboardingStore: OnboardingStore,
+) : ViewModel() {
+    // combine waits for both stores, so the splash also covers the onboarding read.
+    val state: StateFlow<MainState> =
+        combine(sessionStore.sessionState, onboardingStore.isCompleted, ::MainState)
+            .stateIn(viewModelScope, WhileUiSubscribed, MainState())
+
+    /** The user dismissed the session-expired dialog: move on to the signed-out graph. */
+    fun onSessionExpiredAcknowledged() {
+        viewModelScope.launch { sessionStore.acknowledgeExpiry() }
+    }
 }

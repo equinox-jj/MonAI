@@ -3,6 +3,7 @@ package com.djtech.monai.feature.auth.presentation.onboarding
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.djtech.monai.core.datastore.OnboardingStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -17,6 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class OnboardingViewModel @Inject constructor(
     private val savedState: SavedStateHandle,
+    private val onboardingStore: OnboardingStore,
 ) : ViewModel() {
 
     // Mirrored into SavedStateHandle so the page survives process death.
@@ -32,9 +34,9 @@ class OnboardingViewModel @Inject constructor(
             OnboardingIntent.Back -> goTo(mutableState.value.page - 1)
             is OnboardingIntent.PageSettled -> goTo(intent.page)
             OnboardingIntent.Skip,
-            OnboardingIntent.CreateAccount -> send(OnboardingEffect.NavigateToRegister)
+            OnboardingIntent.CreateAccount -> finish(OnboardingEffect.NavigateToRegister)
 
-            OnboardingIntent.SignIn -> send(OnboardingEffect.NavigateToSignIn)
+            OnboardingIntent.SignIn -> finish(OnboardingEffect.NavigateToSignIn)
         }
     }
 
@@ -44,8 +46,12 @@ class OnboardingViewModel @Inject constructor(
         mutableState.update { it.copy(page = page) }
     }
 
-    private fun send(effect: OnboardingEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
+    /** Leaving onboarding is final: the flag is saved first, so later launches start on Sign in. */
+    private fun finish(effect: OnboardingEffect) {
+        viewModelScope.launch {
+            onboardingStore.markCompleted()
+            effectChannel.send(effect)
+        }
     }
 
     private companion object {

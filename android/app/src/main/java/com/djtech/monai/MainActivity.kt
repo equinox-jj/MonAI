@@ -12,7 +12,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.navigation.MonAIApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +24,7 @@ class MainActivity : ComponentActivity() {
         // Must run before super.onCreate. The splash stays until the stored session is read,
         // so the first frame is already the right graph.
         installSplashScreen().setKeepOnScreenCondition {
-            viewModel.sessionState.value == SessionState.Loading
+            viewModel.state.value.isLoading
         }
 
         super.onCreate(savedInstanceState)
@@ -33,10 +32,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             val systemDark = isSystemInDarkTheme()
             var darkTheme by rememberSaveable { mutableStateOf(systemDark) }
-            val sessionState by viewModel.sessionState.collectAsStateWithLifecycle()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             MonAITheme(darkTheme = darkTheme) {
-                MonAIApp(sessionState)
+                MonAIApp(state, viewModel::onSessionExpiredAcknowledged)
             }
         }
     }

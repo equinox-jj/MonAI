@@ -5,6 +5,7 @@ import com.djtech.monai.core.model.Role
 import com.djtech.monai.core.model.User
 import com.djtech.monai.feature.auth.domain.model.AuthResult
 import com.djtech.monai.feature.auth.domain.repository.AuthRepository
+import kotlinx.coroutines.CompletableDeferred
 import java.time.Instant
 
 /** Records the calls it gets and answers with the configured results. */
@@ -14,13 +15,18 @@ class FakeAuthRepository : AuthRepository {
 
     val calls = mutableListOf<String>()
 
+    /** When set, register and login suspend until it completes, to observe the in-flight state. */
+    var gate: CompletableDeferred<Unit>? = null
+
     override suspend fun register(name: String, email: String, password: String): AuthResult<User> {
         calls += "register($name, $email, $password)"
+        gate?.await()
         return userResult
     }
 
     override suspend fun login(email: String, password: String): AuthResult<User> {
         calls += "login($email, $password)"
+        gate?.await()
         return userResult
     }
 

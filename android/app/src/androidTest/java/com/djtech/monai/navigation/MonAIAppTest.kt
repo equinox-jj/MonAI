@@ -11,13 +11,16 @@ import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import com.djtech.monai.HiltTestActivity
+import com.djtech.monai.MainState
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -32,10 +35,20 @@ class MonAIAppTest {
     val compose = createAndroidComposeRule<HiltTestActivity>()
 
     private var sessionState by mutableStateOf<SessionState>(SessionState.Loading)
+    private var onboardingCompleted by mutableStateOf(false)
+    private var expiryAcknowledgements = 0
 
-    private fun setContent(initial: SessionState) {
+    private fun setContent(initial: SessionState, onboardingDone: Boolean = false) {
         sessionState = initial
-        compose.setContent { MonAITheme { MonAIApp(sessionState) } }
+        onboardingCompleted = onboardingDone
+        compose.setContent {
+            MonAITheme {
+                MonAIApp(
+                    MainState(sessionState, onboardingCompleted),
+                    onSessionExpiredAcknowledged = { expiryAcknowledgements++ },
+                )
+            }
+        }
     }
 
     private fun welcome() = compose.onNodeWithText(WELCOME_TITLE)
@@ -51,11 +64,30 @@ class MonAIAppTest {
     }
 
     @Test
-    fun signedOutShowsTheAuthGraph() {
+    fun theFirstLaunchShowsOnboarding() {
         setContent(SessionState.SignedOut)
 
         welcome().assertIsDisplayed()
         tab("Home").assertDoesNotExist()
+    }
+
+    @Test
+    fun afterOnboardingTheAuthGraphOpensOnSignIn() {
+        setContent(SessionState.SignedOut, onboardingDone = true)
+
+        compose.onNodeWithText("Welcome back").assertIsDisplayed()
+        welcome().assertDoesNotExist()
+    }
+
+    @Test
+    fun finishingOnboardingKeepsTheScreenItOpened() {
+        setContent(SessionState.SignedOut)
+        compose.onNodeWithText("Skip").performClick()
+
+        // OnboardingViewModel saves the flag, which reaches the app root while Register is showing.
+        onboardingCompleted = true
+
+        compose.onNodeWithText("Create your account").assertIsDisplayed()
     }
 
     @Test
@@ -82,6 +114,20 @@ class MonAIAppTest {
     }
 
     @Test
+    fun signInAndRegisterReplaceOnboardingWithNoWayBack() {
+        setContent(SessionState.SignedOut)
+        compose.onNodeWithText("Skip").performClick()
+
+        compose.onNodeWithText("Sign in").performClick()
+        compose.onNodeWithText("Welcome back").assertIsDisplayed()
+        compose.onNodeWithText("Create an account").performClick()
+        compose.onNodeWithText("Create your account").assertIsDisplayed()
+
+        compose.onNodeWithContentDescription("Back").assertDoesNotExist()
+        welcome().assertDoesNotExist()
+    }
+
+    @Test
     fun signedInStartsOnHome() {
         setContent(SessionState.SignedIn)
 
@@ -102,13 +148,40 @@ class MonAIAppTest {
     }
 
     @Test
-    fun sessionExpiryReturnsToTheAuthGraph() {
-        setContent(SessionState.SignedIn)
+    fun signingOutReturnsToSignIn() {
+        setContent(SessionState.SignedIn, onboardingDone = true)
 
         sessionState = SessionState.SignedOut
 
-        welcome().assertIsDisplayed()
+        compose.onNodeWithText("Welcome back").assertIsDisplayed()
+        welcome().assertDoesNotExist()
         tab("Home").assertDoesNotExist()
+    }
+
+    @Test
+    fun anExpiredSessionShowsTheDialogOverTheMainGraph() {
+        setContent(SessionState.SignedIn, onboardingDone = true)
+
+        sessionState = SessionState.Expired
+
+        compose.onNodeWithText("Session expired").assertIsDisplayed()
+        tab("Home").assertExists()
+        welcome().assertDoesNotExist()
+    }
+
+    @Test
+    fun signingInAgainAfterExpiryOpensSignIn() {
+        setContent(SessionState.SignedIn, onboardingDone = true)
+        sessionState = SessionState.Expired
+
+        compose.onNodeWithText("Sign in again").performClick()
+        assertEquals(1, expiryAcknowledgements)
+        // MainViewModel acknowledges, which moves the session on to SignedOut.
+        sessionState = SessionState.SignedOut
+
+        compose.onNodeWithText("Welcome back").assertIsDisplayed()
+        compose.onNodeWithText("Session expired").assertDoesNotExist()
+        welcome().assertDoesNotExist()
     }
 
     @Test

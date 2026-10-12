@@ -33,7 +33,15 @@ class ApiAuthRepository @Inject constructor(
 
     // Passwords are sent as typed: spaces may be part of them.
     override suspend fun register(name: String, email: String, password: String): AuthResult<User> =
-        signIn { authApiService.register(RegisterRequestDto(name.trim(), email.normalizedEmail(), password)) }
+        signIn {
+            authApiService.register(
+                RegisterRequestDto(
+                    name.trim(),
+                    email.normalizedEmail(),
+                    password
+                )
+            )
+        }
 
     override suspend fun login(email: String, password: String): AuthResult<User> =
         signIn { authApiService.login(LoginRequestDto(email.normalizedEmail(), password)) }
@@ -50,7 +58,10 @@ class ApiAuthRepository @Inject constructor(
             .mapError(ApiError::toAuthError)
     }
 
-    override suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit> {
+    override suspend fun changePassword(
+        currentPassword: String,
+        newPassword: String
+    ): AuthResult<Unit> {
         val body = ChangePasswordRequestDto(currentPassword, newPassword)
         return storingSession {
             // Older tokens are revoked; requests still carrying one 401 harmlessly,
@@ -61,16 +72,17 @@ class ApiAuthRepository @Inject constructor(
         }
     }
 
-    private suspend fun signIn(request: suspend () -> ApiResponse<AuthDataDto>): AuthResult<User> = storingSession {
-        apiCaller.call(request).map { data ->
-            // Map first: a payload that fails to parse must not leave a half-started session.
-            val user = data.user.asModel()
-            // Drop anything cached for a previous account before the new session starts.
-            localCache.clear()
-            sessionStore.saveToken(data.accessToken)
-            user
-        }.mapError(ApiError::toAuthError)
-    }
+    private suspend fun signIn(request: suspend () -> ApiResponse<AuthDataDto>): AuthResult<User> =
+        storingSession {
+            apiCaller.call(request).map { data ->
+                // Map first: a payload that fails to parse must not leave a half-started session.
+                val user = data.user.asModel()
+                // Drop anything cached for a previous account before the new session starts.
+                localCache.clear()
+                sessionStore.saveToken(data.accessToken)
+                user
+            }.mapError(ApiError::toAuthError)
+        }
 
     /**
      * ApiCaller already turns network failures into results; this does the same for failures

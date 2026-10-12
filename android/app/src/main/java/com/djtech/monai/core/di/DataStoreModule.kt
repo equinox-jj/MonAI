@@ -7,7 +7,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.djtech.monai.core.common.dispatcher.Dispatcher
 import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.datastore.AppPreferences
 import com.djtech.monai.core.datastore.KeystoreTokenCipher
+import com.djtech.monai.core.datastore.SessionPreferences
 import com.djtech.monai.core.datastore.SessionStore
 import com.djtech.monai.core.datastore.TokenCipher
 import com.djtech.monai.core.network.auth.AccessTokenProvider
@@ -39,10 +41,21 @@ object DataStoreModule {
 
     @Provides
     @Singleton
+    @SessionPreferences
     fun provideSessionDataStore(
         @ApplicationContext context: Context,
         @Dispatcher(MonAIDispatcher.IO) ioDispatcher: CoroutineDispatcher,
     ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
         scope = CoroutineScope(ioDispatcher + SupervisorJob()),
     ) { context.preferencesDataStoreFile("session") }
+
+    @Provides
+    @Singleton
+    @AppPreferences
+    fun provideAppDataStore(
+        @ApplicationContext context: Context,
+        @Dispatcher(MonAIDispatcher.IO) ioDispatcher: CoroutineDispatcher,
+    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
+        scope = CoroutineScope(ioDispatcher + SupervisorJob()),
+    ) { context.preferencesDataStoreFile("app") }
 }

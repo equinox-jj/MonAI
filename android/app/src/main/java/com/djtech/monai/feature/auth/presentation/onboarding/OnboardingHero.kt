@@ -218,10 +218,38 @@ private fun IllustrationRow(content: @Composable RowScope.() -> Unit) {
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CaptureIllustration() {
+    val spacing = MonAITheme.spacing
+    SamplePromptCard()
+    Icon(
+        MonAIIcons.South,
+        null,
+        Modifier.size(MonAITheme.sizes.iconXl),
+        tint = MonAITheme.colors.highlight,
+    )
+    SampleExpenseCard()
+    FlowRow(
+        horizontalArrangement = Arrangement.spacedBy(spacing.x2, Alignment.CenterHorizontally),
+        verticalArrangement = Arrangement.spacedBy(spacing.x2),
+    ) {
+        // Wallet and provider names are brands, so they stay untranslated.
+        listOf(
+            "Cash",
+            "BCA",
+            "GoPay",
+            "OVO",
+            "DANA",
+        ).forEach { MonAIPill(it) }
+    }
+}
+
+/** The sample quick-add sentence. Also drawn in the tablet auth hero. */
+@Composable
+internal fun SamplePromptCard(modifier: Modifier = Modifier) {
     val colors = MonAITheme.colors
     val spacing = MonAITheme.spacing
     IllustrationCard(
         CircleShape,
+        modifier = modifier,
         contentPadding = PaddingValues(horizontal = spacing.x4, vertical = spacing.x3),
     ) {
         Row(
@@ -241,13 +269,12 @@ private fun CaptureIllustration() {
             )
         }
     }
-    Icon(
-        MonAIIcons.South,
-        null,
-        Modifier.size(MonAITheme.sizes.iconXl),
-        tint = colors.highlight,
-    )
-    IllustrationCard(RoundedCornerShape(MonAITheme.radius.xl)) {
+}
+
+/** The expense the sample sentence becomes. Also drawn in the tablet auth hero. */
+@Composable
+internal fun SampleExpenseCard(modifier: Modifier = Modifier) {
+    IllustrationCard(RoundedCornerShape(MonAITheme.radius.xl), modifier = modifier) {
         IllustrationRow {
             MonAICategoryIcon(MonAIIcons.Restaurant, FoodColor)
             Column(Modifier.weight(1f)) {
@@ -258,7 +285,7 @@ private fun CaptureIllustration() {
                 Text(
                     stringResource(R.string.onboarding_sample_meta),
                     style = MonAITheme.typography.bodySmall,
-                    color = colors.textTertiary,
+                    color = MonAITheme.colors.textTertiary,
                 )
             }
             MonAIAmountText(
@@ -266,19 +293,6 @@ private fun CaptureIllustration() {
                 MoneyDirection.Expense,
             )
         }
-    }
-    FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(spacing.x2, Alignment.CenterHorizontally),
-        verticalArrangement = Arrangement.spacedBy(spacing.x2),
-    ) {
-        // Wallet and provider names are brands, so they stay untranslated.
-        listOf(
-            "Cash",
-            "BCA",
-            "GoPay",
-            "OVO",
-            "DANA",
-        ).forEach { MonAIPill(it) }
     }
 }
 

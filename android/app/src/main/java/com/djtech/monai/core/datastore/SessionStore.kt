@@ -28,6 +28,9 @@ sealed interface SessionState {
     data object Loading : SessionState
     data object SignedIn : SessionState
     data object SignedOut : SessionState
+
+    /** The server rejected the token; signed out, but the UI tells the user before leaving. */
+    data object Expired : SessionState
 }
 
 /**
@@ -37,7 +40,7 @@ sealed interface SessionState {
  */
 @Singleton
 class SessionStore @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
+    @SessionPreferences private val dataStore: DataStore<Preferences>,
     private val cipher: TokenCipher,
     @ApplicationScope scope: CoroutineScope,
     @Dispatcher(MonAIDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
@@ -49,8 +52,11 @@ class SessionStore @Inject constructor(
         .map { cache ->
             when (cache) {
                 CachedToken.Unloaded -> SessionState.Loading
-                is CachedToken.Loaded ->
-                    if (cache.token == null) SessionState.SignedOut else SessionState.SignedIn
+                is CachedToken.Loaded -> when {
+                    cache.token != null -> SessionState.SignedIn
+                    cache.expired -> SessionState.Expired
+                    else -> SessionState.SignedOut
+                }
             }
         }
         .distinctUntilChanged()
@@ -75,18 +81,26 @@ class SessionStore @Inject constructor(
     suspend fun clear() = writeLock.withLock { removeToken() }
 
     /**
-     * Clears [token] only if it is still the stored one; a newer login wins.
-     * Returns whether it was cleared.
+     * Clears [token] only if it is still the stored one; a newer login wins. Only called when the
+     * server rejects the token, so the session becomes [SessionState.Expired] until
+     * [acknowledgeExpiry]. Returns whether it was cleared.
      */
     suspend fun clearIfCurrent(token: String): Boolean = writeLock.withLock {
         val isCurrent = loadIfNeeded() == token
-        if (isCurrent) removeToken()
+        if (isCurrent) removeToken(expired = true)
         isCurrent
     }
 
-    private suspend fun removeToken() {
+    /** The user saw the expiry notice; [SessionState.Expired] becomes [SessionState.SignedOut]. */
+    suspend fun acknowledgeExpiry() = writeLock.withLock {
+        val cache = cached.value
+        if (cache is CachedToken.Loaded && cache.expired) cached.value = cache.copy(expired = false)
+    }
+
+    // The flag lives in memory only: after process death an expired session is plainly signed out.
+    private suspend fun removeToken(expired: Boolean = false) {
         dataStore.edit { it.remove(ACCESS_TOKEN) }
-        cached.value = CachedToken.Loaded(null)
+        cached.value = CachedToken.Loaded(null, expired)
     }
 
     private suspend fun loadIfNeeded(): String? {
@@ -100,7 +114,7 @@ class SessionStore @Inject constructor(
 
     private sealed interface CachedToken {
         data object Unloaded : CachedToken
-        data class Loaded(val token: String?) : CachedToken
+        data class Loaded(val token: String?, val expired: Boolean = false) : CachedToken
     }
 
     internal companion object {

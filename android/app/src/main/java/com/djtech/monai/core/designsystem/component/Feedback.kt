@@ -45,6 +45,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 
@@ -287,10 +288,11 @@ fun MonAIAlertDialog(
     icon: ImageVector? = null,
     tone: MonAIAlertTone = MonAIAlertTone.Warning,
     destructive: Boolean = false,
+    properties: DialogProperties = DialogProperties(),
     content: (@Composable ColumnScope.() -> Unit)? = null,
 ) {
     val colors = MonAITheme.colors
-    Dialog(onDismissRequest = onDismissRequest) {
+    Dialog(onDismissRequest = onDismissRequest, properties = properties) {
         Column(
             modifier = modifier
                 .width(MonAITheme.sizes.dialogWidth)
@@ -327,11 +329,14 @@ fun MonAIAlertDialog(
                         size = MonAIButtonSize.Compact,
                     )
                 }
+                // A lone action spans the dialog, as in "Session expired".
+                val single = dismissLabel == null
                 MonAIButton(
                     confirmLabel,
                     onConfirm,
+                    modifier = if (single) Modifier.weight(1f) else Modifier,
                     variant = if (destructive) MonAIButtonVariant.Destructive else MonAIButtonVariant.Primary,
-                    size = MonAIButtonSize.Compact,
+                    size = if (single) MonAIButtonSize.Medium else MonAIButtonSize.Compact,
                 )
             }
         }

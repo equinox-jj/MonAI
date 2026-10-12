@@ -29,6 +29,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -36,13 +37,19 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.contentType
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -65,6 +72,8 @@ enum class MonAIFieldTone {
  * @param label shown above the field; pass null for label-less fields like the note input
  *   (then give [placeholder] or a [contentDescription]).
  * @param compact 48dp instead of 56dp, for secondary inputs like the note.
+ * @param supportingLinkLabel an inline link after [supportingText], e.g. "Sign in instead".
+ * @param contentType what autofill should offer, e.g. [ContentType.EmailAddress].
  */
 @Composable
 fun MonAITextField(
@@ -76,6 +85,8 @@ fun MonAITextField(
     leadingIcon: ImageVector? = null,
     trailing: (@Composable () -> Unit)? = null,
     supportingText: String? = null,
+    supportingLinkLabel: String? = null,
+    onSupportingLinkClick: () -> Unit = {},
     tone: MonAIFieldTone = MonAIFieldTone.Neutral,
     compact: Boolean = false,
     enabled: Boolean = true,
@@ -84,6 +95,7 @@ fun MonAITextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     contentDescription: String? = null,
+    contentType: ContentType? = null,
 ) {
     val colors = MonAITheme.colors
     val sizes = MonAITheme.sizes
@@ -109,6 +121,7 @@ fun MonAITextField(
                 .fillMaxWidth()
                 .semantics {
                     if (contentDescription != null) this.contentDescription = contentDescription
+                    if (contentType != null) this.contentType = contentType
                     if (isError && supportingText != null) error(supportingText)
                 },
             enabled = enabled,
@@ -167,7 +180,12 @@ fun MonAITextField(
             },
         )
         if (supportingText != null) {
-            FieldSupportingText(supportingText, tone)
+            FieldSupportingText(
+                supportingText,
+                tone,
+                supportingLinkLabel,
+                onSupportingLinkClick,
+            )
         }
     }
 }
@@ -179,12 +197,14 @@ fun MonAIPasswordField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
     label: String? = null,
+    placeholder: String? = null,
     supportingText: String? = null,
     tone: MonAIFieldTone = MonAIFieldTone.Neutral,
     showPasswordLabel: String = "Show password",
     hidePasswordLabel: String = "Hide password",
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
+    contentType: ContentType = ContentType.Password,
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }
     MonAITextField(
@@ -192,6 +212,7 @@ fun MonAIPasswordField(
         onValueChange = onValueChange,
         modifier = modifier,
         label = label,
+        placeholder = placeholder,
         leadingIcon = MonAIIcons.Lock,
         trailing = {
             MonAIIconButton(
@@ -206,11 +227,17 @@ fun MonAIPasswordField(
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
+        contentType = contentType,
     )
 }
 
 @Composable
-private fun FieldSupportingText(text: String, tone: MonAIFieldTone) {
+private fun FieldSupportingText(
+    text: String,
+    tone: MonAIFieldTone,
+    linkLabel: String?,
+    onLinkClick: () -> Unit,
+) {
     val colors = MonAITheme.colors
     val color = when (tone) {
         MonAIFieldTone.Neutral -> colors.textTertiary
@@ -229,7 +256,24 @@ private fun FieldSupportingText(text: String, tone: MonAIFieldTone) {
                 tint = color,
             )
         }
-        Text(text, style = MonAITheme.typography.bodySmall, color = color)
+        if (linkLabel == null) {
+            Text(text, style = MonAITheme.typography.bodySmall, color = color)
+        } else {
+            // One text node, so TalkBack reads message and link together and the link stays focusable.
+            val linkStyle = SpanStyle(color = colors.accent, fontWeight = FontWeight.SemiBold)
+            val annotated = buildAnnotatedString {
+                append(text)
+                append(' ')
+                withLink(
+                    LinkAnnotation.Clickable(
+                        "supporting",
+                        TextLinkStyles(linkStyle)
+                    ) { onLinkClick() }) {
+                    append(linkLabel)
+                }
+            }
+            Text(annotated, style = MonAITheme.typography.bodySmall, color = color)
+        }
     }
 }
 

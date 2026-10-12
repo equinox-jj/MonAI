@@ -108,7 +108,7 @@ class SessionStoreTest {
         store.saveToken("token-1")
 
         assertTrue(store.clearIfCurrent("token-1"))
-        assertEquals(SessionState.SignedOut, store.awaitLoaded())
+        assertEquals(SessionState.Expired, store.awaitLoaded())
         assertNull(store.accessToken())
     }
 
@@ -121,6 +121,56 @@ class SessionStoreTest {
         assertFalse(store.clearIfCurrent("token-1"))
         assertEquals(SessionState.SignedIn, store.awaitLoaded())
         assertEquals("token-2", store.accessToken())
+    }
+
+    @Test
+    fun `clearIfCurrent marks the session expired until acknowledged`() = runTest {
+        val store = store()
+        store.saveToken("token-1")
+
+        store.clearIfCurrent("token-1")
+
+        assertEquals(SessionState.Expired, store.awaitLoaded())
+        assertNull(store.accessToken())
+
+        store.acknowledgeExpiry()
+
+        assertEquals(SessionState.SignedOut, store.awaitLoaded())
+    }
+
+    @Test
+    fun `a stale clearIfCurrent does not mark the session expired`() = runTest {
+        val store = store()
+        store.saveToken("token-2")
+
+        store.clearIfCurrent("token-1")
+        store.clear()
+
+        assertEquals(SessionState.SignedOut, store.awaitLoaded())
+    }
+
+    @Test
+    fun `signing in after expiry clears the expired state`() = runTest {
+        val store = store()
+        store.saveToken("token-1")
+        store.clearIfCurrent("token-1")
+
+        store.saveToken("token-2")
+
+        assertEquals(SessionState.SignedIn, store.awaitLoaded())
+        store.clear()
+        assertEquals(SessionState.SignedOut, store.awaitLoaded())
+    }
+
+    @Test
+    fun `clear after expiry signs out without the expired state`() = runTest {
+        val store = store()
+        store.saveToken("token-1")
+        store.clearIfCurrent("token-1")
+
+        store.clear()
+
+        assertEquals(SessionState.SignedOut, store.awaitLoaded())
     }
 
     private fun TestScope.store() = SessionStore(

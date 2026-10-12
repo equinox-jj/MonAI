@@ -3,6 +3,7 @@ package com.djtech.monai.feature.auth.domain.validation
 import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.model.AuthFieldError
 import com.djtech.monai.feature.auth.domain.model.FieldIssue
+import com.djtech.monai.feature.auth.domain.validation.AuthInputValidator.passwordIssue
 
 /**
  * Checks auth forms on the device with the backend's rules (`backend/internal/auth/dto.go`),
@@ -14,6 +15,9 @@ import com.djtech.monai.feature.auth.domain.model.FieldIssue
  * maximum (see [passwordIssue]).
  */
 object AuthInputValidator {
+
+    /** Minimum password length in code points; the register screen shows it as a live hint. */
+    const val PASSWORD_MIN = 8
 
     fun register(name: String, email: String, password: String): List<AuthFieldError> = buildList {
         addIssue(AuthField.NAME, nameIssue(name.trim()))
@@ -27,13 +31,20 @@ object AuthInputValidator {
         addIssue(AuthField.PASSWORD, passwordIssue(password))
     }
 
-    fun changePassword(currentPassword: String, newPassword: String): List<AuthFieldError> = buildList {
-        if (currentPassword.isEmpty()) add(AuthFieldError(AuthField.CURRENT_PASSWORD, FieldIssue.Required))
-        addIssue(
-            AuthField.NEW_PASSWORD,
-            passwordIssue(newPassword) ?: FieldIssue.SameAsCurrent.takeIf { newPassword == currentPassword },
-        )
-    }
+    fun changePassword(currentPassword: String, newPassword: String): List<AuthFieldError> =
+        buildList {
+            if (currentPassword.isEmpty()) add(
+                AuthFieldError(
+                    AuthField.CURRENT_PASSWORD,
+                    FieldIssue.Required
+                )
+            )
+            addIssue(
+                AuthField.NEW_PASSWORD,
+                passwordIssue(newPassword)
+                    ?: FieldIssue.SameAsCurrent.takeIf { newPassword == currentPassword },
+            )
+        }
 
     private fun MutableList<AuthFieldError>.addIssue(field: AuthField, issue: FieldIssue?) {
         if (issue != null) add(AuthFieldError(field, issue))
@@ -57,7 +68,10 @@ object AuthInputValidator {
         password.codePointLength() < PASSWORD_MIN -> FieldIssue.TooShort(PASSWORD_MIN)
         // bcrypt takes at most 72 bytes. The server's validator counts runes, so a longer
         // non-ASCII password would pass it and then fail hashing with a 500.
-        password.encodeToByteArray().size > PASSWORD_MAX_BYTES -> FieldIssue.TooLong(PASSWORD_MAX_BYTES)
+        password.encodeToByteArray().size > PASSWORD_MAX_BYTES -> FieldIssue.TooLong(
+            PASSWORD_MAX_BYTES
+        )
+
         else -> null
     }
 
@@ -65,7 +79,6 @@ object AuthInputValidator {
 
     private const val NAME_MAX = 100
     private const val EMAIL_MAX = 254
-    private const val PASSWORD_MIN = 8
     private const val PASSWORD_MAX_BYTES = 72
 
     // Loose on purpose: catches typos without rejecting addresses the server accepts.

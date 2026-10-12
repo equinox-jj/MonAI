@@ -47,6 +47,7 @@ object MonAIIcons {
     val Inventory2: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_inventory_2)
     val LocalCafe: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_local_cafe)
     val Lock: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_lock)
+    val LockClock: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_lock_clock)
     val Logout: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_logout)
     val Mail: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_mail)
     val Movie: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_movie)
