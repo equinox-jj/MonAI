@@ -5,7 +5,8 @@ import com.djtech.monai.feature.auth.domain.model.AuthResult
 
 /**
  * Signs the user in and out. A successful register, login or password change stores
- * the new token, and navigation follows the session state from there.
+ * the new token, and navigation follows the session state from there. Failures come back as
+ * [com.djtech.monai.core.common.result.Outcome.Failure]; nothing here throws except cancellation.
  */
 interface AuthRepository {
     suspend fun register(name: String, email: String, password: String): AuthResult<User>

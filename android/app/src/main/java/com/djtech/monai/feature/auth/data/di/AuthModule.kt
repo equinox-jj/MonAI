@@ -16,17 +16,20 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class AuthModule {
+abstract class AuthBindsModule {
 
     @Binds
     abstract fun bindSessionExpiredHandler(handler: ClearSessionOnExpiry): SessionExpiredHandler
 
     @Binds
     abstract fun bindAuthRepository(repository: ApiAuthRepository): AuthRepository
+}
 
-    companion object {
-        @Provides
-        @Singleton
-        fun provideAuthApiService(retrofit: Retrofit): AuthApiService = retrofit.create()
-    }
+@Module
+@InstallIn(SingletonComponent::class)
+object AuthModule {
+
+    @Provides
+    @Singleton
+    fun provideAuthApiService(retrofit: Retrofit): AuthApiService = retrofit.create()
 }

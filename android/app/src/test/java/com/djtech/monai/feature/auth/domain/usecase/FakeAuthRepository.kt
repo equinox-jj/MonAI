@@ -1,5 +1,6 @@
 package com.djtech.monai.feature.auth.domain.usecase
 
+import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.model.Role
 import com.djtech.monai.core.model.User
 import com.djtech.monai.feature.auth.domain.model.AuthResult
@@ -8,8 +9,8 @@ import java.time.Instant
 
 /** Records the calls it gets and answers with the configured results. */
 class FakeAuthRepository : AuthRepository {
-    var userResult: AuthResult<User> = AuthResult.Success(testUser)
-    var unitResult: AuthResult<Unit> = AuthResult.Success(Unit)
+    var userResult: AuthResult<User> = Outcome.Success(testUser)
+    var unitResult: AuthResult<Unit> = Outcome.Success(Unit)
 
     val calls = mutableListOf<String>()
 

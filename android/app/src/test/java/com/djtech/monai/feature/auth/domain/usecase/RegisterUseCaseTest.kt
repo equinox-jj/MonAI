@@ -1,9 +1,10 @@
 package com.djtech.monai.feature.auth.domain.usecase
 
+import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.feature.auth.domain.model.AuthError
 import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.model.AuthFieldError
-import com.djtech.monai.feature.auth.domain.model.AuthResult
+import com.djtech.monai.feature.auth.domain.model.FieldIssue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -17,7 +18,7 @@ class RegisterUseCaseTest {
     fun `valid input registers through the repository`() = runTest {
         val result = register("Joshua", "joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Success(testUser), result)
+        assertEquals(Outcome.Success(testUser), result)
         assertEquals(listOf("register(Joshua, joshua@example.com, s3cretPass)"), repository.calls)
     }
 
@@ -26,7 +27,7 @@ class RegisterUseCaseTest {
         val result = register("", "joshua@example.com", "s3cretPass")
 
         assertEquals(
-            AuthResult.Failure(AuthError.InvalidFields(listOf(AuthFieldError(AuthField.NAME, "required")))),
+            Outcome.Failure(AuthError.InvalidFields(listOf(AuthFieldError(AuthField.NAME, FieldIssue.Required)))),
             result,
         )
         assertEquals(emptyList<String>(), repository.calls)
@@ -34,10 +35,10 @@ class RegisterUseCaseTest {
 
     @Test
     fun `repository failure is passed through`() = runTest {
-        repository.userResult = AuthResult.Failure(AuthError.EmailAlreadyRegistered)
+        repository.userResult = Outcome.Failure(AuthError.EmailAlreadyRegistered)
 
         assertEquals(
-            AuthResult.Failure(AuthError.EmailAlreadyRegistered),
+            Outcome.Failure(AuthError.EmailAlreadyRegistered),
             register("Joshua", "joshua@example.com", "s3cretPass"),
         )
     }

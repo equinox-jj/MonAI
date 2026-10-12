@@ -1,9 +1,11 @@
 package com.djtech.monai.feature.auth.data.repository
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.database.FakeLocalCache
 import com.djtech.monai.core.datastore.FakeTokenCipher
 import com.djtech.monai.core.datastore.SessionStore
+import com.djtech.monai.core.datastore.TokenCipher
 import com.djtech.monai.core.model.Role
 import com.djtech.monai.core.model.User
 import com.djtech.monai.core.network.ApiCaller
@@ -13,7 +15,7 @@ import com.djtech.monai.feature.auth.data.remote.AuthApiService
 import com.djtech.monai.feature.auth.domain.model.AuthError
 import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.model.AuthFieldError
-import com.djtech.monai.feature.auth.domain.model.AuthResult
+import com.djtech.monai.feature.auth.domain.model.FieldIssue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -66,7 +68,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.login("  Joshua@Example.COM ", " s3cretPass ")
 
-        assertEquals(AuthResult.Success(expectedUser), result)
+        assertEquals(Outcome.Success(expectedUser), result)
         assertEquals("token-1", store.accessToken())
         val request = server.takeRequest()
         assertEquals("POST", request.method)
@@ -84,7 +86,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.login("joshua@example.com", "wrongPass1")
 
-        assertEquals(AuthResult.Failure(AuthError.InvalidCredentials), result)
+        assertEquals(Outcome.Failure(AuthError.InvalidCredentials), result)
         assertNull(store.accessToken())
     }
 
@@ -95,7 +97,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.register(" Joshua ", "Joshua@Example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Success(expectedUser), result)
+        assertEquals(Outcome.Success(expectedUser), result)
         assertEquals("token-new", store.accessToken())
         val request = server.takeRequest()
         assertEquals("/api/v1/auth/register", request.url.encodedPath)
@@ -122,7 +124,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.register("Joshua", "joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Failure(AuthError.EmailAlreadyRegistered), result)
+        assertEquals(Outcome.Failure(AuthError.EmailAlreadyRegistered), result)
     }
 
     @Test
@@ -143,11 +145,47 @@ class ApiAuthRepositoryTest {
         val result = repository.register("Joshua", "joshua", "short")
 
         assertEquals(
-            AuthResult.Failure(
+            Outcome.Failure(
                 AuthError.InvalidFields(
                     listOf(
-                        AuthFieldError(AuthField.PASSWORD, "min_length", mapOf("min" to "8")),
-                        AuthFieldError(AuthField.EMAIL, "invalid_format"),
+                        AuthFieldError(AuthField.PASSWORD, FieldIssue.TooShort(8)),
+                        AuthFieldError(AuthField.EMAIL, FieldIssue.InvalidFormat),
+                    ),
+                ),
+            ),
+            result,
+        )
+    }
+
+    @Test
+    fun `field error codes are decoded with their params`() = runTest {
+        val (repository, _) = repository()
+        server.enqueue(
+            errorResponse(
+                422,
+                "validation_failed",
+                fields = """[
+                    {"field":"current_password","code":"required","message":"required"},
+                    {"field":"new_password","code":"not_equal","message":"same","params":{"other":"current_password"}},
+                    {"field":"name","code":"max_length","message":"too long","params":{"max":100}},
+                    {"field":"password","code":"min_length","message":"too short"},
+                    {"field":"email","code":"some_new_code","message":"bad"}
+                ]""",
+            ),
+        )
+
+        val result = repository.changePassword("oldPass123", "oldPass123")
+
+        assertEquals(
+            Outcome.Failure(
+                AuthError.InvalidFields(
+                    listOf(
+                        AuthFieldError(AuthField.CURRENT_PASSWORD, FieldIssue.Required),
+                        AuthFieldError(AuthField.NEW_PASSWORD, FieldIssue.SameAsCurrent),
+                        AuthFieldError(AuthField.NAME, FieldIssue.TooLong(100)),
+                        // A length code without its limit, or an unknown code, still marks the field.
+                        AuthFieldError(AuthField.PASSWORD, FieldIssue.Invalid),
+                        AuthFieldError(AuthField.EMAIL, FieldIssue.Invalid),
                     ),
                 ),
             ),
@@ -162,7 +200,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.login("joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Failure(AuthError.Unexpected), result)
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
     }
 
     @Test
@@ -172,7 +210,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.login("joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Failure(AuthError.RateLimited), result)
+        assertEquals(Outcome.Failure(AuthError.RateLimited), result)
     }
 
     @Test
@@ -182,7 +220,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.login("joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Failure(AuthError.Unexpected), result)
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
     }
 
     @Test
@@ -192,7 +230,31 @@ class ApiAuthRepositoryTest {
 
         val result = repository.login("joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Failure(AuthError.Network), result)
+        assertEquals(Outcome.Failure(AuthError.Network), result)
+    }
+
+    @Test
+    fun `a token that cannot be stored fails instead of throwing`() = runTest {
+        val (repository, store) = repository(cipher = FailingCipher)
+        server.enqueue(MockResponse(code = 200, body = authBody(token = "token-1")))
+
+        val result = repository.login("joshua@example.com", "s3cretPass")
+
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
+        assertNull(store.accessToken())
+    }
+
+    @Test
+    fun `a malformed user fails without signing in`() = runTest {
+        val (repository, store) = repository()
+        val body = authBody(token = "token-1").replace("2026-10-08T12:30:00Z", "yesterday")
+        server.enqueue(MockResponse(code = 200, body = body))
+
+        val result = repository.login("joshua@example.com", "s3cretPass")
+
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
+        assertNull(store.accessToken())
+        assertEquals(0, localCache.clearCount)
     }
 
     @Test
@@ -215,7 +277,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.logoutAllDevices()
 
-        assertEquals(AuthResult.Success(Unit), result)
+        assertEquals(Outcome.Success(Unit), result)
         assertNull(store.accessToken())
         assertEquals(1, localCache.clearCount)
         val request = server.takeRequest()
@@ -231,7 +293,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.logoutAllDevices()
 
-        assertEquals(AuthResult.Failure(AuthError.Unexpected), result)
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
         assertEquals("token-1", store.accessToken())
         assertEquals(0, localCache.clearCount)
     }
@@ -244,7 +306,7 @@ class ApiAuthRepositoryTest {
 
         val result = repository.changePassword("oldPass123", "newPass123")
 
-        assertEquals(AuthResult.Success(Unit), result)
+        assertEquals(Outcome.Success(Unit), result)
         assertEquals("token-new", store.accessToken())
         assertEquals(0, localCache.clearCount)
         val request = server.takeRequest()
@@ -264,16 +326,18 @@ class ApiAuthRepositoryTest {
 
         val result = repository.changePassword("wrongPass1", "newPass123")
 
-        assertEquals(AuthResult.Failure(AuthError.WrongCurrentPassword), result)
+        assertEquals(Outcome.Failure(AuthError.WrongCurrentPassword), result)
         assertEquals("token-old", store.accessToken())
     }
 
-    private fun TestScope.repository(): Pair<ApiAuthRepository, SessionStore> {
+    private fun TestScope.repository(
+        cipher: TokenCipher = FakeTokenCipher,
+    ): Pair<ApiAuthRepository, SessionStore> {
         val store = SessionStore(
             dataStore = PreferenceDataStoreFactory.create(scope = dataStoreScope) {
                 tmp.root.resolve("session.preferences_pb")
             },
-            cipher = FakeTokenCipher,
+            cipher = cipher,
             scope = backgroundScope,
             ioDispatcher = StandardTestDispatcher(testScheduler),
         )
@@ -322,6 +386,13 @@ class ApiAuthRepositoryTest {
     private fun json(raw: String): JsonObject = NetworkJson.parseToJsonElement(raw).jsonObject
 
     private fun RecordedRequest.jsonBody(): JsonObject = json(body!!.utf8())
+
+    // Stands in for a Keystore that refuses to encrypt (e.g. a key invalidated by the OS).
+    private object FailingCipher : TokenCipher {
+        override fun encrypt(plaintext: String): String = throw IllegalStateException("Keystore unavailable")
+
+        override fun decrypt(ciphertext: String): String? = null
+    }
 
     private val expectedUser = User(
         id = "2b1f6c1e-4a7d-4c1b-9a43-1f7e0c9d2a11",

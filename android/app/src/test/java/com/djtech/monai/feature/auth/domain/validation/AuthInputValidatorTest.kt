@@ -2,6 +2,7 @@ package com.djtech.monai.feature.auth.domain.validation
 
 import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.model.AuthFieldError
+import com.djtech.monai.feature.auth.domain.model.FieldIssue
 import org.junit.Assert.assertEquals
 import org.junit.Test
 
@@ -20,9 +21,9 @@ class AuthInputValidatorTest {
     fun `blank fields are required`() {
         assertEquals(
             listOf(
-                AuthFieldError(AuthField.NAME, "required"),
-                AuthFieldError(AuthField.EMAIL, "required"),
-                AuthFieldError(AuthField.PASSWORD, "required"),
+                AuthFieldError(AuthField.NAME, FieldIssue.Required),
+                AuthFieldError(AuthField.EMAIL, FieldIssue.Required),
+                AuthFieldError(AuthField.PASSWORD, FieldIssue.Required),
             ),
             AuthInputValidator.register("   ", " ", ""),
         )
@@ -31,7 +32,7 @@ class AuthInputValidatorTest {
     @Test
     fun `name over 100 characters is too long`() {
         assertEquals(
-            listOf(AuthFieldError(AuthField.NAME, "max_length", mapOf("max" to "100"))),
+            listOf(AuthFieldError(AuthField.NAME, FieldIssue.TooLong(100))),
             AuthInputValidator.register("a".repeat(101), "joshua@example.com", "s3cretPass"),
         )
     }
@@ -48,7 +49,7 @@ class AuthInputValidatorTest {
         listOf("joshua", "joshua@", "@example.com", "joshua@example", "jo shua@example.com").forEach { email ->
             assertEquals(
                 email,
-                listOf(AuthFieldError(AuthField.EMAIL, "invalid_format")),
+                listOf(AuthFieldError(AuthField.EMAIL, FieldIssue.InvalidFormat)),
                 AuthInputValidator.register("Joshua", email, "s3cretPass"),
             )
         }
@@ -64,7 +65,7 @@ class AuthInputValidatorTest {
         val email = "a".repeat(243) + "@example.com"
 
         assertEquals(
-            listOf(AuthFieldError(AuthField.EMAIL, "max_length", mapOf("max" to "254"))),
+            listOf(AuthFieldError(AuthField.EMAIL, FieldIssue.TooLong(254))),
             AuthInputValidator.register("Joshua", email, "s3cretPass"),
         )
     }
@@ -72,14 +73,33 @@ class AuthInputValidatorTest {
     @Test
     fun `password must be 8 to 72 characters`() {
         assertEquals(
-            listOf(AuthFieldError(AuthField.PASSWORD, "min_length", mapOf("min" to "8"))),
+            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooShort(8))),
             AuthInputValidator.register("Joshua", "joshua@example.com", "short12"),
         )
         assertEquals(
-            listOf(AuthFieldError(AuthField.PASSWORD, "max_length", mapOf("max" to "72"))),
+            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooLong(72))),
             AuthInputValidator.register("Joshua", "joshua@example.com", "a".repeat(73)),
         )
         assertEquals(noErrors, AuthInputValidator.register("Joshua", "joshua@example.com", "a".repeat(72)))
+    }
+
+    @Test
+    fun `password minimum counts characters, not bytes`() {
+        assertEquals(noErrors, AuthInputValidator.register("Joshua", "joshua@example.com", "😀".repeat(8)))
+        assertEquals(
+            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooShort(8))),
+            AuthInputValidator.register("Joshua", "joshua@example.com", "😀".repeat(7)),
+        )
+    }
+
+    @Test
+    fun `password maximum counts UTF-8 bytes, the bcrypt limit`() {
+        // 18 emoji are 72 bytes; 19 are 76 bytes but only 19 characters.
+        assertEquals(noErrors, AuthInputValidator.register("Joshua", "joshua@example.com", "😀".repeat(18)))
+        assertEquals(
+            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooLong(72))),
+            AuthInputValidator.register("Joshua", "joshua@example.com", "😀".repeat(19)),
+        )
     }
 
     @Test
@@ -90,15 +110,36 @@ class AuthInputValidatorTest {
     // ---------------------------------------------------------------- login
 
     @Test
+    fun `valid login has no errors`() {
+        assertEquals(noErrors, AuthInputValidator.login("  Joshua@Example.com ", "s3cretPass"))
+    }
+
+    @Test
     fun `login needs a well-formed email and a password`() {
-        assertEquals(noErrors, AuthInputValidator.login("joshua@example.com", "x"))
         assertEquals(
             listOf(
-                AuthFieldError(AuthField.EMAIL, "invalid_format"),
-                AuthFieldError(AuthField.PASSWORD, "required"),
+                AuthFieldError(AuthField.EMAIL, FieldIssue.InvalidFormat),
+                AuthFieldError(AuthField.PASSWORD, FieldIssue.Required),
             ),
             AuthInputValidator.login("joshua", ""),
         )
+    }
+
+    @Test
+    fun `login applies the server's password length rules`() {
+        assertEquals(
+            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooShort(8))),
+            AuthInputValidator.login("joshua@example.com", "short12"),
+        )
+        assertEquals(
+            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooLong(72))),
+            AuthInputValidator.login("joshua@example.com", "a".repeat(73)),
+        )
+    }
+
+    @Test
+    fun `login does not cap the email length`() {
+        assertEquals(noErrors, AuthInputValidator.login("a".repeat(243) + "@example.com", "s3cretPass"))
     }
 
     // ---------------------------------------------------------------- change password
@@ -112,8 +153,8 @@ class AuthInputValidatorTest {
     fun `password change needs both passwords`() {
         assertEquals(
             listOf(
-                AuthFieldError(AuthField.CURRENT_PASSWORD, "required"),
-                AuthFieldError(AuthField.NEW_PASSWORD, "required"),
+                AuthFieldError(AuthField.CURRENT_PASSWORD, FieldIssue.Required),
+                AuthFieldError(AuthField.NEW_PASSWORD, FieldIssue.Required),
             ),
             AuthInputValidator.changePassword("", ""),
         )
@@ -122,11 +163,11 @@ class AuthInputValidatorTest {
     @Test
     fun `new password must be 8 to 72 characters`() {
         assertEquals(
-            listOf(AuthFieldError(AuthField.NEW_PASSWORD, "min_length", mapOf("min" to "8"))),
+            listOf(AuthFieldError(AuthField.NEW_PASSWORD, FieldIssue.TooShort(8))),
             AuthInputValidator.changePassword("oldPass1", "short"),
         )
         assertEquals(
-            listOf(AuthFieldError(AuthField.NEW_PASSWORD, "max_length", mapOf("max" to "72"))),
+            listOf(AuthFieldError(AuthField.NEW_PASSWORD, FieldIssue.TooLong(72))),
             AuthInputValidator.changePassword("oldPass1", "a".repeat(73)),
         )
     }
@@ -134,7 +175,7 @@ class AuthInputValidatorTest {
     @Test
     fun `new password must differ from the current one`() {
         assertEquals(
-            listOf(AuthFieldError(AuthField.NEW_PASSWORD, "not_equal", mapOf("other" to "current_password"))),
+            listOf(AuthFieldError(AuthField.NEW_PASSWORD, FieldIssue.SameAsCurrent)),
             AuthInputValidator.changePassword("samePass1", "samePass1"),
         )
     }

@@ -1,9 +1,10 @@
 package com.djtech.monai.feature.auth.domain.usecase
 
+import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.feature.auth.domain.model.AuthError
 import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.model.AuthFieldError
-import com.djtech.monai.feature.auth.domain.model.AuthResult
+import com.djtech.monai.feature.auth.domain.model.FieldIssue
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -17,7 +18,7 @@ class LoginUseCaseTest {
     fun `valid input logs in through the repository`() = runTest {
         val result = login("joshua@example.com", "s3cretPass")
 
-        assertEquals(AuthResult.Success(testUser), result)
+        assertEquals(Outcome.Success(testUser), result)
         assertEquals(listOf("login(joshua@example.com, s3cretPass)"), repository.calls)
     }
 
@@ -25,17 +26,15 @@ class LoginUseCaseTest {
     fun `invalid input fails without calling the repository`() = runTest {
         val result = login("joshua@example.com", "")
 
-        assertEquals(
-            AuthResult.Failure(AuthError.InvalidFields(listOf(AuthFieldError(AuthField.PASSWORD, "required")))),
-            result,
-        )
+        val error = AuthFieldError(AuthField.PASSWORD, FieldIssue.Required)
+        assertEquals(Outcome.Failure(AuthError.InvalidFields(listOf(error))), result)
         assertEquals(emptyList<String>(), repository.calls)
     }
 
     @Test
     fun `repository failure is passed through`() = runTest {
-        repository.userResult = AuthResult.Failure(AuthError.InvalidCredentials)
+        repository.userResult = Outcome.Failure(AuthError.InvalidCredentials)
 
-        assertEquals(AuthResult.Failure(AuthError.InvalidCredentials), login("joshua@example.com", "s3cretPass"))
+        assertEquals(Outcome.Failure(AuthError.InvalidCredentials), login("joshua@example.com", "s3cretPass"))
     }
 }

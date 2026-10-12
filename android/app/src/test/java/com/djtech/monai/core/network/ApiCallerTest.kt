@@ -1,5 +1,6 @@
 package com.djtech.monai.core.network
 
+import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.network.model.ApiResponse
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
@@ -19,7 +20,7 @@ class ApiCallerTest {
     fun `returns the data of a successful call`() = runTest {
         val result = caller.call { ApiResponse(success = true, message = "OK", data = 42) }
 
-        assertEquals(ApiResult.Success(42), result)
+        assertEquals(Outcome.Success(42), result)
     }
 
     @Test
@@ -31,7 +32,7 @@ class ApiCallerTest {
         }
 
         assertEquals(
-            ApiResult.Failure(
+            Outcome.Failure(
                 ApiError.Http(
                     429,
                     "rate_limited",
@@ -47,7 +48,7 @@ class ApiCallerTest {
     fun `returns a network error when the connection fails`() = runTest {
         val result = caller.call<Int> { throw IOException("no route") }
 
-        assertEquals(ApiResult.Failure(ApiError.Network), result)
+        assertEquals(Outcome.Failure(ApiError.Network), result)
     }
 
     @Test(expected = CancellationException::class)

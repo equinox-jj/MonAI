@@ -10,7 +10,7 @@ sealed interface AuthError {
     /** The current password given to change the password is wrong. */
     data object WrongCurrentPassword : AuthError
 
-    /** The server rejected one or more form fields. */
+    /** The device or the server rejected one or more form fields. */
     data class InvalidFields(val errors: List<AuthFieldError>) : AuthError
 
     data object RateLimited : AuthError
@@ -20,11 +20,26 @@ sealed interface AuthError {
     data object Unexpected : AuthError
 }
 
-/** [code] is the API's field error code (`required`, `min_length`, `invalid_format`, …). */
 data class AuthFieldError(
     val field: AuthField,
-    val code: String,
-    val params: Map<String, String> = emptyMap(),
+    val issue: FieldIssue,
 )
 
 enum class AuthField { NAME, EMAIL, PASSWORD, CURRENT_PASSWORD, NEW_PASSWORD }
+
+/** What is wrong with a field, decoded from the API's field error code and params. */
+sealed interface FieldIssue {
+    data object Required : FieldIssue
+
+    data class TooShort(val min: Int) : FieldIssue
+
+    data class TooLong(val max: Int) : FieldIssue
+
+    data object InvalidFormat : FieldIssue
+
+    /** The new password is the same as the current one. */
+    data object SameAsCurrent : FieldIssue
+
+    /** A code this app does not know yet; show a generic message. */
+    data object Invalid : FieldIssue
+}
