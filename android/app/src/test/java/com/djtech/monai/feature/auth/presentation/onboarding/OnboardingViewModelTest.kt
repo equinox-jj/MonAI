@@ -5,6 +5,10 @@ import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
 import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
 import com.djtech.monai.core.datastore.OnboardingStore
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -92,6 +96,20 @@ class OnboardingViewModelTest {
         viewModel.onIntent(OnboardingIntent.SignIn)
 
         assertEquals(OnboardingEffect.NavigateToSignIn, viewModel.effects.first())
+    }
+
+    // Navigation replaces the top of the stack, so a second effect would override the first.
+    @Test
+    fun `only the first way out navigates`() = runTest(mainDispatcherRule.dispatcher) {
+        val effects = mutableListOf<OnboardingEffect>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.effects.toList(effects) }
+
+        viewModel.onIntent(OnboardingIntent.CreateAccount)
+        viewModel.onIntent(OnboardingIntent.SignIn)
+        viewModel.onIntent(OnboardingIntent.CreateAccount)
+        advanceUntilIdle()
+
+        assertEquals(listOf(OnboardingEffect.NavigateToRegister), effects)
     }
 
     @Test

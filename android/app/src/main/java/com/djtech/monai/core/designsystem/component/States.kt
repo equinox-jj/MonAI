@@ -261,7 +261,7 @@ private fun StatesPreview() {
             MonAIPageIndicator(pageCount = 3, currentPage = 0)
             Row(
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 MonAISkeleton(40.dp, width = 40.dp, shape = CircleShape)
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(6.dp)) {

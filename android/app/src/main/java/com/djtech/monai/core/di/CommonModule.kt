@@ -1,5 +1,7 @@
 package com.djtech.monai.core.di
 
+import com.djtech.monai.core.common.log.ErrorLogger
+import com.djtech.monai.core.common.log.LogcatErrorLogger
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.time.SystemAppClock
 import dagger.Binds
@@ -15,4 +17,7 @@ abstract class CommonBindsModule {
     @Binds
     @Singleton
     abstract fun bindAppClock(clock: SystemAppClock): AppClock
+
+    @Binds
+    abstract fun bindErrorLogger(logger: LogcatErrorLogger): ErrorLogger
 }

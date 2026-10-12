@@ -13,6 +13,9 @@ import com.djtech.monai.feature.auth.domain.usecase.FakeAuthRepository
 import com.djtech.monai.feature.auth.domain.usecase.RegisterUseCase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,7 +32,10 @@ class RegisterViewModelTest {
 
     private val repository = FakeAuthRepository()
     private val savedState = SavedStateHandle()
-    private val viewModel by lazy { RegisterViewModel(RegisterUseCase(repository), savedState) }
+    private val viewModel by lazy { viewModel() }
+
+    private fun viewModel(initialEmail: String = "") =
+        RegisterViewModel(RegisterUseCase(repository), savedState, initialEmail)
 
     private val state get() = viewModel.state.value
 
@@ -113,6 +119,47 @@ class RegisterViewModelTest {
     }
 
     @Test
+    fun `field errors focus the first invalid field in layout order`() = runTest(mainDispatcherRule.dispatcher) {
+        // The server may list fields in any order.
+        repository.userResult = Outcome.Failure(
+            AuthError.InvalidFields(
+                listOf(
+                    AuthFieldError(AuthField.PASSWORD, FieldIssue.Invalid),
+                    AuthFieldError(AuthField.NAME, FieldIssue.TooLong(100)),
+                ),
+            ),
+        )
+        fillValidForm()
+
+        viewModel.onIntent(RegisterIntent.Submit)
+
+        assertEquals(RegisterEffect.FocusField(AuthField.NAME), viewModel.effects.first())
+    }
+
+    @Test
+    fun `a registered email focuses the email`() = runTest(mainDispatcherRule.dispatcher) {
+        repository.userResult = Outcome.Failure(AuthError.EmailAlreadyRegistered)
+        fillValidForm()
+
+        viewModel.onIntent(RegisterIntent.Submit)
+
+        assertEquals(RegisterEffect.FocusField(AuthField.EMAIL), viewModel.effects.first())
+    }
+
+    @Test
+    fun `a banner error leaves focus alone`() = runTest(mainDispatcherRule.dispatcher) {
+        val effects = mutableListOf<RegisterEffect>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.effects.toList(effects) }
+        repository.userResult = Outcome.Failure(AuthError.Network)
+        fillValidForm()
+
+        viewModel.onIntent(RegisterIntent.Submit)
+        advanceUntilIdle()
+
+        assertTrue(effects.isEmpty())
+    }
+
+    @Test
     fun `other failures show the banner until a field changes`() = runTest(mainDispatcherRule.dispatcher) {
         repository.userResult = Outcome.Failure(AuthError.Network)
         fillValidForm()
@@ -143,7 +190,7 @@ class RegisterViewModelTest {
     fun `name and email survive process death but the password does not`() {
         fillValidForm()
 
-        val restored = RegisterViewModel(RegisterUseCase(repository), savedState).state.value
+        val restored = viewModel().state.value
 
         assertEquals("Joshua", restored.name)
         assertEquals("joshua@example.com", restored.email)
@@ -151,9 +198,36 @@ class RegisterViewModelTest {
     }
 
     @Test
-    fun `sign in navigates to sign in`() = runTest(mainDispatcherRule.dispatcher) {
+    fun `starts with the email handed over from sign in`() {
+        val viewModel = viewModel(initialEmail = "joshua@example.com")
+
+        assertEquals("joshua@example.com", viewModel.state.value.email)
+    }
+
+    @Test
+    fun `an email edited here wins over the handed-over one after process death`() {
+        viewModel(initialEmail = "joshua@example.com")
+            .onIntent(RegisterIntent.EmailChanged("josh@example.com"))
+
+        val restored = viewModel(initialEmail = "joshua@example.com")
+
+        assertEquals("josh@example.com", restored.state.value.email)
+    }
+
+    @Test
+    fun `sign in hands the typed email to sign in`() = runTest(mainDispatcherRule.dispatcher) {
+        repository.userResult = Outcome.Failure(AuthError.EmailAlreadyRegistered)
+        fillValidForm()
+        viewModel.onIntent(RegisterIntent.Submit)
+        advanceUntilIdle()
+
+        // "Sign in instead" under the taken email.
         viewModel.onIntent(RegisterIntent.SignIn)
 
-        assertEquals(RegisterEffect.NavigateToSignIn, viewModel.effects.first())
+        // The failed submit already focused the email field; the navigation follows it.
+        assertEquals(
+            RegisterEffect.NavigateToSignIn("joshua@example.com"),
+            viewModel.effects.first { it is RegisterEffect.NavigateToSignIn },
+        )
     }
 }

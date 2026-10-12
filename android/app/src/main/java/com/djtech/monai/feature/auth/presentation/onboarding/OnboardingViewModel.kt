@@ -34,7 +34,8 @@ class OnboardingViewModel @Inject constructor(
             OnboardingIntent.Back -> goTo(mutableState.value.page - 1)
             is OnboardingIntent.PageSettled -> goTo(intent.page)
             OnboardingIntent.Skip,
-            OnboardingIntent.CreateAccount -> finish(OnboardingEffect.NavigateToRegister)
+            OnboardingIntent.CreateAccount,
+                -> finish(OnboardingEffect.NavigateToRegister)
 
             OnboardingIntent.SignIn -> finish(OnboardingEffect.NavigateToSignIn)
         }
@@ -46,8 +47,13 @@ class OnboardingViewModel @Inject constructor(
         mutableState.update { it.copy(page = page) }
     }
 
+    // Set by the first way out; navigation replaces the screen, so a second tap must not navigate again.
+    private var finishing = false
+
     /** Leaving onboarding is final: the flag is saved first, so later launches start on Sign in. */
     private fun finish(effect: OnboardingEffect) {
+        if (finishing) return
+        finishing = true
         viewModelScope.launch {
             onboardingStore.markCompleted()
             effectChannel.send(effect)

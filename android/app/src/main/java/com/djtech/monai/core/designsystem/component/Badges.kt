@@ -159,7 +159,7 @@ private fun BadgesPreview() {
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 MonAITag("Admin")
                 MonAIPill("Default")
@@ -168,14 +168,14 @@ private fun BadgesPreview() {
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 MonAIAvatar("JP")
                 MonAIAvatar("JP", size = 64.dp)
                 MonAIMonogram(
                     "BCA",
                     containerColor = MonAITheme.colors.primary,
-                    contentColor = Color.White
+                    contentColor = Color.White,
                 )
                 MonAIPill("Cash", icon = MonAIIcons.Check)
             }

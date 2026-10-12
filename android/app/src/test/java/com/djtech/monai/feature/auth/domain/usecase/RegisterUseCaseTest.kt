@@ -23,6 +23,30 @@ class RegisterUseCaseTest {
     }
 
     @Test
+    fun `name and email are sent trimmed, the email lowercased, the password as typed`() = runTest {
+        register(" Joshua ", "  Joshua@Example.com ", " s3cretPass ")
+
+        assertEquals(listOf("register(Joshua, joshua@example.com,  s3cretPass )"), repository.calls)
+    }
+
+    @Test
+    fun `a name of only spaces is required`() = runTest {
+        val result = register("   ", "joshua@example.com", "s3cretPass")
+
+        assertEquals(
+            Outcome.Failure(AuthError.InvalidFields(listOf(AuthFieldError(AuthField.NAME, FieldIssue.Required)))),
+            result,
+        )
+    }
+
+    @Test
+    fun `surrounding spaces don't count toward the name limit`() = runTest {
+        val result = register("  " + "a".repeat(100) + "  ", "joshua@example.com", "s3cretPass")
+
+        assertEquals(Outcome.Success(testUser), result)
+    }
+
+    @Test
     fun `invalid input fails without calling the repository`() = runTest {
         val result = register("", "joshua@example.com", "s3cretPass")
 

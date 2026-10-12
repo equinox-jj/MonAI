@@ -205,6 +205,7 @@ fun MonAIPasswordField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     contentType: ContentType = ContentType.Password,
+    enabled: Boolean = true,
 ) {
     var visible by rememberSaveable { mutableStateOf(false) }
     MonAITextField(
@@ -228,6 +229,7 @@ fun MonAIPasswordField(
         keyboardOptions = keyboardOptions,
         keyboardActions = keyboardActions,
         contentType = contentType,
+        enabled = enabled,
     )
 }
 
@@ -267,8 +269,9 @@ private fun FieldSupportingText(
                 withLink(
                     LinkAnnotation.Clickable(
                         "supporting",
-                        TextLinkStyles(linkStyle)
-                    ) { onLinkClick() }) {
+                        TextLinkStyles(linkStyle),
+                    ) { onLinkClick() },
+                ) {
                     append(linkLabel)
                 }
             }
@@ -510,7 +513,7 @@ private fun TextFieldPreview() {
             MonAISearchField(
                 value = "",
                 onValueChange = {},
-                placeholder = "Search note or merchant"
+                placeholder = "Search note or merchant",
             )
             MonAIPillField(
                 "makan siang 35rb pakai gopay",

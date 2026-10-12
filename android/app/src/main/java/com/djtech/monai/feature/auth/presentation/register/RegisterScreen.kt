@@ -7,11 +7,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,25 +27,36 @@ import com.djtech.monai.core.designsystem.component.MonAIPasswordField
 import com.djtech.monai.core.designsystem.component.MonAITextField
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.validation.AuthInputValidator
 import com.djtech.monai.feature.auth.presentation.common.AuthActions
+import com.djtech.monai.feature.auth.presentation.common.AuthFieldFocus
+import com.djtech.monai.feature.auth.presentation.common.AuthFormError
 import com.djtech.monai.feature.auth.presentation.common.AuthHeader
 import com.djtech.monai.feature.auth.presentation.common.AuthScaffold
+import com.djtech.monai.feature.auth.presentation.common.fieldTone
 import com.djtech.monai.feature.auth.presentation.common.isExpandedAuthWidth
+import com.djtech.monai.feature.auth.presentation.common.rememberAuthFieldFocus
 
+/** @param initialEmail the email typed on Sign in, if the user came from there. */
 @Composable
 fun RegisterRoute(
-    onNavigateToSignIn: () -> Unit,
+    initialEmail: String,
+    onNavigateToSignIn: (email: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RegisterViewModel = hiltViewModel(),
+    viewModel: RegisterViewModel = hiltViewModel<RegisterViewModel, RegisterViewModel.Factory>(
+        creationCallback = { it.create(initialEmail) },
+    ),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val fieldFocus = rememberAuthFieldFocus()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
-            RegisterEffect.NavigateToSignIn -> onNavigateToSignIn()
+            is RegisterEffect.NavigateToSignIn -> onNavigateToSignIn(effect.email)
+            is RegisterEffect.FocusField -> fieldFocus.request(effect.field)
         }
     }
-    RegisterScreen(state, viewModel::onIntent, modifier)
+    RegisterScreen(state, viewModel::onIntent, modifier, fieldFocus = fieldFocus)
 }
 
 /** A successful register needs no effect: the saved session switches the app to the main graph. */
@@ -57,6 +66,7 @@ fun RegisterScreen(
     onIntent: (RegisterIntent) -> Unit,
     modifier: Modifier = Modifier,
     expanded: Boolean = isExpandedAuthWidth(),
+    fieldFocus: AuthFieldFocus = rememberAuthFieldFocus(),
 ) {
     val focusManager = LocalFocusManager.current
     val submit = {
@@ -68,25 +78,18 @@ fun RegisterScreen(
         expanded = expanded,
         modifier = modifier,
         form = {
-            AuthHeader(
-                stringResource(R.string.register_title),
-                stringResource(R.string.register_subtitle)
-            )
-            state.formError?.let { error ->
-                MonAIInlineAlert(
-                    error.asString(),
-                    Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-                    tone = MonAIAlertTone.Error,
-                )
-            }
+            AuthHeader(stringResource(R.string.register_title), stringResource(R.string.register_subtitle))
+            AuthFormError(state.formError)
             MonAITextField(
                 value = state.name,
                 onValueChange = { onIntent(RegisterIntent.NameChanged(it)) },
+                modifier = Modifier.focusRequester(fieldFocus.requester(AuthField.NAME)),
+                enabled = !state.isSubmitting,
                 label = stringResource(R.string.auth_name_label),
                 placeholder = stringResource(R.string.auth_name_placeholder),
                 leadingIcon = MonAIIcons.Person,
                 supportingText = state.nameError?.asString(),
-                tone = state.nameError.errorTone(),
+                tone = state.nameError.fieldTone(),
                 keyboardOptions = KeyboardOptions(
                     capitalization = KeyboardCapitalization.Words,
                     imeAction = ImeAction.Next,
@@ -97,17 +100,16 @@ fun RegisterScreen(
             MonAITextField(
                 value = state.email,
                 onValueChange = { onIntent(RegisterIntent.EmailChanged(it)) },
+                modifier = Modifier.focusRequester(fieldFocus.requester(AuthField.EMAIL)),
+                enabled = !state.isSubmitting,
                 label = stringResource(R.string.auth_email_label),
                 placeholder = stringResource(R.string.auth_email_placeholder),
                 leadingIcon = MonAIIcons.Mail,
                 supportingText = state.emailError?.asString(),
                 supportingLinkLabel = if (state.emailTaken) stringResource(R.string.register_sign_in_instead) else null,
                 onSupportingLinkClick = { onIntent(RegisterIntent.SignIn) },
-                tone = state.emailError.errorTone(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                ),
+                tone = state.emailError.fieldTone(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 keyboardActions = next,
                 contentType = ContentType.EmailAddress,
             )
@@ -116,13 +118,12 @@ fun RegisterScreen(
             MonAIPasswordField(
                 value = state.password,
                 onValueChange = { onIntent(RegisterIntent.PasswordChanged(it)) },
+                modifier = Modifier.focusRequester(fieldFocus.requester(AuthField.PASSWORD)),
+                enabled = !state.isSubmitting,
                 label = stringResource(R.string.auth_password_label),
                 placeholder = stringResource(R.string.register_password_placeholder),
                 supportingText = passwordError?.asString()
-                    ?: stringResource(
-                        R.string.register_password_hint,
-                        AuthInputValidator.PASSWORD_MIN
-                    ),
+                    ?: stringResource(R.string.register_password_hint, AuthInputValidator.PASSWORD_MIN),
                 tone = when {
                     passwordError != null -> MonAIFieldTone.Error
                     state.passwordLongEnough -> MonAIFieldTone.Success
@@ -130,10 +131,7 @@ fun RegisterScreen(
                 },
                 showPasswordLabel = stringResource(R.string.auth_show_password),
                 hidePasswordLabel = stringResource(R.string.auth_hide_password),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { submit() }),
                 contentType = ContentType.NewPassword,
             )
@@ -157,19 +155,12 @@ fun RegisterScreen(
     )
 }
 
-private fun UiText?.errorTone(): MonAIFieldTone =
-    if (this == null) MonAIFieldTone.Neutral else MonAIFieldTone.Error
-
 @PreviewLightDark
 @Composable
 private fun RegisterScreenPreview() {
     MonAITheme {
         RegisterScreen(
-            RegisterState(
-                name = "Joshua Pardede",
-                email = "joshua@example.com",
-                password = "secretpass"
-            ),
+            RegisterState(name = "Joshua Pardede", email = "joshua@example.com", password = "secretpass"),
             onIntent = {},
             expanded = false,
         )

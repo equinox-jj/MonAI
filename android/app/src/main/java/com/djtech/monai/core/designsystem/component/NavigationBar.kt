@@ -127,7 +127,7 @@ private fun RowScope.NavItem(item: MonAINavItem, selected: Boolean, onClick: () 
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(
             MonAITheme.spacing.x1,
-            Alignment.CenterVertically
+            Alignment.CenterVertically,
         ),
     ) {
         Box(
@@ -230,13 +230,13 @@ fun MonAINavigationRail(
                 Icon(
                     MonAIIcons.Add,
                     contentDescription = null,
-                    modifier = Modifier.size(sizes.iconXl)
+                    modifier = Modifier.size(sizes.iconXl),
                 )
             }
             items.forEachIndexed { i, item ->
                 RailItem(
                     item,
-                    i == selectedIndex
+                    i == selectedIndex,
                 ) { onItemClick(i) }
             }
         }
@@ -319,7 +319,7 @@ fun MonAINavigationDrawer(
                 modifier = Modifier.padding(
                     start = spacing.x2,
                     end = spacing.x2,
-                    bottom = spacing.x5
+                    bottom = spacing.x5,
                 ),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(spacing.x2_5),
@@ -364,14 +364,14 @@ fun MonAINavigationDrawer(
                     Icon(MonAIIcons.Add, contentDescription = null)
                     Text(
                         addLabel,
-                        style = MonAITheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
+                        style = MonAITheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
                     )
                 }
             }
             items.forEachIndexed { i, item ->
                 DrawerItem(
                     item,
-                    i == selectedIndex
+                    i == selectedIndex,
                 ) { onItemClick(i) }
             }
         }
@@ -397,7 +397,7 @@ private fun DrawerItem(item: MonAINavItem, selected: Boolean, onClick: () -> Uni
         Icon(
             if (selected) item.selectedIcon else item.icon,
             contentDescription = null,
-            tint = content
+            tint = content,
         )
         Text(
             item.label,

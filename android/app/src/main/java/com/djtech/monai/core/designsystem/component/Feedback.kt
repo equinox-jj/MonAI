@@ -119,8 +119,8 @@ fun MonAIInlineAlert(
                 if (t.border != null) Modifier.border(
                     MonAITheme.sizes.border,
                     t.border,
-                    shape
-                ) else Modifier
+                    shape,
+                ) else Modifier,
             )
             .padding(MonAITheme.spacing.x3)
             .semantics { if (tone == MonAIAlertTone.Error) liveRegion = LiveRegionMode.Assertive },
@@ -152,7 +152,7 @@ fun MonAIStatusStrip(
             Modifier
                 .fillMaxWidth()
                 .height(MonAITheme.sizes.border)
-                .background(borderColor)
+                .background(borderColor),
         )
         Row(
             modifier = Modifier
@@ -183,7 +183,7 @@ fun MonAIStatusStrip(
             Modifier
                 .fillMaxWidth()
                 .height(MonAITheme.sizes.border)
-                .background(borderColor)
+                .background(borderColor),
         )
     }
 }
@@ -261,7 +261,7 @@ data class MonAISnackbarVisuals(
 fun MonAISnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {
     SnackbarHost(
         hostState,
-        modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal)
+        modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal),
     ) { data: SnackbarData ->
         MonAISnackbar(
             message = data.visuals.message,
@@ -363,7 +363,7 @@ fun MonAIBottomSheet(
         sheetState = sheetState,
         shape = RoundedCornerShape(
             topStart = MonAITheme.radius.xxl,
-            topEnd = MonAITheme.radius.xxl
+            topEnd = MonAITheme.radius.xxl,
         ),
         containerColor = colors.surface,
         contentColor = colors.textPrimary,
@@ -407,7 +407,7 @@ private fun FeedbackPreview() {
             MonAIStatusStrip("You're offline", detail = "Showing saved data")
             Column(
                 Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
             ) {
                 MonAIInlineAlert(
                     "Email or password is incorrect. Check them and try again.",

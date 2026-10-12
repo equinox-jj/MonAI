@@ -7,6 +7,8 @@ import kotlinx.serialization.json.JsonPrimitive
 import retrofit2.HttpException
 import java.io.IOException
 import javax.inject.Inject
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.seconds
 
 /** Turns whatever a Retrofit call threw into an [ApiError]. */
 class ApiErrorMapper @Inject constructor(
@@ -20,11 +22,13 @@ class ApiErrorMapper @Inject constructor(
 
     private fun fromHttp(e: HttpException): ApiError.Http {
         val status = e.code()
+        val retryAfter = retryAfter(e)
         val body = parseBody(e) ?: return ApiError.Http(
             status,
             fallbackCode(status),
             "",
             emptyList(),
+            retryAfter,
         )
 
         return ApiError.Http(
@@ -41,8 +45,13 @@ class ApiErrorMapper @Inject constructor(
                     },
                 )
             },
+            retryAfter = retryAfter,
         )
     }
+
+    // The backend's rate limiter sends whole seconds; the HTTP-date form is not used, so it is ignored.
+    private fun retryAfter(e: HttpException): Duration? =
+        e.response()?.headers()?.get("Retry-After")?.trim()?.toLongOrNull()?.takeIf { it >= 0 }?.seconds
 
     // A proxy or load balancer can answer with HTML or an empty body.
     private fun parseBody(e: HttpException): ErrorResponse? {

@@ -30,7 +30,7 @@ class MainNavigator(
         get() {
             val home = stack(TopLevelDestination.Home)
             return if (currentTabState == TopLevelDestination.Home) home.toList() else home + stack(
-                currentTabState
+                currentTabState,
             )
         }
 

@@ -3,10 +3,12 @@ package com.djtech.monai.core.datastore
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.djtech.monai.core.common.dispatcher.ApplicationScope
 import com.djtech.monai.core.common.dispatcher.Dispatcher
 import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.log.ErrorLogger
 import com.djtech.monai.core.network.auth.AccessTokenProvider
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
@@ -20,6 +22,8 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
+import java.io.IOException
+import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -44,6 +48,7 @@ class SessionStore @Inject constructor(
     private val cipher: TokenCipher,
     @ApplicationScope scope: CoroutineScope,
     @Dispatcher(MonAIDispatcher.IO) private val ioDispatcher: CoroutineDispatcher,
+    private val errorLogger: ErrorLogger,
 ) : AccessTokenProvider {
     private val cached = MutableStateFlow<CachedToken>(CachedToken.Unloaded)
     private val writeLock = Mutex()
@@ -72,13 +77,24 @@ class SessionStore @Inject constructor(
         CachedToken.Unloaded -> runBlocking { loadIfNeeded() }
     }
 
-    suspend fun saveToken(token: String) = writeLock.withLock {
+    /** @param expiresAt when the server stops accepting [token]; null when it didn't say. */
+    suspend fun saveToken(token: String, expiresAt: Instant? = null) = writeLock.withLock {
         val encrypted = withContext(ioDispatcher) { cipher.encrypt(token) }
-        dataStore.edit { it[ACCESS_TOKEN] = encrypted }
-        cached.value = CachedToken.Loaded(token)
+        dataStore.edit {
+            it[ACCESS_TOKEN] = encrypted
+            if (expiresAt != null) it[EXPIRES_AT] = expiresAt.toEpochMilli() else it.remove(EXPIRES_AT)
+        }
+        cached.value = CachedToken.Loaded(token, expiresAt = expiresAt)
     }
 
     suspend fun clear() = writeLock.withLock { removeToken() }
+
+    /** The stored token if its expiry is at or before [now], so it can be expired before a request 401s. */
+    suspend fun overdueToken(now: Instant): String? {
+        val session = load()
+        val expiresAt = session.expiresAt ?: return null
+        return session.token?.takeIf { !now.isBefore(expiresAt) }
+    }
 
     /**
      * Clears [token] only if it is still the stored one; a newer login wins. Only called when the
@@ -99,25 +115,43 @@ class SessionStore @Inject constructor(
 
     // The flag lives in memory only: after process death an expired session is plainly signed out.
     private suspend fun removeToken(expired: Boolean = false) {
-        dataStore.edit { it.remove(ACCESS_TOKEN) }
+        dataStore.edit {
+            it.remove(ACCESS_TOKEN)
+            it.remove(EXPIRES_AT)
+        }
         cached.value = CachedToken.Loaded(null, expired)
     }
 
-    private suspend fun loadIfNeeded(): String? {
-        (cached.value as? CachedToken.Loaded)?.let { return it.token }
-        // An undecryptable token (e.g. restored without its Keystore key) means signed out.
-        val token = dataStore.data.first()[ACCESS_TOKEN]?.let(cipher::decrypt)
+    private suspend fun loadIfNeeded(): String? = load().token
+
+    private suspend fun load(): CachedToken.Loaded {
+        (cached.value as? CachedToken.Loaded)?.let { return it }
+        // An unreadable file or an undecryptable token (e.g. restored without its Keystore key) means
+        // signed out; a read error escaping here would crash startup or leave it Loading for good.
+        val stored = try {
+            dataStore.data.first()
+        } catch (e: IOException) {
+            errorLogger.log("Session file unreadable; starting signed out", e)
+            null
+        }
+        val token = stored?.get(ACCESS_TOKEN)?.let(cipher::decrypt)
+        val expiresAt = stored?.get(EXPIRES_AT)?.takeIf { token != null }?.let(Instant::ofEpochMilli)
         // A write that landed during the read is newer; keep it.
-        cached.compareAndSet(CachedToken.Unloaded, CachedToken.Loaded(token))
-        return (cached.value as CachedToken.Loaded).token
+        cached.compareAndSet(CachedToken.Unloaded, CachedToken.Loaded(token, expiresAt = expiresAt))
+        return cached.value as CachedToken.Loaded
     }
 
     private sealed interface CachedToken {
         data object Unloaded : CachedToken
-        data class Loaded(val token: String?, val expired: Boolean = false) : CachedToken
+        data class Loaded(
+            val token: String?,
+            val expired: Boolean = false,
+            val expiresAt: Instant? = null,
+        ) : CachedToken
     }
 
     internal companion object {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")
+        val EXPIRES_AT = longPreferencesKey("access_token_expires_at")
     }
 }

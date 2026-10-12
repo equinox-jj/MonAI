@@ -2,6 +2,7 @@ package com.djtech.monai.feature.auth.presentation.register
 
 import androidx.compose.runtime.Immutable
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.validation.AuthInputValidator
 
 /**
@@ -21,9 +22,9 @@ data class RegisterState(
     val formError: UiText? = null,
     val isSubmitting: Boolean = false,
 ) {
-    /** Drives the live "At least 8 characters" hint; counted like the validator, in code points. */
+    /** Drives the live "At least 8 characters" hint, with the validator's own rule. */
     val passwordLongEnough: Boolean
-        get() = password.codePointCount(0, password.length) >= AuthInputValidator.PASSWORD_MIN
+        get() = AuthInputValidator.isPasswordLongEnough(password)
 }
 
 sealed interface RegisterIntent {
@@ -37,5 +38,9 @@ sealed interface RegisterIntent {
 }
 
 sealed interface RegisterEffect {
-    data object NavigateToSignIn : RegisterEffect
+    /** Carries the typed email so Sign in can start with it. */
+    data class NavigateToSignIn(val email: String) : RegisterEffect
+
+    /** A submit failed on [field]: focus it so the keyboard and TalkBack land on the error. */
+    data class FocusField(val field: AuthField) : RegisterEffect
 }

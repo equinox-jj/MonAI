@@ -15,16 +15,9 @@ fun ApiError.toAuthError(): AuthError = when (this) {
         "invalid_credentials" -> AuthError.InvalidCredentials
         "conflict" -> AuthError.EmailAlreadyRegistered
         "invalid_password" -> AuthError.WrongCurrentPassword
-        "rate_limited" -> AuthError.RateLimited
+        "rate_limited" -> AuthError.RateLimited(retryAfter)
         "validation_failed" -> fields
-            .mapNotNull { field ->
-                API_FIELDS[field.field]?.let {
-                    AuthFieldError(
-                        it,
-                        field.toFieldIssue()
-                    )
-                }
-            }
+            .mapNotNull { field -> API_FIELDS[field.field]?.let { AuthFieldError(it, field.toFieldIssue()) } }
             .takeIf { it.isNotEmpty() }
             ?.let(AuthError::InvalidFields)
             ?: AuthError.Unexpected

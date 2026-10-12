@@ -1,11 +1,13 @@
 package com.djtech.monai.core.network
 
+import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.network.model.ApiResponse
 import kotlinx.coroutines.test.runTest
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
@@ -14,7 +16,8 @@ import kotlin.coroutines.cancellation.CancellationException
 
 class ApiCallerTest {
 
-    private val caller = ApiCaller(ApiErrorMapper(NetworkJson))
+    private val errorLogger = RecordingErrorLogger()
+    private val caller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger)
 
     @Test
     fun `returns the data of a successful call`() = runTest {
@@ -49,6 +52,26 @@ class ApiCallerTest {
         val result = caller.call<Int> { throw IOException("no route") }
 
         assertEquals(Outcome.Failure(ApiError.Network), result)
+    }
+
+    @Test
+    fun `an unexpected failure is logged with its cause`() = runTest {
+        val cause = IllegalStateException("bad payload")
+
+        val result = caller.call<Int> { throw cause }
+
+        assertEquals(Outcome.Failure(ApiError.Unknown(cause)), result)
+        assertEquals(listOf(cause), errorLogger.errors)
+    }
+
+    @Test
+    fun `expected failures are not logged`() = runTest {
+        caller.call<Int> { throw IOException("offline") }
+        caller.call<Int> {
+            throw HttpException(Response.error<Any>(404, "".toResponseBody("application/json".toMediaType())))
+        }
+
+        assertTrue(errorLogger.errors.isEmpty())
     }
 
     @Test(expected = CancellationException::class)

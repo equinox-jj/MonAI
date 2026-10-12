@@ -4,6 +4,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertIsFocused
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.assertAll
+import androidx.compose.ui.test.assertCountEquals
+import androidx.compose.ui.test.isNotEnabled
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -14,6 +20,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.feature.auth.domain.model.AuthField
+import com.djtech.monai.feature.auth.presentation.common.AuthFieldFocus
+import com.djtech.monai.feature.auth.presentation.common.rememberAuthFieldFocus
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -26,12 +35,14 @@ class SignInScreenTest {
     val compose = createComposeRule()
 
     private var state by mutableStateOf(SignInState())
+    private lateinit var fieldFocus: AuthFieldFocus
     private val intents = mutableListOf<SignInIntent>()
 
     private fun setContent(initial: SignInState = SignInState(), expanded: Boolean = false) {
         state = initial
         compose.setContent {
-            MonAITheme { SignInScreen(state, onIntent = ::record, expanded = expanded) }
+            fieldFocus = rememberAuthFieldFocus()
+            MonAITheme { SignInScreen(state, onIntent = ::record, expanded = expanded, fieldFocus = fieldFocus) }
         }
     }
 
@@ -114,5 +125,24 @@ class SignInScreenTest {
         compose.onNodeWithText("Sign in to see your wallets on this tablet.").assertIsDisplayed()
         // The hero is decorative, so it is hidden from accessibility.
         compose.onNodeWithText("Expense Tracker").assertDoesNotExist()
+    }
+
+    @Test
+    fun theFieldsAreLockedWhileSubmitting() {
+        setContent(SignInState(isSubmitting = true))
+
+        // A disabled field drops its SetText action, so match the fields by their text instead.
+        val fields = compose.onAllNodes(SemanticsMatcher.keyIsDefined(SemanticsProperties.EditableText))
+        fields.assertCountEquals(2)
+        fields.assertAll(isNotEnabled())
+    }
+
+    @Test
+    fun aFocusRequestMovesFocusToThatField() {
+        setContent()
+
+        compose.runOnIdle { fieldFocus.request(AuthField.PASSWORD) }
+
+        field(1).assertIsFocused()
     }
 }

@@ -7,6 +7,8 @@ import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.isSelectable
 import androidx.compose.ui.test.junit4.v2.createAndroidComposeRule
@@ -14,6 +16,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTextInput
 import com.djtech.monai.HiltTestActivity
 import com.djtech.monai.MainState
 import com.djtech.monai.core.datastore.SessionState
@@ -54,6 +57,8 @@ class MonAIAppTest {
     private fun welcome() = compose.onNodeWithText(WELCOME_TITLE)
 
     private fun tab(label: String) = compose.onNode(hasText(label) and isSelectable())
+
+    private fun textField(index: Int) = compose.onAllNodes(hasSetTextAction())[index]
 
     @Test
     fun loadingShowsNeitherGraph() {
@@ -125,6 +130,21 @@ class MonAIAppTest {
 
         compose.onNodeWithContentDescription("Back").assertDoesNotExist()
         welcome().assertDoesNotExist()
+    }
+
+    @Test
+    fun switchingBetweenSignInAndRegisterKeepsTheTypedEmail() {
+        setContent(SessionState.SignedOut, onboardingDone = true)
+        textField(0).performTextInput("joshua@example.com")
+
+        compose.onNodeWithText("Create an account").performClick()
+        compose.onNodeWithText("Create your account").assertIsDisplayed()
+        // Register's fields in layout order: name, email, password.
+        textField(1).assertTextContains("joshua@example.com")
+
+        compose.onNodeWithText("Sign in").performClick()
+        compose.onNodeWithText("Welcome back").assertIsDisplayed()
+        textField(0).assertTextContains("joshua@example.com")
     }
 
     @Test

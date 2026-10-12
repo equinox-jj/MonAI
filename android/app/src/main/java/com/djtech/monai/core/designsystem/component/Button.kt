@@ -138,7 +138,7 @@ fun MonAIButton(
                 Icon(
                     leadingIcon,
                     contentDescription = null,
-                    modifier = Modifier.size(spec.iconSize)
+                    modifier = Modifier.size(spec.iconSize),
                 )
                 Spacer(Modifier.width(spec.iconGap))
             }
@@ -291,7 +291,7 @@ private fun ButtonPreview() {
             }
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 MonAIButton(
                     "Scan",

@@ -238,17 +238,10 @@ internal fun AuthActions(
             )
             Row(
                 Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
-                    spacing.x1,
-                    Alignment.CenterHorizontally
-                ),
+                horizontalArrangement = Arrangement.spacedBy(spacing.x1, Alignment.CenterHorizontally),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
-                Text(
-                    prompt,
-                    style = MonAITheme.typography.bodyMedium,
-                    color = MonAITheme.colors.textSecondary
-                )
+                Text(prompt, style = MonAITheme.typography.bodyMedium, color = MonAITheme.colors.textSecondary)
                 MonAITextLink(linkLabel, onLinkClick)
             }
         }

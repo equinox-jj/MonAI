@@ -1,5 +1,6 @@
 package com.djtech.monai.core.network
 
+import com.djtech.monai.core.common.log.ErrorLogger
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.network.model.ApiResponse
 import javax.inject.Inject
@@ -14,6 +15,7 @@ import kotlin.coroutines.cancellation.CancellationException
  */
 class ApiCaller @Inject constructor(
     private val errorMapper: ApiErrorMapper,
+    private val errorLogger: ErrorLogger,
 ) {
 
     /** Unwraps `data` from the success envelope. */
@@ -26,6 +28,9 @@ class ApiCaller @Inject constructor(
     } catch (e: CancellationException) {
         throw e
     } catch (e: Exception) {
-        Outcome.Failure(errorMapper.map(e))
+        val error = errorMapper.map(e)
+        // Offline and HTTP errors are expected; anything else is a bug or a contract mismatch.
+        if (error is ApiError.Unknown) errorLogger.log("Unexpected API failure", e)
+        Outcome.Failure(error)
     }
 }

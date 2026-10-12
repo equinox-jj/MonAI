@@ -1,5 +1,7 @@
 package com.djtech.monai.feature.auth.domain.model
 
+import kotlin.time.Duration
+
 /** Why an auth action failed, in terms the auth screens can show. */
 sealed interface AuthError {
     /** Wrong email or password; the API does not say which. */
@@ -13,7 +15,8 @@ sealed interface AuthError {
     /** The device or the server rejected one or more form fields. */
     data class InvalidFields(val errors: List<AuthFieldError>) : AuthError
 
-    data object RateLimited : AuthError
+    /** Too many attempts; [retryAfter] is how long the server asks to wait, when it says. */
+    data class RateLimited(val retryAfter: Duration?) : AuthError
 
     data object Network : AuthError
 

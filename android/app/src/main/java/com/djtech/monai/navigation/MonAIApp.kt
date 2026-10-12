@@ -68,7 +68,7 @@ fun MonAIApp(
 private fun AuthNavDisplay(showOnboarding: Boolean) {
     // The start key is only read when the stack is first created, so marking onboarding
     // completed while it is on screen doesn't reset the stack.
-    val backStack = rememberNavBackStack(if (showOnboarding) WelcomeRoute else SignInRoute)
+    val backStack = rememberNavBackStack(if (showOnboarding) WelcomeRoute else SignInRoute())
     NavDisplay(
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
@@ -80,15 +80,22 @@ private fun AuthNavDisplay(showOnboarding: Boolean) {
         entryProvider = entryProvider {
             entry<WelcomeRoute> {
                 OnboardingRoute(
-                    onNavigateToRegister = { backStack.switchTo(RegisterRoute) },
-                    onNavigateToSignIn = { backStack.switchTo(SignInRoute) },
+                    onNavigateToRegister = { backStack.switchTo(RegisterRoute()) },
+                    onNavigateToSignIn = { backStack.switchTo(SignInRoute()) },
                 )
             }
-            entry<RegisterRoute> {
-                RegisterRoute(onNavigateToSignIn = { backStack.switchTo(SignInRoute) })
+            // Switching between Register and Sign in hands over the typed email.
+            entry<RegisterRoute> { key ->
+                RegisterRoute(
+                    initialEmail = key.email,
+                    onNavigateToSignIn = { email -> backStack.switchTo(SignInRoute(email)) },
+                )
             }
-            entry<SignInRoute> {
-                SignInRoute(onNavigateToRegister = { backStack.switchTo(RegisterRoute) })
+            entry<SignInRoute> { key ->
+                SignInRoute(
+                    initialEmail = key.email,
+                    onNavigateToRegister = { email -> backStack.switchTo(RegisterRoute(email)) },
+                )
             }
         },
     )

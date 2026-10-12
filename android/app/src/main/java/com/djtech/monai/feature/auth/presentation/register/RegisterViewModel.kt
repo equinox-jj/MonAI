@@ -11,6 +11,9 @@ import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.usecase.RegisterUseCase
 import com.djtech.monai.feature.auth.presentation.common.fieldMessage
 import com.djtech.monai.feature.auth.presentation.common.toFormErrorText
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -20,17 +23,18 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class RegisterViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = RegisterViewModel.Factory::class)
+class RegisterViewModel @AssistedInject constructor(
     private val register: RegisterUseCase,
     private val savedState: SavedStateHandle,
+    @Assisted initialEmail: String,
 ) : ViewModel() {
 
     // Name and email survive process death; the password is never written to the saved state.
+    // An email edited here wins over the one handed over from Sign in.
     private val mutableState = MutableStateFlow(
-        RegisterState(name = savedState[KEY_NAME] ?: "", email = savedState[KEY_EMAIL] ?: ""),
+        RegisterState(name = savedState[KEY_NAME] ?: "", email = savedState[KEY_EMAIL] ?: initialEmail),
     )
     val state: StateFlow<RegisterState> = mutableState.asStateFlow()
 
@@ -41,13 +45,7 @@ class RegisterViewModel @Inject constructor(
         when (intent) {
             is RegisterIntent.NameChanged -> {
                 savedState[KEY_NAME] = intent.value
-                mutableState.update {
-                    it.copy(
-                        name = intent.value,
-                        nameError = null,
-                        formError = null
-                    )
-                }
+                mutableState.update { it.copy(name = intent.value, nameError = null, formError = null) }
             }
 
             is RegisterIntent.EmailChanged -> {
@@ -57,7 +55,7 @@ class RegisterViewModel @Inject constructor(
                         email = intent.value,
                         emailError = null,
                         emailTaken = false,
-                        formError = null
+                        formError = null,
                     )
                 }
             }
@@ -67,7 +65,7 @@ class RegisterViewModel @Inject constructor(
             }
 
             RegisterIntent.Submit -> submit()
-            RegisterIntent.SignIn -> send(RegisterEffect.NavigateToSignIn)
+            RegisterIntent.SignIn -> send(RegisterEffect.NavigateToSignIn(mutableState.value.email))
         }
     }
 
@@ -80,9 +78,20 @@ class RegisterViewModel @Inject constructor(
                 // The saved token flips the session to SignedIn and the app leaves this graph,
                 // so the form stays busy instead of briefly becoming submittable again.
                 is Outcome.Success -> Unit
-                is Outcome.Failure -> mutableState.update { it.withError(result.error) }
+                is Outcome.Failure -> {
+                    mutableState.update { it.withError(result.error) }
+                    mutableState.value.firstInvalidField()?.let { send(RegisterEffect.FocusField(it)) }
+                }
             }
         }
+    }
+
+    // In layout order, whatever order the server listed the errors in.
+    private fun RegisterState.firstInvalidField(): AuthField? = when {
+        nameError != null -> AuthField.NAME
+        emailError != null -> AuthField.EMAIL
+        passwordError != null -> AuthField.PASSWORD
+        else -> null
     }
 
     private fun RegisterState.withError(error: AuthError): RegisterState = when (error) {
@@ -105,6 +114,11 @@ class RegisterViewModel @Inject constructor(
 
     private fun send(effect: RegisterEffect) {
         viewModelScope.launch { effectChannel.send(effect) }
+    }
+
+    @AssistedFactory
+    interface Factory {
+        fun create(initialEmail: String): RegisterViewModel
     }
 
     private companion object {

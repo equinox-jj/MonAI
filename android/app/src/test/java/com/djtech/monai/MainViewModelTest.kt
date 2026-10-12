@@ -1,11 +1,13 @@
 package com.djtech.monai
 
 import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.datastore.FakeTokenCipher
 import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore
+import com.djtech.monai.feature.auth.domain.usecase.FakeAuthRepository
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -19,12 +21,14 @@ import org.junit.Test
 
 class MainViewModelTest {
 
+    private val errorLogger = RecordingErrorLogger()
+
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
     @Test
     fun `is loading until the stored session is read`() = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = subscribed(MainViewModel(store(), onboardingStore))
+        val viewModel = subscribed(MainViewModel(store(), onboardingStore, authRepository))
 
         assertEquals(SessionState.Loading, viewModel.state.value.sessionState)
         assertTrue(viewModel.state.value.isLoading)
@@ -36,7 +40,7 @@ class MainViewModelTest {
     @Test
     fun `follows sign in and sign out`() = runTest(mainDispatcherRule.dispatcher) {
         val store = store()
-        val viewModel = subscribed(MainViewModel(store, onboardingStore))
+        val viewModel = subscribed(MainViewModel(store, onboardingStore, authRepository))
 
         store.saveToken("token-1")
         advanceUntilIdle()
@@ -50,7 +54,7 @@ class MainViewModelTest {
     @Test
     fun `an expired session signs out once acknowledged`() = runTest(mainDispatcherRule.dispatcher) {
         val store = store()
-        val viewModel = subscribed(MainViewModel(store, onboardingStore))
+        val viewModel = subscribed(MainViewModel(store, onboardingStore, authRepository))
         store.saveToken("token-1")
 
         store.clearIfCurrent("token-1")
@@ -64,7 +68,7 @@ class MainViewModelTest {
 
     @Test
     fun `reports onboarding as completed once it is marked`() = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = subscribed(MainViewModel(store(), onboardingStore))
+        val viewModel = subscribed(MainViewModel(store(), onboardingStore, authRepository))
         advanceUntilIdle()
         assertFalse(viewModel.state.value.onboardingCompleted)
 
@@ -74,12 +78,24 @@ class MainViewModelTest {
     }
 
     private val onboardingStore = OnboardingStore(InMemoryPreferencesDataStore())
+    private val authRepository = FakeAuthRepository()
+
+    @Test
+    fun `coming to the foreground expires an overdue session`() = runTest(mainDispatcherRule.dispatcher) {
+        val viewModel = MainViewModel(store(), onboardingStore, authRepository)
+
+        viewModel.onAppForegrounded()
+        advanceUntilIdle()
+
+        assertEquals(listOf("expireSessionIfDue"), authRepository.calls)
+    }
 
     private fun TestScope.store() = SessionStore(
         dataStore = InMemoryPreferencesDataStore(),
         cipher = FakeTokenCipher,
         scope = backgroundScope,
         ioDispatcher = mainDispatcherRule.dispatcher,
+        errorLogger = errorLogger,
     )
 
     /** WhileUiSubscribed only updates while someone is subscribed, as the UI would be. */

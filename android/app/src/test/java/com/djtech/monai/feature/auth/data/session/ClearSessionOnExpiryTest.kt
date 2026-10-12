@@ -1,6 +1,7 @@
 package com.djtech.monai.feature.auth.data.session
 
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.database.FakeLocalCache
 import com.djtech.monai.core.datastore.FakeTokenCipher
 import com.djtech.monai.core.datastore.SessionStore
@@ -19,8 +20,11 @@ import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
+import java.io.IOException
 
 class ClearSessionOnExpiryTest {
+
+    private val errorLogger = RecordingErrorLogger()
 
     @get:Rule
     val tmp = TemporaryFolder()
@@ -55,6 +59,20 @@ class ClearSessionOnExpiryTest {
         assertEquals(0, localCache.clearCount)
     }
 
+    // runTest fails on an exception that escapes the launched clear; on a device it would crash the app.
+    @Test
+    fun `a cache that cannot be cleared still signs out without crashing`() = runTest {
+        val store = store()
+        store.saveToken("token-1")
+        val failure = IOException("disk full")
+        localCache.failure = failure
+
+        expire(store, "token-1")
+
+        assertNull(store.accessToken())
+        assertEquals(listOf(failure), errorLogger.errors)
+    }
+
     private fun TestScope.store() = SessionStore(
         dataStore = PreferenceDataStoreFactory.create(scope = dataStoreScope) {
             tmp.root.resolve("session.preferences_pb")
@@ -62,12 +80,13 @@ class ClearSessionOnExpiryTest {
         cipher = FakeTokenCipher,
         scope = backgroundScope,
         ioDispatcher = StandardTestDispatcher(testScheduler),
+        errorLogger = errorLogger,
     )
 
     // Runs the handler on its own scope and waits for the clear it launches.
     private suspend fun TestScope.expire(store: SessionStore, token: String) {
         val handlerScope = CoroutineScope(StandardTestDispatcher(testScheduler))
-        ClearSessionOnExpiry(store, localCache, handlerScope).onSessionExpired(token)
+        ClearSessionOnExpiry(store, localCache, handlerScope, errorLogger).onSessionExpired(token)
         handlerScope.coroutineContext.job.children.toList().joinAll()
     }
 }

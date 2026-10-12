@@ -30,13 +30,18 @@ class FakeAuthRepository : AuthRepository {
         return userResult
     }
 
-    override suspend fun logout() {
+    override suspend fun logout(): AuthResult<Unit> {
         calls += "logout"
+        return unitResult
     }
 
     override suspend fun logoutAllDevices(): AuthResult<Unit> {
         calls += "logoutAllDevices"
         return unitResult
+    }
+
+    override suspend fun expireSessionIfDue() {
+        calls += "expireSessionIfDue"
     }
 
     override suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit> {

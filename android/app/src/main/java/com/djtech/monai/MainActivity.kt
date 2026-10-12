@@ -39,4 +39,10 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    // Launch and every return to the foreground: the token may have expired while the app was away.
+    override fun onStart() {
+        super.onStart()
+        viewModel.onAppForegrounded()
+    }
 }

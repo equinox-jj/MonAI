@@ -80,13 +80,7 @@ fun OnboardingScreen(
     LaunchedEffect(state.page) { pagerState.animateScrollToPage(state.page) }
     // A swipe reports back once the pager comes to rest.
     LaunchedEffect(pagerState) {
-        snapshotFlow { pagerState.settledPage }.collect {
-            currentOnIntent(
-                OnboardingIntent.PageSettled(
-                    it
-                )
-            )
-        }
+        snapshotFlow { pagerState.settledPage }.collect { currentOnIntent(OnboardingIntent.PageSettled(it)) }
     }
     // System back steps through the pages before leaving the app.
     BackHandler(enabled = state.page > 0) { onIntent(OnboardingIntent.Back) }
@@ -133,11 +127,7 @@ private fun OnboardingPageContent(page: OnboardingPage, onSkip: () -> Unit) {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(
-                start = spacing.screenHorizontalWide,
-                end = spacing.screenHorizontalWide,
-                top = spacing.x6
-            ),
+            .padding(start = spacing.screenHorizontalWide, end = spacing.screenHorizontalWide, top = spacing.x6),
         verticalArrangement = Arrangement.spacedBy(spacing.x6),
     ) {
         OnboardingHero(page, onSkip, Modifier.weight(1f))
@@ -181,11 +171,7 @@ private fun OnboardingFooter(
                 modifier = Modifier.semantics { contentDescription = step },
             )
             AnimatedVisibility(visible = state.page == 0, enter = fadeIn(), exit = fadeOut()) {
-                MonAITextLink(
-                    next,
-                    { onIntent(OnboardingIntent.Next) },
-                    trailingIcon = MonAIIcons.ArrowForward
-                )
+                MonAITextLink(next, { onIntent(OnboardingIntent.Next) }, trailingIcon = MonAIIcons.ArrowForward)
             }
         }
         // The first page can skip ahead, the middle one steps Back/Next, the last offers the account actions.

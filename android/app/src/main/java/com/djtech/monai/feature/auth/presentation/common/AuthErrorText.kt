@@ -18,7 +18,8 @@ internal fun FieldIssue.toUiText(field: AuthField): UiText = when (this) {
             AuthField.EMAIL -> R.string.auth_field_email_required
             AuthField.PASSWORD,
             AuthField.CURRENT_PASSWORD,
-            AuthField.NEW_PASSWORD -> R.string.auth_field_password_required
+            AuthField.NEW_PASSWORD,
+                -> R.string.auth_field_password_required
         },
     )
 
@@ -34,14 +35,18 @@ internal fun FieldIssue.toUiText(field: AuthField): UiText = when (this) {
  * [AuthError.EmailAlreadyRegistered]) are shown on their fields; if one reaches here it falls back to the
  * generic message.
  */
-internal fun AuthError.toFormErrorText(): UiText = UiText.Resource(
-    when (this) {
-        AuthError.InvalidCredentials -> R.string.auth_error_invalid_credentials
-        AuthError.RateLimited -> R.string.auth_error_rate_limited
-        AuthError.Network -> R.string.auth_error_network
-        AuthError.EmailAlreadyRegistered,
-        AuthError.WrongCurrentPassword,
-        is AuthError.InvalidFields,
-        AuthError.Unexpected -> R.string.auth_error_unexpected
-    },
-)
+internal fun AuthError.toFormErrorText(): UiText = when (this) {
+    is AuthError.RateLimited -> retryAfter?.let {
+        // Whole minutes, rounded up so the user never retries too early.
+        val minutes = it.inWholeSeconds.plus(59).div(60).coerceAtLeast(1).toInt()
+        UiText.Plural(R.plurals.auth_error_rate_limited_wait, minutes, minutes)
+    } ?: UiText.Resource(R.string.auth_error_rate_limited)
+
+    AuthError.InvalidCredentials -> UiText.Resource(R.string.auth_error_invalid_credentials)
+    AuthError.Network -> UiText.Resource(R.string.auth_error_network)
+    AuthError.EmailAlreadyRegistered,
+    AuthError.WrongCurrentPassword,
+    is AuthError.InvalidFields,
+    AuthError.Unexpected,
+        -> UiText.Resource(R.string.auth_error_unexpected)
+}

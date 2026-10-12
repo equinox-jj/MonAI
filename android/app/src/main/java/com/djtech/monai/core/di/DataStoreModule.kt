@@ -2,8 +2,10 @@ package com.djtech.monai.core.di
 
 import android.content.Context
 import androidx.datastore.core.DataStore
+import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
 import com.djtech.monai.core.common.dispatcher.Dispatcher
 import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
@@ -22,6 +24,7 @@ import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import java.io.File
 import javax.inject.Singleton
 
 @Module
@@ -45,9 +48,9 @@ object DataStoreModule {
     fun provideSessionDataStore(
         @ApplicationContext context: Context,
         @Dispatcher(MonAIDispatcher.IO) ioDispatcher: CoroutineDispatcher,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        scope = CoroutineScope(ioDispatcher + SupervisorJob()),
-    ) { context.preferencesDataStoreFile("session") }
+    ): DataStore<Preferences> = createPreferencesDataStore(CoroutineScope(ioDispatcher + SupervisorJob())) {
+        context.preferencesDataStoreFile("session")
+    }
 
     @Provides
     @Singleton
@@ -55,7 +58,18 @@ object DataStoreModule {
     fun provideAppDataStore(
         @ApplicationContext context: Context,
         @Dispatcher(MonAIDispatcher.IO) ioDispatcher: CoroutineDispatcher,
-    ): DataStore<Preferences> = PreferenceDataStoreFactory.create(
-        scope = CoroutineScope(ioDispatcher + SupervisorJob()),
-    ) { context.preferencesDataStoreFile("app") }
+    ): DataStore<Preferences> = createPreferencesDataStore(CoroutineScope(ioDispatcher + SupervisorJob())) {
+        context.preferencesDataStoreFile("app")
+    }
 }
+
+/**
+ * A damaged file would fail every read and write, so it is replaced with an empty one: the session
+ * reads as signed out and onboarding as not done, which the user can recover from.
+ */
+internal fun createPreferencesDataStore(scope: CoroutineScope, produceFile: () -> File): DataStore<Preferences> =
+    PreferenceDataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+        scope = scope,
+        produceFile = produceFile,
+    )

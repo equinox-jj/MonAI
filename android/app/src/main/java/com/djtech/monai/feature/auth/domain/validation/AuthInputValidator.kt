@@ -10,35 +10,33 @@ import com.djtech.monai.feature.auth.domain.validation.AuthInputValidator.passwo
  * so a form shows the same errors offline as the server would send. The server stays the
  * authority; this only saves a round trip, which on login also counts toward the rate limit.
  *
- * Name and email are checked trimmed, as the repository sends them; passwords as typed.
+ * Takes input already cleaned up by [normalizedName] and [normalizedEmail], as the use cases send it.
  * Lengths count code points, as the backend's validator counts runes, except the password
  * maximum (see [passwordIssue]).
  */
 object AuthInputValidator {
 
-    /** Minimum password length in code points; the register screen shows it as a live hint. */
+    /** Minimum password length in code points; the register screen shows it in its hint. */
     const val PASSWORD_MIN = 8
 
+    /** Whether [password] meets the minimum length; drives the register screen's live hint. */
+    fun isPasswordLongEnough(password: String): Boolean = password.codePointLength() >= PASSWORD_MIN
+
     fun register(name: String, email: String, password: String): List<AuthFieldError> = buildList {
-        addIssue(AuthField.NAME, nameIssue(name.trim()))
-        addIssue(AuthField.EMAIL, emailIssue(email.trim(), max = EMAIL_MAX))
+        addIssue(AuthField.NAME, nameIssue(name))
+        addIssue(AuthField.EMAIL, emailIssue(email, max = EMAIL_MAX))
         addIssue(AuthField.PASSWORD, passwordIssue(password))
     }
 
     // The server applies the full password rules on login too, so checking them here hides nothing.
     fun login(email: String, password: String): List<AuthFieldError> = buildList {
-        addIssue(AuthField.EMAIL, emailIssue(email.trim(), max = null))
+        addIssue(AuthField.EMAIL, emailIssue(email, max = null))
         addIssue(AuthField.PASSWORD, passwordIssue(password))
     }
 
     fun changePassword(currentPassword: String, newPassword: String): List<AuthFieldError> =
         buildList {
-            if (currentPassword.isEmpty()) add(
-                AuthFieldError(
-                    AuthField.CURRENT_PASSWORD,
-                    FieldIssue.Required
-                )
-            )
+            if (currentPassword.isEmpty()) add(AuthFieldError(AuthField.CURRENT_PASSWORD, FieldIssue.Required))
             addIssue(
                 AuthField.NEW_PASSWORD,
                 passwordIssue(newPassword)
@@ -65,12 +63,10 @@ object AuthInputValidator {
 
     private fun passwordIssue(password: String): FieldIssue? = when {
         password.isEmpty() -> FieldIssue.Required
-        password.codePointLength() < PASSWORD_MIN -> FieldIssue.TooShort(PASSWORD_MIN)
+        !isPasswordLongEnough(password) -> FieldIssue.TooShort(PASSWORD_MIN)
         // bcrypt takes at most 72 bytes. The server's validator counts runes, so a longer
         // non-ASCII password would pass it and then fail hashing with a 500.
-        password.encodeToByteArray().size > PASSWORD_MAX_BYTES -> FieldIssue.TooLong(
-            PASSWORD_MAX_BYTES
-        )
+        password.encodeToByteArray().size > PASSWORD_MAX_BYTES -> FieldIssue.TooLong(PASSWORD_MAX_BYTES)
 
         else -> null
     }

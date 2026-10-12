@@ -1,5 +1,7 @@
 package com.djtech.monai.core.network
 
+import kotlin.time.Duration
+
 /** Why an API call failed. Repositories map these to their own domain errors. */
 sealed interface ApiError {
 
@@ -13,6 +15,7 @@ sealed interface ApiError {
         val code: String,
         val message: String,
         val fields: List<FieldError>,
+        val retryAfter: Duration? = null,
     ) : ApiError
 
     /** No response: offline, DNS failure, timeout, connection reset. */

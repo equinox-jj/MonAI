@@ -68,6 +68,10 @@
     <!-- Auth errors -->
     <string name="auth_error_invalid_credentials">Email or password is incorrect. Check them and try again.</string>
     <string name="auth_error_rate_limited">Too many attempts. Wait a minute, then try again.</string>
+    <plurals name="auth_error_rate_limited_wait">
+        <item quantity="one">Too many attempts. Try again in %d minute.</item>
+        <item quantity="other">Too many attempts. Try again in %d minutes.</item>
+    </plurals>
     <string name="auth_error_network">Can\'t reach MonAI. Check your connection and try again.</string>
     <string name="auth_error_unexpected">Something went wrong on our side. Try again.</string>
     <string name="auth_field_name_required">Enter your name</string>

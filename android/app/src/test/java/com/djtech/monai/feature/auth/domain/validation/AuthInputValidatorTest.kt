@@ -25,7 +25,7 @@ class AuthInputValidatorTest {
                 AuthFieldError(AuthField.EMAIL, FieldIssue.Required),
                 AuthFieldError(AuthField.PASSWORD, FieldIssue.Required),
             ),
-            AuthInputValidator.register("   ", " ", ""),
+            AuthInputValidator.register("", "", ""),
         )
     }
 
@@ -38,8 +38,8 @@ class AuthInputValidatorTest {
     }
 
     @Test
-    fun `name length ignores surrounding spaces and counts emoji as one character`() {
-        val name = "  " + "😀".repeat(100) + "  "
+    fun `name length counts emoji as one character`() {
+        val name = "😀".repeat(100)
 
         assertEquals(noErrors, AuthInputValidator.register(name, "joshua@example.com", "s3cretPass"))
     }
@@ -53,11 +53,6 @@ class AuthInputValidatorTest {
                 AuthInputValidator.register("Joshua", email, "s3cretPass"),
             )
         }
-    }
-
-    @Test
-    fun `email is checked after trimming`() {
-        assertEquals(noErrors, AuthInputValidator.register("Joshua", "  Joshua@Example.com ", "s3cretPass"))
     }
 
     @Test
@@ -111,7 +106,7 @@ class AuthInputValidatorTest {
 
     @Test
     fun `valid login has no errors`() {
-        assertEquals(noErrors, AuthInputValidator.login("  Joshua@Example.com ", "s3cretPass"))
+        assertEquals(noErrors, AuthInputValidator.login("joshua@example.com", "s3cretPass"))
     }
 
     @Test

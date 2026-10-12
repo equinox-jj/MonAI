@@ -1,9 +1,14 @@
 package com.djtech.monai.feature.auth.data.repository
 
+import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
+import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.database.FakeLocalCache
 import com.djtech.monai.core.datastore.FakeTokenCipher
+import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore
 import com.djtech.monai.core.datastore.TokenCipher
 import com.djtech.monai.core.model.Role
@@ -20,6 +25,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
@@ -28,6 +35,7 @@ import kotlinx.serialization.json.jsonObject
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
 import mockwebserver3.RecordedRequest
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import org.junit.After
@@ -39,9 +47,13 @@ import org.junit.Test
 import org.junit.rules.TemporaryFolder
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
+import java.io.IOException
 import java.time.Instant
+import kotlin.time.Duration.Companion.seconds
 
 class ApiAuthRepositoryTest {
+
+    private val errorLogger = RecordingErrorLogger()
 
     @get:Rule
     val tmp = TemporaryFolder()
@@ -49,6 +61,9 @@ class ApiAuthRepositoryTest {
     private val server = MockWebServer()
     private val dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val localCache = FakeLocalCache()
+
+    /** Once set, the session file refuses writes, so the token can be neither saved nor removed. */
+    private var diskFull = false
 
     @Before
     fun setUp() {
@@ -62,11 +77,11 @@ class ApiAuthRepositoryTest {
     }
 
     @Test
-    fun `login sends normalized credentials, saves the token and returns the user`() = runTest {
+    fun `login sends the credentials as given, saves the token and returns the user`() = runTest {
         val (repository, store) = repository()
         server.enqueue(MockResponse(code = 200, body = authBody(token = "token-1")))
 
-        val result = repository.login("  Joshua@Example.COM ", " s3cretPass ")
+        val result = repository.login("joshua@example.com", " s3cretPass ")
 
         assertEquals(Outcome.Success(expectedUser), result)
         assertEquals("token-1", store.accessToken())
@@ -77,6 +92,17 @@ class ApiAuthRepositoryTest {
             json("""{"email":"joshua@example.com","password":" s3cretPass "}"""),
             request.jsonBody(),
         )
+    }
+
+    @Test
+    fun `login records when the token expires`() = runTest {
+        val (repository, store) = repository()
+        server.enqueue(MockResponse(code = 200, body = authBody(token = "token-1")))
+
+        repository.login("joshua@example.com", "s3cretPass")
+
+        assertNull(store.overdueToken(now = NOW.plusSeconds(TOKEN_LIFETIME_SECONDS - 1)))
+        assertEquals("token-1", store.overdueToken(now = NOW.plusSeconds(TOKEN_LIFETIME_SECONDS)))
     }
 
     @Test
@@ -91,11 +117,11 @@ class ApiAuthRepositoryTest {
     }
 
     @Test
-    fun `register sends the trimmed name and saves the token`() = runTest {
+    fun `register sends the form and saves the token`() = runTest {
         val (repository, store) = repository()
         server.enqueue(MockResponse(code = 201, body = authBody(token = "token-new")))
 
-        val result = repository.register(" Joshua ", "Joshua@Example.com", "s3cretPass")
+        val result = repository.register("Joshua", "joshua@example.com", "s3cretPass")
 
         assertEquals(Outcome.Success(expectedUser), result)
         assertEquals("token-new", store.accessToken())
@@ -204,13 +230,13 @@ class ApiAuthRepositoryTest {
     }
 
     @Test
-    fun `rate limiting is reported`() = runTest {
+    fun `rate limiting is reported with how long to wait`() = runTest {
         val (repository, _) = repository()
-        server.enqueue(errorResponse(429, "rate_limited"))
+        server.enqueue(errorResponse(429, "rate_limited", headers = Headers.headersOf("Retry-After", "120")))
 
         val result = repository.login("joshua@example.com", "s3cretPass")
 
-        assertEquals(Outcome.Failure(AuthError.RateLimited), result)
+        assertEquals(Outcome.Failure(AuthError.RateLimited(120.seconds)), result)
     }
 
     @Test
@@ -242,6 +268,7 @@ class ApiAuthRepositoryTest {
 
         assertEquals(Outcome.Failure(AuthError.Unexpected), result)
         assertNull(store.accessToken())
+        assertEquals(listOf("Keystore unavailable"), errorLogger.errors.map { it.message })
     }
 
     @Test
@@ -255,6 +282,7 @@ class ApiAuthRepositoryTest {
         assertEquals(Outcome.Failure(AuthError.Unexpected), result)
         assertNull(store.accessToken())
         assertEquals(0, localCache.clearCount)
+        assertEquals(1, errorLogger.errors.size)
     }
 
     @Test
@@ -262,11 +290,39 @@ class ApiAuthRepositoryTest {
         val (repository, store) = repository()
         store.saveToken("token-1")
 
-        repository.logout()
+        val result = repository.logout()
 
+        assertEquals(Outcome.Success(Unit), result)
         assertNull(store.accessToken())
         assertEquals(1, localCache.clearCount)
         assertEquals(0, server.requestCount)
+    }
+
+    @Test
+    fun `a token that cannot be removed fails logout and keeps the session`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1")
+        diskFull = true
+
+        val result = repository.logout()
+
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
+        assertEquals("token-1", store.accessToken())
+        assertEquals(listOf("disk full"), errorLogger.errors.map { it.message })
+    }
+
+    @Test
+    fun `a cache that cannot be cleared still signs out`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1")
+        val failure = IOException("disk full")
+        localCache.failure = failure
+
+        val result = repository.logout()
+
+        assertEquals(Outcome.Success(Unit), result)
+        assertNull(store.accessToken())
+        assertEquals(listOf(failure), errorLogger.errors)
     }
 
     @Test
@@ -283,6 +339,32 @@ class ApiAuthRepositoryTest {
         val request = server.takeRequest()
         assertEquals("POST", request.method)
         assertEquals("/api/v1/auth/logout-all", request.url.encodedPath)
+    }
+
+    @Test
+    fun `a cache that cannot be cleared does not fail logout on all devices`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1")
+        localCache.failure = IOException("disk full")
+        server.enqueue(MockResponse(code = 200, body = """{"success":true,"message":"Logged out","data":null}"""))
+
+        val result = repository.logoutAllDevices()
+
+        assertEquals(Outcome.Success(Unit), result)
+        assertNull(store.accessToken())
+    }
+
+    @Test
+    fun `logout on all devices fails when this device's token cannot be removed`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1")
+        diskFull = true
+        server.enqueue(MockResponse(code = 200, body = """{"success":true,"message":"Logged out","data":null}"""))
+
+        val result = repository.logoutAllDevices()
+
+        assertEquals(Outcome.Failure(AuthError.Unexpected), result)
+        assertEquals("token-1", store.accessToken())
     }
 
     @Test
@@ -319,6 +401,51 @@ class ApiAuthRepositoryTest {
     }
 
     @Test
+    fun `changing the password records when the new token expires`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-old")
+        server.enqueue(MockResponse(code = 200, body = authBody(token = "token-new")))
+
+        repository.changePassword("oldPass123", "newPass123")
+
+        assertEquals("token-new", store.overdueToken(now = NOW.plusSeconds(TOKEN_LIFETIME_SECONDS)))
+    }
+
+    @Test
+    fun `an overdue session is expired and its cache cleared`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1", expiresAt = NOW)
+
+        repository.expireSessionIfDue()
+
+        assertNull(store.accessToken())
+        assertEquals(SessionState.Expired, store.sessionState.first())
+        assertEquals(1, localCache.clearCount)
+    }
+
+    @Test
+    fun `a session still in date is left alone`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1", expiresAt = NOW.plusSeconds(1))
+
+        repository.expireSessionIfDue()
+
+        assertEquals("token-1", store.accessToken())
+        assertEquals(0, localCache.clearCount)
+    }
+
+    @Test
+    fun `an overdue session that cannot be cleared is logged, not thrown`() = runTest {
+        val (repository, store) = repository()
+        store.saveToken("token-1", expiresAt = NOW)
+        diskFull = true
+
+        repository.expireSessionIfDue()
+
+        assertEquals(listOf("disk full"), errorLogger.errors.map { it.message })
+    }
+
+    @Test
     fun `a wrong current password keeps the old token`() = runTest {
         val (repository, store) = repository()
         store.saveToken("token-old")
@@ -334,12 +461,15 @@ class ApiAuthRepositoryTest {
         cipher: TokenCipher = FakeTokenCipher,
     ): Pair<ApiAuthRepository, SessionStore> {
         val store = SessionStore(
-            dataStore = PreferenceDataStoreFactory.create(scope = dataStoreScope) {
-                tmp.root.resolve("session.preferences_pb")
-            },
+            dataStore = FailingWritesDataStore(
+                PreferenceDataStoreFactory.create(scope = dataStoreScope) {
+                    tmp.root.resolve("session.preferences_pb")
+                },
+            ) { diskFull },
             cipher = cipher,
             scope = backgroundScope,
             ioDispatcher = StandardTestDispatcher(testScheduler),
+            errorLogger = errorLogger,
         )
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
@@ -349,9 +479,11 @@ class ApiAuthRepositoryTest {
             .create(AuthApiService::class.java)
         val repository = ApiAuthRepository(
             authApiService = api,
-            apiCaller = ApiCaller(ApiErrorMapper(NetworkJson)),
+            apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             sessionStore = store,
             localCache = localCache,
+            errorLogger = errorLogger,
+            clock = FixedAppClock(NOW),
         )
         return repository to store
     }
@@ -378,8 +510,14 @@ class ApiAuthRepositoryTest {
         }
     """.trimIndent()
 
-    private fun errorResponse(status: Int, code: String, fields: String = "[]") = MockResponse(
+    private fun errorResponse(
+        status: Int,
+        code: String,
+        fields: String = "[]",
+        headers: Headers = Headers.headersOf(),
+    ) = MockResponse(
         code = status,
+        headers = headers,
         body = """{"success":false,"message":"Failed","data":null,"error":{"code":"$code","fields":$fields}}""",
     )
 
@@ -387,11 +525,30 @@ class ApiAuthRepositoryTest {
 
     private fun RecordedRequest.jsonBody(): JsonObject = json(body!!.utf8())
 
+    private class FailingWritesDataStore(
+        private val delegate: DataStore<Preferences>,
+        private val failWrites: () -> Boolean,
+    ) : DataStore<Preferences> {
+        override val data: Flow<Preferences> get() = delegate.data
+
+        override suspend fun updateData(transform: suspend (t: Preferences) -> Preferences): Preferences {
+            if (failWrites()) throw IOException("disk full")
+            return delegate.updateData(transform)
+        }
+    }
+
     // Stands in for a Keystore that refuses to encrypt (e.g. a key invalidated by the OS).
     private object FailingCipher : TokenCipher {
         override fun encrypt(plaintext: String): String = throw IllegalStateException("Keystore unavailable")
 
         override fun decrypt(ciphertext: String): String? = null
+    }
+
+    private companion object {
+        val NOW: Instant = Instant.parse("2026-10-12T08:00:00Z")
+
+        // authBody's expires_in: seven days.
+        const val TOKEN_LIFETIME_SECONDS = 604_800L
     }
 
     private val expectedUser = User(

@@ -13,6 +13,9 @@ import com.djtech.monai.feature.auth.domain.usecase.FakeAuthRepository
 import com.djtech.monai.feature.auth.domain.usecase.LoginUseCase
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -29,7 +32,10 @@ class SignInViewModelTest {
 
     private val repository = FakeAuthRepository()
     private val savedState = SavedStateHandle()
-    private val viewModel by lazy { SignInViewModel(LoginUseCase(repository), savedState) }
+    private val viewModel by lazy { viewModel() }
+
+    private fun viewModel(initialEmail: String = "") =
+        SignInViewModel(LoginUseCase(repository), savedState, initialEmail)
 
     private val state get() = viewModel.state.value
 
@@ -92,7 +98,7 @@ class SignInViewModelTest {
         advanceUntilIdle()
         assertEquals(UiText.Resource(R.string.auth_error_network), state.formError)
 
-        repository.userResult = Outcome.Failure(AuthError.RateLimited)
+        repository.userResult = Outcome.Failure(AuthError.RateLimited(null))
         viewModel.onIntent(SignInIntent.Submit)
         advanceUntilIdle()
         assertEquals(UiText.Resource(R.string.auth_error_rate_limited), state.formError)
@@ -110,6 +116,47 @@ class SignInViewModelTest {
 
         assertEquals(UiText.Resource(R.string.auth_field_email_invalid), state.emailError)
         assertNull(state.formError)
+    }
+
+    @Test
+    fun `field errors focus the first invalid field in layout order`() = runTest(mainDispatcherRule.dispatcher) {
+        // The server may list fields in any order.
+        repository.userResult = Outcome.Failure(
+            AuthError.InvalidFields(
+                listOf(
+                    AuthFieldError(AuthField.PASSWORD, FieldIssue.Invalid),
+                    AuthFieldError(AuthField.EMAIL, FieldIssue.InvalidFormat),
+                ),
+            ),
+        )
+        fillValidForm()
+
+        viewModel.onIntent(SignInIntent.Submit)
+
+        assertEquals(SignInEffect.FocusField(AuthField.EMAIL), viewModel.effects.first())
+    }
+
+    @Test
+    fun `a local password error focuses the password`() = runTest(mainDispatcherRule.dispatcher) {
+        viewModel.onIntent(SignInIntent.EmailChanged("joshua@example.com"))
+        viewModel.onIntent(SignInIntent.PasswordChanged("short"))
+
+        viewModel.onIntent(SignInIntent.Submit)
+
+        assertEquals(SignInEffect.FocusField(AuthField.PASSWORD), viewModel.effects.first())
+    }
+
+    @Test
+    fun `a banner error leaves focus alone`() = runTest(mainDispatcherRule.dispatcher) {
+        val effects = mutableListOf<SignInEffect>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.effects.toList(effects) }
+        repository.userResult = Outcome.Failure(AuthError.InvalidCredentials)
+        fillValidForm()
+
+        viewModel.onIntent(SignInIntent.Submit)
+        advanceUntilIdle()
+
+        assertTrue(effects.isEmpty())
     }
 
     @Test
@@ -163,16 +210,35 @@ class SignInViewModelTest {
     fun `the email survives process death but the password does not`() {
         fillValidForm()
 
-        val restored = SignInViewModel(LoginUseCase(repository), savedState)
+        val restored = viewModel()
 
         assertEquals("joshua@example.com", restored.state.value.email)
         assertEquals("", restored.state.value.password)
     }
 
     @Test
-    fun `create account navigates to register`() = runTest(mainDispatcherRule.dispatcher) {
+    fun `starts with the email handed over from register`() {
+        val viewModel = viewModel(initialEmail = "joshua@example.com")
+
+        assertEquals("joshua@example.com", viewModel.state.value.email)
+    }
+
+    @Test
+    fun `an email edited here wins over the handed-over one after process death`() {
+        viewModel(initialEmail = "joshua@example.com")
+            .onIntent(SignInIntent.EmailChanged("josh@example.com"))
+
+        val restored = viewModel(initialEmail = "joshua@example.com")
+
+        assertEquals("josh@example.com", restored.state.value.email)
+    }
+
+    @Test
+    fun `create account hands the typed email to register`() = runTest(mainDispatcherRule.dispatcher) {
+        viewModel.onIntent(SignInIntent.EmailChanged("joshua@example.com"))
+
         viewModel.onIntent(SignInIntent.CreateAccount)
 
-        assertEquals(SignInEffect.NavigateToRegister, viewModel.effects.first())
+        assertEquals(SignInEffect.NavigateToRegister("joshua@example.com"), viewModel.effects.first())
     }
 }

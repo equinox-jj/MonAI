@@ -9,6 +9,8 @@ import com.djtech.monai.feature.auth.domain.model.FieldIssue
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 class AuthErrorTextTest {
 
@@ -49,9 +51,25 @@ class AuthErrorTextTest {
             UiText.Resource(R.string.auth_error_invalid_credentials),
             AuthError.InvalidCredentials.toFormErrorText(),
         )
-        assertEquals(UiText.Resource(R.string.auth_error_rate_limited), AuthError.RateLimited.toFormErrorText())
+        assertEquals(UiText.Resource(R.string.auth_error_rate_limited), AuthError.RateLimited(null).toFormErrorText())
         assertEquals(UiText.Resource(R.string.auth_error_network), AuthError.Network.toFormErrorText())
         assertEquals(UiText.Resource(R.string.auth_error_unexpected), AuthError.Unexpected.toFormErrorText())
+    }
+
+    @Test
+    fun `a known rate-limit wait is shown in whole minutes, rounded up`() {
+        assertEquals(
+            UiText.Plural(R.plurals.auth_error_rate_limited_wait, 2, 2),
+            AuthError.RateLimited(90.seconds).toFormErrorText(),
+        )
+        assertEquals(
+            UiText.Plural(R.plurals.auth_error_rate_limited_wait, 1, 1),
+            AuthError.RateLimited(20.seconds).toFormErrorText(),
+        )
+        assertEquals(
+            UiText.Plural(R.plurals.auth_error_rate_limited_wait, 15, 15),
+            AuthError.RateLimited(15.minutes).toFormErrorText(),
+        )
     }
 
     @Test

@@ -23,6 +23,21 @@ class LoginUseCaseTest {
     }
 
     @Test
+    fun `the email is sent trimmed and lowercased, the password as typed`() = runTest {
+        login("  Joshua@Example.COM ", " s3cretPass ")
+
+        assertEquals(listOf("login(joshua@example.com,  s3cretPass )"), repository.calls)
+    }
+
+    @Test
+    fun `an email of only spaces is required`() = runTest {
+        val result = login("   ", "s3cretPass")
+
+        val error = AuthFieldError(AuthField.EMAIL, FieldIssue.Required)
+        assertEquals(Outcome.Failure(AuthError.InvalidFields(listOf(error))), result)
+    }
+
+    @Test
     fun `invalid input fails without calling the repository`() = runTest {
         val result = login("joshua@example.com", "")
 

@@ -7,11 +7,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.ContentType
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,32 +19,40 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.common.ui.UiText
-import com.djtech.monai.core.designsystem.component.MonAIAlertTone
-import com.djtech.monai.core.designsystem.component.MonAIFieldTone
-import com.djtech.monai.core.designsystem.component.MonAIInlineAlert
 import com.djtech.monai.core.designsystem.component.MonAIPasswordField
 import com.djtech.monai.core.designsystem.component.MonAITextField
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.presentation.common.AuthActions
+import com.djtech.monai.feature.auth.presentation.common.AuthFieldFocus
+import com.djtech.monai.feature.auth.presentation.common.AuthFormError
 import com.djtech.monai.feature.auth.presentation.common.AuthHeader
 import com.djtech.monai.feature.auth.presentation.common.AuthLogoTile
 import com.djtech.monai.feature.auth.presentation.common.AuthScaffold
+import com.djtech.monai.feature.auth.presentation.common.fieldTone
 import com.djtech.monai.feature.auth.presentation.common.isExpandedAuthWidth
+import com.djtech.monai.feature.auth.presentation.common.rememberAuthFieldFocus
 
+/** @param initialEmail the email typed on Register, if the user came from there. */
 @Composable
 fun SignInRoute(
-    onNavigateToRegister: () -> Unit,
+    initialEmail: String,
+    onNavigateToRegister: (email: String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: SignInViewModel = hiltViewModel(),
+    viewModel: SignInViewModel = hiltViewModel<SignInViewModel, SignInViewModel.Factory>(
+        creationCallback = { it.create(initialEmail) },
+    ),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
+    val fieldFocus = rememberAuthFieldFocus()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
-            SignInEffect.NavigateToRegister -> onNavigateToRegister()
+            is SignInEffect.NavigateToRegister -> onNavigateToRegister(effect.email)
+            is SignInEffect.FocusField -> fieldFocus.request(effect.field)
         }
     }
-    SignInScreen(state, viewModel::onIntent, modifier)
+    SignInScreen(state, viewModel::onIntent, modifier, fieldFocus = fieldFocus)
 }
 
 /** A successful sign-in needs no effect: the saved session switches the app to the main graph. */
@@ -56,6 +62,7 @@ fun SignInScreen(
     onIntent: (SignInIntent) -> Unit,
     modifier: Modifier = Modifier,
     expanded: Boolean = isExpandedAuthWidth(),
+    fieldFocus: AuthFieldFocus = rememberAuthFieldFocus(),
 ) {
     val focusManager = LocalFocusManager.current
     val submit = {
@@ -71,41 +78,33 @@ fun SignInScreen(
                 stringResource(R.string.sign_in_title),
                 stringResource(if (expanded) R.string.sign_in_subtitle_tablet else R.string.sign_in_subtitle),
             )
-            state.formError?.let { error ->
-                MonAIInlineAlert(
-                    error.asString(),
-                    Modifier.semantics { liveRegion = LiveRegionMode.Polite },
-                    tone = MonAIAlertTone.Error,
-                )
-            }
+            AuthFormError(state.formError)
             MonAITextField(
                 value = state.email,
                 onValueChange = { onIntent(SignInIntent.EmailChanged(it)) },
+                modifier = Modifier.focusRequester(fieldFocus.requester(AuthField.EMAIL)),
+                enabled = !state.isSubmitting,
                 label = stringResource(R.string.auth_email_label),
                 placeholder = stringResource(R.string.auth_email_placeholder),
                 leadingIcon = MonAIIcons.Mail,
                 supportingText = state.emailError?.asString(),
-                tone = state.emailError.tone(),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Email,
-                    imeAction = ImeAction.Next
-                ),
+                tone = state.emailError.fieldTone(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next),
                 keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
                 contentType = ContentType.EmailAddress,
             )
             MonAIPasswordField(
                 value = state.password,
                 onValueChange = { onIntent(SignInIntent.PasswordChanged(it)) },
+                modifier = Modifier.focusRequester(fieldFocus.requester(AuthField.PASSWORD)),
+                enabled = !state.isSubmitting,
                 label = stringResource(R.string.auth_password_label),
                 placeholder = stringResource(R.string.auth_password_placeholder),
                 supportingText = state.passwordError?.asString(),
-                tone = state.passwordError.tone(),
+                tone = state.passwordError.fieldTone(),
                 showPasswordLabel = stringResource(R.string.auth_show_password),
                 hidePasswordLabel = stringResource(R.string.auth_hide_password),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Password,
-                    imeAction = ImeAction.Done
-                ),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
                 keyboardActions = KeyboardActions(onDone = { submit() }),
                 contentType = ContentType.Password,
             )
@@ -123,9 +122,6 @@ fun SignInScreen(
         },
     )
 }
-
-private fun UiText?.tone(): MonAIFieldTone =
-    if (this == null) MonAIFieldTone.Neutral else MonAIFieldTone.Error
 
 @PreviewLightDark
 @Composable

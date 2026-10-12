@@ -62,7 +62,7 @@ fun MonAICard(
         Column(
             Modifier.padding(contentPadding),
             verticalArrangement = verticalArrangement,
-            content = content
+            content = content,
         )
     }
     if (onClick != null) {
@@ -124,8 +124,8 @@ fun MonAIGradientCard(
             .then(
                 if (onClick != null) Modifier.clickable(
                     role = Role.Button,
-                    onClick = onClick
-                ) else Modifier
+                    onClick = onClick,
+                ) else Modifier,
             ),
     ) {
         if (decorated) {
@@ -286,7 +286,7 @@ fun MonAIDivider(modifier: Modifier = Modifier) {
     HorizontalDivider(
         modifier = modifier,
         thickness = MonAITheme.sizes.border,
-        color = MonAITheme.colors.divider
+        color = MonAITheme.colors.divider,
     )
 }
 
@@ -311,7 +311,7 @@ private fun SurfacesPreview() {
             }
             Column(
                 Modifier.padding(horizontal = 16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 MonAIScreenTitle("Wallets") {
                     MonAIButton(

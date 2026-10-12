@@ -1,14 +1,19 @@
 package com.djtech.monai.core.network
 
 import kotlinx.serialization.SerializationException
+import okhttp3.Headers
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.Protocol
+import okhttp3.Request
 import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertSame
 import org.junit.Test
 import retrofit2.HttpException
 import retrofit2.Response
 import java.io.IOException
+import kotlin.time.Duration.Companion.seconds
 
 class ApiErrorMapperTest {
 
@@ -104,6 +109,27 @@ class ApiErrorMapperTest {
     }
 
     @Test
+    fun `reads how long to wait from a Retry-After header in seconds`() {
+        val error = mapper.map(httpException(429, "", Headers.headersOf("Retry-After", "120"))) as ApiError.Http
+
+        assertEquals(120.seconds, error.retryAfter)
+    }
+
+    @Test
+    fun `a missing or unreadable Retry-After gives no wait`() {
+        // The backend only sends seconds; the HTTP-date form is not read.
+        val headers = listOf(
+            Headers.headersOf(),
+            Headers.headersOf("Retry-After", "Wed, 21 Oct 2026 07:28:00 GMT"),
+            Headers.headersOf("Retry-After", "-5"),
+        )
+
+        headers.forEach { headers ->
+            assertNull("$headers", (mapper.map(httpException(429, "", headers)) as ApiError.Http).retryAfter)
+        }
+    }
+
+    @Test
     fun `maps an IOException to a network error`() {
         assertSame(ApiError.Network, mapper.map(IOException("timeout")))
     }
@@ -115,7 +141,16 @@ class ApiErrorMapperTest {
         assertEquals(ApiError.Unknown(cause), mapper.map(cause))
     }
 
-    private fun httpException(status: Int, body: String) = HttpException(
-        Response.error<Any>(status, body.toResponseBody("application/json".toMediaType())),
+    private fun httpException(status: Int, body: String, headers: Headers = Headers.headersOf()) = HttpException(
+        Response.error<Any>(
+            body.toResponseBody("application/json".toMediaType()),
+            okhttp3.Response.Builder()
+                .code(status)
+                .message("Error")
+                .protocol(Protocol.HTTP_1_1)
+                .request(Request.Builder().url("http://localhost/").build())
+                .headers(headers)
+                .build(),
+        ),
     )
 }

@@ -409,7 +409,7 @@ private fun ListItemsPreview() {
             }
             MonAISettingsGroup(
                 "Money",
-                footer = "Only people with provider permissions see this section."
+                footer = "Only people with provider permissions see this section.",
             ) {
                 MonAISettingsRow(
                     "Monthly budget",

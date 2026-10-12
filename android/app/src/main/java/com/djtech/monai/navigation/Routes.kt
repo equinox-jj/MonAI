@@ -8,11 +8,13 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object WelcomeRoute : NavKey
 
+/** [email] is the one typed on Sign in, so the form doesn't start empty. */
 @Serializable
-data object RegisterRoute : NavKey
+data class RegisterRoute(val email: String = "") : NavKey
 
+/** [email] is the one typed on Register, e.g. after "already has an account". */
 @Serializable
-data object SignInRoute : NavKey
+data class SignInRoute(val email: String = "") : NavKey
 
 @Serializable
 data object HomeRoute : NavKey

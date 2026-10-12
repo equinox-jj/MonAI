@@ -55,7 +55,7 @@ fun MonAIFilterChip(
             .border(
                 sizes.border,
                 if (selected) colors.primaryContainerBorder else colors.borderStrong,
-                shape
+                shape,
             )
             .toggleable(value = selected, role = Role.Checkbox, onValueChange = { onClick() })
             .padding(horizontal = MonAITheme.spacing.x2_5),
@@ -173,15 +173,16 @@ fun MonAISegmentedControl(
                     .then(
                         if (selected && !colors.isDark) Modifier.shadow(
                             1.dp,
-                            CircleShape
-                        ) else Modifier
+                            CircleShape,
+                        ) else Modifier,
                     )
                     .clip(CircleShape)
                     .background(container)
                     .selectable(
                         selected = selected,
                         role = Role.Tab,
-                        onClick = { onSelect(index) }),
+                        onClick = { onSelect(index) },
+                    ),
                 contentAlignment = Alignment.Center,
             ) {
                 Text(segment.label, style = MonAITheme.typography.labelLarge, color = content)
