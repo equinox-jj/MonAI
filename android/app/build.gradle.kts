@@ -56,6 +56,22 @@ room3 {
     schemaDirectory("$projectDir/schemas")
 }
 
+// Debug avatar, receipt and logo URLs are signed for localhost:9000 (the backend's MINIO_PUBLIC_URL).
+// Forwarding the device's localhost:9000 to this machine lets the emulator or a USB phone load them.
+// Runs after every debug build, which Android Studio's Run also does; without a single connected
+// device it only prints adb's message.
+val adbReverseMinio = tasks.register<Exec>("adbReverseMinio") {
+    group = "install"
+    description = "Forwards the connected device's localhost:9000 to the local MinIO."
+    executable = androidComponents.sdkComponents.adb.get().asFile.absolutePath
+    args("reverse", "tcp:9000", "tcp:9000")
+    isIgnoreExitValue = true
+}
+
+tasks.matching { it.name == "assembleDebug" || it.name == "installDebug" }.configureEach {
+    finalizedBy(adbReverseMinio)
+}
+
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
