@@ -5,21 +5,27 @@ import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.NOW
 import com.djtech.monai.core.model.OCTOBER
+import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.category
+import com.djtech.monai.core.model.draft
+import com.djtech.monai.core.model.draftConfidence
 import com.djtech.monai.core.model.transaction
 import com.djtech.monai.core.model.wallet
 import com.djtech.monai.feature.budgets.domain.repository.FakeBudgetRepository
-import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.event.CategoryCreationEvents
+import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
 import com.djtech.monai.feature.categories.domain.usecase.CreateCategoryUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCreatedCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveVisibleCategoriesUseCase
+import com.djtech.monai.feature.quickadd.domain.repository.FakeQuickAddRepository
+import com.djtech.monai.feature.quickadd.domain.usecase.SuggestCategoryUseCase
 import com.djtech.monai.feature.reports.domain.repository.FakeReportRepository
 import com.djtech.monai.feature.transactions.domain.event.TransactionDeletionEvents
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
@@ -30,6 +36,7 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.repository.FakeTransactionRepository
 import com.djtech.monai.feature.transactions.domain.usecase.CreateTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.DeleteTransactionUseCase
+import com.djtech.monai.feature.transactions.domain.usecase.FindCategoryForNoteUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionDependentsUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
@@ -71,6 +78,7 @@ class TransactionFormViewModelTest {
     private val categoryCreations = CategoryCreationEvents()
     private val lunch = transaction("lunch", note = "Makan siang", merchant = "Warteg", walletId = "gopay")
     private val transactions = FakeTransactionRepository(listOf(lunch))
+    private val quickAdd = FakeQuickAddRepository()
 
     private fun viewModel(
         id: String? = null,
@@ -90,6 +98,7 @@ class TransactionFormViewModelTest {
             observeCategories = ObserveCategoriesUseCase(categories),
             observeVisibleCategories = ObserveVisibleCategoriesUseCase(categories),
             observeCreatedCategories = ObserveCreatedCategoriesUseCase(categoryCreations),
+            suggestCategory = SuggestCategoryUseCase(FindCategoryForNoteUseCase(transactions), quickAdd, clock),
             clock = clock,
         )
     }
@@ -212,7 +221,7 @@ class TransactionFormViewModelTest {
             ),
             transactions.created,
         )
-        assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.Close), effects)
+        assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.Saved("new")), effects)
     }
 
     @Test
@@ -387,7 +396,7 @@ class TransactionFormViewModelTest {
         assertEquals("lunch", transactions.updated.single().first)
         assertEquals(3_500L, transactions.updated.single().second.amount)
         assertEquals("Warteg", transactions.updated.single().second.merchant)
-        assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.Close), effects)
+        assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.Saved("lunch")), effects)
     }
 
     @Test
@@ -405,5 +414,74 @@ class TransactionFormViewModelTest {
 
         assertEquals(listOf("lunch"), transactions.deletedIds)
         assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.Deleted("lunch")), effects)
+    }
+
+    @Test
+    fun `a quick-add draft fills the form and marks its unsure fields`() = runFormTest(
+        preset = TransactionFormPreset(
+            draft = draft(
+                amount = null,
+                walletId = "bca",
+                categoryId = "food",
+                date = today.minusDays(1),
+                note = "Kopi",
+                confidence = draftConfidence(amount = 0.0, wallet = 0.5),
+            ),
+        ),
+    ) { vm, _ ->
+        val state = vm.state.value
+        assertEquals(0L, state.amount)
+        assertEquals("food", state.categoryId)
+        assertEquals(today.minusDays(1), state.date)
+        assertEquals("Kopi", state.note)
+        assertEquals(
+            mapOf(
+                TransactionField.AMOUNT to FieldHighlight.Low,
+                TransactionField.WALLET to FieldHighlight.Low,
+                TransactionField.CATEGORY to FieldHighlight.Ai,
+                TransactionField.DATE to FieldHighlight.Ai,
+            ),
+            state.highlights,
+        )
+
+        send(vm, TransactionFormIntent.Digit(9))
+
+        assertNull(vm.state.value.highlights[TransactionField.AMOUNT])
+    }
+
+    @Test
+    fun `a quick-add draft is saved as a quick add`() =
+        runFormTest(preset = TransactionFormPreset(draft = draft())) { vm, _ ->
+            send(vm, TransactionFormIntent.Save)
+
+            assertEquals(TransactionSource.QUICK_ADD, transactions.created.single().source)
+        }
+
+    @Test
+    fun `typing a note suggests the category used for it before`() = runFormTest { vm, _ ->
+        categories.categories.value += category("drinks")
+        transactions.noteCategories = mapOf("kopi kenangan" to "drinks")
+
+        send(vm, TransactionFormIntent.NoteChanged("Kopi Kenangan"))
+
+        assertEquals("drinks", vm.state.value.categoryId)
+        assertEquals(FieldHighlight.Ai, vm.state.value.highlights[TransactionField.CATEGORY])
+    }
+
+    @Test
+    fun `a category the user picked is never replaced by a suggestion`() = runFormTest { vm, _ ->
+        categories.categories.value += category("drinks")
+        transactions.noteCategories = mapOf("kopi kenangan" to "drinks")
+
+        send(vm, TransactionFormIntent.PickCategory("food"), TransactionFormIntent.NoteChanged("Kopi Kenangan"))
+
+        assertEquals("food", vm.state.value.categoryId)
+    }
+
+    @Test
+    fun `scan opens the receipt scanner`() = runFormTest { vm, effects ->
+        send(vm, TransactionFormIntent.Scan)
+
+        assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.OpenScan), effects)
     }
 }

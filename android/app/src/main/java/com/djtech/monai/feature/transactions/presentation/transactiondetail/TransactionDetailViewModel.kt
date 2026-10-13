@@ -7,8 +7,11 @@ import com.djtech.monai.core.common.flow.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.media.ImageProcessor
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
+import com.djtech.monai.feature.transactions.domain.model.ReceiptUpload
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
+import com.djtech.monai.feature.transactions.domain.usecase.AttachReceiptUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.DeleteTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
@@ -39,6 +42,8 @@ class TransactionDetailViewModel @AssistedInject constructor(
     observeTransaction: ObserveTransactionUseCase,
     private val refreshTransaction: RefreshTransactionUseCase,
     private val deleteTransaction: DeleteTransactionUseCase,
+    private val attachReceipt: AttachReceiptUseCase,
+    private val imageProcessor: ImageProcessor,
     observeCategories: ObserveCategoriesUseCase,
     observeAllWallets: ObserveAllWalletsUseCase,
     private val clock: AppClock,
@@ -64,6 +69,8 @@ class TransactionDetailViewModel @AssistedInject constructor(
             loadError = if (transaction == null) ui.fetchError else null,
             isDeleting = ui.isDeleting,
             isReceiptOpen = ui.isReceiptOpen && transaction?.receiptUrl != null,
+            isPhotoSourceOpen = ui.isPhotoSourceOpen,
+            receiptUpload = ui.receiptUpload,
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, TransactionDetailState(today = clock.today()))
 
@@ -82,6 +89,22 @@ class TransactionDetailViewModel @AssistedInject constructor(
             TransactionDetailIntent.Retry -> fetch()
             TransactionDetailIntent.OpenReceipt -> ui.update { it.copy(isReceiptOpen = true) }
             TransactionDetailIntent.CloseReceipt -> ui.update { it.copy(isReceiptOpen = false) }
+            TransactionDetailIntent.AddReceipt -> if (ui.value.receiptUpload == null) {
+                ui.update { it.copy(isPhotoSourceOpen = true) }
+            }
+
+            TransactionDetailIntent.TakeReceiptPhoto -> {
+                ui.update { it.copy(isPhotoSourceOpen = false) }
+                send(TransactionDetailEffect.LaunchCamera(imageProcessor.newCameraUri()))
+            }
+
+            TransactionDetailIntent.ChooseReceiptPhoto -> {
+                ui.update { it.copy(isPhotoSourceOpen = false) }
+                send(TransactionDetailEffect.LaunchGallery)
+            }
+
+            TransactionDetailIntent.DismissPhotoSource -> ui.update { it.copy(isPhotoSourceOpen = false) }
+            is TransactionDetailIntent.ReceiptPhotoPicked -> intent.uri?.let(::uploadReceipt)
         }
     }
 
@@ -108,6 +131,27 @@ class TransactionDetailViewModel @AssistedInject constructor(
         }
     }
 
+    /** Uploads the photo and links it, adding the receipt or replacing the old one. */
+    private fun uploadReceipt(uri: String) {
+        if (ui.value.receiptUpload != null) return
+        ui.update { it.copy(receiptUpload = 0f) }
+        viewModelScope.launch {
+            attachReceipt(transactionId, uri).collect { step ->
+                when (step) {
+                    is ReceiptUpload.Progress -> ui.update { it.copy(receiptUpload = step.fraction) }
+                    is ReceiptUpload.Done -> {
+                        ui.update { it.copy(receiptUpload = null) }
+                        val message = when (val result = step.result) {
+                            is Outcome.Success -> UiText.Resource(R.string.transaction_detail_receipt_added)
+                            is Outcome.Failure -> result.error.toMessage()
+                        }
+                        send(TransactionDetailEffect.ShowMessage(message))
+                    }
+                }
+            }
+        }
+    }
+
     private fun send(effect: TransactionDetailEffect) {
         viewModelScope.launch { effectChannel.send(effect) }
     }
@@ -117,6 +161,8 @@ class TransactionDetailViewModel @AssistedInject constructor(
         val fetchError: UiText? = null,
         val isDeleting: Boolean = false,
         val isReceiptOpen: Boolean = false,
+        val isPhotoSourceOpen: Boolean = false,
+        val receiptUpload: Float? = null,
     )
 }
 

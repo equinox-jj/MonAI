@@ -166,6 +166,13 @@
     <string name="transaction_error_unexpected">Something went wrong. Try again in a moment.</string>
     <string name="transaction_error_not_found">This transaction no longer exists.</string>
     <string name="transaction_error_wallet_archived">Can\'t restore it: one of its wallets was archived.</string>
+    <string name="transaction_error_photo_too_large">This photo is too large, even after shrinking. Try another one.</string>
+    <string name="transaction_error_photo_unsupported">This photo can\'t be used. Try a JPEG or PNG.</string>
+    <plurals name="transaction_error_rate_limited">
+        <item quantity="one">Too many uploads. Try again in %1$d minute.</item>
+        <item quantity="other">Too many uploads. Try again in %1$d minutes.</item>
+    </plurals>
+    <string name="transaction_error_rate_limited_soon">Too many uploads. Try again in a few minutes.</string>
     <string name="transaction_try_again">Try again</string>
 
     <!-- Transactions: filters and month picker -->
@@ -241,6 +248,14 @@
     <string name="transaction_detail_receipt">Receipt photo</string>
     <string name="transaction_detail_receipt_meta">Location data removed</string>
     <string name="transaction_detail_receipt_view">View</string>
+    <string name="transaction_detail_receipt_add">Add receipt photo</string>
+    <string name="transaction_detail_receipt_add_meta">Location data is removed before upload</string>
+    <string name="transaction_detail_receipt_add_action">Add</string>
+    <string name="transaction_detail_receipt_replace">Replace</string>
+    <string name="transaction_detail_receipt_uploading">Uploading… %1$d%%</string>
+    <string name="transaction_detail_receipt_added">Receipt photo saved</string>
+    <string name="transaction_detail_photo_camera">Take a photo</string>
+    <string name="transaction_detail_photo_gallery">Choose from gallery</string>
     <string name="transaction_detail_receipt_close">Close receipt</string>
     <string name="transaction_detail_receipt_failed">Couldn\'t load the receipt. Reopen the transaction to try again.</string>
     <string name="transaction_detail_loading">Loading transaction</string>

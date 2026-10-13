@@ -32,8 +32,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.designsystem.component.MonAIAlertTone
 import com.djtech.monai.core.designsystem.component.MonAIButton
+import com.djtech.monai.core.designsystem.component.MonAIButtonSize
+import com.djtech.monai.core.designsystem.component.MonAIButtonVariant
+import com.djtech.monai.core.designsystem.component.MonAICategoryPickerSheet
+import com.djtech.monai.core.designsystem.component.MonAIDatePickerSheet
 import com.djtech.monai.core.designsystem.component.MonAIIconButton
 import com.djtech.monai.core.designsystem.component.MonAIInlineAlert
 import com.djtech.monai.core.designsystem.component.MonAISegmentedControl
@@ -42,21 +47,23 @@ import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.MonAIWalletPickerSheet
 import com.djtech.monai.core.designsystem.component.transactionTypeSegments
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
+import com.djtech.monai.feature.transactions.presentation.common.dateText
+import com.djtech.monai.feature.transactions.presentation.common.direction
+import com.djtech.monai.feature.transactions.presentation.common.label
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormAmount
-import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormCategoryPickerSheet
-import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormDatePickerSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormDiscardDialog
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormFields
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormKeypad
-import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormWalletPickerSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
+import com.djtech.monai.feature.transactions.presentation.transactionform.model.WalletTarget
 import com.djtech.monai.feature.transactions.presentation.transactionform.preview.TransactionFormPreviewData
 import kotlinx.coroutines.launch
 
@@ -65,6 +72,8 @@ import kotlinx.coroutines.launch
  * @param preset how a new transaction starts; ignored when editing.
  * @param onDeleted the edited transaction was deleted from here.
  * @param onNewCategory open the category form for a new category of this type.
+ * @param onSaved the transaction was saved; closes the form unless the caller does more.
+ * @param onScan the add form's Scan chip; hidden when null.
  * @param isSideSheet shown as a side sheet over the list on a wide screen, below no status bar.
  */
 @Composable
@@ -75,9 +84,11 @@ fun TransactionFormRoute(
     onNewCategory: (CategoryType) -> Unit,
     modifier: Modifier = Modifier,
     preset: TransactionFormPreset = TransactionFormPreset(),
+    onSaved: (String) -> Unit = { onClose() },
+    onScan: (() -> Unit)? = null,
     isSideSheet: Boolean = false,
     viewModel: TransactionFormViewModel = hiltViewModel<TransactionFormViewModel, TransactionFormViewModel.Factory>(
-        key = transactionId ?: "new-${preset.type}-${preset.walletId}",
+        key = transactionId ?: "new-${preset.type}-${preset.walletId}-${preset.draft.hashCode()}",
     ) {
         it.create(transactionId, preset)
     },
@@ -89,6 +100,8 @@ fun TransactionFormRoute(
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             TransactionFormEffect.Close -> onClose()
+            is TransactionFormEffect.Saved -> onSaved(effect.id)
+            TransactionFormEffect.OpenScan -> onScan?.invoke()
             is TransactionFormEffect.Deleted -> onDeleted(effect.id)
             is TransactionFormEffect.OpenNewCategory -> onNewCategory(effect.type)
             is TransactionFormEffect.ShowMessage -> scope.launch {
@@ -102,6 +115,7 @@ fun TransactionFormRoute(
         viewModel::onIntent,
         modifier,
         isSideSheet = isSideSheet,
+        canScan = onScan != null,
         snackbarHostState = snackbarHostState,
     )
 }
@@ -112,6 +126,7 @@ fun TransactionFormScreen(
     onIntent: (TransactionFormIntent) -> Unit,
     modifier: Modifier = Modifier,
     isSideSheet: Boolean = false,
+    canScan: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Box(
@@ -141,6 +156,15 @@ fun TransactionFormScreen(
                 titleStyle = MonAITheme.typography.headlineSmall,
                 windowInsets = if (isSideSheet) WindowInsets(0) else WindowInsets.statusBars,
             ) {
+                if (!state.isEdit && canScan) {
+                    MonAIButton(
+                        stringResource(R.string.transaction_form_scan),
+                        onClick = { onIntent(TransactionFormIntent.Scan) },
+                        variant = MonAIButtonVariant.Tonal,
+                        size = MonAIButtonSize.Small,
+                        leadingIcon = MonAIIcons.DocumentScanner,
+                    )
+                }
                 if (state.isEdit && !state.isLoading && state.loadError == null) {
                     MonAIIconButton(
                         MonAIIcons.Delete,
@@ -222,6 +246,7 @@ private fun FormContent(
                 amount = state.amount,
                 originalAmount = state.originalAmount,
                 error = state.errors[TransactionField.AMOUNT]?.asString(),
+                highlight = state.highlights[TransactionField.AMOUNT] ?: FieldHighlight.None,
             )
             TransactionFormFields(state, onIntent)
             if (state.isEdit) {
@@ -248,21 +273,43 @@ private fun FormContent(
 @Composable
 private fun FormSheets(state: TransactionFormState, onIntent: (TransactionFormIntent) -> Unit) {
     when (val sheet = state.sheet) {
-        is FormSheet.Category -> TransactionFormCategoryPickerSheet(
-            sheet,
-            state.type,
-            state.categories,
-            onIntent,
+        is FormSheet.Category -> MonAICategoryPickerSheet(
+            categories = state.categories,
+            selectedId = sheet.selectedId,
+            typeLabel = state.type.label(),
+            direction = state.type.direction(),
+            onSelect = { onIntent(TransactionFormIntent.SheetPickCategory(it)) },
+            onConfirm = { onIntent(TransactionFormIntent.ConfirmSheet) },
+            onDismiss = { onIntent(TransactionFormIntent.DismissSheet) },
+            onNewCategory = { onIntent(TransactionFormIntent.NewCategory) },
         )
 
-        is FormSheet.Wallet -> TransactionFormWalletPickerSheet(
-            sheet,
-            state.type,
-            state.wallets,
-            onIntent,
+        is FormSheet.Wallet -> MonAIWalletPickerSheet(
+            title = stringResource(
+                when {
+                    sheet.target == WalletTarget.DESTINATION -> R.string.transaction_picker_transfer_to
+                    state.type == TransactionType.TRANSFER -> R.string.transaction_picker_transfer_from
+                    state.type == TransactionType.INCOME -> R.string.transaction_picker_receive_into
+                    else -> R.string.transaction_picker_pay_from
+                },
+            ),
+            wallets = state.wallets,
+            selectedId = sheet.selectedId,
+            onSelect = { onIntent(TransactionFormIntent.SheetPickWallet(it)) },
+            onConfirm = { onIntent(TransactionFormIntent.ConfirmSheet) },
+            onDismiss = { onIntent(TransactionFormIntent.DismissSheet) },
         )
 
-        is FormSheet.Date -> TransactionFormDatePickerSheet(sheet, state.today, onIntent)
+        is FormSheet.Date -> MonAIDatePickerSheet(
+            selected = sheet.selected,
+            shownMonth = sheet.shownMonth,
+            today = state.today,
+            selectedLabel = dateText(sheet.selected, state.today),
+            onSelect = { onIntent(TransactionFormIntent.SheetPickDate(it)) },
+            onShowMonth = { onIntent(TransactionFormIntent.SheetShowMonth(it)) },
+            onConfirm = { onIntent(TransactionFormIntent.ConfirmSheet) },
+            onDismiss = { onIntent(TransactionFormIntent.DismissSheet) },
+        )
         null -> Unit
     }
 }

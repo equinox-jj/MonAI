@@ -158,3 +158,46 @@ fun report(
     expenseChangePercent = expenseChangePercent,
     categories = categories,
 )
+
+/** Every field at [sure] confidence unless overridden. */
+fun draftConfidence(
+    sure: Double = 0.95,
+    type: Double = sure,
+    amount: Double = sure,
+    wallet: Double = sure,
+    category: Double = sure,
+    date: Double = sure,
+) = DraftConfidence(
+    type = type,
+    amount = amount,
+    wallet = wallet,
+    category = category,
+    date = date,
+)
+
+fun draft(
+    amount: Long? = 35_000,
+    type: TransactionType? = TransactionType.EXPENSE,
+    walletId: String? = "bca",
+    toWalletId: String? = null,
+    categoryId: String? = "food",
+    date: LocalDate? = LocalDate.of(2026, 10, 10),
+    note: String? = "Makan siang",
+    merchant: String? = null,
+    confidence: DraftConfidence = draftConfidence(),
+) = TransactionDraft(
+    type = type,
+    amount = amount,
+    walletId = walletId,
+    toWalletId = toWalletId,
+    categoryId = categoryId,
+    date = date,
+    note = note,
+    merchant = merchant,
+    confidence = confidence,
+)
+
+fun receiptDraft(
+    draft: TransactionDraft = draft(note = null, merchant = "Toko Sumber Rejeki", amount = 187_500),
+    items: List<ReceiptItem> = listOf(ReceiptItem("Beras 5 kg", 1.0, 74_000), ReceiptItem("Telur 1 kg", 1.0, 29_000)),
+) = ReceiptDraft(draft, items)

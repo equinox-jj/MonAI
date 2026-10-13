@@ -45,14 +45,29 @@ data class TransactionDetailRoute(val id: String) : NavKey
 
 /**
  * [id] is the transaction to edit; null adds one, starting as [presetType] (expense when null)
- * from [presetWalletId] (the default wallet when null).
+ * from [presetWalletId] (the default wallet when null), or filled from a quick-add [draft].
  */
 @Serializable
 data class TransactionFormRoute(
     val id: String? = null,
     val presetType: TransactionType? = null,
     val presetWalletId: String? = null,
+    val draft: DraftKey? = null,
 ) : NavKey
+
+@Serializable
+data object QuickAddRoute : NavKey
+
+/** Several [drafts] read from one quick-add [phrase], reviewed one by one. */
+@Serializable
+data class QuickAddReviewRoute(val phrase: String, val drafts: List<DraftKey>) : NavKey
+
+@Serializable
+data object ScanReceiptRoute : NavKey
+
+/** The [draft] read from the photo at [photoUri]; [aiFailed] when the AI couldn't, so it is empty. */
+@Serializable
+data class ReceiptReviewRoute(val photoUri: String, val draft: ReceiptDraftKey, val aiFailed: Boolean) : NavKey
 
 /** [month] is `YYYY-MM`, the month to search first; null for the current one. */
 @Serializable
@@ -88,6 +103,10 @@ data class ProviderFormRoute(val id: String? = null) : NavKey
 internal fun NavKey.isFullScreen(): Boolean = when (this) {
     is TransactionDetailRoute,
     is TransactionFormRoute,
+    QuickAddRoute,
+    is QuickAddReviewRoute,
+    ScanReceiptRoute,
+    is ReceiptReviewRoute,
     is TransactionSearchRoute,
     is WalletDetailRoute,
     is WalletFormRoute,

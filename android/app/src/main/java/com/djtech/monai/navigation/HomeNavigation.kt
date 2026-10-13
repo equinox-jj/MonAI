@@ -5,7 +5,7 @@ import com.djtech.monai.feature.home.presentation.home.HomeDestination
 
 /**
  * Where Home's links lead. "See all" and the avatar switch tabs; search, transactions, the budget
- * and the report open on top of Home. Quick add and scan wait for their screens and do nothing until then.
+ * the report, quick add and receipt scanning open on top of Home.
  */
 internal fun MainNavigator.openFromHome(destination: HomeDestination) {
     when (destination) {
@@ -23,8 +23,7 @@ internal fun MainNavigator.openFromHome(destination: HomeDestination) {
         is HomeDestination.Budget -> navigate(BudgetRoute(destination.month.toApiString()))
         is HomeDestination.Report -> navigate(ReportRoute(destination.month.toApiString()))
 
-        HomeDestination.QuickAdd,
-        HomeDestination.ScanReceipt,
-            -> Unit
+        HomeDestination.QuickAdd -> navigate(QuickAddRoute)
+        HomeDestination.ScanReceipt -> navigate(ScanReceiptRoute)
     }
 }

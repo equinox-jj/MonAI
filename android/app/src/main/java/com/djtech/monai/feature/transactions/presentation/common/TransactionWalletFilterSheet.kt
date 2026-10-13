@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import com.djtech.monai.R
 import com.djtech.monai.core.designsystem.component.MonAIBottomSheet
 import com.djtech.monai.core.designsystem.component.MonAIDivider
+import com.djtech.monai.core.designsystem.component.MonAISheetButtons
 import com.djtech.monai.core.designsystem.component.WalletMonogram
 import com.djtech.monai.core.designsystem.component.label
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
@@ -59,7 +60,7 @@ internal fun TransactionWalletFilterSheet(
                 )
             }
         }
-        TransactionSheetButtons(
+        MonAISheetButtons(
             secondaryLabel = stringResource(R.string.transactions_sheet_clear),
             onSecondary = { onIntent(FilterIntent.ClearSheet) },
             primaryLabel = stringResource(

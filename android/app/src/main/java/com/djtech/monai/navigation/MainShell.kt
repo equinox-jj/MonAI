@@ -35,6 +35,10 @@ import com.djtech.monai.feature.categories.presentation.categories.CategoriesRou
 import com.djtech.monai.feature.categories.presentation.categoryform.CategoryFormRoute
 import com.djtech.monai.feature.home.presentation.home.HomeRoute
 import com.djtech.monai.feature.profile.presentation.editprofile.EditProfileRoute
+import com.djtech.monai.feature.quickadd.presentation.quickadd.QuickAddRoute
+import com.djtech.monai.feature.quickadd.presentation.quickaddreview.QuickAddReviewRoute
+import com.djtech.monai.feature.receipt.presentation.receiptreview.ReceiptReviewRoute
+import com.djtech.monai.feature.receipt.presentation.scanreceipt.ScanReceiptRoute
 import com.djtech.monai.feature.reports.presentation.report.ReportRoute
 import com.djtech.monai.feature.settings.presentation.manageproviders.ManageProvidersRoute
 import com.djtech.monai.feature.settings.presentation.providerform.ProviderFormRoute
@@ -169,10 +173,50 @@ private fun MainNavDisplay(
                             preset = TransactionFormPreset(
                                 type = key.presetType ?: TransactionType.EXPENSE,
                                 walletId = key.presetWalletId,
+                                draft = key.draft?.toModel(),
                             ),
+                            onSaved = { if (key.draft != null) navigator.closeQuickAdd() else navigator.goBack() },
+                            // Scanning is offered only on a blank add form.
+                            onScan = if (key.id == null && key.draft == null) {
+                                { navigator.navigate(ScanReceiptRoute) }
+                            } else {
+                                null
+                            },
                             isSideSheet = isExpanded,
                         )
                     }
+                }
+                entry<QuickAddRoute> {
+                    QuickAddRoute(
+                        onClose = navigator::goBack,
+                        onOpenForm = navigator::openDraftForm,
+                        onOpenReview = navigator::openDraftReview,
+                    )
+                }
+                entry<ScanReceiptRoute> {
+                    ScanReceiptRoute(
+                        onClose = navigator::goBack,
+                        onOpenReview = navigator::openReceiptReview,
+                        onOpenForm = navigator::typeInsteadOfScan,
+                    )
+                }
+                entry<ReceiptReviewRoute> { key ->
+                    ReceiptReviewRoute(
+                        photoUri = key.photoUri,
+                        receipt = key.draft.toModel(),
+                        aiFailed = key.aiFailed,
+                        onBack = navigator::goBack,
+                        onRetake = navigator::goBack,
+                        onSaved = navigator::showSavedReceipt,
+                    )
+                }
+                entry<QuickAddReviewRoute> { key ->
+                    QuickAddReviewRoute(
+                        phrase = key.phrase,
+                        drafts = key.drafts.map { it.toModel() },
+                        onBack = navigator::goBack,
+                        onFinish = navigator::closeQuickAdd,
+                    )
                 }
                 entry<TransactionSearchRoute> { key ->
                     SearchRoute(

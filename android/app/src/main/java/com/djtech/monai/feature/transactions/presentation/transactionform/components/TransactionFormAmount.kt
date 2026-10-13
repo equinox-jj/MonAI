@@ -20,6 +20,8 @@ import com.djtech.monai.core.common.format.MoneySign
 import com.djtech.monai.core.common.format.formatRupiah
 import com.djtech.monai.core.common.format.formatRupiahSigned
 import com.djtech.monai.core.common.format.formatThousands
+import com.djtech.monai.core.designsystem.component.FieldHighlight
+import com.djtech.monai.core.designsystem.component.HighlightIcon
 import com.djtech.monai.core.designsystem.component.color
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.designsystem.theme.tabular
@@ -29,7 +31,8 @@ import com.djtech.monai.feature.transactions.presentation.common.sign
 
 /**
  * The typed amount, "−Rp 35.000" style, colored by type. While editing, the saved amount shows
- * underneath once it differs. [error] is the amount's validation message.
+ * underneath once it differs. [error] is the amount's validation message. A drafted amount shows
+ * its [highlight]: a sparkle, or a warning to check it (or type it, when the draft had none).
  */
 @Composable
 internal fun TransactionFormAmount(
@@ -38,6 +41,7 @@ internal fun TransactionFormAmount(
     originalAmount: Long?,
     error: String?,
     modifier: Modifier = Modifier,
+    highlight: FieldHighlight = FieldHighlight.None,
 ) {
     val colors = MonAITheme.colors
     val prefix = when (type.sign()) {
@@ -72,9 +76,23 @@ internal fun TransactionFormAmount(
                 color = if (amount == 0L) colors.textDisabled else type.direction().color(),
                 maxLines = 1,
             )
+            if (error == null && highlight == FieldHighlight.Ai) {
+                HighlightIcon(highlight, Modifier.padding(bottom = MonAITheme.spacing.x2))
+            }
         }
         when {
             error != null -> Text(error, style = MonAITheme.typography.bodySmall, color = colors.errorText)
+            highlight == FieldHighlight.Low -> Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
+            ) {
+                HighlightIcon(highlight)
+                Text(
+                    stringResource(if (amount == 0L) R.string.ai_hint_amount_missing else R.string.ai_hint_check),
+                    style = MonAITheme.typography.bodySmall,
+                    color = colors.onWarningContainer,
+                )
+            }
             originalAmount != null && originalAmount != amount -> Text(
                 stringResource(R.string.transaction_form_was, formatRupiah(originalAmount)),
                 style = MonAITheme.typography.bodySmall.tabular(),

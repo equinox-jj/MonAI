@@ -325,4 +325,24 @@ class TransactionDaoTest {
         categoryId = null,
         type = type,
     ).loadAll()
+
+    @Test
+    fun latestCategoryForTextMatchesNoteOrMerchantAndPrefersTheNewestEdit() = runTest {
+        val later = Instant.parse("2026-10-05T00:00:00Z")
+        dao.upsertAll(
+            listOf(
+                transaction("old", note = " Kopi Kenangan ", categoryId = "food"),
+                transaction("new", note = "kopi kenangan", categoryId = "drinks").copy(updatedAt = later),
+                transaction("shop", merchant = "Indomaret", categoryId = "shopping"),
+                transaction("income", type = TransactionType.INCOME, note = "bonus", categoryId = "bonus"),
+                transaction("move", type = TransactionType.TRANSFER, note = "topup", categoryId = null),
+            ),
+        )
+
+        assertEquals("drinks", dao.latestCategoryForText("kopi kenangan", TransactionType.EXPENSE))
+        assertEquals("shopping", dao.latestCategoryForText("indomaret", TransactionType.EXPENSE))
+        assertEquals(null, dao.latestCategoryForText("bonus", TransactionType.EXPENSE))
+        assertEquals("bonus", dao.latestCategoryForText("bonus", TransactionType.INCOME))
+        assertEquals(null, dao.latestCategoryForText("topup", TransactionType.TRANSFER))
+    }
 }

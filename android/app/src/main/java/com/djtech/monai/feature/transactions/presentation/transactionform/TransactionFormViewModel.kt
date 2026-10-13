@@ -9,13 +9,16 @@ import com.djtech.monai.core.common.format.deleteDigit
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.Transaction
+import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCreatedCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveVisibleCategoriesUseCase
+import com.djtech.monai.feature.quickadd.domain.usecase.SuggestCategoryUseCase
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
@@ -29,6 +32,7 @@ import com.djtech.monai.feature.transactions.presentation.common.mapper.toMessag
 import com.djtech.monai.feature.transactions.presentation.common.model.TransactionLookups
 import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.categoryType
 import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toFieldMessages
+import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toHighlights
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormMode
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
@@ -40,12 +44,16 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
@@ -60,9 +68,11 @@ import java.time.YearMonth
 
 /**
  * Adds a transaction ([transactionId] null) or edits one. The keypad, type tabs and pickers edit a
- * draft; saving validates it in the use case and maps any field errors back onto the form.
+ * draft; saving validates it in the use case and maps any field errors back onto the form. A new
+ * transaction can start from a quick-add draft, and gets its category suggested from the note
+ * until the user picks one.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 @HiltViewModel(assistedFactory = TransactionFormViewModel.Factory::class)
 class TransactionFormViewModel @AssistedInject constructor(
     @Assisted private val transactionId: String?,
@@ -77,6 +87,7 @@ class TransactionFormViewModel @AssistedInject constructor(
     observeCategories: ObserveCategoriesUseCase,
     private val observeVisibleCategories: ObserveVisibleCategoriesUseCase,
     private val observeCreatedCategories: ObserveCreatedCategoriesUseCase,
+    private val suggestCategory: SuggestCategoryUseCase,
     private val clock: AppClock,
 ) : ViewModel() {
 
@@ -88,7 +99,17 @@ class TransactionFormViewModel @AssistedInject constructor(
     private val mode: TransactionFormMode =
         transactionId?.let(TransactionFormMode::Edit) ?: TransactionFormMode.Add
     private val editor = MutableStateFlow(
-        newDraft().let { draft -> Editor(draft = draft, pristine = draft, isLoading = transactionId != null) },
+        newDraft().let { draft ->
+            val highlights = preset.draft?.takeIf { transactionId == null }?.toHighlights().orEmpty()
+            Editor(
+                draft = draft,
+                pristine = draft,
+                isLoading = transactionId != null,
+                highlights = highlights,
+                // A sure drafted category counts as chosen, so the note doesn't override it.
+                categoryChosen = highlights[TransactionField.CATEGORY] == FieldHighlight.Ai,
+            )
+        },
     )
 
     private val categories: Flow<List<Category>> = editor
@@ -122,6 +143,7 @@ class TransactionFormViewModel @AssistedInject constructor(
             wallets = wallets,
             lookups = lookups,
             errors = editor.errors,
+            highlights = editor.highlights,
             sheet = editor.sheet,
             isSaving = editor.isSaving,
             isDeleting = editor.isDeleting,
@@ -139,6 +161,7 @@ class TransactionFormViewModel @AssistedInject constructor(
             prefillDestination()
         }
         selectCreatedCategories()
+        if (transactionId == null) suggestCategoriesFromNote()
     }
 
     fun onIntent(intent: TransactionFormIntent) {
@@ -147,8 +170,9 @@ class TransactionFormViewModel @AssistedInject constructor(
             is TransactionFormIntent.Digit -> editAmount { appendDigit(it, intent.digit) }
             TransactionFormIntent.TripleZero -> editAmount { appendDigit(appendDigit(appendDigit(it, 0), 0), 0) }
             TransactionFormIntent.Backspace -> editAmount(::deleteDigit)
-            is TransactionFormIntent.PickCategory -> editDraft(TransactionField.CATEGORY) {
-                it.copy(categoryId = intent.id)
+            is TransactionFormIntent.PickCategory -> {
+                editDraft(TransactionField.CATEGORY) { it.copy(categoryId = intent.id) }
+                editor.update { it.copy(categoryChosen = true) }
             }
 
             is TransactionFormIntent.NoteChanged -> editDraft(TransactionField.NOTE) {
@@ -199,6 +223,7 @@ class TransactionFormViewModel @AssistedInject constructor(
             TransactionFormIntent.KeepEditing -> editor.update { it.copy(showDiscardDialog = false) }
             TransactionFormIntent.Delete -> delete()
             TransactionFormIntent.Retry -> transactionId?.let(::load)
+            TransactionFormIntent.Scan -> send(TransactionFormEffect.OpenScan)
         }
     }
 
@@ -242,6 +267,8 @@ class TransactionFormViewModel @AssistedInject constructor(
                     toWalletId = destination,
                 ),
                 errors = editor.errors - TransactionField.CATEGORY - TransactionField.TO_WALLET,
+                highlights = editor.highlights - TransactionField.CATEGORY - TransactionField.TO_WALLET,
+                categoryChosen = editor.categoryChosen && keepsCategory,
             )
         }
     }
@@ -250,7 +277,9 @@ class TransactionFormViewModel @AssistedInject constructor(
         editDraft(TransactionField.AMOUNT) { it.copy(amount = edit(it.amount)) }
 
     private fun editDraft(field: TransactionField, edit: (Draft) -> Draft) {
-        editor.update { it.copy(draft = edit(it.draft), errors = it.errors - field) }
+        editor.update {
+            it.copy(draft = edit(it.draft), errors = it.errors - field, highlights = it.highlights - field)
+        }
     }
 
     private fun openSheet(sheet: FormSheet) = editor.update { it.copy(sheet = sheet) }
@@ -263,6 +292,7 @@ class TransactionFormViewModel @AssistedInject constructor(
         when (val sheet = editor.value.sheet) {
             is FormSheet.Category -> sheet.selectedId?.let { id ->
                 editDraft(TransactionField.CATEGORY) { it.copy(categoryId = id) }
+                editor.update { it.copy(categoryChosen = true) }
             }
 
             is FormSheet.Wallet -> sheet.selectedId?.let { id ->
@@ -292,6 +322,7 @@ class TransactionFormViewModel @AssistedInject constructor(
             date = draft.date,
             note = draft.note,
             merchant = draft.merchant,
+            source = if (preset.draft != null) TransactionSource.QUICK_ADD else TransactionSource.MANUAL,
         )
         editor.update { it.copy(isSaving = true) }
         viewModelScope.launch {
@@ -302,7 +333,7 @@ class TransactionFormViewModel @AssistedInject constructor(
             }
             editor.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(TransactionFormEffect.Close)
+                is Outcome.Success -> send(TransactionFormEffect.Saved(result.data.id))
                 is Outcome.Failure -> when (val error = result.error) {
                     is TransactionError.InvalidFields -> editor.update {
                         it.copy(errors = error.errors.toFieldMessages())
@@ -314,8 +345,50 @@ class TransactionFormViewModel @AssistedInject constructor(
         }
     }
 
-    /** The chosen source wallet, else the default one. */
-    private fun newDraft() = Draft(type = preset.type, walletId = preset.walletId, date = clock.today())
+    /** The preset's quick-add draft, else its type and wallet (null: the default one). */
+    private fun newDraft(): Draft {
+        val draft = preset.draft ?: return Draft(type = preset.type, walletId = preset.walletId, date = clock.today())
+        return Draft(
+            type = draft.type ?: TransactionType.EXPENSE,
+            amount = draft.amount ?: 0,
+            walletId = draft.walletId,
+            toWalletId = draft.toWalletId,
+            categoryId = draft.categoryId,
+            date = draft.date?.takeIf { !it.isAfter(clock.today()) } ?: clock.today(),
+            note = draft.note.orEmpty(),
+            merchant = draft.merchant,
+        )
+    }
+
+    /**
+     * Auto-categorization: once the note rests for a moment, picks the category the user's history,
+     * the keywords or the AI suggest, until the user picks one themselves.
+     */
+    private fun suggestCategoriesFromNote() {
+        viewModelScope.launch {
+            editor
+                .map { it.draft.note.trim() }
+                .distinctUntilChanged()
+                .drop(1)
+                .debounce(SUGGEST_DELAY_MS)
+                .collectLatest { note ->
+                    val current = editor.value
+                    val type = current.draft.type
+                    val skip = note.isEmpty() || current.categoryChosen || type == TransactionType.TRANSFER
+                    if (skip) return@collectLatest
+                    val categories = state.value.categories
+                    val id = suggestCategory(note, type, categories) ?: return@collectLatest
+                    editor.update { editor ->
+                        if (editor.categoryChosen || editor.draft.type != type) return@update editor
+                        editor.copy(
+                            draft = editor.draft.copy(categoryId = id),
+                            errors = editor.errors - TransactionField.CATEGORY,
+                            highlights = editor.highlights + (TransactionField.CATEGORY to FieldHighlight.Ai),
+                        )
+                    }
+                }
+        }
+    }
 
     // A preset transfer starts out to the first other wallet, as picking the Transfer tab does. It still
     // counts as untouched, so closing right away doesn't ask to discard.
@@ -402,6 +475,9 @@ private data class Editor(
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
     val showDiscardDialog: Boolean = false,
+    val highlights: Map<TransactionField, FieldHighlight> = emptyMap(),
+    /** The user picked the category, so note suggestions stop. */
+    val categoryChosen: Boolean = false,
 )
 
 private fun Transaction.toDraft() = Draft(
@@ -414,6 +490,8 @@ private fun Transaction.toDraft() = Draft(
     note = note.orEmpty(),
     merchant = merchant,
 )
+
+private const val SUGGEST_DELAY_MS = 600L
 
 private fun List<Wallet>.defaultWallet(): Wallet? = firstOrNull(Wallet::isDefault) ?: firstOrNull()
 

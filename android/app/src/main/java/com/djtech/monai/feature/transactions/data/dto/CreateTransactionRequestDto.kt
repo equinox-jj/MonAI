@@ -17,4 +17,5 @@ data class CreateTransactionRequestDto(
     @SerialName("note") val note: String? = null,
     @SerialName("merchant") val merchant: String? = null,
     @SerialName("source") val source: TransactionSource,
+    @SerialName("receipt_key") val receiptKey: String? = null,
 )

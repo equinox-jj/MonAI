@@ -103,6 +103,22 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE date BETWEEN :from AND :to ORDER BY date DESC, id DESC LIMIT :limit")
     fun observeRecent(from: LocalDate, to: LocalDate, limit: Int): Flow<List<TransactionEntity>>
 
+    /**
+     * The category of the newest [type] transaction whose note or merchant, trimmed and lowercased,
+     * is [text] (already lowercase). Newest by last edit, so a corrected category wins next time.
+     */
+    @Query(
+        """
+        SELECT category_id FROM transactions
+        WHERE type = :type
+          AND category_id IS NOT NULL
+          AND (lower(trim(note)) = :text OR lower(trim(merchant)) = :text)
+        ORDER BY updated_at DESC
+        LIMIT 1
+        """,
+    )
+    suspend fun latestCategoryForText(text: String, type: TransactionType): String?
+
     @Upsert
     suspend fun upsertAll(transactions: List<TransactionEntity>)
 

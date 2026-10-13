@@ -4,14 +4,19 @@ import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.network.model.ApiResponse
 import com.djtech.monai.core.network.model.CursorResponse
 import com.djtech.monai.core.network.model.EmptyResponse
+import com.djtech.monai.feature.transactions.data.dto.AttachReceiptRequestDto
 import com.djtech.monai.feature.transactions.data.dto.CreateTransactionRequestDto
+import com.djtech.monai.feature.transactions.data.dto.ReceiptUploadDto
 import com.djtech.monai.feature.transactions.data.dto.TransactionDto
+import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
+import retrofit2.http.Part
 import retrofit2.http.Path
 import retrofit2.http.Query
 
@@ -44,6 +49,18 @@ interface TransactionApiService {
         @Path("id") id: String,
         @Body body: RequestBody,
     ): ApiResponse<TransactionDto>
+
+    /** Links an uploaded receipt photo to the transaction, leaving every other field as it is. */
+    @PATCH("transactions/{id}")
+    suspend fun attachReceipt(
+        @Path("id") id: String,
+        @Body request: AttachReceiptRequestDto,
+    ): ApiResponse<TransactionDto>
+
+    /** JPEG or WebP up to 5 MB; build [file] with `filePart`. */
+    @Multipart
+    @POST("transactions/receipt")
+    suspend fun uploadReceipt(@Part file: MultipartBody.Part): ApiResponse<ReceiptUploadDto>
 
     @DELETE("transactions/{id}")
     suspend fun deleteTransaction(@Path("id") id: String): EmptyResponse

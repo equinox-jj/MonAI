@@ -162,6 +162,12 @@
     <string name="transaction_error_unexpected">Terjadi kesalahan. Coba lagi sebentar lagi.</string>
     <string name="transaction_error_not_found">Transaksi ini sudah tidak ada.</string>
     <string name="transaction_error_wallet_archived">Tidak bisa dipulihkan: salah satu dompetnya sudah diarsipkan.</string>
+    <string name="transaction_error_photo_too_large">Foto ini terlalu besar, bahkan setelah diperkecil. Coba foto lain.</string>
+    <string name="transaction_error_photo_unsupported">Foto ini tidak bisa dipakai. Coba JPEG atau PNG.</string>
+    <plurals name="transaction_error_rate_limited">
+        <item quantity="other">Terlalu banyak unggahan. Coba lagi dalam %1$d menit.</item>
+    </plurals>
+    <string name="transaction_error_rate_limited_soon">Terlalu banyak unggahan. Coba lagi beberapa menit lagi.</string>
     <string name="transaction_try_again">Coba lagi</string>
 
     <!-- Transactions: filters and month picker -->
@@ -237,6 +243,14 @@
     <string name="transaction_detail_receipt">Foto struk</string>
     <string name="transaction_detail_receipt_meta">Data lokasi dihapus</string>
     <string name="transaction_detail_receipt_view">Lihat</string>
+    <string name="transaction_detail_receipt_add">Tambah foto struk</string>
+    <string name="transaction_detail_receipt_add_meta">Data lokasi dihapus sebelum diunggah</string>
+    <string name="transaction_detail_receipt_add_action">Tambah</string>
+    <string name="transaction_detail_receipt_replace">Ganti</string>
+    <string name="transaction_detail_receipt_uploading">Mengunggah… %1$d%%</string>
+    <string name="transaction_detail_receipt_added">Foto struk disimpan</string>
+    <string name="transaction_detail_photo_camera">Ambil foto</string>
+    <string name="transaction_detail_photo_gallery">Pilih dari galeri</string>
     <string name="transaction_detail_receipt_close">Tutup struk</string>
     <string name="transaction_detail_receipt_failed">Gagal memuat struk. Buka ulang transaksi untuk mencoba lagi.</string>
     <string name="transaction_detail_loading">Memuat transaksi</string>

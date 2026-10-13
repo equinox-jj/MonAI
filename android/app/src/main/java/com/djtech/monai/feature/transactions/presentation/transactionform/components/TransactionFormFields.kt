@@ -12,7 +12,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.djtech.monai.R
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.designsystem.component.MonAICategoryIcon
+import com.djtech.monai.core.designsystem.component.MonAIFieldTile
+import com.djtech.monai.core.designsystem.component.MonAITileIcon
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.TransactionType
@@ -36,13 +39,15 @@ internal fun TransactionFormFields(
     val horizontal = Modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal)
     val choose = stringResource(R.string.transaction_form_choose)
     val errors = state.errors.mapValues { it.value.asString() }
+    val check = stringResource(R.string.ai_hint_check)
+    fun highlight(field: TransactionField) = state.highlights[field] ?: FieldHighlight.None
     Column(modifier, verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x3)) {
         when {
             state.type == TransactionType.TRANSFER -> TransferWallets(state, errors, onIntent, horizontal)
             state.isEdit -> {
                 val category = state.lookups.category(state.categoryId)
                 val (icon, color) = category.iconAndColor()
-                TransactionFormFieldTile(
+                MonAIFieldTile(
                     label = stringResource(R.string.transaction_form_category),
                     value = category?.name ?: choose,
                     onClick = { onIntent(TransactionFormIntent.OpenCategoryPicker) },
@@ -57,6 +62,8 @@ internal fun TransactionFormFields(
                     },
                     showChevron = true,
                     error = errors[TransactionField.CATEGORY],
+                    highlight = highlight(TransactionField.CATEGORY),
+                    hint = check,
                 )
             }
 
@@ -66,27 +73,32 @@ internal fun TransactionFormFields(
                 error = errors[TransactionField.CATEGORY],
                 onPick = { onIntent(TransactionFormIntent.PickCategory(it)) },
                 onShowAll = { onIntent(TransactionFormIntent.OpenCategoryPicker) },
+                highlight = highlight(TransactionField.CATEGORY),
             )
         }
         Row(horizontal.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2)) {
             if (state.type != TransactionType.TRANSFER) {
-                TransactionFormFieldTile(
+                MonAIFieldTile(
                     label = if (state.isEdit) stringResource(R.string.transaction_form_wallet) else null,
                     value = state.lookups.wallet(state.walletId)?.name ?: choose,
                     onClick = { onIntent(TransactionFormIntent.OpenWalletPicker(WalletTarget.SOURCE)) },
                     modifier = Modifier.weight(1f),
-                    leading = { TileIcon(MonAIIcons.AccountBalanceWallet) },
+                    leading = { MonAITileIcon(MonAIIcons.AccountBalanceWallet) },
                     showChevron = !state.isEdit,
                     error = errors[TransactionField.WALLET],
+                    highlight = highlight(TransactionField.WALLET),
+                    hint = check,
                 )
             }
-            TransactionFormFieldTile(
+            MonAIFieldTile(
                 label = if (state.isEdit) stringResource(R.string.transaction_form_date) else null,
                 value = dateText(state.date, state.today),
                 onClick = { onIntent(TransactionFormIntent.OpenDatePicker) },
                 modifier = Modifier.weight(1f),
-                leading = { TileIcon(MonAIIcons.CalendarToday) },
+                leading = { MonAITileIcon(MonAIIcons.CalendarToday) },
                 error = errors[TransactionField.DATE],
+                highlight = highlight(TransactionField.DATE),
+                hint = check,
             )
         }
         TransactionFormNote(
@@ -107,12 +119,13 @@ private fun TransferWallets(
 ) {
     val choose = stringResource(R.string.transaction_form_choose)
     Row(modifier.fillMaxWidth(), verticalAlignment = Alignment.Top) {
-        TransactionFormFieldTile(
+        MonAIFieldTile(
             label = stringResource(R.string.transaction_form_from),
             value = state.lookups.wallet(state.walletId)?.name ?: choose,
             onClick = { onIntent(TransactionFormIntent.OpenWalletPicker(WalletTarget.SOURCE)) },
             modifier = Modifier.weight(1f),
             error = errors[TransactionField.WALLET],
+            highlight = state.highlights[TransactionField.WALLET] ?: FieldHighlight.None,
         )
         Icon(
             MonAIIcons.ArrowForward,
@@ -122,12 +135,13 @@ private fun TransferWallets(
                 .size(MonAITheme.sizes.icon),
             tint = MonAITheme.colors.accent,
         )
-        TransactionFormFieldTile(
+        MonAIFieldTile(
             label = stringResource(R.string.transaction_form_to),
             value = state.lookups.wallet(state.toWalletId)?.name ?: choose,
             onClick = { onIntent(TransactionFormIntent.OpenWalletPicker(WalletTarget.DESTINATION)) },
             modifier = Modifier.weight(1f),
             error = errors[TransactionField.TO_WALLET],
+            highlight = state.highlights[TransactionField.TO_WALLET] ?: FieldHighlight.None,
         )
     }
 }

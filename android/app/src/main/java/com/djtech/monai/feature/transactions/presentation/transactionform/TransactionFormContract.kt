@@ -2,6 +2,7 @@ package com.djtech.monai.feature.transactions.presentation.transactionform
 
 import androidx.compose.runtime.Immutable
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
@@ -25,6 +26,7 @@ import java.time.YearMonth
  * @param wallets wallets that are not archived, for the pickers.
  * @param lookups names of every wallet and category, archived and hidden ones included.
  * @param errors one message per invalid field, from the device's checks or the server's.
+ * @param highlights fields drafted by quick add or suggested from the note, until the user changes them.
  */
 @Immutable
 data class TransactionFormState(
@@ -44,6 +46,7 @@ data class TransactionFormState(
     val wallets: List<Wallet> = emptyList(),
     val lookups: TransactionLookups = TransactionLookups(),
     val errors: Map<TransactionField, UiText> = emptyMap(),
+    val highlights: Map<TransactionField, FieldHighlight> = emptyMap(),
     val sheet: FormSheet? = null,
     val isSaving: Boolean = false,
     val isDeleting: Boolean = false,
@@ -102,11 +105,17 @@ sealed interface TransactionFormIntent {
     data object Delete : TransactionFormIntent
 
     data object Retry : TransactionFormIntent
+
+    /** The header's Scan chip: scan a receipt instead. */
+    data object Scan : TransactionFormIntent
 }
 
 sealed interface TransactionFormEffect {
-    /** Saved, or closed without saving. */
+    /** Closed without saving. */
     data object Close : TransactionFormEffect
+
+    /** Saved as transaction [id]. */
+    data class Saved(val id: String) : TransactionFormEffect
 
     /** The edited transaction was deleted, so its detail screen should close too. */
     data class Deleted(val id: String) : TransactionFormEffect
@@ -115,4 +124,6 @@ sealed interface TransactionFormEffect {
 
     /** Opens the category form; the category it creates comes back selected in the picker. */
     data class OpenNewCategory(val type: CategoryType) : TransactionFormEffect
+
+    data object OpenScan : TransactionFormEffect
 }

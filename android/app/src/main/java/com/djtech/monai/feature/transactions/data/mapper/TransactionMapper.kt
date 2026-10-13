@@ -1,7 +1,6 @@
 package com.djtech.monai.feature.transactions.data.mapper
 
 import com.djtech.monai.core.model.Transaction
-import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.network.ApiError
 import com.djtech.monai.core.network.FieldError
 import com.djtech.monai.core.network.NetworkJson
@@ -46,7 +45,8 @@ fun TransactionInput.toCreateRequest() = CreateTransactionRequestDto(
     date = date.toString(),
     note = note,
     merchant = merchant,
-    source = TransactionSource.MANUAL,
+    source = source,
+    receiptKey = receiptKey,
 )
 
 fun TransactionInput.toUpdateRequest() = UpdateTransactionRequestDto(
@@ -74,7 +74,8 @@ fun ApiError.toTransactionError(): TransactionError = when (this) {
     is ApiError.Http -> when (code) {
         "not_found" -> TransactionError.NotFound
         "wallet_archived" -> TransactionError.WalletArchived
-        "validation_failed" -> fields
+        "rate_limited" -> TransactionError.RateLimited(retryAfter)
+        "validation_failed" -> fields.toPhotoError() ?: fields
             .mapNotNull { field -> API_FIELDS[field.field]?.let { TransactionFieldError(it, field.toFieldIssue()) } }
             .takeIf { it.isNotEmpty() }
             ?.let(TransactionError::InvalidFields)
@@ -82,6 +83,11 @@ fun ApiError.toTransactionError(): TransactionError = when (this) {
 
         else -> TransactionError.Unexpected
     }
+}
+
+// A receipt upload reports its problems on the `file` field.
+private fun List<FieldError>.toPhotoError(): TransactionError? = firstOrNull { it.field == "file" }?.let {
+    if (it.code == "max_size") TransactionError.PhotoTooLarge else TransactionError.PhotoUnsupported
 }
 
 private fun FieldError.toFieldIssue(): TransactionFieldIssue = when (code) {

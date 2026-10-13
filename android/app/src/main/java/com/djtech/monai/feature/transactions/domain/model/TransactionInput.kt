@@ -1,5 +1,6 @@
 package com.djtech.monai.feature.transactions.domain.model
 
+import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.TransactionType
 import java.time.LocalDate
 
@@ -10,6 +11,8 @@ import java.time.LocalDate
  * @param amount rupiah, positive; [type] gives the direction.
  * @param toWalletId only for a transfer.
  * @param categoryId only for an expense or income.
+ * @param source how it was entered: by hand, from quick add or from a receipt.
+ * @param receiptKey from an uploaded receipt photo; only sent when creating.
  */
 data class TransactionInput(
     val type: TransactionType,
@@ -20,4 +23,6 @@ data class TransactionInput(
     val date: LocalDate,
     val note: String?,
     val merchant: String? = null,
+    val source: TransactionSource = TransactionSource.MANUAL,
+    val receiptKey: String? = null,
 )

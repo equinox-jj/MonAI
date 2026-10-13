@@ -2,9 +2,10 @@ package com.djtech.monai.feature.transactions.domain.repository
 
 import androidx.paging.PagingData
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.media.EncodedImage
 import com.djtech.monai.core.model.Transaction
-import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.TransactionType
+import com.djtech.monai.feature.transactions.domain.model.ReceiptUpload
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
@@ -44,6 +45,14 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
     val refreshedIds = mutableListOf<String>()
     val pagedQueries = mutableListOf<Pair<YearMonth, TransactionFilter>>()
     val searches = mutableListOf<Triple<String, YearMonth?, TransactionFilter>>()
+
+    /** What a receipt upload ends with, after reporting half and full progress. */
+    var uploadResult: TransactionResult<String> = Outcome.Success("receipts-pending/key.webp")
+    val uploadedImages = mutableListOf<EncodedImage>()
+    val attached = mutableListOf<Pair<String, String>>()
+
+    /** Answers [findCategoryForNote] by lowercase text. */
+    var noteCategories: Map<String, String> = emptyMap()
 
     override fun observeRecentTransactions(month: YearMonth, limit: Int): Flow<List<Transaction>> =
         transactions.map { list -> list.filter { YearMonth.from(it.date) == month }.sorted().take(limit) }
@@ -128,6 +137,25 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
         return restoreResult ?: Outcome.Failure(TransactionError.NotFound)
     }
 
+    override fun uploadReceipt(image: EncodedImage): Flow<ReceiptUpload<String>> = flow {
+        uploadedImages += image
+        emit(ReceiptUpload.Progress(0.5f))
+        emit(ReceiptUpload.Progress(1f))
+        emit(ReceiptUpload.Done(uploadResult))
+    }
+
+    override suspend fun attachReceipt(id: String, receiptKey: String): TransactionResult<Transaction> {
+        attached += id to receiptKey
+        gate?.await()
+        val cached = transactions.value.find { it.id == id } ?: return Outcome.Failure(TransactionError.NotFound)
+        val updated = cached.copy(receiptUrl = "https://files.example.com/$receiptKey")
+        transactions.value = transactions.value.map { if (it.id == id) updated else it }
+        return Outcome.Success(updated)
+    }
+
+    override suspend fun findCategoryForNote(text: String, type: TransactionType): String? =
+        noteCategories[text.trim().lowercase()]
+
     // One page of what is cached when collected; a finite flow, so Paging's asSnapshot completes.
     private fun page(select: (List<Transaction>) -> List<Transaction>): Flow<PagingData<Transaction>> =
         flow { emit(PagingData.from(select(transactions.value).sorted())) }
@@ -160,7 +188,7 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
         note = note,
         merchant = merchant,
         receiptUrl = null,
-        source = TransactionSource.MANUAL,
+        source = source,
         createdAt = Instant.EPOCH,
         updatedAt = Instant.EPOCH,
     )

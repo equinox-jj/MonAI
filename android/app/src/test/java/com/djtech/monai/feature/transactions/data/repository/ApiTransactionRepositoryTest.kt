@@ -1,13 +1,14 @@
 package com.djtech.monai.feature.transactions.data.repository
 
-import com.djtech.monai.core.common.log.RecordingErrorLogger
 import androidx.paging.testing.asSnapshot
+import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.database.FakeTransactionDao
 import com.djtech.monai.core.database.entity.TransactionEntity
 import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
+import com.djtech.monai.core.media.EncodedImage
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.TransactionType
@@ -15,6 +16,7 @@ import com.djtech.monai.core.network.ApiCaller
 import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.transactions.data.remote.TransactionApiService
+import com.djtech.monai.feature.transactions.domain.model.ReceiptUpload
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.domain.model.TransactionFieldError
@@ -22,6 +24,8 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionFieldIssue
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -436,6 +440,101 @@ class ApiTransactionRepositoryTest {
     }
 
     private fun envelope(data: String) = """{"success":true,"message":"OK","data":$data}"""
+
+    @Test
+    fun `createTransaction sends the source and the receipt key`() = runTest {
+        server.enqueue(MockResponse(code = 201, body = envelope(LUNCH_JSON)))
+
+        repository(FakeTransactionDao()).createTransaction(
+            TRANSFER_INPUT.copy(source = TransactionSource.RECEIPT, receiptKey = "receipts-pending/u1/a.webp"),
+        )
+
+        assertEquals(
+            """{"type":"TRANSFER","amount":500000,"wallet_id":"bca","to_wallet_id":"gopay","date":"2026-10-10",""" +
+                """"source":"RECEIPT","receipt_key":"receipts-pending/u1/a.webp"}""",
+            server.takeRequest().body?.utf8(),
+        )
+    }
+
+    @Test
+    fun `uploadReceipt posts the photo as a file part and ends with its key`() = runTest {
+        server.enqueue(
+            MockResponse(
+                code = 200,
+                body = """{"success":true,"message":"OK","data":{"receipt_key":"receipts-pending/u1/a.webp"}}""",
+            ),
+        )
+
+        val steps = repository(FakeTransactionDao())
+            .uploadReceipt(EncodedImage(byteArrayOf(1, 2, 3), "image/webp"))
+            .toList()
+
+        assertEquals(ReceiptUpload.Done(Outcome.Success("receipts-pending/u1/a.webp")), steps.last())
+        assertEquals(ReceiptUpload.Progress(1f), steps[steps.lastIndex - 1])
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/v1/transactions/receipt", request.url.encodedPath)
+        val body = request.body?.utf8().orEmpty()
+        assertEquals(true, body.contains("""name="file"; filename="file.webp""""))
+    }
+
+    @Test
+    fun `uploadReceipt maps the file and rate limit errors`() = runTest {
+        server.enqueue(MockResponse(code = 422, body = fileErrorBody("max_size")))
+        server.enqueue(MockResponse(code = 422, body = fileErrorBody("content_type")))
+        server.enqueue(MockResponse(code = 429, body = errorBody("rate_limited")))
+        val repository = repository(FakeTransactionDao())
+        val image = EncodedImage(byteArrayOf(1), "image/webp")
+
+        val results = List(3) { (repository.uploadReceipt(image).last() as ReceiptUpload.Done).result }
+
+        assertEquals(
+            listOf(
+                Outcome.Failure(TransactionError.PhotoTooLarge),
+                Outcome.Failure(TransactionError.PhotoUnsupported),
+                Outcome.Failure(TransactionError.RateLimited(null)),
+            ),
+            results,
+        )
+    }
+
+    @Test
+    fun `attachReceipt patches only the receipt key and caches the result`() = runTest {
+        val dao = FakeTransactionDao()
+        server.enqueue(MockResponse(code = 200, body = envelope(LUNCH_JSON)))
+
+        val result = repository(dao).attachReceipt(LUNCH.id, "receipts-pending/u1/a.webp")
+
+        assertEquals(Outcome.Success(LUNCH), result)
+        val request = server.takeRequest()
+        assertEquals("PATCH", request.method)
+        assertEquals("/api/v1/transactions/${LUNCH.id}", request.url.encodedPath)
+        assertEquals("""{"receipt_key":"receipts-pending/u1/a.webp"}""", request.body?.utf8())
+        assertEquals(listOf(LUNCH), dao.transactions.map { it.asModel() })
+    }
+
+    @Test
+    fun `findCategoryForNote matches the note or merchant ignoring case and keeps the newest`() = runTest {
+        val old = Instant.parse("2026-09-01T00:00:00Z")
+        val dao = FakeTransactionDao(
+            listOf(
+                entity("a", LocalDate.of(2026, 9, 1))
+                    .copy(note = "Kopi Kenangan", categoryId = "food", updatedAt = old),
+                entity("b", LocalDate.of(2026, 9, 2)).copy(note = "kopi kenangan", categoryId = "drinks"),
+                entity("c", LocalDate.of(2026, 9, 3)).copy(merchant = "Indomaret", categoryId = "shopping"),
+            ),
+        )
+        val repository = repository(dao)
+
+        assertEquals("drinks", repository.findCategoryForNote("  KOPI kenangan ", TransactionType.EXPENSE))
+        assertEquals("shopping", repository.findCategoryForNote("indomaret", TransactionType.EXPENSE))
+        assertEquals(null, repository.findCategoryForNote("kopi kenangan", TransactionType.INCOME))
+        assertEquals(null, repository.findCategoryForNote(" ", TransactionType.EXPENSE))
+    }
+
+    private fun fileErrorBody(code: String) =
+        """{"success":false,"message":"Invalid","data":null,"error":{"code":"validation_failed","fields":[""" +
+            """{"field":"file","code":"$code","message":"bad file"}]}}"""
 
     private fun errorBody(code: String) =
         """{"success":false,"message":"Failed","data":null,"error":{"code":"$code"}}"""

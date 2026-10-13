@@ -28,6 +28,11 @@ data class DraftConfidence(
     val date: Double,
 )
 
+/** Below this a drafted field is highlighted for the user to check. */
+const val LOW_CONFIDENCE = 0.7
+
+fun Double.isLowConfidence(): Boolean = this < LOW_CONFIDENCE
+
 /** A scanned receipt: the draft for its total plus the line items found. */
 data class ReceiptDraft(
     val draft: TransactionDraft,

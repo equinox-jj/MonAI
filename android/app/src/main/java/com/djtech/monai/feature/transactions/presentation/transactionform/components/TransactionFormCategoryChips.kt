@@ -15,6 +15,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.djtech.monai.R
+import com.djtech.monai.core.designsystem.component.FieldHighlight
+import com.djtech.monai.core.designsystem.component.HighlightIcon
 import com.djtech.monai.core.designsystem.component.MonAICategoryChip
 import com.djtech.monai.core.designsystem.component.MonAITextLink
 import com.djtech.monai.core.designsystem.theme.MonAITheme
@@ -24,6 +26,7 @@ import com.djtech.monai.feature.transactions.presentation.common.iconAndColor
 /**
  * The add form's category row: the type's categories as chips that pick at once, and "All
  * categories" for the grid picker. The chosen one moves to the front so it is always visible.
+ * A drafted or suggested category says so underneath ([highlight]).
  */
 @Composable
 internal fun TransactionFormCategoryChips(
@@ -33,6 +36,7 @@ internal fun TransactionFormCategoryChips(
     onPick: (String) -> Unit,
     onShowAll: () -> Unit,
     modifier: Modifier = Modifier,
+    highlight: FieldHighlight = FieldHighlight.None,
 ) {
     val colors = MonAITheme.colors
     val ordered = categories.sortedByDescending { it.id == selectedId }
@@ -78,6 +82,22 @@ internal fun TransactionFormCategoryChips(
                         onClick = { onPick(category.id) },
                     )
                 }
+            }
+        }
+        if (error == null && highlight != FieldHighlight.None) {
+            Row(
+                Modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
+            ) {
+                HighlightIcon(highlight)
+                Text(
+                    stringResource(
+                        if (highlight == FieldHighlight.Low) R.string.ai_hint_check else R.string.ai_category_suggested,
+                    ),
+                    style = MonAITheme.typography.bodySmall,
+                    color = if (highlight == FieldHighlight.Low) colors.onWarningContainer else colors.textSecondary,
+                )
             }
         }
         if (error != null) {

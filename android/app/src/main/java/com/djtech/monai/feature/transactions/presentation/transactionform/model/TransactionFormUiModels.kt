@@ -1,6 +1,7 @@
 package com.djtech.monai.feature.transactions.presentation.transactionform.model
 
 import androidx.compose.runtime.Immutable
+import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.core.model.TransactionType
 import java.time.LocalDate
 import java.time.YearMonth
@@ -13,11 +14,13 @@ sealed interface TransactionFormMode {
 
 /**
  * How a new transaction starts, e.g. a transfer out of the wallet whose detail screen opened the form.
- * A null [walletId] starts from the default wallet. Ignored when editing.
+ * A null [walletId] starts from the default wallet. A quick-add [draft] fills every field it has
+ * instead, and the transaction is saved as a quick add. Ignored when editing.
  */
 data class TransactionFormPreset(
     val type: TransactionType = TransactionType.EXPENSE,
     val walletId: String? = null,
+    val draft: TransactionDraft? = null,
 )
 
 /** Which wallet a wallet picker sets: the source (or the only wallet), or a transfer's destination. */

@@ -78,6 +78,15 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
     override fun observeRecent(from: LocalDate, to: LocalDate, limit: Int): Flow<List<TransactionEntity>> =
         rows.map { all -> all.values.filter { it.date in from..to }.sorted().take(limit) }
 
+    override suspend fun latestCategoryForText(text: String, type: TransactionType): String? =
+        rows.value.values
+            .filter { row ->
+                row.type == type && row.categoryId != null &&
+                    (row.note?.trim()?.lowercase() == text || row.merchant?.trim()?.lowercase() == text)
+            }
+            .maxByOrNull { it.updatedAt }
+            ?.categoryId
+
     override suspend fun upsertAll(transactions: List<TransactionEntity>) {
         failure?.let { throw it }
         rows.value += transactions.associateBy { it.id }

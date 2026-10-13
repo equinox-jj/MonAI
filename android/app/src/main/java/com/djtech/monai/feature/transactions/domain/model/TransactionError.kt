@@ -1,5 +1,7 @@
 package com.djtech.monai.feature.transactions.domain.model
 
+import kotlin.time.Duration
+
 /** Why a transaction action failed, in terms the transaction screens can show. */
 sealed interface TransactionError {
     /** The device or the server rejected one or more form fields. */
@@ -10,6 +12,15 @@ sealed interface TransactionError {
 
     /** The transaction was deleted, or never belonged to this user. */
     data object NotFound : TransactionError
+
+    /** The receipt photo is over the upload limit, even after shrinking. */
+    data object PhotoTooLarge : TransactionError
+
+    /** The receipt photo can't be read or isn't an accepted type. */
+    data object PhotoUnsupported : TransactionError
+
+    /** Too many receipt uploads; [retryAfter] is when to try again, if the server said. */
+    data class RateLimited(val retryAfter: Duration?) : TransactionError
 
     data object Network : TransactionError
 

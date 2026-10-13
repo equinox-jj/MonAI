@@ -3,6 +3,8 @@ package com.djtech.monai.navigation
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.djtech.monai.core.model.draft
+import com.djtech.monai.core.model.receiptDraft
 import com.djtech.monai.feature.home.presentation.home.HomeDestination
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -73,15 +75,52 @@ class HomeNavigationTest {
     }
 
     @Test
-    fun `destinations without a screen yet stay on home`() {
-        val unbuilt = listOf(
-            HomeDestination.QuickAdd,
-            HomeDestination.ScanReceipt,
-        )
+    fun `scanning opens on top of home and a saved receipt shows its transaction`() {
+        navigator.openFromHome(HomeDestination.ScanReceipt)
+        navigator.openReceiptReview("content://camera/1", receiptDraft(), aiFailed = false)
 
-        unbuilt.forEach(navigator::openFromHome)
+        navigator.showSavedReceipt("t1")
 
-        assertEquals(TopLevelDestination.Home, navigator.currentTab)
+        assertEquals(listOf(HomeRoute, TransactionDetailRoute("t1")), navigator.backStack)
+    }
+
+    @Test
+    fun `typing instead of scanning swaps the scan for the add form`() {
+        navigator.openFromHome(HomeDestination.ScanReceipt)
+
+        navigator.typeInsteadOfScan()
+
+        assertEquals(listOf(HomeRoute, TransactionFormRoute()), navigator.backStack)
+    }
+
+    @Test
+    fun `typing instead of a scan opened from the add form goes back to that form`() {
+        navigator.openFromHome(HomeDestination.AddTransaction)
+        navigator.navigate(ScanReceiptRoute)
+
+        navigator.typeInsteadOfScan()
+
+        assertEquals(listOf(HomeRoute, TransactionFormRoute()), navigator.backStack)
+    }
+
+    @Test
+    fun `quick add opens on top of home`() {
+        navigator.openFromHome(HomeDestination.QuickAdd)
+
+        assertEquals(listOf(HomeRoute, QuickAddRoute), navigator.backStack)
+    }
+
+    @Test
+    fun `saving a drafted transaction closes quick add and its review or form`() {
+        navigator.openFromHome(HomeDestination.QuickAdd)
+        navigator.openDraftReview("kopi 25rb sama parkir 5rb", listOf(draft(), draft()))
+
+        navigator.closeQuickAdd()
+        assertEquals(listOf(HomeRoute), navigator.backStack)
+
+        navigator.openFromHome(HomeDestination.QuickAdd)
+        navigator.openDraftForm(draft())
+        navigator.closeQuickAdd()
         assertEquals(listOf(HomeRoute), navigator.backStack)
     }
 }

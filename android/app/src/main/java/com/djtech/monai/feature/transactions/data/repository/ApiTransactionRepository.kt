@@ -16,8 +16,12 @@ import com.djtech.monai.core.database.entity.TransactionEntity
 import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.database.toFtsMatchQuery
+import com.djtech.monai.core.media.EncodedImage
 import com.djtech.monai.core.model.Transaction
+import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.network.ApiCaller
+import com.djtech.monai.core.network.upload.filePart
+import com.djtech.monai.feature.transactions.data.dto.AttachReceiptRequestDto
 import com.djtech.monai.feature.transactions.data.dto.TransactionDto
 import com.djtech.monai.feature.transactions.data.mapper.asModel
 import com.djtech.monai.feature.transactions.data.mapper.toCreateRequest
@@ -28,12 +32,14 @@ import com.djtech.monai.feature.transactions.data.paging.TransactionPage
 import com.djtech.monai.feature.transactions.data.paging.TransactionRemoteMediator
 import com.djtech.monai.feature.transactions.data.paging.TransactionSearchPagingSource
 import com.djtech.monai.feature.transactions.data.remote.TransactionApiService
+import com.djtech.monai.feature.transactions.domain.model.ReceiptUpload
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.model.TransactionResult
 import com.djtech.monai.feature.transactions.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -198,6 +204,32 @@ class ApiTransactionRepository @Inject constructor(
 
     override suspend fun restoreTransaction(id: String): TransactionResult<Transaction> = write {
         transactionApiService.restoreTransaction(id).data
+    }
+
+    override fun uploadReceipt(image: EncodedImage): Flow<ReceiptUpload<String>> = channelFlow {
+        val part = filePart(image.bytes, image.mimeType) { trySend(ReceiptUpload.Progress(it)) }
+        val result = apiCaller.call { transactionApiService.uploadReceipt(part) }
+            .map { it.receiptKey }
+            .mapError { it.toTransactionError() }
+        send(ReceiptUpload.Done(result))
+    }
+
+    override suspend fun attachReceipt(id: String, receiptKey: String): TransactionResult<Transaction> = write {
+        transactionApiService.attachReceipt(id, AttachReceiptRequestDto(receiptKey)).data
+    }
+
+    override suspend fun findCategoryForNote(text: String, type: TransactionType): String? {
+        val key = text.trim().lowercase()
+        if (key.isEmpty()) return null
+        return try {
+            transactionDao.latestCategoryForText(key, type)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            // A failed cache read only means no suggestion.
+            errorLogger.log("Reading a category suggestion failed", e)
+            null
+        }
     }
 
     /**

@@ -2,8 +2,11 @@ package com.djtech.monai.feature.transactions.presentation.transactionform.mappe
 
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.model.CategoryType
+import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.core.model.TransactionType
+import com.djtech.monai.core.model.isLowConfidence
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.domain.model.TransactionFieldError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFieldIssue
@@ -13,6 +16,23 @@ fun TransactionType.categoryType(): CategoryType? = when (this) {
     TransactionType.EXPENSE -> CategoryType.EXPENSE
     TransactionType.INCOME -> CategoryType.INCOME
     TransactionType.TRANSFER -> null
+}
+
+/** How each field a quick-add draft filled is marked: unsure or missing ones for review, the rest as AI-filled. */
+fun TransactionDraft.toHighlights(): Map<TransactionField, FieldHighlight> {
+    fun mark(present: Boolean, confidence: Double) =
+        if (!present || confidence.isLowConfidence()) FieldHighlight.Low else FieldHighlight.Ai
+    val isTransfer = type == TransactionType.TRANSFER
+    return buildMap {
+        put(TransactionField.AMOUNT, mark(amount != null, confidence.amount))
+        put(TransactionField.WALLET, mark(walletId != null, confidence.wallet))
+        put(TransactionField.DATE, mark(date != null, confidence.date))
+        if (isTransfer) {
+            put(TransactionField.TO_WALLET, mark(toWalletId != null, confidence.wallet))
+        } else {
+            put(TransactionField.CATEGORY, mark(categoryId != null, confidence.category))
+        }
+    }
 }
 
 /** One message per field; the first issue of a field wins. */

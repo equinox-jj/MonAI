@@ -1,7 +1,10 @@
 package com.djtech.monai.feature.transactions.domain.repository
 
 import androidx.paging.PagingData
+import com.djtech.monai.core.media.EncodedImage
 import com.djtech.monai.core.model.Transaction
+import com.djtech.monai.core.model.TransactionType
+import com.djtech.monai.feature.transactions.domain.model.ReceiptUpload
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.model.TransactionResult
@@ -67,4 +70,16 @@ interface TransactionRepository {
 
     /** Undoes a delete and caches the restored transaction. */
     suspend fun restoreTransaction(id: String): TransactionResult<Transaction>
+
+    /** Uploads a receipt photo; the key it ends with is valid for a create or attach within 24 hours. */
+    fun uploadReceipt(image: EncodedImage): Flow<ReceiptUpload<String>>
+
+    /** Links the uploaded receipt [receiptKey] to transaction [id] and caches the result. */
+    suspend fun attachReceipt(id: String, receiptKey: String): TransactionResult<Transaction>
+
+    /**
+     * The category of the newest cached [type] transaction whose note or merchant is [text]
+     * (ignoring case and outer spaces), or null. Works offline.
+     */
+    suspend fun findCategoryForNote(text: String, type: TransactionType): String?
 }

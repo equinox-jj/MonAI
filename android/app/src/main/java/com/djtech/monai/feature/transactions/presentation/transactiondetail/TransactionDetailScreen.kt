@@ -1,5 +1,8 @@
 package com.djtech.monai.feature.transactions.presentation.transactiondetail
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -17,8 +20,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -28,6 +34,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
@@ -45,6 +52,7 @@ import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailActions
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailFields
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailHero
+import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailPhotoSheet
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailReceipt
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailReceiptViewer
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.preview.TransactionDetailPreviewData
@@ -70,8 +78,25 @@ fun TransactionDetailRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+    // Kept across process death: the camera app may outlive this one.
+    var cameraUri by rememberSaveable { mutableStateOf<String?>(null) }
+    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
+        viewModel.onIntent(TransactionDetailIntent.ReceiptPhotoPicked(cameraUri.takeIf { taken }))
+        cameraUri = null
+    }
+    val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
+        viewModel.onIntent(TransactionDetailIntent.ReceiptPhotoPicked(uri?.toString()))
+    }
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
+            is TransactionDetailEffect.LaunchCamera -> {
+                cameraUri = effect.uri
+                camera.launch(effect.uri.toUri())
+            }
+
+            TransactionDetailEffect.LaunchGallery ->
+                gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+
             TransactionDetailEffect.NavigateBack -> onBack()
             is TransactionDetailEffect.OpenEdit -> onEdit(effect.id)
             is TransactionDetailEffect.ShowMessage -> scope.launch {
@@ -146,6 +171,13 @@ fun TransactionDetailScreen(
     if (state.isReceiptOpen && receiptUrl != null) {
         TransactionDetailReceiptViewer(receiptUrl, onClose = { onIntent(TransactionDetailIntent.CloseReceipt) })
     }
+    if (state.isPhotoSourceOpen) {
+        TransactionDetailPhotoSheet(
+            onTakePhoto = { onIntent(TransactionDetailIntent.TakeReceiptPhoto) },
+            onChoosePhoto = { onIntent(TransactionDetailIntent.ChooseReceiptPhoto) },
+            onDismiss = { onIntent(TransactionDetailIntent.DismissPhotoSource) },
+        )
+    }
 }
 
 @Composable
@@ -172,9 +204,12 @@ private fun DetailContent(
         ) {
             TransactionDetailHero(transaction, state.lookups)
             TransactionDetailFields(transaction, state.lookups, state.today)
-            transaction.receiptUrl?.let { url ->
-                TransactionDetailReceipt(url, onView = { onIntent(TransactionDetailIntent.OpenReceipt) })
-            }
+            TransactionDetailReceipt(
+                receiptUrl = transaction.receiptUrl,
+                upload = state.receiptUpload,
+                onView = { onIntent(TransactionDetailIntent.OpenReceipt) },
+                onAdd = { onIntent(TransactionDetailIntent.AddReceipt) },
+            )
         }
         TransactionDetailActions(
             isDeleting = state.isDeleting,

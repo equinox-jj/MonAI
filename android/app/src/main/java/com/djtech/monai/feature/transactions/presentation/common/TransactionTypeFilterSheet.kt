@@ -16,6 +16,7 @@ import com.djtech.monai.core.common.format.formatRupiahSigned
 import com.djtech.monai.core.designsystem.component.MonAIBottomSheet
 import com.djtech.monai.core.designsystem.component.MonAICategoryIcon
 import com.djtech.monai.core.designsystem.component.MonAIRadioOption
+import com.djtech.monai.core.designsystem.component.MonAISheetButtons
 import com.djtech.monai.core.designsystem.component.arrowIcon
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
@@ -73,7 +74,7 @@ internal fun TransactionTypeFilterSheet(
             style = MonAITheme.typography.bodySmall,
             color = colors.textTertiary,
         )
-        TransactionSheetButtons(
+        MonAISheetButtons(
             secondaryLabel = stringResource(R.string.transactions_sheet_reset),
             onSecondary = { onIntent(FilterIntent.ClearSheet) },
             primaryLabel = stringResource(R.string.transactions_sheet_apply),
