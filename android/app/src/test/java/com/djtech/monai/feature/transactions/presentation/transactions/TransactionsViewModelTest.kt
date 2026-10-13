@@ -23,6 +23,7 @@ import com.djtech.monai.feature.reports.domain.repository.FakeReportRepository
 import com.djtech.monai.feature.reports.domain.usecase.ObserveCachedExpenseTotalsUseCase
 import com.djtech.monai.feature.reports.domain.usecase.ObserveMonthlyReportUseCase
 import com.djtech.monai.feature.reports.domain.usecase.RefreshMonthlyReportUseCase
+import com.djtech.monai.feature.transactions.domain.event.TransactionDeletionEvents
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.repository.FakeTransactionRepository
@@ -77,15 +78,18 @@ class TransactionsViewModelTest {
         ),
     )
 
+    private val deletionEvents = TransactionDeletionEvents()
+
     private val viewModel by lazy {
         TransactionsViewModel(
             observeTransactions = ObserveTransactionsUseCase(transactions),
             observeDailyNets = ObserveDailyNetsUseCase(transactions),
             deleteTransaction = DeleteTransactionUseCase(
                 transactions,
+                deletionEvents,
                 RefreshTransactionDependentsUseCase(wallets, reports, FakeBudgetRepository()),
             ),
-            observeTransactionDeletions = ObserveTransactionDeletionsUseCase(transactions),
+            observeTransactionDeletions = ObserveTransactionDeletionsUseCase(deletionEvents),
             observeAllWallets = ObserveAllWalletsUseCase(wallets),
             refreshWallets = RefreshWalletsUseCase(wallets),
             observeCategories = ObserveCategoriesUseCase(categories),

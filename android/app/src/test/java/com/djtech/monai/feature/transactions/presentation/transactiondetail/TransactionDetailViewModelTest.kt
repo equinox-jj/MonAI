@@ -13,6 +13,7 @@ import com.djtech.monai.feature.budgets.domain.repository.FakeBudgetRepository
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.reports.domain.repository.FakeReportRepository
+import com.djtech.monai.feature.transactions.domain.event.TransactionDeletionEvents
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.repository.FakeTransactionRepository
 import com.djtech.monai.feature.transactions.domain.usecase.DeleteTransactionUseCase
@@ -50,6 +51,7 @@ class TransactionDetailViewModelTest {
         refreshTransaction = RefreshTransactionUseCase(transactions),
         deleteTransaction = DeleteTransactionUseCase(
             transactions,
+            TransactionDeletionEvents(),
             RefreshTransactionDependentsUseCase(wallets, FakeReportRepository(), FakeBudgetRepository()),
         ),
         observeCategories = ObserveCategoriesUseCase(categories),

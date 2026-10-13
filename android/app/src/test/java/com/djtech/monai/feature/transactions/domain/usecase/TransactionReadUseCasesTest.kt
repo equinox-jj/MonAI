@@ -4,6 +4,7 @@ import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.model.OCTOBER
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.transaction
+import com.djtech.monai.feature.transactions.domain.event.TransactionDeletionEvents
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.repository.FakeTransactionRepository
@@ -44,13 +45,14 @@ class TransactionReadUseCasesTest {
     }
 
     @Test
-    fun `observeDeletions emits each deleted transaction`() = runTest {
+    fun `observeDeletions emits each announced deletion`() = runTest {
+        val events = TransactionDeletionEvents()
         val deleted = mutableListOf<Transaction>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
-            ObserveTransactionDeletionsUseCase(repository)().toList(deleted)
+            ObserveTransactionDeletionsUseCase(events)().toList(deleted)
         }
 
-        repository.deleteTransaction("t1")
+        events.emit(transaction("t1"))
 
         assertEquals(listOf(transaction("t1")), deleted)
     }

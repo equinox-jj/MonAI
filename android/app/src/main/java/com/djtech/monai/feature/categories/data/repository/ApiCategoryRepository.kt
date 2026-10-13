@@ -19,8 +19,6 @@ import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryResult
 import com.djtech.monai.feature.categories.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -33,9 +31,6 @@ class ApiCategoryRepository @Inject constructor(
     private val categoryDao: CategoryDao,
     private val errorLogger: ErrorLogger,
 ) : CategoryRepository {
-
-    private val createdCategories = MutableSharedFlow<Category>(extraBufferCapacity = 8)
-    override val created: Flow<Category> = createdCategories.asSharedFlow()
 
     override fun observeCategories(): Flow<List<Category>> =
         categoryDao.observeAll().map { entities -> entities.map(CategoryEntity::asModel) }
@@ -73,7 +68,6 @@ class ApiCategoryRepository @Inject constructor(
                     errorLogger.log("Caching the created category failed", e)
                     return Outcome.Failure(CategoryError.Unexpected)
                 }
-                createdCategories.tryEmit(category)
                 Outcome.Success(category)
             }
 

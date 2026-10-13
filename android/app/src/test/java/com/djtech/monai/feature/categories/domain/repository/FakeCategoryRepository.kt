@@ -7,7 +7,6 @@ import com.djtech.monai.feature.categories.domain.model.CategoryError
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryResult
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
@@ -15,7 +14,7 @@ import java.time.Instant
 
 /**
  * Serves [categories] as the cache and answers refresh with [refreshResult]. A create records its
- * input and, unless [createError] is set, caches the category and emits it on [created].
+ * input and, unless [createError] is set, caches the category.
  */
 class FakeCategoryRepository(categories: List<Category> = emptyList()) : CategoryRepository {
     val categories = MutableStateFlow(categories)
@@ -23,9 +22,6 @@ class FakeCategoryRepository(categories: List<Category> = emptyList()) : Categor
     var refreshCount = 0
     var createError: CategoryError? = null
     val createdInputs = mutableListOf<CategoryInput>()
-    private val createdCategories = MutableSharedFlow<Category>(extraBufferCapacity = 8)
-
-    override val created: Flow<Category> = createdCategories
 
     override fun observeCategories(): Flow<List<Category>> = categories
 
@@ -53,7 +49,6 @@ class FakeCategoryRepository(categories: List<Category> = emptyList()) : Categor
             updatedAt = CREATED,
         )
         this.categories.update { it + category }
-        createdCategories.emit(category)
         return Outcome.Success(category)
     }
 

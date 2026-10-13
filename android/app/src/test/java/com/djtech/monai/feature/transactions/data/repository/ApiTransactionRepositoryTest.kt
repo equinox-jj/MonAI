@@ -21,9 +21,6 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionFieldError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFieldIssue
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
-import kotlinx.coroutines.flow.toList
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
@@ -324,21 +321,17 @@ class ApiTransactionRepositoryTest {
     }
 
     @Test
-    fun `deleteTransaction drops it from the cache and announces it for undo`() = runTest {
+    fun `deleteTransaction drops it from the cache and returns it`() = runTest {
         val dao = FakeTransactionDao(listOf(LUNCH.asEntity()))
-        val repository = repository(dao)
-        val deleted = mutableListOf<Transaction>()
-        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { repository.deletions.toList(deleted) }
         server.enqueue(MockResponse(code = 200, body = DELETED_BODY))
 
-        val result = repository.deleteTransaction(LUNCH.id)
+        val result = repository(dao).deleteTransaction(LUNCH.id)
 
         assertEquals(Outcome.Success(LUNCH), result)
         val request = server.takeRequest()
         assertEquals("DELETE", request.method)
         assertEquals("/api/v1/transactions/${LUNCH.id}", request.url.encodedPath)
         assertEquals(emptyList<TransactionEntity>(), dao.transactions)
-        assertEquals(listOf(LUNCH), deleted)
     }
 
     @Test

@@ -14,12 +14,14 @@ import com.djtech.monai.core.model.transaction
 import com.djtech.monai.core.model.wallet
 import com.djtech.monai.feature.budgets.domain.repository.FakeBudgetRepository
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
+import com.djtech.monai.feature.categories.domain.event.CategoryCreationEvents
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
 import com.djtech.monai.feature.categories.domain.usecase.CreateCategoryUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCreatedCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveVisibleCategoriesUseCase
 import com.djtech.monai.feature.reports.domain.repository.FakeReportRepository
+import com.djtech.monai.feature.transactions.domain.event.TransactionDeletionEvents
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.domain.model.TransactionFieldError
@@ -66,6 +68,7 @@ class TransactionFormViewModelTest {
     private val categories = FakeCategoryRepository(
         listOf(category("food"), category("salary", type = CategoryType.INCOME)),
     )
+    private val categoryCreations = CategoryCreationEvents()
     private val lunch = transaction("lunch", note = "Makan siang", merchant = "Warteg", walletId = "gopay")
     private val transactions = FakeTransactionRepository(listOf(lunch))
 
@@ -81,12 +84,12 @@ class TransactionFormViewModelTest {
             refreshTransaction = RefreshTransactionUseCase(transactions),
             createTransaction = CreateTransactionUseCase(transactions, dependents, clock),
             updateTransaction = UpdateTransactionUseCase(transactions, dependents, clock),
-            deleteTransaction = DeleteTransactionUseCase(transactions, dependents),
+            deleteTransaction = DeleteTransactionUseCase(transactions, TransactionDeletionEvents(), dependents),
             observeWallets = ObserveWalletsUseCase(wallets),
             observeAllWallets = ObserveAllWalletsUseCase(wallets),
             observeCategories = ObserveCategoriesUseCase(categories),
             observeVisibleCategories = ObserveVisibleCategoriesUseCase(categories),
-            observeCreatedCategories = ObserveCreatedCategoriesUseCase(categories),
+            observeCreatedCategories = ObserveCreatedCategoriesUseCase(categoryCreations),
             clock = clock,
         )
     }
@@ -320,7 +323,7 @@ class TransactionFormViewModelTest {
     fun `a category created from the picker is selected in it`() = runFormTest { vm, _ ->
         send(vm, TransactionFormIntent.OpenCategoryPicker, TransactionFormIntent.NewCategory)
 
-        CreateCategoryUseCase(categories)(newCategory("Kopi", CategoryType.EXPENSE))
+        CreateCategoryUseCase(categories, categoryCreations)(newCategory("Kopi", CategoryType.EXPENSE))
         advanceUntilIdle()
 
         val created = categories.categories.value.single { it.name == "Kopi" }
@@ -332,7 +335,7 @@ class TransactionFormViewModelTest {
     fun `a category created of another type is not selected`() = runFormTest { vm, _ ->
         send(vm, TransactionFormIntent.OpenCategoryPicker)
 
-        CreateCategoryUseCase(categories)(newCategory("Bonus", CategoryType.INCOME))
+        CreateCategoryUseCase(categories, categoryCreations)(newCategory("Bonus", CategoryType.INCOME))
         advanceUntilIdle()
 
         assertEquals(FormSheet.Category(null), vm.state.value.sheet)

@@ -61,13 +61,10 @@ interface TransactionRepository {
 
     /**
      * Soft-deletes [id] on the server and drops it from the cache. Returns the deleted transaction
-     * when it was cached, so it can be named in the undo message, and emits it on [deletions].
+     * when it was cached, so it can be named in the undo message.
      */
     suspend fun deleteTransaction(id: String): TransactionResult<Transaction?>
 
     /** Undoes a delete and caches the restored transaction. */
     suspend fun restoreTransaction(id: String): TransactionResult<Transaction>
-
-    /** Transactions deleted through [deleteTransaction], for the undo message on whichever screen shows it. */
-    val deletions: Flow<Transaction>
 }

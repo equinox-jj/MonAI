@@ -11,7 +11,6 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.model.TransactionResult
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
@@ -45,9 +44,6 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
     val refreshedIds = mutableListOf<String>()
     val pagedQueries = mutableListOf<Pair<YearMonth, TransactionFilter>>()
     val searches = mutableListOf<Triple<String, YearMonth?, TransactionFilter>>()
-
-    private val deleted = MutableSharedFlow<Transaction>(extraBufferCapacity = 8)
-    override val deletions: Flow<Transaction> = deleted
 
     override fun observeRecentTransactions(month: YearMonth, limit: Int): Flow<List<Transaction>> =
         transactions.map { list -> list.filter { YearMonth.from(it.date) == month }.sorted().take(limit) }
@@ -122,7 +118,6 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
             is Outcome.Success -> {
                 val cached = transactions.value.find { it.id == id }
                 transactions.value = transactions.value.filterNot { it.id == id }
-                if (cached != null) deleted.emit(cached)
                 Outcome.Success(cached)
             }
         }

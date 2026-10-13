@@ -14,9 +14,7 @@ import com.djtech.monai.feature.categories.data.remote.CategoryApiService
 import com.djtech.monai.feature.categories.domain.model.CategoryError
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryNameIssue
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -173,13 +171,11 @@ class ApiCategoryRepositoryTest {
     }
 
     @Test
-    fun `createCategory posts the input, caches the created category and announces it`() = runTest {
+    fun `createCategory posts the input and caches the created category`() = runTest {
         val dao = FakeCategoryDao()
-        val repository = repository(dao)
-        val announced = async(UnconfinedTestDispatcher(testScheduler)) { repository.created.first() }
         server.enqueue(MockResponse(code = 201, body = categoryBody(FOOD_JSON)))
 
-        val result = repository.createCategory(FOOD_INPUT)
+        val result = repository(dao).createCategory(FOOD_INPUT)
 
         assertEquals(Outcome.Success(FOOD), result)
         val request = server.takeRequest()
@@ -190,7 +186,6 @@ class ApiCategoryRepositoryTest {
             request.body?.utf8(),
         )
         assertEquals(listOf(FOOD), dao.categories.map { it.asModel() })
-        assertEquals(FOOD, announced.await())
     }
 
     @Test

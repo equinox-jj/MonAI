@@ -4,6 +4,7 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.CategoryType
+import com.djtech.monai.feature.categories.domain.event.CategoryCreationEvents
 import com.djtech.monai.feature.categories.domain.model.CategoryError
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryNameIssue
@@ -35,7 +36,7 @@ class CategoryFormViewModelTest {
         type: CategoryType = CategoryType.EXPENSE,
         block: suspend TestScope.(CategoryFormViewModel, MutableList<CategoryFormEffect>) -> Unit,
     ) = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = CategoryFormViewModel(type, CreateCategoryUseCase(categories))
+        val viewModel = CategoryFormViewModel(type, CreateCategoryUseCase(categories, CategoryCreationEvents()))
         val effects = mutableListOf<CategoryFormEffect>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.effects.toList(effects) }
         block(viewModel, effects)

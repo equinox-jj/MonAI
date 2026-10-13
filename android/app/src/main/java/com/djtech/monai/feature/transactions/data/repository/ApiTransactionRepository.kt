@@ -34,8 +34,6 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.model.TransactionResult
 import com.djtech.monai.feature.transactions.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
@@ -56,9 +54,6 @@ class ApiTransactionRepository @Inject constructor(
     private val clock: AppClock,
     private val errorLogger: ErrorLogger,
 ) : TransactionRepository {
-
-    private val deletedTransactions = MutableSharedFlow<Transaction>(extraBufferCapacity = 8)
-    override val deletions: Flow<Transaction> = deletedTransactions.asSharedFlow()
 
     override fun observeRecentTransactions(month: YearMonth, limit: Int): Flow<List<Transaction>> =
         transactionDao.observeRecent(month.atDay(1), month.atEndOfMonth(), limit)
@@ -198,8 +193,6 @@ class ApiTransactionRepository @Inject constructor(
         if (result is Outcome.Failure && result.error != TransactionError.NotFound) return Outcome.Failure(result.error)
 
         cacheWrite("Dropping a deleted transaction failed") { transactionDao.delete(id) }
-        if (cached != null) deletedTransactions.emit(cached)
-
         return Outcome.Success(cached)
     }
 

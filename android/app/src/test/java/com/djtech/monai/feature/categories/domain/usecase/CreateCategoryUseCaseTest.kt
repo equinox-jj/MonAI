@@ -1,11 +1,17 @@
 package com.djtech.monai.feature.categories.domain.usecase
 
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
+import com.djtech.monai.feature.categories.domain.event.CategoryCreationEvents
 import com.djtech.monai.feature.categories.domain.model.CategoryError
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryNameIssue
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -14,7 +20,8 @@ import org.junit.Test
 class CreateCategoryUseCaseTest {
 
     private val repository = FakeCategoryRepository()
-    private val createCategory = CreateCategoryUseCase(repository)
+    private val creationEvents = CategoryCreationEvents()
+    private val createCategory = CreateCategoryUseCase(repository, creationEvents)
 
     private val kopi = CategoryInput(
         name = "Kopi",
@@ -59,5 +66,30 @@ class CreateCategoryUseCaseTest {
     @Test
     fun `a 30 character name is fine`() = runTest {
         assertTrue(createCategory(kopi.copy(name = "a".repeat(30))) is Outcome.Success)
+    }
+
+    @Test
+    fun `announces the created category`() = runTest {
+        val created = collectCreations()
+
+        val result = createCategory(kopi)
+
+        assertEquals(listOf((result as Outcome.Success).data), created)
+    }
+
+    @Test
+    fun `a failed create announces nothing`() = runTest {
+        val created = collectCreations()
+        repository.createError = CategoryError.Network
+
+        createCategory(kopi)
+
+        assertEquals(emptyList<Category>(), created)
+    }
+
+    private fun TestScope.collectCreations(): List<Category> {
+        val created = mutableListOf<Category>()
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { creationEvents.created.toList(created) }
+        return created
     }
 }

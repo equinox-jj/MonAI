@@ -10,6 +10,7 @@ import com.djtech.monai.feature.budgets.domain.repository.FakeBudgetRepository
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.reports.domain.repository.FakeReportRepository
+import com.djtech.monai.feature.transactions.domain.event.TransactionDeletionEvents
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.repository.FakeTransactionRepository
 import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionDeletionsUseCase
@@ -35,12 +36,13 @@ class UndoDeleteViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private val transactions = FakeTransactionRepository(listOf(transaction("lunch"), transaction("coffee")))
+    private val transactions = FakeTransactionRepository()
     private val wallets = FakeWalletRepository()
+    private val deletionEvents = TransactionDeletionEvents()
 
     private val viewModel by lazy {
         UndoDeleteViewModel(
-            observeTransactionDeletions = ObserveTransactionDeletionsUseCase(transactions),
+            observeTransactionDeletions = ObserveTransactionDeletionsUseCase(deletionEvents),
             restoreTransaction = RestoreTransactionUseCase(
                 transactions,
                 RefreshTransactionDependentsUseCase(wallets, FakeReportRepository(), FakeBudgetRepository()),
@@ -61,7 +63,7 @@ class UndoDeleteViewModelTest {
 
     @Test
     fun `a delete anywhere is offered for undo for five seconds`() = runUndoTest {
-        transactions.deleteTransaction("lunch")
+        deletionEvents.emit(transaction("lunch"))
         runCurrent()
         assertEquals("lunch", viewModel.state.value.deleted?.id)
         assertEquals("food", viewModel.state.value.lookups.category("food")?.id)
@@ -77,9 +79,9 @@ class UndoDeleteViewModelTest {
 
     @Test
     fun `a second delete replaces the offer and gets its own five seconds`() = runUndoTest {
-        transactions.deleteTransaction("lunch")
+        deletionEvents.emit(transaction("lunch"))
         advanceTimeBy(4_000)
-        transactions.deleteTransaction("coffee")
+        deletionEvents.emit(transaction("coffee"))
         advanceTimeBy(4_000)
         runCurrent()
 
@@ -89,7 +91,7 @@ class UndoDeleteViewModelTest {
     @Test
     fun `undo restores the transaction and hides the bar`() = runUndoTest { effects ->
         transactions.restoreResult = Outcome.Success(transaction("lunch"))
-        transactions.deleteTransaction("lunch")
+        deletionEvents.emit(transaction("lunch"))
         runCurrent()
 
         viewModel.onIntent(UndoDeleteIntent.Undo)
@@ -103,7 +105,7 @@ class UndoDeleteViewModelTest {
     @Test
     fun `a failed undo says why`() = runUndoTest { effects ->
         transactions.restoreResult = Outcome.Failure(TransactionError.WalletArchived)
-        transactions.deleteTransaction("lunch")
+        deletionEvents.emit(transaction("lunch"))
         runCurrent()
 
         viewModel.onIntent(UndoDeleteIntent.Undo)
