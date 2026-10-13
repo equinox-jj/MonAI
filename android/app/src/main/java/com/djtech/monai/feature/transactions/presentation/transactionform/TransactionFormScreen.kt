@@ -55,11 +55,13 @@ import com.djtech.monai.feature.transactions.presentation.transactionform.compon
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormKeypad
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormWalletPickerSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
+import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
 import com.djtech.monai.feature.transactions.presentation.transactionform.preview.TransactionFormPreviewData
 import kotlinx.coroutines.launch
 
 /**
  * @param transactionId the transaction to edit; null adds a new one.
+ * @param preset how a new transaction starts; ignored when editing.
  * @param onDeleted the edited transaction was deleted from here.
  * @param isSideSheet shown as a side sheet over the list on a wide screen, below no status bar.
  */
@@ -69,11 +71,13 @@ fun TransactionFormRoute(
     onClose: () -> Unit,
     onDeleted: (String) -> Unit,
     modifier: Modifier = Modifier,
+    preset: TransactionFormPreset = TransactionFormPreset(),
     isSideSheet: Boolean = false,
-    viewModel: TransactionFormViewModel =
-        hiltViewModel<TransactionFormViewModel, TransactionFormViewModel.Factory>(key = transactionId ?: "new") {
-            it.create(transactionId)
-        },
+    viewModel: TransactionFormViewModel = hiltViewModel<TransactionFormViewModel, TransactionFormViewModel.Factory>(
+        key = transactionId ?: "new-${preset.type}-${preset.walletId}",
+    ) {
+        it.create(transactionId, preset)
+    },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

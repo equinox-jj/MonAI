@@ -5,6 +5,7 @@ import androidx.room3.Dao
 import androidx.room3.Query
 import androidx.room3.Transaction
 import androidx.room3.Upsert
+import com.djtech.monai.core.database.entity.DailyAmount
 import com.djtech.monai.core.database.entity.DailyNet
 import com.djtech.monai.core.database.entity.TransactionEntity
 import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
@@ -78,6 +79,22 @@ interface TransactionDao {
         categoryId: String?,
         type: TransactionType?,
     ): Flow<List<DailyNet>>
+
+    /**
+     * Each cached day's money leaving [walletId]: its expenses plus transfers out of it, for the
+     * wallet detail's "Money out" chart. Transfers into the wallet don't count.
+     */
+    @Query(
+        """
+        SELECT date, SUM(amount) AS amount
+        FROM transactions
+        WHERE date BETWEEN :from AND :to
+          AND wallet_id = :walletId
+          AND type IN ('EXPENSE', 'TRANSFER')
+        GROUP BY date
+        """,
+    )
+    fun observeDailyOutflows(from: LocalDate, to: LocalDate, walletId: String): Flow<List<DailyAmount>>
 
     @Query("SELECT * FROM transactions WHERE id = :id")
     fun observe(id: String): Flow<TransactionEntity?>

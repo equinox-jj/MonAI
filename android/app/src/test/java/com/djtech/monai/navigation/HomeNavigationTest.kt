@@ -45,12 +45,19 @@ class HomeNavigationTest {
     }
 
     @Test
+    fun `a wallet card and add wallet open on top of home`() {
+        navigator.openFromHome(HomeDestination.WalletDetail("bca"))
+        navigator.openFromHome(HomeDestination.AddWallet)
+
+        assertEquals(TopLevelDestination.Home, navigator.currentTab)
+        assertEquals(listOf(HomeRoute, WalletDetailRoute("bca"), WalletFormRoute()), navigator.backStack)
+    }
+
+    @Test
     fun `destinations without a screen yet stay on home`() {
         val unbuilt = listOf(
             HomeDestination.QuickAdd,
             HomeDestination.ScanReceipt,
-            HomeDestination.WalletDetail("bca"),
-            HomeDestination.AddWallet,
             HomeDestination.Budget,
             HomeDestination.Report,
         )

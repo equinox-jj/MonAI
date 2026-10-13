@@ -120,6 +120,10 @@ class ApiTransactionRepository @Inject constructor(
             type = filter.type,
         ).map { days -> days.associate { it.date to it.net } }
 
+    override fun observeDailyOutflows(month: YearMonth, walletId: String): Flow<Map<LocalDate, Long>> =
+        transactionDao.observeDailyOutflows(from = month.atDay(1), to = month.atEndOfMonth(), walletId = walletId)
+            .map { days -> days.associate { it.date to it.amount } }
+
     override fun searchTransactions(
         query: String,
         month: YearMonth,

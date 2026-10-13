@@ -29,12 +29,18 @@ import com.djtech.monai.core.designsystem.component.MonAIWidthClass
 import com.djtech.monai.core.designsystem.component.currentWidthClass
 import com.djtech.monai.core.designsystem.component.monAIMainNavItems
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.home.presentation.home.HomeRoute
 import com.djtech.monai.feature.transactions.presentation.search.SearchRoute
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.TransactionDetailRoute
 import com.djtech.monai.feature.transactions.presentation.transactionform.TransactionFormRoute
+import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
 import com.djtech.monai.feature.transactions.presentation.transactions.TransactionsRoute
 import com.djtech.monai.feature.transactions.presentation.undodelete.UndoDeleteRoute
+import com.djtech.monai.feature.wallets.presentation.archivedwallets.ArchivedWalletsRoute
+import com.djtech.monai.feature.wallets.presentation.walletdetail.WalletDetailRoute
+import com.djtech.monai.feature.wallets.presentation.walletform.WalletFormRoute
+import com.djtech.monai.feature.wallets.presentation.wallets.WalletsRoute
 
 /** The add/edit side sheet's width on a wide screen. */
 private val SideSheetWidth = 440.dp
@@ -149,12 +155,19 @@ private fun MainNavDisplay(
                     )
                 }
                 entry<TransactionFormRoute>(metadata = formMetadata) { key ->
-                    TransactionFormEntry(
-                        transactionId = key.id,
-                        asSideSheet = isExpanded,
-                        onClose = navigator::goBack,
-                        onDeleted = navigator::closeDeletedTransaction,
-                    )
+                    SideSheetEntry(asSideSheet = isExpanded) { sheetModifier ->
+                        TransactionFormRoute(
+                            transactionId = key.id,
+                            onClose = navigator::goBack,
+                            onDeleted = navigator::closeDeletedTransaction,
+                            modifier = sheetModifier,
+                            preset = TransactionFormPreset(
+                                type = key.presetType ?: TransactionType.EXPENSE,
+                                walletId = key.presetWalletId,
+                            ),
+                            isSideSheet = isExpanded,
+                        )
+                    }
                 }
                 entry<TransactionSearchRoute> { key ->
                     SearchRoute(
@@ -163,7 +176,47 @@ private fun MainNavDisplay(
                         onOpenTransaction = openTransaction,
                     )
                 }
-                entry<WalletsRoute> { PlaceholderScreen(stringResource(R.string.nav_wallets)) }
+                entry<WalletsRoute> {
+                    WalletsRoute(
+                        onNavigate = navigator::openFromWallets,
+                        detailPane = { id, paneModifier ->
+                            // Deleting from the pane needs no navigation: the list shows the next wallet.
+                            WalletDetailRoute(
+                                walletId = id,
+                                onNavigate = navigator::openFromWalletDetail,
+                                onBack = {},
+                                onDeleted = {},
+                                modifier = paneModifier,
+                                isPane = true,
+                            )
+                        },
+                    )
+                }
+                entry<WalletDetailRoute> { key ->
+                    WalletDetailRoute(
+                        walletId = key.id,
+                        onNavigate = navigator::openFromWalletDetail,
+                        onBack = navigator::goBack,
+                        onDeleted = navigator::closeDeletedWallet,
+                    )
+                }
+                entry<WalletFormRoute>(metadata = formMetadata) { key ->
+                    SideSheetEntry(asSideSheet = isExpanded) { sheetModifier ->
+                        WalletFormRoute(
+                            walletId = key.id,
+                            onClose = navigator::goBack,
+                            onDeleted = navigator::closeDeletedWallet,
+                            modifier = sheetModifier,
+                            isSideSheet = isExpanded,
+                        )
+                    }
+                }
+                entry<ArchivedWalletsRoute> {
+                    ArchivedWalletsRoute(
+                        onBack = navigator::goBack,
+                        onOpenWallet = { id -> navigator.navigate(WalletDetailRoute(id)) },
+                    )
+                }
                 entry<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }
             },
         )
@@ -171,29 +224,23 @@ private fun MainNavDisplay(
     }
 }
 
-/** The add/edit form, full screen, or as an end-aligned sheet when [asSideSheet]. */
+/**
+ * An add/edit form: full screen, or as an end-aligned sheet over what is behind it when
+ * [asSideSheet]. [content] gets the modifier that sizes and shapes it.
+ */
 @Composable
-private fun TransactionFormEntry(
-    transactionId: String?,
-    asSideSheet: Boolean,
-    onClose: () -> Unit,
-    onDeleted: (String) -> Unit,
-) {
+private fun SideSheetEntry(asSideSheet: Boolean, content: @Composable (Modifier) -> Unit) {
     if (!asSideSheet) {
-        TransactionFormRoute(transactionId, onClose, onDeleted)
+        content(Modifier)
         return
     }
     Box(Modifier.fillMaxSize(), contentAlignment = Alignment.CenterEnd) {
-        TransactionFormRoute(
-            transactionId = transactionId,
-            onClose = onClose,
-            onDeleted = onDeleted,
-            modifier = Modifier
+        content(
+            Modifier
                 .width(SideSheetWidth)
                 .fillMaxHeight()
                 .clip(RoundedCornerShape(topStart = MonAITheme.radius.xxl, bottomStart = MonAITheme.radius.xxl))
                 .background(MonAITheme.colors.surface),
-            isSideSheet = true,
         )
     }
 }

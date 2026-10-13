@@ -211,6 +211,26 @@ class ApiTransactionRepositoryTest {
     }
 
     @Test
+    fun `observeDailyOutflows sums each day's expenses and transfers out of the wallet`() = runTest {
+        val dao = FakeTransactionDao(
+            listOf(
+                entity(id = "lunch", date = LocalDate.of(2026, 10, 5)),
+                entity(id = "top-up", date = LocalDate.of(2026, 10, 5))
+                    .copy(type = TransactionType.TRANSFER, amount = 500_000, toWalletId = "gopay", categoryId = null),
+                entity(id = "salary", date = LocalDate.of(2026, 10, 5)).copy(type = TransactionType.INCOME),
+                entity(id = "received", date = LocalDate.of(2026, 10, 6))
+                    .copy(type = TransactionType.TRANSFER, walletId = "bca", toWalletId = "cash", categoryId = null),
+                entity(id = "other-wallet", date = LocalDate.of(2026, 10, 6)).copy(walletId = "bca"),
+                entity(id = "sept", date = LocalDate.of(2026, 9, 30)),
+            ),
+        )
+
+        val outflows = repository(dao).observeDailyOutflows(OCTOBER, walletId = "cash").first()
+
+        assertEquals(mapOf(LocalDate.of(2026, 10, 5) to 510_000L), outflows)
+    }
+
+    @Test
     fun `createTransaction posts the input and caches what the server returns`() = runTest {
         val dao = FakeTransactionDao()
         server.enqueue(MockResponse(code = 201, body = envelope(LUNCH_JSON)))

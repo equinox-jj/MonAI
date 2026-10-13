@@ -30,6 +30,7 @@ import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionDe
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.UpdateTransactionUseCase
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
+import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.WalletTarget
 import com.djtech.monai.feature.wallets.domain.repository.FakeWalletRepository
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveAllWalletsUseCase
@@ -65,10 +66,14 @@ class TransactionFormViewModelTest {
     private val lunch = transaction("lunch", note = "Makan siang", merchant = "Warteg", walletId = "gopay")
     private val transactions = FakeTransactionRepository(listOf(lunch))
 
-    private fun viewModel(id: String? = null): TransactionFormViewModel {
+    private fun viewModel(
+        id: String? = null,
+        preset: TransactionFormPreset = TransactionFormPreset(),
+    ): TransactionFormViewModel {
         val dependents = RefreshTransactionDependentsUseCase(wallets, FakeReportRepository(), FakeBudgetRepository())
         return TransactionFormViewModel(
             transactionId = id,
+            preset = preset,
             observeTransaction = ObserveTransactionUseCase(transactions),
             refreshTransaction = RefreshTransactionUseCase(transactions),
             createTransaction = CreateTransactionUseCase(transactions, dependents, clock),
@@ -84,9 +89,10 @@ class TransactionFormViewModelTest {
 
     private fun runFormTest(
         id: String? = null,
+        preset: TransactionFormPreset = TransactionFormPreset(),
         block: suspend TestScope.(TransactionFormViewModel, MutableList<TransactionFormEffect>) -> Unit,
     ) = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = viewModel(id)
+        val viewModel = viewModel(id, preset)
         val effects = mutableListOf<TransactionFormEffect>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.state.collect {} }
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.effects.toList(effects) }
@@ -140,6 +146,39 @@ class TransactionFormViewModelTest {
         assertEquals("gopay", vm.state.value.toWalletId)
         assertEquals(emptyList<Any>(), vm.state.value.categories)
     }
+
+    @Test
+    fun `a transfer preset starts from the given wallet to the first other one`() =
+        runFormTest(preset = TransactionFormPreset(TransactionType.TRANSFER, walletId = "gopay")) { vm, _ ->
+            val state = vm.state.value
+
+            assertEquals(TransactionType.TRANSFER, state.type)
+            assertEquals("gopay", state.walletId)
+            assertEquals("bca", state.toWalletId)
+        }
+
+    @Test
+    fun `an untouched preset form closes at once`() =
+        runFormTest(preset = TransactionFormPreset(TransactionType.TRANSFER, walletId = "gopay")) { vm, effects ->
+            send(vm, TransactionFormIntent.Close)
+
+            assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.Close), effects)
+        }
+
+    @Test
+    fun `a preset wallet replaces the default wallet`() =
+        runFormTest(preset = TransactionFormPreset(walletId = "gopay")) { vm, _ ->
+            assertEquals(TransactionType.EXPENSE, vm.state.value.type)
+            assertEquals("gopay", vm.state.value.walletId)
+            assertNull(vm.state.value.toWalletId)
+        }
+
+    @Test
+    fun `editing ignores the preset`() =
+        runFormTest("lunch", TransactionFormPreset(TransactionType.TRANSFER, walletId = "bca")) { vm, _ ->
+            assertEquals(TransactionType.EXPENSE, vm.state.value.type)
+            assertEquals("gopay", vm.state.value.walletId)
+        }
 
     @Test
     fun `saving a valid expense creates it and closes`() = runFormTest { vm, effects ->

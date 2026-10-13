@@ -124,12 +124,12 @@
     <string name="home_scan_receipt">Scan receipt</string>
     <string name="home_wallets">Wallets</string>
     <string name="home_see_all">See all</string>
-    <string name="home_wallet_default">Default</string>
+    <string name="wallet_default">Default</string>
     <string name="home_wallet_balance">%1$s · balance</string>
-    <string name="home_wallet_type_cash">Cash</string>
-    <string name="home_wallet_type_bank">Bank</string>
-    <string name="home_wallet_type_e_wallet">E-wallet</string>
-    <string name="home_wallet_type_other">Other</string>
+    <string name="wallet_type_cash">Cash</string>
+    <string name="wallet_type_bank">Bank</string>
+    <string name="wallet_type_e_wallet">E-wallet</string>
+    <string name="wallet_type_other">Other</string>
     <string name="home_budget_title">%1$s budget</string>
     <plurals name="home_budget_days_left">
         <item quantity="one">%1$d day left</item>
@@ -333,4 +333,125 @@
     <!-- Transactions: undo delete -->
     <string name="transaction_undo_deleted">%1$s deleted</string>
     <string name="transaction_undo">Undo</string>
+
+    <!-- Wallets: shared -->
+    <string name="wallets_error_network">You\'re offline. Check your connection and try again.</string>
+    <string name="wallets_error_unexpected">Something went wrong. Try again in a moment.</string>
+    <string name="wallets_error_not_found">This wallet no longer exists.</string>
+    <string name="wallets_error_default_required">Make another wallet the default first.</string>
+    <string name="wallets_error_has_transactions">This wallet has transactions, so it can\'t be deleted.</string>
+
+    <!-- Wallets: list -->
+    <string name="wallets_title">Wallets</string>
+    <string name="wallets_add">Add wallet</string>
+    <plurals name="wallets_total">
+        <item quantity="one">Total across %1$d wallet</item>
+        <item quantity="other">Total across %1$d wallets</item>
+    </plurals>
+    <string name="wallets_type_share">%1$s %2$d%%</string>
+    <plurals name="wallets_show_archived">
+        <item quantity="one">Show %1$d archived wallet</item>
+        <item quantity="other">Show %1$d archived wallets</item>
+    </plurals>
+    <string name="wallets_refresh_failed_network">You\'re offline. Showing saved wallets.</string>
+    <string name="wallets_refresh_failed_unexpected">Couldn\'t refresh. Showing saved wallets.</string>
+    <string name="wallets_load_failed_network">You\'re offline. Connect to the internet to load your wallets.</string>
+    <string name="wallets_load_failed_unexpected">Something went wrong on our side. Your data is safe — try again in a moment.</string>
+    <string name="wallets_error_title">Couldn\'t load your wallets</string>
+    <string name="wallets_try_again">Try again</string>
+    <string name="wallets_empty_title">No wallets yet</string>
+    <string name="wallets_empty_body">Add BCA, GoPay, cash and more to see every balance in one place.</string>
+    <string name="wallets_loading">Loading your wallets</string>
+    <string name="wallets_balance_split">Balance by wallet type</string>
+
+    <!-- Wallets: detail -->
+    <string name="wallet_detail_title">Wallet</string>
+    <string name="wallet_detail_more">More options</string>
+    <string name="wallet_detail_current_balance">Current balance</string>
+    <string name="wallet_detail_edit">Edit</string>
+    <string name="wallet_detail_transfer_action">Transfer</string>
+    <string name="wallet_detail_archive">Archive</string>
+    <string name="wallet_detail_unarchive">Unarchive</string>
+    <string name="wallet_detail_set_default">Make default</string>
+    <string name="wallet_detail_delete">Delete</string>
+    <string name="wallet_detail_default_hint">Your default wallet can\'t be archived. Make another wallet the default first.</string>
+    <string name="wallet_detail_archived_hint">Archived: hidden from pickers, still in your history and reports.</string>
+    <string name="wallet_detail_money_out">Money out · %1$s</string>
+    <string name="wallet_detail_chart_description">Daily money out of %1$s, %2$s to %3$s. Biggest day %4$s, %5$s.</string>
+    <string name="wallet_detail_chart_empty">No money out of %1$s this month yet.</string>
+    <string name="wallet_detail_this_month">This month</string>
+    <string name="wallet_detail_no_transactions">No transactions in this wallet this month.</string>
+    <string name="wallet_detail_transfer">Transfer</string>
+    <string name="wallet_detail_transfer_to">Transfer to %1$s</string>
+    <string name="wallet_detail_transfer_from">Transfer from %1$s</string>
+    <string name="wallet_detail_untitled">Transaction</string>
+    <string name="wallet_detail_no_category">No category</string>
+    <string name="wallet_detail_row_meta">%1$s · %2$s</string>
+    <string name="wallet_detail_now_default">%1$s is now your default wallet</string>
+    <string name="wallet_detail_archived">%1$s archived</string>
+    <string name="wallet_detail_unarchived">%1$s is back in your wallets</string>
+    <string name="wallet_detail_error_title">Couldn\'t load this wallet</string>
+    <string name="wallet_detail_loading">Loading wallet</string>
+    <string name="wallets_delete_title">Delete %1$s?</string>
+    <string name="wallets_delete_body">This can\'t be undone. A wallet with transactions can only be archived.</string>
+    <string name="wallets_delete_confirm">Delete</string>
+    <string name="wallets_cancel">Cancel</string>
+    <string name="wallets_archive_instead_title">Archive %1$s instead?</string>
+    <string name="wallets_archive_instead_body">%1$s has transactions, so it can\'t be deleted. Archiving hides it from pickers — its history, balance and reports stay as they are.</string>
+    <string name="wallets_archive_instead_keeps_history">Transactions stay in your list</string>
+    <string name="wallets_archive_instead_reversible">You can unarchive any time</string>
+
+    <!-- Wallets: add/edit form -->
+    <string name="wallet_form_add_title">Add wallet</string>
+    <string name="wallet_form_edit_title">Edit wallet</string>
+    <string name="wallet_form_close">Close</string>
+    <string name="wallet_form_save">Save</string>
+    <string name="wallet_form_add">Add wallet</string>
+    <string name="wallet_form_pick_provider">Pick where your money is</string>
+    <string name="wallet_form_custom">Custom</string>
+    <string name="wallet_form_name">Wallet name</string>
+    <string name="wallet_form_name_help_provider">You can rename it — e.g. “%1$s Bisnis”.</string>
+    <string name="wallet_form_name_help_custom">Give it a name you recognise, e.g. “Tabungan rumah”.</string>
+    <string name="wallet_form_type">Type</string>
+    <string name="wallet_form_type_locked">Set by the provider.</string>
+    <string name="wallet_form_type_from_provider">Type: %1$s · set by the provider</string>
+    <string name="wallet_form_current_balance">Current balance</string>
+    <string name="wallet_form_current_balance_help">What\'s in it right now. Your transactions adjust it from here.</string>
+    <string name="wallet_form_starting_balance">Starting balance</string>
+    <string name="wallet_form_balance_shift">Changing the starting balance shifts the current balance by the same amount: %1$s → %2$s (%3$s). Your transactions don\'t change.</string>
+    <string name="wallet_form_make_default">Make this my default wallet</string>
+    <string name="wallet_form_make_default_help">Pre-selected when you add a transaction</string>
+    <string name="wallet_form_default">Default wallet</string>
+    <string name="wallet_form_default_current">This is your default wallet</string>
+    <string name="wallet_form_default_other">%1$s is your default now</string>
+    <string name="wallet_form_card_color">Card color</string>
+    <string name="wallet_form_color_indigo">Indigo</string>
+    <string name="wallet_form_color_teal">Teal</string>
+    <string name="wallet_form_color_green">Green</string>
+    <string name="wallet_form_color_violet">Violet</string>
+    <string name="wallet_form_color_rose">Rose</string>
+    <string name="wallet_form_color_slate">Slate</string>
+    <string name="wallet_form_archive">Archive</string>
+    <string name="wallet_form_delete">Delete</string>
+    <string name="wallet_form_error_name_required">Give the wallet a name.</string>
+    <string name="wallet_form_error_name_too_long">Use 30 characters or fewer.</string>
+    <string name="wallet_form_error_name_taken">You already have a wallet with this name.</string>
+    <string name="wallet_form_error_type_required">Choose a type.</string>
+    <string name="wallet_form_error_balance_too_large">That amount is too large.</string>
+    <string name="wallet_form_error_invalid">Check this field.</string>
+    <string name="wallet_form_discard_title">Discard changes?</string>
+    <string name="wallet_form_discard_body">Your changes to this wallet won\'t be saved.</string>
+    <string name="wallet_form_discard_confirm">Discard</string>
+    <string name="wallet_form_keep_editing">Keep editing</string>
+    <string name="wallet_form_loading">Loading wallet</string>
+
+    <!-- Wallets: archived -->
+    <string name="archived_wallets_title">Archived wallets</string>
+    <string name="archived_wallets_intro">Hidden from wallet pickers. Their transactions still show in your history and reports.</string>
+    <string name="archived_wallets_meta">%1$s · %2$s</string>
+    <string name="archived_wallets_unarchive">Unarchive</string>
+    <string name="archived_wallets_empty_title">No archived wallets</string>
+    <string name="archived_wallets_empty_body">Wallets you archive will show up here.</string>
+    <string name="archived_wallets_restored">%1$s is back in your wallets</string>
+    <string name="archived_wallets_view">View</string>
 </resources>

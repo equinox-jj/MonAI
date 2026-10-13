@@ -8,7 +8,6 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.format.MoneySign
 import com.djtech.monai.core.common.format.formatRupiahSigned
 import com.djtech.monai.core.model.TransactionType
-import com.djtech.monai.core.model.WalletType
 import com.djtech.monai.feature.home.presentation.home.model.Greeting
 import com.djtech.monai.feature.home.presentation.home.model.RecentTransaction
 import com.djtech.monai.feature.home.presentation.home.model.TransactionDay
@@ -41,17 +40,6 @@ internal fun Greeting.text(): String = stringResource(
         Greeting.AFTERNOON -> R.string.home_greeting_afternoon
         Greeting.EVENING -> R.string.home_greeting_evening
         Greeting.WELCOME -> R.string.home_greeting_welcome
-    },
-)
-
-@Composable
-@ReadOnlyComposable
-internal fun WalletType.label(): String = stringResource(
-    when (this) {
-        WalletType.CASH -> R.string.home_wallet_type_cash
-        WalletType.BANK -> R.string.home_wallet_type_bank
-        WalletType.E_WALLET -> R.string.home_wallet_type_e_wallet
-        WalletType.OTHER -> R.string.home_wallet_type_other
     },
 )
 

@@ -2,6 +2,7 @@ package com.djtech.monai.core.database
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.djtech.monai.core.database.dao.TransactionDao
+import com.djtech.monai.core.database.entity.DailyAmount
 import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
 import com.djtech.monai.core.model.TransactionType
 import kotlinx.coroutines.flow.first
@@ -74,6 +75,38 @@ class TransactionDaoTest {
         )
 
         assertEquals(setOf("spent", "received"), list(walletId = "bca").map { it.id }.toSet())
+    }
+
+    @Test
+    fun dailyOutflowsSumExpensesAndTransfersOutOfOneWallet() = runTest {
+        dao.upsertAll(
+            listOf(
+                transaction("lunch", date = LocalDate.of(2026, 10, 5), amount = 35_000),
+                transaction(
+                    "top-up",
+                    date = LocalDate.of(2026, 10, 5),
+                    type = TransactionType.TRANSFER,
+                    toWalletId = "gopay",
+                    categoryId = null,
+                    amount = 500_000,
+                ),
+                transaction("salary", date = LocalDate.of(2026, 10, 5), type = TransactionType.INCOME),
+                transaction(
+                    "received",
+                    date = LocalDate.of(2026, 10, 6),
+                    type = TransactionType.TRANSFER,
+                    walletId = "bca",
+                    toWalletId = "cash",
+                    categoryId = null,
+                ),
+                transaction("other-wallet", date = LocalDate.of(2026, 10, 6), walletId = "bca"),
+                transaction("sept", date = LocalDate.of(2026, 9, 30)),
+            ),
+        )
+
+        val outflows = dao.observeDailyOutflows(october.first, october.second, walletId = "cash").first()
+
+        assertEquals(listOf(DailyAmount(LocalDate.of(2026, 10, 5), 535_000)), outflows)
     }
 
     @Test

@@ -1,7 +1,12 @@
 package com.djtech.monai.feature.wallets.data.di
 
+import com.djtech.monai.feature.wallets.data.remote.PaymentProviderApiService
 import com.djtech.monai.feature.wallets.data.remote.WalletApiService
+import com.djtech.monai.feature.wallets.data.repository.ApiPaymentProviderRepository
 import com.djtech.monai.feature.wallets.data.repository.ApiWalletRepository
+import com.djtech.monai.feature.wallets.data.seed.AssetPaymentProviderSeed
+import com.djtech.monai.feature.wallets.data.seed.PaymentProviderSeed
+import com.djtech.monai.feature.wallets.domain.repository.PaymentProviderRepository
 import com.djtech.monai.feature.wallets.domain.repository.WalletRepository
 import dagger.Binds
 import dagger.Module
@@ -18,6 +23,12 @@ abstract class WalletBindsModule {
 
     @Binds
     abstract fun bindWalletRepository(repository: ApiWalletRepository): WalletRepository
+
+    @Binds
+    abstract fun bindPaymentProviderRepository(repository: ApiPaymentProviderRepository): PaymentProviderRepository
+
+    @Binds
+    abstract fun bindPaymentProviderSeed(seed: AssetPaymentProviderSeed): PaymentProviderSeed
 }
 
 @Module
@@ -27,4 +38,8 @@ object WalletModule {
     @Provides
     @Singleton
     fun provideWalletApiService(retrofit: Retrofit): WalletApiService = retrofit.create()
+
+    @Provides
+    @Singleton
+    fun providePaymentProviderApiService(retrofit: Retrofit): PaymentProviderApiService = retrofit.create()
 }

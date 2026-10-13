@@ -59,6 +59,14 @@ internal object Palette {
     val Cyan400 = Color(0xFF22D3EE)
     val Cyan100 = Color(0xFFCFFAFE)
     val Emerald800 = Color(0xFF05603A)
+
+    val Violet800 = Color(0xFF5B21B6)
+    val Violet600 = Color(0xFF7C3AED)
+    val Violet100 = Color(0xFFEDE9FE)
+
+    val Rose800 = Color(0xFF9F1239)
+    val Rose600 = Color(0xFFE11D48)
+    val Rose100 = Color(0xFFFFE4E6)
 }
 
 /**
@@ -259,6 +267,33 @@ object WalletGradients {
     fun cash(dark: Boolean) =
         if (dark) WalletGradient(Palette.Emerald800, Palette.Green700, Palette.Green50)
         else WalletGradient(Palette.Green700, Palette.Green600, Palette.Green50)
+}
+
+/**
+ * The card colors a user can pick for a wallet (Edit wallet). The server stores [hex], the bright
+ * end of the gradient; a wallet without a color, or with one the app doesn't know, uses its type's.
+ */
+enum class WalletColor(val hex: String) {
+    Indigo("#4A45D6"),
+    Teal("#0891B2"),
+    Green("#079455"),
+    Violet("#7C3AED"),
+    Rose("#E11D48"),
+    Slate("#475467"),
+    ;
+
+    fun gradient(dark: Boolean): WalletGradient = when (this) {
+        Indigo -> WalletGradients.bankAlt(dark)
+        Teal -> WalletGradients.eWallet(dark)
+        Green -> WalletGradients.cash(dark)
+        Violet -> WalletGradient(Palette.Violet800, Palette.Violet600, Palette.Violet100)
+        Rose -> WalletGradient(Palette.Rose800, Palette.Rose600, Palette.Rose100)
+        Slate -> WalletGradient(Palette.Gray800, Palette.Gray600, Palette.Gray100)
+    }
+
+    companion object {
+        fun fromHex(hex: String?): WalletColor? = entries.firstOrNull { it.hex.equals(hex, ignoreCase = true) }
+    }
 }
 
 /**

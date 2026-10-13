@@ -13,13 +13,14 @@ internal fun MainNavigator.openFromHome(destination: HomeDestination) {
         is HomeDestination.TransactionDetail -> navigate(TransactionDetailRoute(destination.transactionId))
         HomeDestination.AddTransaction -> navigate(TransactionFormRoute())
 
+        is HomeDestination.WalletDetail -> navigate(WalletDetailRoute(destination.walletId))
+        HomeDestination.AddWallet -> navigate(WalletFormRoute())
+
         HomeDestination.Wallets -> selectTab(TopLevelDestination.Wallets)
         HomeDestination.Settings -> selectTab(TopLevelDestination.Settings)
 
         HomeDestination.QuickAdd,
         HomeDestination.ScanReceipt,
-        is HomeDestination.WalletDetail,
-        HomeDestination.AddWallet,
         HomeDestination.Budget,
         HomeDestination.Report,
             -> Unit

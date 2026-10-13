@@ -30,6 +30,7 @@ import com.djtech.monai.feature.transactions.presentation.transactionform.mapper
 import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toFieldMessages
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormMode
+import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.WalletTarget
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveAllWalletsUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletsUseCase
@@ -64,6 +65,7 @@ import java.time.YearMonth
 @HiltViewModel(assistedFactory = TransactionFormViewModel.Factory::class)
 class TransactionFormViewModel @AssistedInject constructor(
     @Assisted private val transactionId: String?,
+    @Assisted private val preset: TransactionFormPreset,
     private val observeTransaction: ObserveTransactionUseCase,
     private val refreshTransaction: RefreshTransactionUseCase,
     private val createTransaction: CreateTransactionUseCase,
@@ -78,13 +80,13 @@ class TransactionFormViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(transactionId: String?): TransactionFormViewModel
+        fun create(transactionId: String?, preset: TransactionFormPreset): TransactionFormViewModel
     }
 
     private val mode: TransactionFormMode =
         transactionId?.let(TransactionFormMode::Edit) ?: TransactionFormMode.Add
     private val editor = MutableStateFlow(
-        Editor(draft = Draft(date = clock.today()), isLoading = transactionId != null),
+        newDraft().let { draft -> Editor(draft = draft, pristine = draft, isLoading = transactionId != null) },
     )
 
     private val categories: Flow<List<Category>> = editor
@@ -129,7 +131,11 @@ class TransactionFormViewModel @AssistedInject constructor(
     val effects: Flow<TransactionFormEffect> = effectChannel.receiveAsFlow()
 
     init {
-        if (transactionId != null) load(transactionId)
+        if (transactionId != null) {
+            load(transactionId)
+        } else if (preset.type == TransactionType.TRANSFER) {
+            prefillDestination()
+        }
     }
 
     fun onIntent(intent: TransactionFormIntent) {
@@ -303,11 +309,28 @@ class TransactionFormViewModel @AssistedInject constructor(
     }
 
     /** The chosen source wallet, else the default one. */
+    private fun newDraft() = Draft(type = preset.type, walletId = preset.walletId, date = clock.today())
+
+    // A preset transfer starts out to the first other wallet, as picking the Transfer tab does. It still
+    // counts as untouched, so closing right away doesn't ask to discard.
+    private fun prefillDestination() {
+        viewModelScope.launch {
+            val wallets = activeWallets.first()
+            editor.update { editor ->
+                val draft = editor.draft
+                if (draft.toWalletId != null) return@update editor
+                val source = draft.walletId ?: wallets.defaultWallet()?.id
+                val prefilled = draft.copy(toWalletId = wallets.firstOrNull { it.id != source }?.id)
+                editor.copy(draft = prefilled, pristine = if (draft == editor.pristine) prefilled else editor.pristine)
+            }
+        }
+    }
+
     private fun sourceWalletId(): String? = editor.value.draft.walletId ?: state.value.wallets.defaultWallet()?.id
 
     private fun close() {
         val editor = editor.value
-        val initial = editor.original ?: Draft(date = clock.today())
+        val initial = editor.original ?: editor.pristine
         if (editor.draft != initial && !editor.isLoading) {
             this.editor.update { it.copy(showDiscardDialog = true) }
         } else {
@@ -347,9 +370,13 @@ private data class Draft(
     val merchant: String? = null,
 )
 
-/** [original] is the transaction being edited, to tell whether anything changed. */
+/**
+ * [original] is the transaction being edited, and [pristine] the draft a new one started from;
+ * both tell whether anything changed.
+ */
 private data class Editor(
     val draft: Draft,
+    val pristine: Draft,
     val original: Draft? = null,
     val isLoading: Boolean = false,
     val loadError: UiText? = null,

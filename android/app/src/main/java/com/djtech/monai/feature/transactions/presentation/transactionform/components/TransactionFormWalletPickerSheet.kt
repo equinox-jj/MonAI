@@ -18,10 +18,10 @@ import com.djtech.monai.core.common.format.formatRupiah
 import com.djtech.monai.core.designsystem.component.MonAIBottomSheet
 import com.djtech.monai.core.designsystem.component.MonAIButton
 import com.djtech.monai.core.designsystem.component.MonAIRadioOption
+import com.djtech.monai.core.designsystem.component.WalletMonogram
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.Wallet
-import com.djtech.monai.feature.transactions.presentation.common.WalletMonogram
 import com.djtech.monai.feature.transactions.presentation.transactionform.TransactionFormIntent
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.WalletTarget

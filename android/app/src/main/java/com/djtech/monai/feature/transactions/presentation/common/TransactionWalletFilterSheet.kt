@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import com.djtech.monai.R
 import com.djtech.monai.core.designsystem.component.MonAIBottomSheet
 import com.djtech.monai.core.designsystem.component.MonAIDivider
+import com.djtech.monai.core.designsystem.component.WalletMonogram
+import com.djtech.monai.core.designsystem.component.label
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.Wallet

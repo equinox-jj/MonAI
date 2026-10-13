@@ -2,6 +2,7 @@ package com.djtech.monai.core.database
 
 import androidx.paging.PagingSource
 import com.djtech.monai.core.database.dao.TransactionDao
+import com.djtech.monai.core.database.entity.DailyAmount
 import com.djtech.monai.core.database.entity.DailyNet
 import com.djtech.monai.core.database.entity.TransactionEntity
 import com.djtech.monai.core.database.entity.TransactionRemoteKeyEntity
@@ -59,6 +60,18 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
             .groupBy { it.date }
             .map { (date, rows) -> DailyNet(date, rows.sumOf { it.signedAmount() }) }
     }
+
+    override fun observeDailyOutflows(from: LocalDate, to: LocalDate, walletId: String): Flow<List<DailyAmount>> =
+        rows.map { all ->
+            all.values
+                .filter { row ->
+                    row.date in from..to &&
+                        row.walletId == walletId &&
+                        row.type != TransactionType.INCOME
+                }
+                .groupBy { it.date }
+                .map { (date, rows) -> DailyAmount(date, rows.sumOf { it.amount }) }
+        }
 
     override fun observe(id: String): Flow<TransactionEntity?> = rows.map { it[id] }
 

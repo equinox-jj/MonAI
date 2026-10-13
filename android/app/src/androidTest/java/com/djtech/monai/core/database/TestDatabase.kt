@@ -81,10 +81,11 @@ fun transaction(
     categoryId: String? = "food",
     note: String? = null,
     merchant: String? = null,
+    amount: Long = 35_000,
 ) = TransactionEntity(
     id = id,
     type = type,
-    amount = 35_000,
+    amount = amount,
     walletId = walletId,
     toWalletId = toWalletId,
     categoryId = categoryId,

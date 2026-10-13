@@ -23,7 +23,3 @@ internal fun MainNavigator.closeDeletedTransaction(id: String) {
 
 private fun NavKey.showsTransaction(id: String): Boolean =
     (this is TransactionFormRoute && this.id == id) || (this is TransactionDetailRoute && this.id == id)
-
-/** Screens that take the whole window on a phone, so the bottom bar hides under them. */
-internal fun NavKey.isFullScreen(): Boolean =
-    this is TransactionDetailRoute || this is TransactionFormRoute || this is TransactionSearchRoute

@@ -4,6 +4,7 @@ import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.database.FakeWalletDao
 import com.djtech.monai.core.database.entity.WalletEntity
+import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.core.model.WalletType
@@ -11,7 +12,12 @@ import com.djtech.monai.core.network.ApiCaller
 import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.wallets.data.remote.WalletApiService
+import com.djtech.monai.feature.wallets.domain.model.WalletChanges
 import com.djtech.monai.feature.wallets.domain.model.WalletError
+import com.djtech.monai.feature.wallets.domain.model.WalletField
+import com.djtech.monai.feature.wallets.domain.model.WalletFieldError
+import com.djtech.monai.feature.wallets.domain.model.WalletFieldIssue
+import com.djtech.monai.feature.wallets.domain.model.WalletInput
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
@@ -180,6 +186,164 @@ class ApiWalletRepositoryTest {
         assertSame(failure, errorLogger.errors.single())
     }
 
+    @Test
+    fun `createWallet posts the form and caches the new wallet`() = runTest {
+        val dao = FakeWalletDao()
+        server.enqueue(MockResponse(code = 201, body = walletBody(GOPAY_JSON)))
+
+        val result = repository(dao).createWallet(
+            WalletInput(name = "GoPay", type = WalletType.E_WALLET, initialBalance = 0),
+        )
+
+        assertEquals(Outcome.Success(GOPAY), result)
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/v1/wallets", request.url.encodedPath)
+        assertEquals(
+            """{"name":"GoPay","type":"E_WALLET","initial_balance":0,"is_default":false}""",
+            request.body?.utf8(),
+        )
+        assertEquals(listOf(GOPAY), dao.wallets.map { it.asModel() })
+    }
+
+    @Test
+    fun `a new default wallet clears the old default in the cache`() = runTest {
+        val dao = FakeWalletDao(listOf(entity(id = "cash", name = "Cash", isDefault = true)))
+        server.enqueue(MockResponse(code = 201, body = walletBody(BCA_JSON)))
+
+        repository(dao).createWallet(WalletInput(name = "BCA Tabungan", type = WalletType.BANK, isDefault = true))
+
+        assertEquals(listOf(BCA.id to true, "cash" to false), dao.wallets.map { it.id to it.isDefault })
+    }
+
+    @Test
+    fun `createWallet with a taken name fails on the name field`() = runTest {
+        val dao = FakeWalletDao()
+        server.enqueue(
+            MockResponse(
+                code = 409,
+                body = """{"success":false,"message":"Taken","data":null,"error":{"code":"conflict"}}""",
+            ),
+        )
+
+        val result = repository(dao).createWallet(WalletInput(name = "Cash", type = WalletType.CASH))
+
+        assertEquals(
+            Outcome.Failure(
+                WalletError.InvalidFields(listOf(WalletFieldError(WalletField.NAME, WalletFieldIssue.ALREADY_EXISTS))),
+            ),
+            result,
+        )
+        assertEquals(emptyList<WalletEntity>(), dao.wallets)
+    }
+
+    @Test
+    fun `updateWallet patches only the changed fields and caches the result`() = runTest {
+        val dao = FakeWalletDao(listOf(BCA.copy(name = "BCA").asEntity()))
+        server.enqueue(MockResponse(code = 200, body = walletBody(BCA_JSON)))
+
+        val result = repository(dao).updateWallet(BCA.id, WalletChanges(name = "BCA Tabungan"))
+
+        assertEquals(Outcome.Success(BCA), result)
+        val request = server.takeRequest()
+        assertEquals("PATCH", request.method)
+        assertEquals("/api/v1/wallets/${BCA.id}", request.url.encodedPath)
+        assertEquals("""{"name":"BCA Tabungan"}""", request.body?.utf8())
+        assertEquals(listOf(BCA), dao.wallets.map { it.asModel() })
+    }
+
+    @Test
+    fun `setting a default through update clears the old default in the cache`() = runTest {
+        val dao = FakeWalletDao(
+            listOf(entity(id = "cash", name = "Cash", isDefault = true), BCA.copy(isDefault = false).asEntity()),
+        )
+        server.enqueue(MockResponse(code = 200, body = walletBody(BCA_JSON)))
+
+        repository(dao).updateWallet(BCA.id, WalletChanges(isDefault = true))
+
+        assertEquals(listOf(BCA.id to true, "cash" to false), dao.wallets.map { it.id to it.isDefault })
+    }
+
+    @Test
+    fun `archiving the default wallet fails with the business rule`() = runTest {
+        val dao = FakeWalletDao(listOf(BCA.asEntity()))
+        server.enqueue(
+            MockResponse(
+                code = 422,
+                body = """{"success":false,"message":"No","data":null,"error":{"code":"default_wallet_required"}}""",
+            ),
+        )
+
+        val result = repository(dao).updateWallet(BCA.id, WalletChanges(isArchived = true))
+
+        assertEquals(Outcome.Failure(WalletError.DefaultRequired), result)
+        assertEquals(listOf(BCA), dao.wallets.map { it.asModel() })
+    }
+
+    @Test
+    fun `deleteWallet removes the wallet from the cache`() = runTest {
+        val dao = FakeWalletDao(listOf(GOPAY.asEntity(), BCA.asEntity()))
+        server.enqueue(MockResponse(code = 200, body = """{"success":true,"message":"Deleted","data":null}"""))
+
+        val result = repository(dao).deleteWallet(GOPAY.id)
+
+        assertEquals(Outcome.Success(Unit), result)
+        val request = server.takeRequest()
+        assertEquals("DELETE", request.method)
+        assertEquals("/api/v1/wallets/${GOPAY.id}", request.url.encodedPath)
+        assertEquals(listOf(BCA.id), dao.wallets.map { it.id })
+    }
+
+    @Test
+    fun `deleting a wallet with transactions keeps it and says so`() = runTest {
+        val dao = FakeWalletDao(listOf(GOPAY.asEntity()))
+        server.enqueue(
+            MockResponse(
+                code = 422,
+                body = """{"success":false,"message":"No","data":null,"error":{"code":"wallet_has_transactions"}}""",
+            ),
+        )
+
+        assertEquals(Outcome.Failure(WalletError.HasTransactions), repository(dao).deleteWallet(GOPAY.id))
+        assertEquals(listOf(GOPAY.id), dao.wallets.map { it.id })
+    }
+
+    @Test
+    fun `refreshWallet caches the server's copy`() = runTest {
+        val dao = FakeWalletDao(listOf(BCA.copy(currentBalance = 1).asEntity()))
+        server.enqueue(MockResponse(code = 200, body = walletBody(BCA_JSON)))
+
+        assertEquals(Outcome.Success(Unit), repository(dao).refreshWallet(BCA.id))
+        assertEquals("/api/v1/wallets/${BCA.id}", server.takeRequest().url.encodedPath)
+        assertEquals(listOf(BCA), dao.wallets.map { it.asModel() })
+    }
+
+    @Test
+    fun `refreshWallet drops a wallet the server no longer has`() = runTest {
+        val dao = FakeWalletDao(listOf(BCA.asEntity()))
+        server.enqueue(
+            MockResponse(
+                code = 404,
+                body = """{"success":false,"message":"Not found","data":null,"error":{"code":"not_found"}}""",
+            ),
+        )
+
+        assertEquals(Outcome.Failure(WalletError.NotFound), repository(dao).refreshWallet(BCA.id))
+        assertEquals(emptyList<WalletEntity>(), dao.wallets)
+    }
+
+    @Test
+    fun `a write that can't be cached fails as unexpected and logs`() = runTest {
+        val failure = IOException("disk full")
+        val dao = FakeWalletDao().apply { this.failure = failure }
+        server.enqueue(MockResponse(code = 201, body = walletBody(GOPAY_JSON)))
+
+        val result = repository(dao).createWallet(WalletInput(name = "GoPay", type = WalletType.E_WALLET))
+
+        assertEquals(Outcome.Failure(WalletError.Unexpected), result)
+        assertSame(failure, errorLogger.errors.single())
+    }
+
     private fun repository(dao: FakeWalletDao): ApiWalletRepository {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
@@ -194,6 +358,8 @@ class ApiWalletRepositoryTest {
             errorLogger = errorLogger,
         )
     }
+
+    private fun walletBody(wallet: String) = """{"success":true,"message":"OK","data":$wallet}"""
 
     // `meta` is sent like the real API, though the repository doesn't read it.
     private fun walletsBody(vararg wallets: String) =

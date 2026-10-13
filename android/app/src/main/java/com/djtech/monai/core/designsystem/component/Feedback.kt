@@ -243,11 +243,15 @@ fun MonAISnackbar(
     }
 }
 
-/** [SnackbarVisuals] that also carries an icon, for [MonAISnackbarHost]. */
+/**
+ * [SnackbarVisuals] that also carries an icon, for [MonAISnackbarHost]. [iconTint] defaults to
+ * the warning amber; pass e.g. the success green for a confirmation.
+ */
 data class MonAISnackbarVisuals(
     override val message: String,
     override val actionLabel: String? = null,
     val icon: ImageVector? = null,
+    val iconTint: Color = Color.Unspecified,
     override val withDismissAction: Boolean = false,
     override val duration: SnackbarDuration =
         if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Long,
@@ -263,9 +267,11 @@ fun MonAISnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifie
         hostState,
         modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal),
     ) { data: SnackbarData ->
+        val visuals = data.visuals as? MonAISnackbarVisuals
         MonAISnackbar(
             message = data.visuals.message,
-            icon = (data.visuals as? MonAISnackbarVisuals)?.icon,
+            icon = visuals?.icon,
+            iconTint = visuals?.iconTint?.takeIf { it != Color.Unspecified } ?: MonAITheme.colors.warning,
             actionLabel = data.visuals.actionLabel,
             onAction = data::performAction,
         )

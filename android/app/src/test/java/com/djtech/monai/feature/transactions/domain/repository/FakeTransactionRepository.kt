@@ -69,6 +69,15 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
                 .mapValues { (_, day) -> day.sumOf { it.signedAmount() } }
         }
 
+    override fun observeDailyOutflows(month: YearMonth, walletId: String): Flow<Map<LocalDate, Long>> =
+        transactions.map { list ->
+            list.filter {
+                YearMonth.from(it.date) == month && it.walletId == walletId && it.type != TransactionType.INCOME
+            }
+                .groupBy { it.date }
+                .mapValues { (_, day) -> day.sumOf { it.amount } }
+        }
+
     override fun searchTransactions(
         query: String,
         month: YearMonth,

@@ -29,20 +29,41 @@ fun wallet(
     balance: Long = 0,
     isDefault: Boolean = false,
     isArchived: Boolean = false,
+    type: WalletType = WalletType.BANK,
+    providerId: String? = null,
+    initialBalance: Long = 0,
+    color: String? = null,
 ) = Wallet(
     id = id,
-    providerId = null,
+    providerId = providerId,
     name = name,
-    type = WalletType.BANK,
+    type = type,
     logoUrl = null,
-    initialBalance = 0,
+    initialBalance = initialBalance,
     currentBalance = balance,
     icon = null,
-    color = null,
+    color = color,
     isDefault = isDefault,
     isArchived = isArchived,
     createdAt = CREATED,
     updatedAt = CREATED,
+)
+
+/** [id] is empty for an entry of the bundled seed catalog, which only knows slugs. */
+fun paymentProvider(
+    slug: String,
+    id: String = "p-$slug",
+    name: String = slug,
+    type: WalletType = WalletType.BANK,
+    sortOrder: Int = 0,
+) = PaymentProvider(
+    id = id,
+    slug = slug,
+    name = name,
+    type = type,
+    logoUrl = null,
+    aliases = listOf(slug),
+    sortOrder = sortOrder,
 )
 
 fun category(

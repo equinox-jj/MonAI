@@ -31,6 +31,9 @@ interface TransactionRepository {
     /** Income minus expenses of each cached day of [month] matching [filter]; transfers count as zero. */
     fun observeDailyNets(month: YearMonth, filter: TransactionFilter): Flow<Map<LocalDate, Long>>
 
+    /** Expenses plus transfers out of [walletId] on each cached day of [month], in positive rupiah. */
+    fun observeDailyOutflows(month: YearMonth, walletId: String): Flow<Map<LocalDate, Long>>
+
     /** Transactions of [month] whose note or merchant contains [query], straight from the API. */
     fun searchTransactions(
         query: String,
