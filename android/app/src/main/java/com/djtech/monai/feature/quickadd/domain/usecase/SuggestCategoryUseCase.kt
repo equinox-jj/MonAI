@@ -3,8 +3,8 @@ package com.djtech.monai.feature.quickadd.domain.usecase
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.model.Category
-import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
+import com.djtech.monai.core.model.categoryType
 import com.djtech.monai.core.model.isLowConfidence
 import com.djtech.monai.feature.quickadd.domain.parser.CategoryKeywords
 import com.djtech.monai.feature.quickadd.domain.repository.QuickAddRepository
@@ -25,11 +25,11 @@ class SuggestCategoryUseCase @Inject constructor(
 ) {
     suspend operator fun invoke(text: String, type: TransactionType, categories: List<Category>): String? {
         val note = text.trim()
-        if (note.isEmpty() || type == TransactionType.TRANSFER) return null
+        val categoryType = type.categoryType()
+        if (note.isEmpty() || categoryType == null) return null
         val allowed = categories.map { it.id }.toSet()
         findCategoryForNote(note, type)?.takeIf { it in allowed }?.let { return it }
 
-        val categoryType = if (type == TransactionType.INCOME) CategoryType.INCOME else CategoryType.EXPENSE
         CategoryKeywords.find(note.lowercase(), categories, categoryType)?.let { return it.categoryId }
 
         if (note.length < MIN_AI_TEXT) return null

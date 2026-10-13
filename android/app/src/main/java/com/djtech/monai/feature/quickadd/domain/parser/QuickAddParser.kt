@@ -1,12 +1,12 @@
 package com.djtech.monai.feature.quickadd.domain.parser
 
 import com.djtech.monai.core.model.Category
-import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.DraftConfidence
 import com.djtech.monai.core.model.PaymentProvider
 import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.Wallet
+import com.djtech.monai.core.model.categoryType
 import java.time.LocalDate
 
 /** What the parser matches against: the user's active wallets, visible categories and the provider catalog. */
@@ -104,7 +104,7 @@ object QuickAddParser {
     }
 
     private fun Segment.categoryOf(type: TransactionType, categories: List<Category>): CategoryMatch? {
-        val categoryType = if (type == TransactionType.INCOME) CategoryType.INCOME else CategoryType.EXPENSE
+        val categoryType = type.categoryType() ?: return null
         return CategoryKeywords.find(text, categories, categoryType)
             ?: categories.firstOrNull { it.type == categoryType && it.isSystem }
                 ?.let { CategoryMatch(it.id, FALLBACK_CATEGORY) }

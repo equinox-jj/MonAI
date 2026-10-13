@@ -7,7 +7,7 @@ import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.feature.quickadd.presentation.quickaddreview.model.ReviewDraft
 import com.djtech.monai.feature.quickadd.presentation.quickaddreview.model.ReviewOutcome
 import com.djtech.monai.feature.quickadd.presentation.quickaddreview.model.ReviewSummaryRow
-import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toHighlights
+import com.djtech.monai.feature.transactions.presentation.common.mapper.toHighlights
 import java.time.LocalDate
 
 /** A draft to review: missing type and date become an expense today, and a future date becomes today. */

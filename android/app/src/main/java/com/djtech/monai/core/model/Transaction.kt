@@ -5,6 +5,13 @@ import java.time.LocalDate
 
 enum class TransactionType { EXPENSE, INCOME, TRANSFER }
 
+/** The category type a transaction type uses; transfers have none. */
+fun TransactionType.categoryType(): CategoryType? = when (this) {
+    TransactionType.EXPENSE -> CategoryType.EXPENSE
+    TransactionType.INCOME -> CategoryType.INCOME
+    TransactionType.TRANSFER -> null
+}
+
 /** How a transaction was entered. */
 enum class TransactionSource { MANUAL, QUICK_ADD, RECEIPT }
 

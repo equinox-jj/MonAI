@@ -9,6 +9,7 @@ import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.Wallet
+import com.djtech.monai.core.model.categoryType
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.quickadd.presentation.quickaddreview.mapper.toReviewDraft
 import com.djtech.monai.feature.quickadd.presentation.quickaddreview.mapper.toSummaryRow
@@ -21,9 +22,8 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.usecase.CreateTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.validation.MAX_NOTE_LENGTH
+import com.djtech.monai.feature.transactions.presentation.common.mapper.toFieldMessages
 import com.djtech.monai.feature.transactions.presentation.common.mapper.toMessage
-import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.categoryType
-import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toFieldMessages
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletsUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory

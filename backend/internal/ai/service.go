@@ -24,6 +24,11 @@ type Service interface {
 	ParseReceipt(ctx context.Context, userID uuid.UUID, req ParseReceiptRequest) (ParseReceiptResponse, error)
 }
 
+// phraseTimeout caps a quick-add parse: the app falls back to its local
+// parser after 3 seconds, so waiting longer only spends quota. Receipts keep
+// the configured GEMINI_TIMEOUT, since long OCR text takes the model longer.
+const phraseTimeout = 3 * time.Second
+
 type service struct {
 	parser     TransactionParser
 	wallets    wallet.Repository
@@ -57,7 +62,7 @@ func (s *service) ParseTransaction(ctx context.Context, userID uuid.UUID, req Pa
 		return ParseTransactionResponse{}, err
 	}
 
-	ctx, cancel := context.WithTimeout(ctx, s.timeout)
+	ctx, cancel := context.WithTimeout(ctx, min(s.timeout, phraseTimeout))
 	defer cancel()
 
 	raws, err := s.parser.ParseTransaction(ctx, in)

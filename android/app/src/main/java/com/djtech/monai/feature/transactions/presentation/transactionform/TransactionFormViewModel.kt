@@ -15,6 +15,7 @@ import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.TransactionSource
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.Wallet
+import com.djtech.monai.core.model.categoryType
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCreatedCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveVisibleCategoriesUseCase
@@ -28,11 +29,10 @@ import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionUs
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.UpdateTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.validation.MAX_NOTE_LENGTH
+import com.djtech.monai.feature.transactions.presentation.common.mapper.toFieldMessages
+import com.djtech.monai.feature.transactions.presentation.common.mapper.toHighlights
 import com.djtech.monai.feature.transactions.presentation.common.mapper.toMessage
 import com.djtech.monai.feature.transactions.presentation.common.model.TransactionLookups
-import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.categoryType
-import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toFieldMessages
-import com.djtech.monai.feature.transactions.presentation.transactionform.mapper.toHighlights
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormMode
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
