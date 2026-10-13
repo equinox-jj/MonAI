@@ -1,7 +1,9 @@
 package com.djtech.monai.feature.categories.data.repository
 
 import com.djtech.monai.core.common.log.ErrorLogger
-import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.log.runLogged
+import com.djtech.monai.core.common.result.flatMap
+import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.database.dao.CategoryDao
 import com.djtech.monai.core.database.dao.TransactionDao
 import com.djtech.monai.core.database.entity.CategoryEntity
@@ -10,6 +12,7 @@ import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.network.ApiCaller
+import com.djtech.monai.core.network.ApiError
 import com.djtech.monai.feature.categories.data.dto.CategoryDto
 import com.djtech.monai.feature.categories.data.mapper.asModel
 import com.djtech.monai.feature.categories.data.mapper.toCategoryError
@@ -25,7 +28,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class ApiCategoryRepository @Inject constructor(
@@ -44,86 +46,50 @@ class ApiCategoryRepository @Inject constructor(
             entities.filterNot(CategoryEntity::isHidden).map(CategoryEntity::asModel)
         }
 
-    override suspend fun refresh(): CategoryResult<Unit> {
-        // Hidden categories too: transactions that use them still need their name and icon.
-        // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
-        val result = apiCaller.callRaw {
-            categoryApiService.getCategories(includeHidden = true).data.map(CategoryDto::asModel)
-        }
-        return when (result) {
-            is Outcome.Success -> cache(result.data)
-            is Outcome.Failure -> Outcome.Failure(result.error.toCategoryError())
-        }
-    }
-
-    override suspend fun createCategory(input: CategoryInput): CategoryResult<Category> {
-        val body = input.toCreateRequest()
-        // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
-        val result = apiCaller.callRaw { categoryApiService.createCategory(body).data.asModel() }
-        return when (result) {
-            is Outcome.Success -> {
-                val category = result.data
-                try {
-                    categoryDao.upsertAll(listOf(category.asEntity()))
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    // Created on the server but not cached; the next refresh brings it in.
-                    errorLogger.log("Caching the created category failed", e)
-                    return Outcome.Failure(CategoryError.Unexpected)
+    // Hidden categories too: transactions that use them still need their name and icon.
+    // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
+    override suspend fun refresh(): CategoryResult<Unit> =
+        apiCaller.callRaw { categoryApiService.getCategories(includeHidden = true).data.map(CategoryDto::asModel) }
+            .mapError(ApiError::toCategoryError)
+            .flatMap { categories ->
+                errorLogger.runLogged("Caching categories failed", CategoryError.Unexpected) {
+                    categoryDao.replaceAll(categories.map(Category::asEntity))
                 }
-                Outcome.Success(category)
             }
 
-            is Outcome.Failure -> Outcome.Failure(result.error.toCategoryError())
-        }
+    // A change made on the server but not cached fails with Unexpected; the next refresh brings it in.
+    override suspend fun createCategory(input: CategoryInput): CategoryResult<Category> {
+        val body = input.toCreateRequest()
+        return apiCaller.callRaw { categoryApiService.createCategory(body).data.asModel() }
+            .mapError(ApiError::toCategoryError)
+            .flatMap { category ->
+                errorLogger.runLogged("Caching the created category failed", CategoryError.Unexpected) {
+                    categoryDao.upsertAll(listOf(category.asEntity()))
+                    category
+                }
+            }
     }
 
     override suspend fun updateCategory(id: String, changes: CategoryChanges): CategoryResult<Category> {
         val body = changes.toUpdateRequest()
-        val result = apiCaller.callRaw { categoryApiService.updateCategory(id, body).data.asModel() }
-        return when (result) {
-            is Outcome.Success -> {
-                val cached = writingCache("Caching the updated category failed") {
-                    categoryDao.upsertAll(listOf(result.data.asEntity()))
+        return apiCaller.callRaw { categoryApiService.updateCategory(id, body).data.asModel() }
+            .mapError(ApiError::toCategoryError)
+            .flatMap { category ->
+                errorLogger.runLogged("Caching the updated category failed", CategoryError.Unexpected) {
+                    categoryDao.upsertAll(listOf(category.asEntity()))
+                    category
                 }
-                if (cached is Outcome.Failure) cached else Outcome.Success(result.data)
             }
-
-            is Outcome.Failure -> Outcome.Failure(result.error.toCategoryError())
-        }
     }
 
     override suspend fun deleteCategory(id: String, moveTo: String?): CategoryResult<Unit> =
-        when (val result = apiCaller.callRaw { categoryApiService.deleteCategory(id, moveTo) }) {
-            // No foreign keys: the cached transactions follow the server's move by hand.
-            is Outcome.Success -> writingCache("Removing the deleted category from the cache failed") {
-                if (moveTo != null) transactionDao.moveCategory(from = id, to = moveTo)
-                categoryDao.delete(id)
+        apiCaller.callRaw { categoryApiService.deleteCategory(id, moveTo) }
+            .mapError(ApiError::toCategoryError)
+            .flatMap {
+                errorLogger.runLogged("Removing the deleted category from the cache failed", CategoryError.Unexpected) {
+                    // No foreign keys: the cached transactions follow the server's move by hand.
+                    if (moveTo != null) transactionDao.moveCategory(from = id, to = moveTo)
+                    categoryDao.delete(id)
+                }
             }
-
-            is Outcome.Failure -> Outcome.Failure(result.error.toCategoryError())
-        }
-
-    // Done on the server but not cached; the next refresh brings the cache up to date.
-    private suspend fun writingCache(message: String, block: suspend () -> Unit): CategoryResult<Unit> = try {
-        block()
-        Outcome.Success(Unit)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log(message, e)
-        Outcome.Failure(CategoryError.Unexpected)
-    }
-
-    // ApiCaller covers network failures; this keeps a failed cache write from throwing too.
-    private suspend fun cache(categories: List<Category>): CategoryResult<Unit> = try {
-        categoryDao.replaceAll(categories.map(Category::asEntity))
-        Outcome.Success(Unit)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log("Caching categories failed", e)
-        Outcome.Failure(CategoryError.Unexpected)
-    }
 }

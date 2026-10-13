@@ -12,8 +12,8 @@ import androidx.core.content.FileProvider
 import androidx.core.graphics.scale
 import androidx.core.net.toUri
 import androidx.exifinterface.media.ExifInterface
-import com.djtech.monai.core.common.dispatcher.Dispatcher
-import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.coroutines.Dispatcher
+import com.djtech.monai.core.common.coroutines.MonAIDispatcher
 import com.djtech.monai.core.common.log.ErrorLogger
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineDispatcher

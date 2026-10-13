@@ -6,7 +6,11 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingData
 import androidx.paging.map
 import com.djtech.monai.core.common.log.ErrorLogger
+import com.djtech.monai.core.common.log.runLogged
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.catching
+import com.djtech.monai.core.common.result.flatMap
+import com.djtech.monai.core.common.result.getOrElse
 import com.djtech.monai.core.common.result.map
 import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.common.time.AppClock
@@ -20,6 +24,7 @@ import com.djtech.monai.core.media.EncodedImage
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.network.ApiCaller
+import com.djtech.monai.core.network.ApiError
 import com.djtech.monai.core.network.upload.filePart
 import com.djtech.monai.feature.transactions.data.dto.AttachReceiptRequestDto
 import com.djtech.monai.feature.transactions.data.dto.TransactionDto
@@ -47,7 +52,6 @@ import java.time.LocalDate
 import java.time.YearMonth
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 /** Rows per page of a paged list; the API allows up to 100. */
 internal const val TRANSACTION_PAGE_SIZE = 20
@@ -65,28 +69,21 @@ class ApiTransactionRepository @Inject constructor(
         transactionDao.observeRecent(month.atDay(1), month.atEndOfMonth(), limit)
             .map { entities -> entities.map(TransactionEntity::asModel) }
 
-    override suspend fun refreshRecentTransactions(month: YearMonth, limit: Int): TransactionResult<Unit> {
-        // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
-        val result = apiCaller.callRaw {
+    // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
+    override suspend fun refreshRecentTransactions(month: YearMonth, limit: Int): TransactionResult<Unit> =
+        apiCaller.callRaw {
             val page = transactionApiService.getTransactions(month.toApiString(), limit)
             page.data.map(TransactionDto::asModel) to page.meta.hasMore
-        }
-        return when (result) {
-            is Outcome.Success -> {
-                val (transactions, hasMore) = result.data
-                cacheWrite("Caching transactions failed") {
-                    transactionDao.replaceRecent(
-                        from = month.atDay(1),
-                        to = month.atEndOfMonth(),
-                        transactions = transactions.map(Transaction::asEntity),
-                        hasMore = hasMore,
-                    )
-                }
+        }.mapError(ApiError::toTransactionError).flatMap { (transactions, hasMore) ->
+            cacheWrite("Caching transactions failed") {
+                transactionDao.replaceRecent(
+                    from = month.atDay(1),
+                    to = month.atEndOfMonth(),
+                    transactions = transactions.map(Transaction::asEntity),
+                    hasMore = hasMore,
+                )
             }
-
-            is Outcome.Failure -> Outcome.Failure(result.error.toTransactionError())
         }
-    }
 
     @OptIn(ExperimentalPagingApi::class)
     override fun pagedTransactions(month: YearMonth, filter: TransactionFilter): Flow<PagingData<Transaction>> =
@@ -221,11 +218,7 @@ class ApiTransactionRepository @Inject constructor(
     override suspend fun findCategoryForNote(text: String, type: TransactionType): String? {
         val key = text.trim().lowercase()
         if (key.isEmpty()) return null
-        return try {
-            transactionDao.latestCategoryForText(key, type)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        return catching { transactionDao.latestCategoryForText(key, type) }.getOrElse { e ->
             // A failed cache read only means no suggestion.
             errorLogger.log("Reading a category suggestion failed", e)
             null
@@ -275,15 +268,8 @@ class ApiTransactionRepository @Inject constructor(
     }
 
     // ApiCaller covers network failures; this keeps a failed cache write from throwing too.
-    private suspend fun cacheWrite(what: String, block: suspend () -> Unit): TransactionResult<Unit> = try {
-        block()
-        Outcome.Success(Unit)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log(what, e)
-        Outcome.Failure(TransactionError.Unexpected)
-    }
+    private inline fun cacheWrite(message: String, write: () -> Unit): TransactionResult<Unit> =
+        errorLogger.runLogged(message, TransactionError.Unexpected, write)
 
     private fun pagingConfig() = PagingConfig(pageSize = TRANSACTION_PAGE_SIZE, enablePlaceholders = false)
 

@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.categories.presentation.categories
 
 import com.djtech.monai.R
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.CategoryType

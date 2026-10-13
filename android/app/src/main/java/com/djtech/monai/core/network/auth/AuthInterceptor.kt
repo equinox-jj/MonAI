@@ -4,6 +4,14 @@ import okhttp3.Interceptor
 import okhttp3.Response
 import javax.inject.Inject
 
+/**
+ * Gives OkHttp the current access token. OkHttp calls this on its own
+ * threads, so implementations should serve it from memory, not block on disk.
+ */
+fun interface AccessTokenProvider {
+    fun accessToken(): String?
+}
+
 /** Adds `Authorization: Bearer <token>` when a token is stored. */
 class AuthInterceptor @Inject constructor(
     private val tokenProvider: AccessTokenProvider,

@@ -1,5 +1,6 @@
 package com.djtech.monai.core.network
 
+import com.djtech.monai.core.common.result.Outcome
 import kotlin.time.Duration
 
 /** Why an API call failed. Repositories map these to their own domain errors. */
@@ -32,3 +33,6 @@ data class FieldError(
     val message: String,
     val params: Map<String, String> = emptyMap(),
 )
+
+/** What [ApiCaller] returns; repositories map the [ApiError] to their own domain error. */
+typealias ApiResult<T> = Outcome<T, ApiError>

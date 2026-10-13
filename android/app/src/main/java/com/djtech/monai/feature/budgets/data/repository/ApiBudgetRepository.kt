@@ -1,18 +1,22 @@
 package com.djtech.monai.feature.budgets.data.repository
 
 import com.djtech.monai.core.common.log.ErrorLogger
+import com.djtech.monai.core.common.log.runLogged
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.flatMap
+import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.common.time.toApiString
 import com.djtech.monai.core.database.dao.BudgetDao
 import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Budget
 import com.djtech.monai.core.network.ApiCaller
-import com.djtech.monai.feature.budgets.data.dto.SetBudgetRequestDto
+import com.djtech.monai.core.network.ApiError
 import com.djtech.monai.feature.budgets.data.mapper.asModel
 import com.djtech.monai.feature.budgets.data.mapper.isNoBudgetSet
 import com.djtech.monai.feature.budgets.data.mapper.toBudgetError
 import com.djtech.monai.feature.budgets.data.remote.BudgetApiService
+import com.djtech.monai.feature.budgets.data.remote.SetBudgetRequestDto
 import com.djtech.monai.feature.budgets.domain.model.BudgetError
 import com.djtech.monai.feature.budgets.domain.model.BudgetResult
 import com.djtech.monai.feature.budgets.domain.repository.BudgetRepository
@@ -21,7 +25,6 @@ import kotlinx.coroutines.flow.map
 import java.time.YearMonth
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class ApiBudgetRepository @Inject constructor(
@@ -46,11 +49,9 @@ class ApiBudgetRepository @Inject constructor(
 
     override suspend fun setBudget(month: YearMonth, limitAmount: Long): BudgetResult<Unit> {
         val body = SetBudgetRequestDto(limitAmount)
-        val result = apiCaller.callRaw { budgetApiService.setBudget(month.toApiString(), body).data.asModel() }
-        return when (result) {
-            is Outcome.Success -> cache { budgetDao.upsert(result.data.asEntity()) }
-            is Outcome.Failure -> Outcome.Failure(result.error.toBudgetError())
-        }
+        return apiCaller.callRaw { budgetApiService.setBudget(month.toApiString(), body).data.asModel() }
+            .mapError(ApiError::toBudgetError)
+            .flatMap { budget -> cache { budgetDao.upsert(budget.asEntity()) } }
     }
 
     override suspend fun deleteBudget(month: YearMonth): BudgetResult<Unit> =
@@ -62,13 +63,6 @@ class ApiBudgetRepository @Inject constructor(
         }
 
     // ApiCaller covers network failures; this keeps a failed cache write from throwing too.
-    private inline fun cache(write: () -> Unit): BudgetResult<Unit> = try {
-        write()
-        Outcome.Success(Unit)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log("Caching the budget failed", e)
-        Outcome.Failure(BudgetError.Unexpected)
-    }
+    private inline fun cache(write: () -> Unit): BudgetResult<Unit> =
+        errorLogger.runLogged("Caching the budget failed", BudgetError.Unexpected, write)
 }

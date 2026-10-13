@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.profile.presentation.editprofile
 
 import com.djtech.monai.R
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.media.CropSpec

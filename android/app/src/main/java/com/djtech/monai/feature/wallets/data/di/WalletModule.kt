@@ -19,7 +19,7 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class WalletBindsModule {
+abstract class WalletModule {
 
     @Binds
     abstract fun bindWalletRepository(repository: ApiWalletRepository): WalletRepository
@@ -29,17 +29,15 @@ abstract class WalletBindsModule {
 
     @Binds
     abstract fun bindPaymentProviderSeed(seed: AssetPaymentProviderSeed): PaymentProviderSeed
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object WalletModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideWalletApiService(retrofit: Retrofit): WalletApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideWalletApiService(retrofit: Retrofit): WalletApiService = retrofit.create()
 
-    @Provides
-    @Singleton
-    fun providePaymentProviderApiService(retrofit: Retrofit): PaymentProviderApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun providePaymentProviderApiService(retrofit: Retrofit): PaymentProviderApiService = retrofit.create()
+    }
 }

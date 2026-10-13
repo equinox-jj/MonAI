@@ -10,7 +10,6 @@ import com.djtech.monai.core.database.dao.CategoryDao
 import com.djtech.monai.core.database.dao.MonthlyReportDao
 import com.djtech.monai.core.database.dao.PaymentProviderDao
 import com.djtech.monai.core.database.dao.TransactionDao
-import com.djtech.monai.core.database.dao.TransactionRemoteKeyDao
 import com.djtech.monai.core.database.dao.UserDao
 import com.djtech.monai.core.database.dao.WalletDao
 import com.djtech.monai.core.database.entity.BudgetEntity
@@ -52,7 +51,6 @@ abstract class MonAIDatabase : RoomDatabase() {
     abstract fun walletDao(): WalletDao
     abstract fun categoryDao(): CategoryDao
     abstract fun transactionDao(): TransactionDao
-    abstract fun transactionRemoteKeyDao(): TransactionRemoteKeyDao
     abstract fun budgetDao(): BudgetDao
     abstract fun paymentProviderDao(): PaymentProviderDao
     abstract fun monthlyReportDao(): MonthlyReportDao

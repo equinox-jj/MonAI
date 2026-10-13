@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class SettingsBindsModule {
+abstract class SettingsModule {
 
     @Binds
     abstract fun bindAdminProviderRepository(repository: ApiAdminProviderRepository): AdminProviderRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object SettingsModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideAdminProviderApiService(retrofit: Retrofit): AdminProviderApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideAdminProviderApiService(retrofit: Retrofit): AdminProviderApiService = retrofit.create()
+    }
 }

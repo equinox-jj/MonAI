@@ -5,9 +5,9 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import com.djtech.monai.core.common.dispatcher.ApplicationScope
-import com.djtech.monai.core.common.dispatcher.Dispatcher
-import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.coroutines.ApplicationScope
+import com.djtech.monai.core.common.coroutines.Dispatcher
+import com.djtech.monai.core.common.coroutines.MonAIDispatcher
 import com.djtech.monai.core.common.log.ErrorLogger
 import com.djtech.monai.core.network.auth.AccessTokenProvider
 import kotlinx.coroutines.CoroutineDispatcher

@@ -3,7 +3,7 @@ package com.djtech.monai.feature.transactions.presentation.transactionform
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
-import com.djtech.monai.core.common.flow.WhileUiSubscribed
+import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.format.appendDigit
 import com.djtech.monai.core.common.format.deleteDigit
 import com.djtech.monai.core.common.result.Outcome

@@ -3,7 +3,7 @@ package com.djtech.monai.feature.budgets.data.mapper
 import com.djtech.monai.core.common.time.toYearMonthOrNull
 import com.djtech.monai.core.model.Budget
 import com.djtech.monai.core.network.ApiError
-import com.djtech.monai.feature.budgets.data.dto.BudgetDto
+import com.djtech.monai.feature.budgets.data.remote.BudgetDto
 import com.djtech.monai.feature.budgets.domain.model.BudgetError
 
 /** Throws on a malformed month; call it where the failure becomes a result. */

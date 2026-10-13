@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.transactions.presentation.search
 
 import androidx.paging.testing.asSnapshot
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
 import com.djtech.monai.core.datastore.SearchHistoryStore

@@ -1,4 +1,4 @@
-package com.djtech.monai.core.common.dispatcher
+package com.djtech.monai.core.common.coroutines
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.test.StandardTestDispatcher

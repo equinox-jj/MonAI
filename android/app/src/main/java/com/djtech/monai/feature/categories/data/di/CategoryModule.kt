@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class CategoryBindsModule {
+abstract class CategoryModule {
 
     @Binds
     abstract fun bindCategoryRepository(repository: ApiCategoryRepository): CategoryRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object CategoryModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideCategoryApiService(retrofit: Retrofit): CategoryApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideCategoryApiService(retrofit: Retrofit): CategoryApiService = retrofit.create()
+    }
 }

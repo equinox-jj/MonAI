@@ -1,10 +1,10 @@
 package com.djtech.monai.core.network
 
 import com.djtech.monai.core.common.log.ErrorLogger
-import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.catching
+import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.network.model.ApiResponse
 import javax.inject.Inject
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Runs a Retrofit call and returns an [ApiResult] instead of throwing.
@@ -23,14 +23,10 @@ class ApiCaller @Inject constructor(
         callRaw { block().data }
 
     /** For responses whose envelope the caller needs, e.g. [com.djtech.monai.core.network.model.PagedResponse]. */
-    suspend fun <T> callRaw(block: suspend () -> T): ApiResult<T> = try {
-        Outcome.Success(block())
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        val error = errorMapper.map(e)
-        // Offline and HTTP errors are expected; anything else is a bug or a contract mismatch.
-        if (error is ApiError.Unknown) errorLogger.log("Unexpected API failure", e)
-        Outcome.Failure(error)
+    suspend fun <T> callRaw(block: suspend () -> T): ApiResult<T> = catching { block() }.mapError { e ->
+        errorMapper.map(e).also { error ->
+            // Offline and HTTP errors are expected; anything else is a bug or a contract mismatch.
+            if (error is ApiError.Unknown) errorLogger.log("Unexpected API failure", e)
+        }
     }
 }

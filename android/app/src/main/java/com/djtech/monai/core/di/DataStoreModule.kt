@@ -7,15 +7,10 @@ import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.preferencesDataStoreFile
-import com.djtech.monai.core.common.dispatcher.Dispatcher
-import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.coroutines.Dispatcher
+import com.djtech.monai.core.common.coroutines.MonAIDispatcher
 import com.djtech.monai.core.datastore.AppPreferences
-import com.djtech.monai.core.datastore.KeystoreTokenCipher
 import com.djtech.monai.core.datastore.SessionPreferences
-import com.djtech.monai.core.datastore.SessionStore
-import com.djtech.monai.core.datastore.TokenCipher
-import com.djtech.monai.core.network.auth.AccessTokenProvider
-import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -26,17 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import java.io.File
 import javax.inject.Singleton
-
-@Module
-@InstallIn(SingletonComponent::class)
-abstract class DataStoreBindsModule {
-
-    @Binds
-    abstract fun bindTokenCipher(cipher: KeystoreTokenCipher): TokenCipher
-
-    @Binds
-    abstract fun bindAccessTokenProvider(store: SessionStore): AccessTokenProvider
-}
 
 @Module
 @InstallIn(SingletonComponent::class)

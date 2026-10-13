@@ -1,7 +1,9 @@
 package com.djtech.monai.feature.auth.data.repository
 
 import com.djtech.monai.core.common.log.ErrorLogger
+import com.djtech.monai.core.common.log.runLogged
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.flatMap
 import com.djtech.monai.core.common.result.map
 import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.common.time.AppClock
@@ -24,7 +26,6 @@ import com.djtech.monai.feature.auth.domain.repository.AuthRepository
 import java.time.Instant
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class ApiAuthRepository @Inject constructor(
@@ -49,22 +50,17 @@ class ApiAuthRepository @Inject constructor(
     }
 
     override suspend fun logoutAllDevices(): AuthResult<Unit> =
-        when (val result = apiCaller.callRaw { authApiService.logoutAll() }) {
+        apiCaller.callRaw { authApiService.logoutAll() }
+            .mapError(ApiError::toAuthError)
             // The server revoked this device's token too.
-            is Outcome.Success -> logout()
-            is Outcome.Failure -> Outcome.Failure(result.error.toAuthError())
-        }
+            .flatMap { logout() }
 
+    // A failure is only logged: the server rejects the token on the next request, which expires the session anyway.
     override suspend fun expireSessionIfDue() {
-        try {
+        errorLogger.runLogged("Expiring the overdue session failed", Unit) {
             val token = sessionStore.overdueToken(clock.now()) ?: return
             // As if the server had rejected it: a newer login is kept, and the cache goes with the session.
             if (sessionStore.clearIfCurrent(token)) clearCacheAfterSignOut()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            // The server will reject the token on the next request, which expires the session anyway.
-            errorLogger.log("Expiring the overdue session failed", e)
         }
     }
 
@@ -98,25 +94,12 @@ class ApiAuthRepository @Inject constructor(
      * after the server answered (Keystore, disk, an unparseable payload), so callers never get
      * an exception.
      */
-    private inline fun <T> storingSession(block: () -> AuthResult<T>): AuthResult<T> = try {
-        block()
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log("Storing the session failed", e)
-        Outcome.Failure(AuthError.Unexpected)
-    }
+    private inline fun <T> storingSession(block: () -> AuthResult<T>): AuthResult<T> =
+        errorLogger.runLogged("Storing the session failed", AuthError.Unexpected, block).flatMap { it }
 
     // Once the token is gone the user is signed out, so a cache that fails to clear doesn't fail the
-    // logout: the next sign-in clears it before its session starts.
+    // logout: it is only logged, and the next sign-in clears it before its session starts.
     private suspend fun clearCacheAfterSignOut() {
-        try {
-            localCache.clear()
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            // Left for the next sign-in.
-            errorLogger.log("Clearing the cache on logout failed", e)
-        }
+        errorLogger.runLogged("Clearing the cache on logout failed", Unit) { localCache.clear() }
     }
 }

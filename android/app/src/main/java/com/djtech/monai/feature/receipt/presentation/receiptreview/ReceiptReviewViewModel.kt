@@ -2,7 +2,7 @@ package com.djtech.monai.feature.receipt.presentation.receiptreview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djtech.monai.core.common.flow.WhileUiSubscribed
+import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.ui.UiText

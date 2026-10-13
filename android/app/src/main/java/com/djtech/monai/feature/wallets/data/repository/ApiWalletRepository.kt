@@ -1,13 +1,17 @@
 package com.djtech.monai.feature.wallets.data.repository
 
 import com.djtech.monai.core.common.log.ErrorLogger
+import com.djtech.monai.core.common.log.runLogged
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.flatMap
+import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.database.dao.WalletDao
 import com.djtech.monai.core.database.entity.WalletEntity
 import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.core.network.ApiCaller
+import com.djtech.monai.core.network.ApiError
 import com.djtech.monai.feature.wallets.data.dto.WalletDto
 import com.djtech.monai.feature.wallets.data.mapper.asModel
 import com.djtech.monai.feature.wallets.data.mapper.toCreateRequest
@@ -24,7 +28,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class ApiWalletRepository @Inject constructor(
@@ -44,20 +47,14 @@ class ApiWalletRepository @Inject constructor(
 
     override fun observeWallet(id: String): Flow<Wallet?> = walletDao.observe(id).map { it?.asModel() }
 
-    override suspend fun refresh(): WalletResult<Unit> {
-        // Archived wallets too, so replacing the cache keeps them for history and the archive screen.
-        // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
-        val result = apiCaller.callRaw {
-            walletApiService.getWallets(includeArchived = true).data.map(WalletDto::asModel)
-        }
-        return when (result) {
-            is Outcome.Success -> cacheWrite("Caching wallets") {
-                walletDao.replaceAll(result.data.map(Wallet::asEntity))
+    // Archived wallets too, so replacing the cache keeps them for history and the archive screen.
+    // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
+    override suspend fun refresh(): WalletResult<Unit> =
+        apiCaller.callRaw { walletApiService.getWallets(includeArchived = true).data.map(WalletDto::asModel) }
+            .mapError(ApiError::toWalletError)
+            .flatMap { wallets ->
+                cacheWrite("Caching wallets") { walletDao.replaceAll(wallets.map(Wallet::asEntity)) }
             }
-
-            is Outcome.Failure -> Outcome.Failure(result.error.toWalletError())
-        }
-    }
 
     override suspend fun refreshWallet(id: String): WalletResult<Unit> {
         val result = apiCaller.callRaw { walletApiService.getWallet(id).data.asModel() }
@@ -79,21 +76,20 @@ class ApiWalletRepository @Inject constructor(
         write(nameSent = changes.name != null) { walletApiService.updateWallet(id, changes.toUpdateRequest()).data }
 
     override suspend fun deleteWallet(id: String): WalletResult<Unit> =
-        when (val result = apiCaller.callRaw { walletApiService.deleteWallet(id) }) {
-            is Outcome.Success -> cacheWrite("Removing a deleted wallet") { walletDao.delete(id) }
-            is Outcome.Failure -> Outcome.Failure(result.error.toWalletError())
-        }
+        apiCaller.callRaw { walletApiService.deleteWallet(id) }
+            .mapError(ApiError::toWalletError)
+            .flatMap { cacheWrite("Removing a deleted wallet") { walletDao.delete(id) } }
 
     /** Sends a create or update, then caches the wallet the server returns. */
-    private suspend fun write(nameSent: Boolean, call: suspend () -> WalletDto): WalletResult<Wallet> {
-        val result = apiCaller.callRaw { call().asModel() }
-        return when (result) {
-            is Outcome.Success -> cacheWrite("Caching a saved wallet") { cacheSaved(result.data) }
-                .let { cached -> if (cached is Outcome.Failure) cached else Outcome.Success(result.data) }
-
-            is Outcome.Failure -> Outcome.Failure(result.error.toWalletError(nameSent))
-        }
-    }
+    private suspend fun write(nameSent: Boolean, call: suspend () -> WalletDto): WalletResult<Wallet> =
+        apiCaller.callRaw { call().asModel() }
+            .mapError { it.toWalletError(nameSent) }
+            .flatMap { wallet ->
+                cacheWrite("Caching a saved wallet") {
+                    cacheSaved(wallet)
+                    wallet
+                }
+            }
 
     // The server clears the old default when a new one is set; mirror that here instead of refetching.
     private suspend fun cacheSaved(wallet: Wallet) {
@@ -108,13 +104,6 @@ class ApiWalletRepository @Inject constructor(
     }
 
     // ApiCaller covers network failures; this keeps a failed cache write from throwing too.
-    private suspend fun cacheWrite(what: String, block: suspend () -> Unit): WalletResult<Unit> = try {
-        block()
-        Outcome.Success(Unit)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log("$what failed", e)
-        Outcome.Failure(WalletError.Unexpected)
-    }
+    private inline fun <T> cacheWrite(what: String, write: () -> T): WalletResult<T> =
+        errorLogger.runLogged("$what failed", WalletError.Unexpected, write)
 }

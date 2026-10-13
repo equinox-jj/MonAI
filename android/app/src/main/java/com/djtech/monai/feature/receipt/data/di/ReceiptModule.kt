@@ -16,20 +16,18 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ReceiptBindsModule {
+abstract class ReceiptModule {
 
     @Binds
     abstract fun bindReceiptRepository(repository: ApiReceiptRepository): ReceiptRepository
 
     @Binds
     abstract fun bindReceiptTextReader(reader: MlKitReceiptTextReader): ReceiptTextReader
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object ReceiptModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideReceiptApiService(retrofit: Retrofit): ReceiptApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideReceiptApiService(retrofit: Retrofit): ReceiptApiService = retrofit.create()
+    }
 }

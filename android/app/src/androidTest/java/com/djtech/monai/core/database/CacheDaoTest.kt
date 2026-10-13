@@ -135,21 +135,17 @@ class CacheDaoTest {
 
     @Test
     fun remoteKeysAreStoredPerQuery() = runTest {
-        val dao = database.transactionRemoteKeyDao()
+        val dao = database.transactionDao()
         val key = TransactionRemoteKeyEntity(
             queryKey = "2026-10",
             nextCursor = "cursor-1",
             updatedAt = Instant.parse("2026-10-12T00:00:00Z"),
         )
 
-        dao.upsert(key)
+        dao.upsertRemoteKey(key)
 
-        assertEquals(key, dao.get("2026-10"))
-        assertNull(dao.get("2026-10|wallet=bca"))
-
-        dao.delete("2026-10")
-
-        assertNull(dao.get("2026-10"))
+        assertEquals(key, dao.remoteKey("2026-10"))
+        assertNull(dao.remoteKey("2026-10|wallet=bca"))
     }
 
     private fun provider(id: String, sortOrder: Int) = PaymentProviderEntity(

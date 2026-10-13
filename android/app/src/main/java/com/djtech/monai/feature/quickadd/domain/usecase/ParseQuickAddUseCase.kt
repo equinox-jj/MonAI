@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.quickadd.domain.usecase
 
-import com.djtech.monai.core.common.dispatcher.Dispatcher
-import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.coroutines.Dispatcher
+import com.djtech.monai.core.common.coroutines.MonAIDispatcher
 import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.quickadd.domain.parser.ParseContext

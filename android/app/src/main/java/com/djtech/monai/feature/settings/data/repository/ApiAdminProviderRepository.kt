@@ -1,6 +1,6 @@
 package com.djtech.monai.feature.settings.data.repository
 
-import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.map
 import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.media.EncodedImage
 import com.djtech.monai.core.network.ApiCaller
@@ -55,10 +55,9 @@ class ApiAdminProviderRepository @Inject constructor(
         provider { adminProviderApiService.setStatus(id, ProviderStatusRequestDto(active)).data }
 
     override suspend fun deleteProvider(id: String): AdminProviderResult<Unit> =
-        when (val result = apiCaller.callRaw { adminProviderApiService.deleteProvider(id) }) {
-            is Outcome.Success -> Outcome.Success(Unit)
-            is Outcome.Failure -> Outcome.Failure(result.error.toAdminProviderError())
-        }
+        apiCaller.callRaw { adminProviderApiService.deleteProvider(id) }
+            .map { }
+            .mapError(ApiError::toAdminProviderError)
 
     override suspend fun uploadLogo(id: String, image: EncodedImage): AdminProviderResult<AdminPaymentProvider> =
         provider { adminProviderApiService.setLogo(id, filePart(image.bytes, image.mimeType)).data }

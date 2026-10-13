@@ -1,8 +1,8 @@
 package com.djtech.monai.core.di
 
-import com.djtech.monai.core.common.dispatcher.ApplicationScope
-import com.djtech.monai.core.common.dispatcher.Dispatcher
-import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.coroutines.ApplicationScope
+import com.djtech.monai.core.common.coroutines.Dispatcher
+import com.djtech.monai.core.common.coroutines.MonAIDispatcher
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

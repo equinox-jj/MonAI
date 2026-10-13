@@ -1,9 +1,14 @@
 package com.djtech.monai.feature.wallets.data.repository
 
-import com.djtech.monai.core.common.dispatcher.Dispatcher
-import com.djtech.monai.core.common.dispatcher.MonAIDispatcher
+import com.djtech.monai.core.common.coroutines.Dispatcher
+import com.djtech.monai.core.common.coroutines.MonAIDispatcher
 import com.djtech.monai.core.common.log.ErrorLogger
+import com.djtech.monai.core.common.log.runLogged
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.catching
+import com.djtech.monai.core.common.result.flatMap
+import com.djtech.monai.core.common.result.getOrElse
+import com.djtech.monai.core.common.result.mapError
 import com.djtech.monai.core.database.dao.PaymentProviderDao
 import com.djtech.monai.core.database.entity.PaymentProviderCatalogEntity
 import com.djtech.monai.core.database.entity.PaymentProviderEntity
@@ -12,6 +17,7 @@ import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.PaymentProvider
 import com.djtech.monai.core.model.PaymentProviderCatalog
 import com.djtech.monai.core.network.ApiCaller
+import com.djtech.monai.core.network.ApiError
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.wallets.data.dto.SeedPaymentProviderDto
 import com.djtech.monai.feature.wallets.data.mapper.asModel
@@ -32,7 +38,6 @@ import retrofit2.HttpException
 import java.net.HttpURLConnection.HTTP_NOT_MODIFIED
 import javax.inject.Inject
 import javax.inject.Singleton
-import kotlin.coroutines.cancellation.CancellationException
 
 @Singleton
 class ApiPaymentProviderRepository @Inject constructor(
@@ -53,11 +58,9 @@ class ApiPaymentProviderRepository @Inject constructor(
 
     override suspend fun refresh(): WalletResult<Unit> {
         // The ETag only stands for the cached providers; without any, ask for the full catalog.
-        val etag = try {
+        val etag = catching {
             paymentProviderDao.catalogMeta()?.etag?.takeIf { paymentProviderDao.observeAll().first().isNotEmpty() }
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
+        }.getOrElse { e ->
             errorLogger.log("Reading the provider catalog version failed", e)
             null
         }
@@ -73,37 +76,30 @@ class ApiPaymentProviderRepository @Inject constructor(
                 )
             }
         }
-        return when (result) {
-            is Outcome.Failure -> Outcome.Failure(result.error.toWalletError())
-            is Outcome.Success -> result.data?.let { cache(it) } ?: Outcome.Success(Unit)
+        // No update means 304: the cached catalog is current.
+        return result.mapError(ApiError::toWalletError).flatMap { update ->
+            if (update == null) Outcome.Success(Unit) else cache(update)
         }
     }
 
-    private suspend fun cache(update: CatalogUpdate): WalletResult<Unit> = try {
-        paymentProviderDao.replaceCatalog(
-            meta = PaymentProviderCatalogEntity(version = update.catalog.version, etag = update.etag),
-            providers = update.catalog.providers.map(PaymentProvider::asEntity),
-        )
-        Outcome.Success(Unit)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
-        errorLogger.log("Caching the provider catalog failed", e)
-        Outcome.Failure(WalletError.Unexpected)
-    }
+    private suspend fun cache(update: CatalogUpdate): WalletResult<Unit> =
+        errorLogger.runLogged("Caching the provider catalog failed", WalletError.Unexpected) {
+            paymentProviderDao.replaceCatalog(
+                meta = PaymentProviderCatalogEntity(version = update.catalog.version, etag = update.etag),
+                providers = update.catalog.providers.map(PaymentProvider::asEntity),
+            )
+        }
 
     // Parsed once and kept: it only matters until the first refresh fills the cache.
     private suspend fun seedProviders(): List<PaymentProvider> = seedLock.withLock {
         seedProviders ?: withContext(ioDispatcher) { readSeed() }.also { seedProviders = it }
     }
 
-    private fun readSeed(): List<PaymentProvider> = try {
+    private fun readSeed(): List<PaymentProvider> = catching {
         NetworkJson.decodeFromString<List<SeedPaymentProviderDto>>(seed.read())
             .map(SeedPaymentProviderDto::asModel)
             .sortedWith(compareBy<PaymentProvider> { it.sortOrder }.thenBy(String.CASE_INSENSITIVE_ORDER) { it.name })
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
+    }.getOrElse { e ->
         errorLogger.log("Reading the bundled provider catalog failed", e)
         emptyList()
     }

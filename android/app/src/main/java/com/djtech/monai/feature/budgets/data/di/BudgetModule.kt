@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class BudgetBindsModule {
+abstract class BudgetModule {
 
     @Binds
     abstract fun bindBudgetRepository(repository: ApiBudgetRepository): BudgetRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object BudgetModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideBudgetApiService(retrofit: Retrofit): BudgetApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideBudgetApiService(retrofit: Retrofit): BudgetApiService = retrofit.create()
+    }
 }

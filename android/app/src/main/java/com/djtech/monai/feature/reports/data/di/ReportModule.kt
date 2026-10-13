@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ReportBindsModule {
+abstract class ReportModule {
 
     @Binds
     abstract fun bindReportRepository(repository: ApiReportRepository): ReportRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object ReportModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideReportApiService(retrofit: Retrofit): ReportApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideReportApiService(retrofit: Retrofit): ReportApiService = retrofit.create()
+    }
 }

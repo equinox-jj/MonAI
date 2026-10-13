@@ -1,6 +1,6 @@
 package com.djtech.monai.feature.receipt.presentation.receiptreview
 
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.media.FakeImageProcessor

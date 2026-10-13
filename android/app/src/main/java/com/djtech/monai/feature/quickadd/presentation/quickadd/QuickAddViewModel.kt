@@ -2,7 +2,7 @@ package com.djtech.monai.feature.quickadd.presentation.quickadd
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djtech.monai.core.common.flow.WhileUiSubscribed
+import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.feature.quickadd.domain.model.DraftEngine
 import com.djtech.monai.feature.quickadd.domain.model.needsAi

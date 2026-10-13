@@ -3,7 +3,7 @@ package com.djtech.monai
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djtech.monai.core.common.flow.WhileUiSubscribed
+import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore

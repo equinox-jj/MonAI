@@ -1,4 +1,4 @@
-package com.djtech.monai.feature.budgets.data.repository
+package com.djtech.monai.feature.budgets.data
 
 import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.common.result.Outcome
@@ -11,6 +11,7 @@ import com.djtech.monai.core.network.ApiCaller
 import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.budgets.data.remote.BudgetApiService
+import com.djtech.monai.feature.budgets.data.repository.ApiBudgetRepository
 import com.djtech.monai.feature.budgets.domain.model.BudgetError
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest

@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.auth.presentation.onboarding
 
 import androidx.lifecycle.SavedStateHandle
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.feature.auth.presentation.onboarding.model.OnboardingPage

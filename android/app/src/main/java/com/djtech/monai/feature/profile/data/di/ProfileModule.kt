@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class ProfileBindsModule {
+abstract class ProfileModule {
 
     @Binds
     abstract fun bindProfileRepository(repository: ApiProfileRepository): ProfileRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object ProfileModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideProfileApiService(retrofit: Retrofit): ProfileApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideProfileApiService(retrofit: Retrofit): ProfileApiService = retrofit.create()
+    }
 }

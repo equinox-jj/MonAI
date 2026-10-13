@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class TransactionBindsModule {
+abstract class TransactionModule {
 
     @Binds
     abstract fun bindTransactionRepository(repository: ApiTransactionRepository): TransactionRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object TransactionModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideTransactionApiService(retrofit: Retrofit): TransactionApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideTransactionApiService(retrofit: Retrofit): TransactionApiService = retrofit.create()
+    }
 }

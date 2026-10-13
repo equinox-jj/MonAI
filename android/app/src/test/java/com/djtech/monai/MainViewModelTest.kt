@@ -1,6 +1,6 @@
 package com.djtech.monai
 
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.datastore.FakeTokenCipher
 import com.djtech.monai.core.datastore.InMemoryPreferencesDataStore

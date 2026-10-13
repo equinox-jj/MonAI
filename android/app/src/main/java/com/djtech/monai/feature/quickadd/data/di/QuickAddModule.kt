@@ -14,17 +14,15 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-abstract class QuickAddBindsModule {
+abstract class QuickAddModule {
 
     @Binds
     abstract fun bindQuickAddRepository(repository: ApiQuickAddRepository): QuickAddRepository
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-object QuickAddModule {
+    companion object {
 
-    @Provides
-    @Singleton
-    fun provideQuickAddApiService(retrofit: Retrofit): QuickAddApiService = retrofit.create()
+        @Provides
+        @Singleton
+        fun provideQuickAddApiService(retrofit: Retrofit): QuickAddApiService = retrofit.create()
+    }
 }

@@ -2,7 +2,7 @@ package com.djtech.monai.feature.home.presentation.home
 
 import androidx.lifecycle.SavedStateHandle
 import com.djtech.monai.R
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.FixedAppClock
 import com.djtech.monai.core.common.ui.UiText

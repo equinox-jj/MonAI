@@ -1,6 +1,6 @@
 package com.djtech.monai.feature.quickadd.presentation.quickadd
 
-import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
+import com.djtech.monai.core.common.coroutines.MainDispatcherRule
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.WalletType

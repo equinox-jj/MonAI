@@ -6,6 +6,8 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import com.djtech.monai.core.common.log.ErrorLogger
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.result.catching
+import com.djtech.monai.core.common.result.getOrElse
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.time.toApiString
 import com.djtech.monai.core.database.dao.TransactionDao
@@ -20,7 +22,6 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionFilter
 import com.djtech.monai.feature.transactions.domain.model.TransactionLoadException
 import java.time.YearMonth
-import kotlin.coroutines.cancellation.CancellationException
 
 /**
  * Fills the cache for one month's list, page by page, following the API's cursor. The list itself
@@ -68,7 +69,7 @@ class TransactionRemoteMediator(
         }
     }
 
-    private suspend fun cache(loadType: LoadType, page: Page): MediatorResult = try {
+    private suspend fun cache(loadType: LoadType, page: Page): MediatorResult = catching<MediatorResult> {
         val key = TransactionRemoteKeyEntity(queryKey, page.nextCursor, clock.now())
         if (loadType == LoadType.REFRESH) {
             transactionDao.replaceQueryPage(
@@ -84,9 +85,7 @@ class TransactionRemoteMediator(
             transactionDao.appendQueryPage(page.transactions, key)
         }
         MediatorResult.Success(endOfPaginationReached = page.nextCursor == null)
-    } catch (e: CancellationException) {
-        throw e
-    } catch (e: Exception) {
+    }.getOrElse { e ->
         errorLogger.log("Caching a transactions page failed", e)
         MediatorResult.Error(TransactionLoadException(TransactionError.Unexpected))
     }
