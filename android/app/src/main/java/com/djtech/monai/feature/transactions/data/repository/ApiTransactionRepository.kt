@@ -121,8 +121,10 @@ class ApiTransactionRepository @Inject constructor(
         ).map { days -> days.associate { it.date to it.net } }
 
     override fun observeDailyOutflows(month: YearMonth, walletId: String): Flow<Map<LocalDate, Long>> =
-        transactionDao.observeDailyOutflows(from = month.atDay(1), to = month.atEndOfMonth(), walletId = walletId)
-            .map { days -> days.associate { it.date to it.amount } }
+        transactionDao.observeDailyOutflows(
+            from = month.atDay(1),
+            to = month.atEndOfMonth(), walletId = walletId,
+        ).map { days -> days.associate { it.date to it.amount } }
 
     override fun searchTransactions(
         query: String,
@@ -131,7 +133,15 @@ class ApiTransactionRepository @Inject constructor(
     ): Flow<PagingData<Transaction>> = Pager(
         config = pagingConfig(),
         pagingSourceFactory = {
-            TransactionSearchPagingSource { cursor, limit -> fetchSearchPage(query, month, filter, cursor, limit) }
+            TransactionSearchPagingSource { cursor, limit ->
+                fetchSearchPage(
+                    query,
+                    month,
+                    filter,
+                    cursor,
+                    limit,
+                )
+            }
         },
     ).flow
 
@@ -152,8 +162,7 @@ class ApiTransactionRepository @Inject constructor(
         ).flow.map { page -> page.map(TransactionEntity::asModel) }
     }
 
-    override fun observeTransaction(id: String): Flow<Transaction?> =
-        transactionDao.observe(id).map { it?.asModel() }
+    override fun observeTransaction(id: String): Flow<Transaction?> = transactionDao.observe(id).map { it?.asModel() }
 
     override suspend fun refreshTransaction(id: String): TransactionResult<Unit> {
         val result = apiCaller.call { transactionApiService.getTransaction(id) }.map(TransactionDto::asModel)
@@ -172,11 +181,14 @@ class ApiTransactionRepository @Inject constructor(
         }
     }
 
-    override suspend fun createTransaction(input: TransactionInput): TransactionResult<Transaction> =
-        write { transactionApiService.createTransaction(input.toCreateRequest()).data }
+    override suspend fun createTransaction(input: TransactionInput): TransactionResult<Transaction> = write {
+        transactionApiService.createTransaction(input.toCreateRequest()).data
+    }
 
     override suspend fun updateTransaction(id: String, input: TransactionInput): TransactionResult<Transaction> =
-        write { transactionApiService.updateTransaction(id, input.toUpdateRequest().toRequestBody()).data }
+        write {
+            transactionApiService.updateTransaction(id, input.toUpdateRequest().toRequestBody()).data
+        }
 
     override suspend fun deleteTransaction(id: String): TransactionResult<Transaction?> {
         val cached = transactionDao.observe(id).first()?.asModel()
@@ -184,13 +196,16 @@ class ApiTransactionRepository @Inject constructor(
             .mapError { it.toTransactionError() }
         // Already gone on the server is the outcome the user asked for.
         if (result is Outcome.Failure && result.error != TransactionError.NotFound) return Outcome.Failure(result.error)
+
         cacheWrite("Dropping a deleted transaction failed") { transactionDao.delete(id) }
         if (cached != null) deletedTransactions.emit(cached)
+
         return Outcome.Success(cached)
     }
 
-    override suspend fun restoreTransaction(id: String): TransactionResult<Transaction> =
-        write { transactionApiService.restoreTransaction(id).data }
+    override suspend fun restoreTransaction(id: String): TransactionResult<Transaction> = write {
+        transactionApiService.restoreTransaction(id).data
+    }
 
     /**
      * Runs a write and caches the transaction it returns. The server already saved it, so a failed
