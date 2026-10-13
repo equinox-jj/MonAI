@@ -12,14 +12,20 @@ val NOW: Instant = Instant.parse("2026-10-10T05:40:00Z")
 
 private val CREATED: Instant = Instant.parse("2026-01-01T00:00:00Z")
 
-fun user(name: String = "Joshua Putra", avatarUrl: String? = null) = User(
+fun user(
+    name: String = "Joshua Putra",
+    avatarUrl: String? = null,
+    timezone: String = "Asia/Jakarta",
+    role: Role = Role(slug = "user", name = "User"),
+    permissions: Set<String> = emptySet(),
+) = User(
     id = "u1",
     name = name,
     email = "joshua@example.com",
     avatarUrl = avatarUrl,
-    timezone = "Asia/Jakarta",
-    role = Role(slug = "user", name = "User"),
-    permissions = emptySet(),
+    timezone = timezone,
+    role = role,
+    permissions = permissions,
     createdAt = CREATED,
 )
 
@@ -73,14 +79,16 @@ fun category(
     color: String? = null,
     type: CategoryType = CategoryType.EXPENSE,
     isHidden: Boolean = false,
+    isDefault: Boolean = true,
+    isSystem: Boolean = false,
 ) = Category(
     id = id,
     name = name,
     type = type,
     icon = icon,
     color = color,
-    isDefault = true,
-    isSystem = false,
+    isDefault = isDefault,
+    isSystem = isSystem,
     isHidden = isHidden,
     createdAt = CREATED,
     updatedAt = CREATED,

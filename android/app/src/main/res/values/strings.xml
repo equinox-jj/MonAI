@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">MonAI</string>
+    <string name="app_name" translatable="false">MonAI</string>
 
     <string name="nav_home">Home</string>
     <string name="nav_transactions">Transactions</string>
@@ -510,8 +510,42 @@
     <string name="report_refresh_failed_network">You\'re offline. Showing saved data.</string>
     <string name="report_refresh_failed_unexpected">Couldn\'t refresh the report. Showing saved data.</string>
 
+    <!-- Categories list -->
+    <string name="categories_title">Categories</string>
+    <string name="categories_back">Back</string>
+    <string name="categories_new">New</string>
+    <string name="categories_expense">Expense</string>
+    <string name="categories_income">Income</string>
+    <string name="categories_tag_custom">Custom</string>
+    <string name="categories_tag_hidden">Hidden</string>
+    <string name="categories_meta_default">Default category</string>
+    <string name="categories_meta_custom">Your category</string>
+    <string name="categories_meta_hidden">Hidden from pickers</string>
+    <string name="categories_meta_system">Always kept</string>
+    <string name="categories_locked">Can\'t be hidden or deleted</string>
+    <string name="categories_hide">Hide %1$s</string>
+    <string name="categories_show">Show %1$s</string>
+    <string name="categories_delete">Delete %1$s</string>
+    <string name="categories_footnote">Default categories can be hidden but not deleted. “Other” always stays so every transaction has a home.</string>
+    <string name="categories_empty">No categories yet.</string>
+    <string name="categories_load_error_title">Couldn\'t load categories</string>
+    <string name="categories_retry">Try again</string>
+    <string name="categories_delete_title">Delete “%1$s”?</string>
+    <string name="categories_delete_message">It disappears from the pickers. Categories with transactions ask where to move them first.</string>
+    <string name="categories_delete_confirm">Delete</string>
+    <string name="categories_cancel">Cancel</string>
+    <string name="categories_move_message">Transactions use this category. Choose where to move them — then “%1$s” will be removed.</string>
+    <string name="categories_move_to">Move transactions to</string>
+    <string name="categories_move_confirm">Move &amp; delete</string>
+    <string name="categories_deleted">“%1$s” deleted.</string>
+    <string name="categories_error_locked">This category can\'t be changed that way.</string>
+    <string name="categories_error_not_found">This category was already deleted.</string>
+    <string name="categories_error_network">You\'re offline. Connect to the internet and try again.</string>
+    <string name="categories_error_unexpected">Something went wrong. Try again in a moment.</string>
+
     <!-- Category form -->
     <string name="category_form_new_title">New category</string>
+    <string name="category_form_edit_title">Edit category</string>
     <string name="category_form_save">Save</string>
     <string name="category_form_close">Close</string>
     <string name="category_form_name">Name</string>
@@ -526,6 +560,7 @@
     <string name="category_form_name_invalid">This name can\'t be used. Try another.</string>
     <string name="category_form_error_network">You\'re offline. Connect to the internet and try again.</string>
     <string name="category_form_error_unexpected">Something went wrong. Try again in a moment.</string>
+    <string name="category_form_error_not_found">This category was deleted.</string>
     <string name="category_icon_coffee">Coffee</string>
     <string name="category_icon_restaurant">Restaurant</string>
     <string name="category_icon_meal">Meal</string>

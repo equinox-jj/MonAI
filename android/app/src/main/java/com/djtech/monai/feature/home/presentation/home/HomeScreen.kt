@@ -141,6 +141,7 @@ private fun HomeDashboard(
                 state.greeting,
                 state.userName,
                 state.initials,
+                state.avatarUrl,
                 onIntent,
                 horizontal,
             )

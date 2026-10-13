@@ -31,9 +31,15 @@ import com.djtech.monai.core.designsystem.component.monAIMainNavItems
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.budgets.presentation.budget.BudgetRoute
+import com.djtech.monai.feature.categories.presentation.categories.CategoriesRoute
 import com.djtech.monai.feature.categories.presentation.categoryform.CategoryFormRoute
 import com.djtech.monai.feature.home.presentation.home.HomeRoute
+import com.djtech.monai.feature.profile.presentation.editprofile.EditProfileRoute
 import com.djtech.monai.feature.reports.presentation.report.ReportRoute
+import com.djtech.monai.feature.settings.presentation.manageproviders.ManageProvidersRoute
+import com.djtech.monai.feature.settings.presentation.providerform.ProviderFormRoute
+import com.djtech.monai.feature.settings.presentation.settings.SettingsRoute
+import com.djtech.monai.feature.settings.presentation.settings.model.SettingsPane
 import com.djtech.monai.feature.transactions.presentation.search.SearchRoute
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.TransactionDetailRoute
 import com.djtech.monai.feature.transactions.presentation.transactionform.TransactionFormRoute
@@ -222,6 +228,7 @@ private fun MainNavDisplay(
                             type = key.type,
                             onClose = navigator::goBack,
                             modifier = sheetModifier,
+                            categoryId = key.id,
                             isSideSheet = isExpanded,
                         )
                     }
@@ -237,7 +244,38 @@ private fun MainNavDisplay(
                     // Keys are only built with toApiString, so the month always parses.
                     BudgetRoute(month = YearMonth.parse(key.month), onClose = navigator::goBack)
                 }
-                entry<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }
+                entry<SettingsRoute> {
+                    SettingsRoute(
+                        onNavigate = navigator::openFromSettings,
+                        detailPane = { pane, month, paneModifier ->
+                            SettingsDetailPane(
+                                navigator,
+                                pane,
+                                month,
+                                paneModifier,
+                            )
+                        },
+                    )
+                }
+                entry<EditProfileRoute> { key ->
+                    EditProfileRoute(onClose = navigator::goBack, focusDelete = key.focusDelete)
+                }
+                entry<CategoriesRoute> {
+                    CategoriesRoute(onNavigate = navigator::openFromCategories, onBack = navigator::goBack)
+                }
+                entry<ManageProvidersRoute> {
+                    ManageProvidersRoute(onOpenForm = navigator::openProviderForm, onBack = navigator::goBack)
+                }
+                entry<ProviderFormRoute>(metadata = formMetadata) { key ->
+                    SideSheetEntry(asSideSheet = isExpanded) { sheetModifier ->
+                        ProviderFormRoute(
+                            providerId = key.id,
+                            onClose = navigator::goBack,
+                            modifier = sheetModifier,
+                            isSideSheet = isExpanded,
+                        )
+                    }
+                }
             },
         )
         NavDisplay(
@@ -246,6 +284,42 @@ private fun MainNavDisplay(
             onBack = navigator::goBack,
         )
         UndoDeleteRoute(Modifier.align(Alignment.BottomCenter))
+    }
+}
+
+/** A Settings section beside the menu on a wide screen; its forms open over it as side sheets. */
+@Composable
+private fun SettingsDetailPane(
+    navigator: MainNavigator,
+    pane: SettingsPane,
+    month: YearMonth,
+    modifier: Modifier,
+) {
+    when (pane) {
+        SettingsPane.Profile -> EditProfileRoute(onClose = {}, modifier = modifier, isPane = true)
+        SettingsPane.Budget -> BudgetRoute(
+            month = month,
+            onClose = {},
+            modifier = modifier,
+            isPane = true,
+        )
+
+        SettingsPane.Categories -> CategoriesRoute(
+            onNavigate = navigator::openFromCategories,
+            onBack = {},
+            modifier = modifier,
+            isPane = true,
+        )
+
+        SettingsPane.Providers -> ManageProvidersRoute(
+            onOpenForm = navigator::openProviderForm,
+            onBack = {},
+            modifier = modifier,
+            isPane = true,
+        )
+
+        // Drawn by Settings itself.
+        SettingsPane.Theme, SettingsPane.Language -> Unit
     }
 }
 

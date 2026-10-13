@@ -7,6 +7,8 @@ import com.djtech.monai.core.common.flow.WhileUiSubscribed
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.datastore.SessionStore
+import com.djtech.monai.core.datastore.ThemePreferenceStore
+import com.djtech.monai.core.model.ThemeMode
 import com.djtech.monai.feature.auth.domain.usecase.ExpireSessionIfDueUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.StateFlow
@@ -17,11 +19,13 @@ import javax.inject.Inject
 
 /**
  * @param onboardingCompleted onboarding was finished once, so the auth graph opens on Sign in.
+ * @param themeMode the theme picked in Settings.
  */
 @Immutable
 data class MainState(
     val sessionState: SessionState = SessionState.Loading,
     val onboardingCompleted: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
 ) {
     val isLoading: Boolean get() = sessionState == SessionState.Loading
 }
@@ -31,12 +35,17 @@ data class MainState(
 class MainViewModel @Inject constructor(
     private val sessionStore: SessionStore,
     onboardingStore: OnboardingStore,
+    themePreferenceStore: ThemePreferenceStore,
     private val expireSessionIfDue: ExpireSessionIfDueUseCase,
 ) : ViewModel() {
-    // combine waits for both stores, so the splash also covers the onboarding read.
+    // combine waits for every store, so the splash also covers the onboarding and theme reads.
     val state: StateFlow<MainState> =
-        combine(sessionStore.sessionState, onboardingStore.isCompleted, ::MainState)
-            .stateIn(viewModelScope, WhileUiSubscribed, MainState())
+        combine(
+            sessionStore.sessionState,
+            onboardingStore.isCompleted,
+            themePreferenceStore.themeMode,
+            ::MainState,
+        ).stateIn(viewModelScope, WhileUiSubscribed, MainState())
 
     /** The app came to the foreground: a token past its expiry is expired now, not on the next 401. */
     fun onAppForegrounded() {

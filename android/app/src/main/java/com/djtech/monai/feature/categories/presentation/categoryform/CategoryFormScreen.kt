@@ -44,7 +44,8 @@ import kotlinx.coroutines.launch
 
 /**
  * @param type the type the new category gets.
- * @param onClose the category was created, or the form was closed.
+ * @param categoryId the category to edit; null creates one.
+ * @param onClose the category was saved, or the form was closed.
  * @param isSideSheet shown as a side sheet over the screen behind it: no status-bar inset.
  */
 @Composable
@@ -52,9 +53,12 @@ fun CategoryFormRoute(
     type: CategoryType,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
+    categoryId: String? = null,
     isSideSheet: Boolean = false,
     viewModel: CategoryFormViewModel =
-        hiltViewModel<CategoryFormViewModel, CategoryFormViewModel.Factory>(key = type.name) { it.create(type) },
+        hiltViewModel<CategoryFormViewModel, CategoryFormViewModel.Factory>(key = categoryId ?: type.name) {
+            it.create(type, categoryId)
+        },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -77,7 +81,7 @@ fun CategoryFormRoute(
     )
 }
 
-/** A new category: a preview, then its name, icon and color. Save sits in the top bar. */
+/** A new or edited category: a preview, then its name, icon and color. Save sits in the top bar. */
 @Composable
 fun CategoryFormScreen(
     state: CategoryFormState,
@@ -98,7 +102,9 @@ fun CategoryFormScreen(
                 .imePadding(),
         ) {
             MonAITopBar(
-                title = stringResource(R.string.category_form_new_title),
+                title = stringResource(
+                    if (state.isEditing) R.string.category_form_edit_title else R.string.category_form_new_title,
+                ),
                 navigation = MonAITopBarNavigation.Close,
                 onNavigationClick = { onIntent(CategoryFormIntent.Close) },
                 navigationContentDescription = stringResource(R.string.category_form_close),

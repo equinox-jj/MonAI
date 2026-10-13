@@ -88,6 +88,11 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
         rows.value -= id
     }
 
+    override suspend fun moveCategory(from: String, to: String) {
+        failure?.let { throw it }
+        rows.value = rows.value.mapValues { (_, row) -> if (row.categoryId == from) row.copy(categoryId = to) else row }
+    }
+
     override suspend fun deleteInRange(from: LocalDate, to: LocalDate) {
         failure?.let { throw it }
         rows.value = rows.value.filterValues { it.date !in from..to }

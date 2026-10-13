@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Settings -->
+    <string name="settings_title">Pengaturan</string>
+    <string name="settings_profile_open">Ubah profil</string>
+    <string name="settings_group_account">Akun</string>
+    <string name="settings_group_money">Keuangan</string>
+    <string name="settings_group_app">Aplikasi</string>
+    <string name="settings_group_admin">Admin</string>
+    <string name="settings_admin_footer">Hanya pengguna dengan izin penyedia yang melihat bagian ini.</string>
+    <string name="settings_profile">Profil</string>
+    <string name="settings_budget">Anggaran bulanan</string>
+    <string name="settings_budget_not_set">Belum diatur</string>
+    <string name="settings_categories">Kategori</string>
+    <string name="settings_wallets">Dompet</string>
+    <string name="settings_theme">Tema</string>
+    <string name="settings_language">Bahasa</string>
+    <string name="settings_manage_providers">Kelola penyedia pembayaran</string>
+    <string name="settings_sign_out">Keluar</string>
+    <string name="settings_sign_out_all">Keluar dari semua perangkat</string>
+    <string name="settings_delete_account">Hapus akun</string>
+    <string name="settings_version">Versi %1$s</string>
+    <string name="settings_theme_system">Sistem</string>
+    <string name="settings_theme_light">Terang</string>
+    <string name="settings_theme_dark">Gelap</string>
+    <string name="settings_theme_note">Sistem mengikuti pengaturan mode gelap ponselmu. Warna pemasukan dan pengeluaran tetap mudah dibaca di kedua tema.</string>
+    <string name="settings_done">Selesai</string>
+    <string name="settings_language_indonesian">Bahasa Indonesia</string>
+    <string name="settings_language_indonesian_native">Indonesian</string>
+    <string name="settings_language_english">English</string>
+    <string name="settings_language_english_native">Bahasa Inggris</string>
+    <string name="settings_language_preview">Contoh tampilan</string>
+    <string name="settings_language_preview_title">Makan siang</string>
+    <string name="settings_language_preview_meta">Makanan · GoPay · Sab, 10 Okt 2026</string>
+    <string name="settings_language_note">Rupiah selalu ditulis dengan titik ribuan (Rp 35.000).</string>
+    <string name="settings_sign_out_title">Keluar?</string>
+    <string name="settings_sign_out_message">Datamu tetap aman di server. Masuk lagi untuk melanjutkan.</string>
+    <string name="settings_sign_out_all_title">Keluar dari semua perangkat?</string>
+    <string name="settings_sign_out_all_message">Setiap ponsel dan tablet yang masuk ke akunmu, termasuk yang ini, perlu masuk lagi.</string>
+    <string name="settings_cancel">Batal</string>
+    <string name="settings_error_network">Kamu sedang offline. Sambungkan ke internet dan coba lagi.</string>
+    <string name="settings_error_sign_out">Gagal keluar. Coba lagi sebentar lagi.</string>
+</resources>

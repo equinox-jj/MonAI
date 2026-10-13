@@ -34,6 +34,7 @@ internal fun HomeHeader(
     greeting: Greeting,
     userName: String,
     initials: String,
+    avatarUrl: String?,
     onIntent: (HomeIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -69,6 +70,7 @@ internal fun HomeHeader(
                 .clip(CircleShape)
                 .clickable(role = Role.Button) { onIntent(HomeIntent.Open(HomeDestination.Settings)) }
                 .semantics { contentDescription = profileLabel },
+            imageUrl = avatarUrl,
         )
     }
 }

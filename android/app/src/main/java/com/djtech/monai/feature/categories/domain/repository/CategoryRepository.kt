@@ -2,6 +2,7 @@ package com.djtech.monai.feature.categories.domain.repository
 
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
+import com.djtech.monai.feature.categories.domain.model.CategoryChanges
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryResult
 import kotlinx.coroutines.flow.Flow
@@ -20,4 +21,13 @@ interface CategoryRepository {
 
     /** Creates a custom category and caches it. Input is sent as given. */
     suspend fun createCategory(input: CategoryInput): CategoryResult<Category>
+
+    /** Renames, restyles, hides or unhides a category and caches the result. */
+    suspend fun updateCategory(id: String, changes: CategoryChanges): CategoryResult<Category>
+
+    /**
+     * Deletes a custom category. Its transactions, if any, move to [moveTo] (a category of the same
+     * type), in the cache too; without one, a category in use fails with `HasTransactions`.
+     */
+    suspend fun deleteCategory(id: String, moveTo: String?): CategoryResult<Unit>
 }

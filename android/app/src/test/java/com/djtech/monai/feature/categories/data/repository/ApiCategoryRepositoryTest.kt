@@ -3,14 +3,18 @@ package com.djtech.monai.feature.categories.data.repository
 import com.djtech.monai.core.common.log.RecordingErrorLogger
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.database.FakeCategoryDao
+import com.djtech.monai.core.database.FakeTransactionDao
 import com.djtech.monai.core.database.entity.CategoryEntity
+import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
+import com.djtech.monai.core.model.transaction
 import com.djtech.monai.core.network.ApiCaller
 import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.categories.data.remote.CategoryApiService
+import com.djtech.monai.feature.categories.domain.model.CategoryChanges
 import com.djtech.monai.feature.categories.domain.model.CategoryError
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryNameIssue
@@ -245,7 +249,80 @@ class ApiCategoryRepositoryTest {
         assertSame(failure, errorLogger.errors.single())
     }
 
-    private fun repository(dao: FakeCategoryDao): ApiCategoryRepository {
+    @Test
+    fun `updateCategory patches only the given fields and caches the result`() = runTest {
+        val dao = FakeCategoryDao(listOf(FOOD.copy(isHidden = false).asEntity()))
+        server.enqueue(MockResponse(code = 200, body = categoryBody(FOOD_JSON)))
+
+        val result = repository(dao).updateCategory(FOOD.id, CategoryChanges(isHidden = true))
+
+        assertEquals(Outcome.Success(FOOD), result)
+        val request = server.takeRequest()
+        assertEquals("PATCH", request.method)
+        assertEquals("/api/v1/categories/${FOOD.id}", request.url.encodedPath)
+        assertEquals("""{"is_hidden":true}""", request.body?.utf8())
+        assertEquals(listOf(FOOD), dao.categories.map { it.asModel() })
+    }
+
+    @Test
+    fun `hiding a system category is locked`() = runTest {
+        server.enqueue(errorResponse(422, "system_category_locked"))
+
+        val result = repository(FakeCategoryDao()).updateCategory("other", CategoryChanges(isHidden = true))
+
+        assertEquals(Outcome.Failure(CategoryError.Locked), result)
+    }
+
+    @Test
+    fun `deleteCategory removes it from the cache`() = runTest {
+        val dao = FakeCategoryDao(listOf(FOOD.asEntity(), entity(id = "kopi", name = "Kopi")))
+        server.enqueue(MockResponse(code = 200, body = DELETED))
+
+        val result = repository(dao).deleteCategory("kopi", moveTo = null)
+
+        assertEquals(Outcome.Success(Unit), result)
+        val request = server.takeRequest()
+        assertEquals("DELETE", request.method)
+        assertEquals("/api/v1/categories/kopi", request.url.encodedPath)
+        assertNull(request.url.queryParameter("move_to"))
+        assertEquals(listOf(FOOD.id), dao.categories.map { it.id })
+    }
+
+    @Test
+    fun `deleteCategory with a target moves the cached transactions too`() = runTest {
+        val transactions = FakeTransactionDao(
+            listOf(
+                transaction("t1", categoryId = "kopi").asEntity(),
+                transaction("t2", categoryId = "food").asEntity(),
+            ),
+        )
+        server.enqueue(MockResponse(code = 200, body = DELETED))
+
+        val result = repository(FakeCategoryDao(), transactions).deleteCategory("kopi", moveTo = "other")
+
+        assertEquals(Outcome.Success(Unit), result)
+        assertEquals("other", server.takeRequest().url.queryParameter("move_to"))
+        assertEquals(
+            mapOf("t1" to "other", "t2" to "food"),
+            transactions.transactions.associate { it.id to it.categoryId },
+        )
+    }
+
+    @Test
+    fun `deleteCategory in use without a target needs one`() = runTest {
+        val dao = FakeCategoryDao(listOf(entity(id = "kopi", name = "Kopi")))
+        server.enqueue(errorResponse(422, "category_has_transactions"))
+
+        val result = repository(dao).deleteCategory("kopi", moveTo = null)
+
+        assertEquals(Outcome.Failure(CategoryError.HasTransactions), result)
+        assertEquals(listOf("kopi"), dao.categories.map { it.id })
+    }
+
+    private fun repository(
+        dao: FakeCategoryDao,
+        transactionDao: FakeTransactionDao = FakeTransactionDao(),
+    ): ApiCategoryRepository {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
@@ -256,6 +333,7 @@ class ApiCategoryRepositoryTest {
             categoryApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             categoryDao = dao,
+            transactionDao = transactionDao,
             errorLogger = errorLogger,
         )
     }
@@ -323,6 +401,8 @@ class ApiCategoryRepositoryTest {
             createdAt = CREATED_AT,
             updatedAt = CREATED_AT,
         )
+
+        const val DELETED = """{"success":true,"message":"Deleted","data":null}"""
 
         val FOOD_JSON = """
             {

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths>
+    <!-- Camera photos for the profile picture; deleted once cropped and uploaded. -->
+    <cache-path
+        name="camera"
+        path="camera/" />
+</paths>

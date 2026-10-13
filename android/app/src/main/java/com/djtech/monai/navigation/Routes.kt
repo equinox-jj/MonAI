@@ -66,9 +66,23 @@ data class BudgetRoute(val month: String) : NavKey
 @Serializable
 data class ReportRoute(val month: String? = null) : NavKey
 
-/** A new custom category of [type], from the transaction form's category picker. */
+/** A new custom category of [type], or the one with [id] to edit. */
 @Serializable
-data class CategoryFormRoute(val type: CategoryType) : NavKey
+data class CategoryFormRoute(val type: CategoryType, val id: String? = null) : NavKey
+
+/** [focusDelete] scrolls to the delete-account card. */
+@Serializable
+data class EditProfileRoute(val focusDelete: Boolean = false) : NavKey
+
+@Serializable
+data object CategoriesRoute : NavKey
+
+@Serializable
+data object ManageProvidersRoute : NavKey
+
+/** [id] is the payment provider to edit; null adds one. */
+@Serializable
+data class ProviderFormRoute(val id: String? = null) : NavKey
 
 /** Screens that take the whole window on a phone, so the bottom bar hides under them. */
 internal fun NavKey.isFullScreen(): Boolean = when (this) {
@@ -81,6 +95,10 @@ internal fun NavKey.isFullScreen(): Boolean = when (this) {
     is BudgetRoute,
     is ReportRoute,
     is CategoryFormRoute,
+    is EditProfileRoute,
+    CategoriesRoute,
+    ManageProvidersRoute,
+    is ProviderFormRoute,
         -> true
 
     else -> false

@@ -46,6 +46,10 @@ android {
         compose = true
         buildConfig = true
     }
+    androidResources {
+        // Lists the translated languages for the system's per-app language setting.
+        generateLocaleConfig = true
+    }
 }
 
 room3 {
@@ -81,6 +85,8 @@ dependencies {
     implementation(libs.androidx.paging.compose)
     implementation(libs.coil.compose)
     implementation(libs.coil.network.okhttp)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.exifinterface)
     implementation(libs.androidx.sqlite.bundled)
     ksp(libs.androidx.room.compiler)
     testImplementation(libs.junit)

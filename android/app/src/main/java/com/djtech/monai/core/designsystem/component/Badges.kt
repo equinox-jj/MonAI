@@ -17,11 +17,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil3.compose.AsyncImage
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 
@@ -92,12 +94,17 @@ fun MonAIDirectionPill(text: String, direction: MoneyDirection, modifier: Modifi
     )
 }
 
-/** Initials on a light-indigo circle. Font size scales with [size] (44dp → 15sp, 64dp → 22sp). */
+/**
+ * Initials on a light-indigo circle, or the photo at [imageUrl] once it loads. The initials stay
+ * while it loads and when it fails (presigned URLs expire). Font size scales with [size]
+ * (44dp → 15sp, 64dp → 22sp).
+ */
 @Composable
 fun MonAIAvatar(
     initials: String,
     modifier: Modifier = Modifier,
     size: Dp = MonAITheme.sizes.avatarLarge,
+    imageUrl: String? = null,
 ) {
     Box(
         modifier = modifier
@@ -115,6 +122,14 @@ fun MonAIAvatar(
             ),
             color = MonAITheme.colors.accent,
         )
+        if (imageUrl != null) {
+            AsyncImage(
+                model = imageUrl,
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop,
+            )
+        }
     }
 }
 

@@ -4,12 +4,16 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.dispatcher.MainDispatcherRule
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.CategoryType
+import com.djtech.monai.core.model.category
 import com.djtech.monai.feature.categories.domain.event.CategoryCreationEvents
+import com.djtech.monai.feature.categories.domain.model.CategoryChanges
 import com.djtech.monai.feature.categories.domain.model.CategoryError
 import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryNameIssue
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
 import com.djtech.monai.feature.categories.domain.usecase.CreateCategoryUseCase
+import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
+import com.djtech.monai.feature.categories.domain.usecase.UpdateCategoryUseCase
 import com.djtech.monai.feature.categories.presentation.categoryform.model.CategoryColorChoice
 import com.djtech.monai.feature.categories.presentation.categoryform.model.CategoryIconChoice
 import kotlinx.coroutines.flow.toList
@@ -34,9 +38,16 @@ class CategoryFormViewModelTest {
 
     private fun runFormTest(
         type: CategoryType = CategoryType.EXPENSE,
+        categoryId: String? = null,
         block: suspend TestScope.(CategoryFormViewModel, MutableList<CategoryFormEffect>) -> Unit,
     ) = runTest(mainDispatcherRule.dispatcher) {
-        val viewModel = CategoryFormViewModel(type, CreateCategoryUseCase(categories, CategoryCreationEvents()))
+        val viewModel = CategoryFormViewModel(
+            type,
+            categoryId,
+            CreateCategoryUseCase(categories, CategoryCreationEvents()),
+            UpdateCategoryUseCase(categories),
+            ObserveCategoriesUseCase(categories),
+        )
         val effects = mutableListOf<CategoryFormEffect>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.effects.toList(effects) }
         block(viewModel, effects)
@@ -135,5 +146,49 @@ class CategoryFormViewModelTest {
         send(vm, CategoryFormIntent.Close)
 
         assertEquals(listOf(CategoryFormEffect.Close), effects)
+    }
+
+    @Test
+    fun `editing fills the form from the cached category`() = runFormTest(categoryId = "kopi") { vm, _ ->
+        // The form reads the cache once the dispatcher runs, so this is in place before it does.
+        categories.categories.value = listOf(KOPI)
+        assertTrue(vm.state.value.isLoading)
+        advanceUntilIdle()
+        val state = vm.state.value
+
+        assertTrue(state.isEditing)
+        assertFalse(state.isLoading)
+        assertEquals("Kopi", state.name)
+        assertEquals(CategoryIconChoice.Coffee, state.icon)
+        assertEquals(CategoryColorChoice.Indigo, state.color)
+    }
+
+    @Test
+    fun `saving an edit sends only the changes and closes`() = runFormTest(categoryId = "kopi") { vm, effects ->
+        categories.categories.value = listOf(KOPI)
+        advanceUntilIdle()
+
+        send(vm, CategoryFormIntent.NameChanged("Coffee"), CategoryFormIntent.Save)
+
+        assertEquals(listOf("kopi" to CategoryChanges(name = "Coffee")), categories.updates)
+        assertTrue(categories.createdInputs.isEmpty())
+        assertEquals(listOf<CategoryFormEffect>(CategoryFormEffect.Close), effects)
+    }
+
+    @Test
+    fun `editing a category that is gone closes the form`() = runFormTest(categoryId = "gone") { _, effects ->
+        advanceUntilIdle()
+
+        assertEquals(CategoryFormEffect.Close, effects.last())
+    }
+
+    private companion object {
+        val KOPI = category(
+            "kopi",
+            name = "Kopi",
+            icon = "local_cafe",
+            color = "#6366F1",
+            isDefault = false,
+        )
     }
 }

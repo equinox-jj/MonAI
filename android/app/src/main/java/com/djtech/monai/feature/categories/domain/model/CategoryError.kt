@@ -7,6 +7,15 @@ sealed interface CategoryError {
     /** The device or the server rejected the name. */
     data class InvalidName(val issue: CategoryNameIssue) : CategoryError
 
+    /** Deleting needs a category to move the transactions to, and none was given. */
+    data object HasTransactions : CategoryError
+
+    /** System categories can't be hidden or deleted, nor default ones deleted. */
+    data object Locked : CategoryError
+
+    /** Already gone, e.g. deleted on another device. */
+    data object NotFound : CategoryError
+
     data object Unexpected : CategoryError
 }
 

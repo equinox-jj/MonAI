@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MonAI" parent="android:Theme.Material.Light.NoActionBar" />
+    <!-- AppCompat so AppCompatDelegate can apply the language picked in Settings on every API level. -->
+    <style name="Theme.MonAI" parent="Theme.AppCompat.Light.NoActionBar" />
 
     <!-- Launch theme: the system splash, held by MainActivity until the session is read. -->
     <style name="Theme.MonAI.Starting" parent="Theme.SplashScreen">

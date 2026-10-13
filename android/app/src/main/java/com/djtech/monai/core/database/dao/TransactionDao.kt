@@ -109,6 +109,10 @@ interface TransactionDao {
     @Query("DELETE FROM transactions WHERE id = :id")
     suspend fun delete(id: String)
 
+    /** Follows the server moving a deleted category's transactions to [to]. */
+    @Query("UPDATE transactions SET category_id = :to WHERE category_id = :from")
+    suspend fun moveCategory(from: String, to: String)
+
     /** Drops a date range before a RemoteMediator refresh re-fills it. */
     @Query("DELETE FROM transactions WHERE date BETWEEN :from AND :to")
     suspend fun deleteInRange(from: LocalDate, to: LocalDate)

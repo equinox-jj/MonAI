@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Edit profile -->
+    <string name="profile_title">Ubah profil</string>
+    <string name="profile_save">Simpan</string>
+    <string name="profile_back">Kembali</string>
+    <string name="profile_saved">Profil disimpan.</string>
+    <string name="profile_change_photo">Ganti foto</string>
+    <string name="profile_change_photo_description">Ganti foto profil</string>
+    <string name="profile_remove_photo">Hapus</string>
+    <string name="profile_uploading">Mengunggah foto… %1$d%%</string>
+    <string name="profile_photo_note">Foto persegi, diubah ke 512×512. Data lokasi dihapus sebelum diunggah.</string>
+    <string name="profile_name">Nama tampilan</string>
+    <string name="profile_email">Email</string>
+    <string name="profile_timezone">Zona waktu</string>
+    <string name="profile_timezone_note">Menentukan arti \"hari ini\" untuk transaksimu.</string>
+    <string name="profile_timezone_search">Cari kota atau wilayah</string>
+    <string name="profile_timezone_indonesia">Indonesia</string>
+    <string name="profile_timezone_all">Semua zona waktu</string>
+    <string name="profile_timezone_none">Tidak ada zona waktu yang cocok dengan \"%1$s\".</string>
+    <string name="profile_timezone_wib">WIB · Waktu Indonesia Barat</string>
+    <string name="profile_timezone_wita">WITA · Waktu Indonesia Tengah</string>
+    <string name="profile_timezone_wit">WIT · Waktu Indonesia Timur</string>
+    <string name="profile_delete_title">Hapus akun</string>
+    <string name="profile_delete_body">Ini menghapus permanen dompet, kategori, transaksi, anggaran, foto profil, dan foto struk milikmu. Tidak bisa dibatalkan.</string>
+    <string name="profile_delete_password">Masukkan kata sandi untuk konfirmasi</string>
+    <string name="profile_delete_button">Hapus akun saya</string>
+    <string name="profile_delete_confirm_title">Hapus akunmu?</string>
+    <string name="profile_delete_confirm_message">Semua isi MonAI ikut terhapus, di setiap perangkat. Ini tidak bisa dibatalkan.</string>
+    <string name="profile_delete_confirm">Hapus</string>
+    <string name="profile_cancel">Batal</string>
+    <!-- Profile photo source sheet -->
+    <string name="profile_photo_title">Foto profil</string>
+    <string name="profile_photo_camera">Ambil foto</string>
+    <string name="profile_photo_camera_note">Membuka kamera</string>
+    <string name="profile_photo_gallery">Pilih dari galeri</string>
+    <string name="profile_photo_gallery_note">Pilih satu foto — kami tidak bisa melihat yang lain</string>
+    <string name="profile_photo_remove">Hapus foto</string>
+    <string name="profile_photo_remove_note">Tampilkan inisialmu</string>
+    <string name="profile_photo_privacy">Foto dipotong persegi dan diubah ke 512×512. Detail lokasi dan kamera dihapus sebelum diunggah.</string>
+    <!-- Crop -->
+    <string name="profile_crop_title">Potong foto</string>
+    <string name="profile_crop_cancel">Batal</string>
+    <string name="profile_crop_done">Selesai</string>
+    <string name="profile_crop_hint">Geser untuk memindahkan · cubit atau pakai slider untuk zoom</string>
+    <string name="profile_crop_zoom">Zoom</string>
+    <string name="profile_crop_rotate">Putar</string>
+    <string name="profile_crop_reset">Atur ulang</string>
+    <string name="profile_crop_note">Disimpan sebagai WebP 512×512. Data lokasi dihapus.</string>
+    <string name="profile_crop_unreadable">Foto ini tidak bisa dibuka. Coba foto lain.</string>
+    <!-- Profile errors -->
+    <string name="profile_error_name_required">Masukkan nama.</string>
+    <string name="profile_error_name_too_long">Gunakan maksimal %1$d karakter.</string>
+    <string name="profile_error_name_invalid">Nama ini tidak bisa dipakai. Coba yang lain.</string>
+    <string name="profile_error_timezone">Pilih zona waktu dari daftar.</string>
+    <string name="profile_error_password_required">Masukkan kata sandimu.</string>
+    <string name="profile_error_wrong_password">Kata sandi salah.</string>
+    <string name="profile_error_last_admin">Kamu admin terakhir. Berikan akses admin ke akun lain sebelum menghapus akun ini.</string>
+    <string name="profile_error_photo_too_large">Foto ini terlalu besar, bahkan setelah diperkecil. Coba foto lain.</string>
+    <string name="profile_error_photo_unsupported">Foto ini tidak bisa dipakai. Coba JPEG atau PNG.</string>
+    <string name="profile_error_network">Kamu sedang offline. Sambungkan ke internet dan coba lagi.</string>
+    <string name="profile_error_unexpected">Terjadi kesalahan. Coba lagi sebentar lagi.</string>
+    <plurals name="profile_error_rate_limited">
+        <item quantity="other">Terlalu banyak percobaan. Coba lagi dalam %1$d menit.</item>
+    </plurals>
+    <string name="profile_error_rate_limited_soon">Terlalu banyak percobaan. Coba lagi beberapa menit lagi.</string>
+</resources>
