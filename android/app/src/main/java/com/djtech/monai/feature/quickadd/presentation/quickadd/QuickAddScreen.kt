@@ -3,11 +3,13 @@ package com.djtech.monai.feature.quickadd.presentation.quickadd
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -40,6 +42,7 @@ import com.djtech.monai.feature.quickadd.presentation.quickadd.preview.QuickAddP
 /**
  * @param onOpenForm one draft: open the add form prefilled with it.
  * @param onOpenReview several drafts from [String] (the phrase): review them one by one.
+ * @param isSideSheet shown as a side sheet on a wide screen, below no status bar.
  */
 @Composable
 fun QuickAddRoute(
@@ -47,6 +50,7 @@ fun QuickAddRoute(
     onOpenForm: (TransactionDraft) -> Unit,
     onOpenReview: (String, List<TransactionDraft>) -> Unit,
     modifier: Modifier = Modifier,
+    isSideSheet: Boolean = false,
     viewModel: QuickAddViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -57,7 +61,7 @@ fun QuickAddRoute(
             is QuickAddEffect.OpenReview -> onOpenReview(effect.phrase, effect.drafts)
         }
     }
-    QuickAddScreen(state, viewModel::onIntent, modifier)
+    QuickAddScreen(state, viewModel::onIntent, modifier, isSideSheet)
 }
 
 @Composable
@@ -65,6 +69,7 @@ fun QuickAddScreen(
     state: QuickAddState,
     onIntent: (QuickAddIntent) -> Unit,
     modifier: Modifier = Modifier,
+    isSideSheet: Boolean = false,
 ) {
     val spacing = MonAITheme.spacing
     Column(
@@ -80,6 +85,7 @@ fun QuickAddScreen(
             onNavigationClick = { onIntent(QuickAddIntent.Close) },
             navigationContentDescription = stringResource(R.string.quick_add_close),
             titleStyle = MonAITheme.typography.headlineSmall,
+            windowInsets = if (isSideSheet) WindowInsets(0) else WindowInsets.statusBars,
         )
         Column(
             Modifier

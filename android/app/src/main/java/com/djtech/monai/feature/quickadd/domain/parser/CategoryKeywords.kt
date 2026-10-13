@@ -32,7 +32,8 @@ object CategoryKeywords {
             listOf(
                 "parkir", "bensin", "bbm", "pertalite", "pertamax", "solar", "ojek", "ojol", "gojek", "goride",
                 "gocar", "grab", "grabbike", "grabcar", "taksi", "taxi", "tol", "e-toll", "kereta", "krl", "mrt",
-                "lrt", "transjakarta", "busway", "bus", "angkot", "parking", "fuel", "uber",
+                "lrt", "transjakarta", "busway", "bus", "angkot", "parking", "fuel", "uber", "bengkel", "ganti oli",
+                "servis motor", "servis mobil", "cuci motor", "cuci mobil",
             ),
         ),
         Group(
@@ -40,7 +41,6 @@ object CategoryKeywords {
             listOf(
                 "listrik", "pln", "token", "pdam", "pulsa", "kuota", "paket data", "internet", "wifi", "indihome",
                 "bpjs", "cicilan", "tagihan", "sewa", "kos", "kost", "kontrakan", "iuran", "electricity", "rent",
-                "netflix", "spotify",
             ),
         ),
         Group(
@@ -54,12 +54,15 @@ object CategoryKeywords {
             listOf("health", "kesehatan"),
             listOf(
                 "obat", "apotek", "apotik", "dokter", "rumah sakit", "klinik", "vitamin", "medicine", "doctor",
-                "pharmacy",
+                "pharmacy", "gym", "fitness",
             ),
         ),
         Group(
             listOf("entertainment", "hiburan"),
-            listOf("nonton", "bioskop", "film", "game", "karaoke", "konser", "liburan", "movie", "cinema", "concert"),
+            listOf(
+                "nonton", "bioskop", "film", "game", "karaoke", "konser", "liburan", "movie", "cinema", "concert",
+                "netflix", "spotify", "disney", "youtube premium",
+            ),
         ),
         Group(listOf("salary", "gaji"), listOf("gaji", "gajian", "salary", "payroll")),
         Group(listOf("bonus"), listOf("bonus", "thr", "insentif", "komisi")),

@@ -8,6 +8,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
@@ -143,5 +144,34 @@ class TransactionFormScreenTest {
         compose.onNodeWithText("New").performClick()
 
         assertEquals(listOf<TransactionFormIntent>(TransactionFormIntent.NewCategory), intents)
+    }
+
+    @Test
+    fun draftedFieldsAreMarkedForReview() {
+        setContent(
+            add.copy(
+                amount = 0,
+                highlights = mapOf(
+                    TransactionField.AMOUNT to FieldHighlight.Low,
+                    TransactionField.WALLET to FieldHighlight.Low,
+                ),
+            ),
+        )
+
+        compose.onNodeWithText("We couldn't find an amount. Type it on the keypad.").assertIsDisplayed()
+        compose.onNodeWithText("Please check this value.").assertIsDisplayed()
+    }
+
+    @Test
+    fun theScanChipShowsOnlyWhenScanningIsOffered() {
+        compose.setContent {
+            MonAITheme(darkTheme = false) {
+                TransactionFormScreen(add, onIntent = { intents += it }, canScan = true)
+            }
+        }
+
+        compose.onNodeWithText("Scan").performClick()
+
+        assertEquals(listOf<TransactionFormIntent>(TransactionFormIntent.Scan), intents)
     }
 }

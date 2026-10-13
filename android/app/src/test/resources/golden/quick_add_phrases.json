@@ -1,0 +1,877 @@
+{
+  "description": "Hand-written quick-add phrases with the drafts a person would expect. Replace or extend them with real (anonymized) phrases from users. Wallets and categories are referred to by name; a phrase without a wallet expects the default one.",
+  "today": "2026-10-10",
+  "wallets": [
+    {
+      "name": "Cash",
+      "type": "CASH",
+      "isDefault": true
+    },
+    {
+      "name": "BCA",
+      "type": "BANK",
+      "aliases": [
+        "bca",
+        "klikbca"
+      ]
+    },
+    {
+      "name": "Mandiri",
+      "type": "BANK",
+      "aliases": [
+        "mandiri",
+        "livin"
+      ]
+    },
+    {
+      "name": "GoPay",
+      "type": "E_WALLET",
+      "aliases": [
+        "gopay",
+        "gpay",
+        "go-pay"
+      ]
+    },
+    {
+      "name": "OVO",
+      "type": "E_WALLET",
+      "aliases": [
+        "ovo"
+      ]
+    },
+    {
+      "name": "DANA",
+      "type": "E_WALLET",
+      "aliases": [
+        "dana"
+      ]
+    },
+    {
+      "name": "ShopeePay",
+      "type": "E_WALLET",
+      "aliases": [
+        "shopeepay",
+        "spay"
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "name": "Food",
+      "type": "EXPENSE",
+      "isSystem": false
+    },
+    {
+      "name": "Transport",
+      "type": "EXPENSE",
+      "isSystem": false
+    },
+    {
+      "name": "Bills",
+      "type": "EXPENSE",
+      "isSystem": false
+    },
+    {
+      "name": "Shopping",
+      "type": "EXPENSE",
+      "isSystem": false
+    },
+    {
+      "name": "Health",
+      "type": "EXPENSE",
+      "isSystem": false
+    },
+    {
+      "name": "Entertainment",
+      "type": "EXPENSE",
+      "isSystem": false
+    },
+    {
+      "name": "Other",
+      "type": "EXPENSE",
+      "isSystem": true
+    },
+    {
+      "name": "Salary",
+      "type": "INCOME",
+      "isSystem": false
+    },
+    {
+      "name": "Bonus",
+      "type": "INCOME",
+      "isSystem": false
+    },
+    {
+      "name": "Other Income",
+      "type": "INCOME",
+      "isSystem": true
+    }
+  ],
+  "phrases": [
+    {
+      "text": "makan siang 35rb pakai gopay",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 35000,
+          "wallet": "GoPay",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "kopi 25rb sama parkir 5rb kmrn",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 25000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Food"
+        },
+        {
+          "type": "EXPENSE",
+          "amount": 5000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "bensin 50rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 50000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "gajian 8jt ke bca",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 8000000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "category": "Salary"
+        }
+      ]
+    },
+    {
+      "text": "topup gopay 100rb dari bca",
+      "drafts": [
+        {
+          "type": "TRANSFER",
+          "amount": 100000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "toWallet": "GoPay"
+        }
+      ]
+    },
+    {
+      "text": "listrik 300rb tgl 5",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 300000,
+          "wallet": "Cash",
+          "date": "2026-10-05",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "nonton bioskop 75rb pake ovo",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 75000,
+          "wallet": "OVO",
+          "date": "2026-10-10",
+          "category": "Entertainment"
+        }
+      ]
+    },
+    {
+      "text": "beli obat 45.000 di apotek",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 45000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Health"
+        }
+      ]
+    },
+    {
+      "text": "belanja bulanan 1,2jt via mandiri",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 1200000,
+          "wallet": "Mandiri",
+          "date": "2026-10-10",
+          "category": "Shopping"
+        }
+      ]
+    },
+    {
+      "text": "parkir gopek",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 500,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "ojol 18rb pakai gopay",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 18000,
+          "wallet": "GoPay",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "bonus akhir tahun 2 juta",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 2000000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bonus"
+        }
+      ]
+    },
+    {
+      "text": "pulsa 50rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 50000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "sarapan bubur 12rb tadi pagi",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 12000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "es teh ceban",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 10000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "bayar wifi indihome 385rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 385000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "grab ke kantor 32rb pakai ovo",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 32000,
+          "wallet": "OVO",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "makan malam 85rb kemarin pake shopeepay",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 85000,
+          "wallet": "ShopeePay",
+          "date": "2026-10-09",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "thr 3jt",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 3000000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bonus"
+        }
+      ]
+    },
+    {
+      "text": "beli sepatu 450rb di tokopedia",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 450000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Shopping"
+        }
+      ]
+    },
+    {
+      "text": "token pln 200rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 200000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "bakso 20rb sama es teh 5rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 20000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        },
+        {
+          "type": "EXPENSE",
+          "amount": 5000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "martabak 40rb senin lalu",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 40000,
+          "wallet": "Cash",
+          "date": "2026-10-05",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "tol 15rb kemarin",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 15000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "netflix 54rb pakai bca",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 54000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "category": "Entertainment"
+        }
+      ]
+    },
+    {
+      "text": "dokter gigi 250rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 250000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Health"
+        }
+      ]
+    },
+    {
+      "text": "isi saldo ovo 50rb dari bca",
+      "drafts": [
+        {
+          "type": "TRANSFER",
+          "amount": 50000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "toWallet": "OVO"
+        }
+      ]
+    },
+    {
+      "text": "pindah 1jt dari bca ke mandiri",
+      "drafts": [
+        {
+          "type": "TRANSFER",
+          "amount": 1000000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "toWallet": "Mandiri"
+        }
+      ]
+    },
+    {
+      "text": "kos bulan ini 1.500.000",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 1500000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "ngopi 30k",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 30000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "dapat refund 75rb ke gopay",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 75000,
+          "wallet": "GoPay",
+          "date": "2026-10-10",
+          "category": "Other Income"
+        }
+      ]
+    },
+    {
+      "text": "gaji 7.500.000",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 7500000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Salary"
+        }
+      ]
+    },
+    {
+      "text": "beli baju 2 potong 300rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 300000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Shopping"
+        }
+      ]
+    },
+    {
+      "text": "parkir motor 3rb tgl 8",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 3000,
+          "wallet": "Cash",
+          "date": "2026-10-08",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "makan siang bareng tim 250rb via dana",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 250000,
+          "wallet": "DANA",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "lunch 45k",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 45000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "coffee 38k yesterday",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 38000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "taxi 60k with ovo",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 60000,
+          "wallet": "OVO",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "groceries 320k",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 320000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Shopping"
+        }
+      ]
+    },
+    {
+      "text": "salary 9jt to bca",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 9000000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "category": "Salary"
+        }
+      ]
+    },
+    {
+      "text": "bayar arisan ke tante via mandiri",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": null,
+          "wallet": "Mandiri",
+          "date": "2026-10-10",
+          "category": "Other"
+        }
+      ]
+    },
+    {
+      "text": "beli hadiah ulang tahun ibu 250rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 250000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Other"
+        }
+      ]
+    },
+    {
+      "text": "iuran rt 50rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 50000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "vitamin 120rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 120000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Health"
+        }
+      ]
+    },
+    {
+      "text": "karaoke 200rb jumat",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 200000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Entertainment"
+        }
+      ]
+    },
+    {
+      "text": "bayar cicilan motor 850rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 850000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "seblak 15rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 15000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "krl 5rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 5000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "indomaret 87.500",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 87500,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Shopping"
+        }
+      ]
+    },
+    {
+      "text": "top up gopay 200rb",
+      "drafts": [
+        {
+          "type": "TRANSFER",
+          "amount": 200000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "toWallet": "GoPay"
+        }
+      ]
+    },
+    {
+      "text": "tarik tunai 500rb dari bca",
+      "drafts": [
+        {
+          "type": "TRANSFER",
+          "amount": 500000,
+          "wallet": "BCA",
+          "date": "2026-10-10",
+          "toWallet": "Cash"
+        }
+      ]
+    },
+    {
+      "text": "makan 25rb sama bensin 20rb pakai ovo",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 25000,
+          "wallet": "OVO",
+          "date": "2026-10-10",
+          "category": "Food"
+        },
+        {
+          "type": "EXPENSE",
+          "amount": 20000,
+          "wallet": "OVO",
+          "date": "2026-10-10",
+          "category": "Transport"
+        }
+      ]
+    },
+    {
+      "text": "35rb nasi padang",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 35000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "kado nikahan 500rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 500000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Other"
+        }
+      ]
+    },
+    {
+      "text": "dapet transferan dari papa 1jt",
+      "drafts": [
+        {
+          "type": "INCOME",
+          "amount": 1000000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Other Income"
+        }
+      ]
+    },
+    {
+      "text": "bayar laundry 45 ribu kemarin",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 45000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Other"
+        }
+      ]
+    },
+    {
+      "text": "spotify 55rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 55000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Entertainment"
+        }
+      ]
+    },
+    {
+      "text": "bayar bpjs 150rb lewat livin",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 150000,
+          "wallet": "Mandiri",
+          "date": "2026-10-10",
+          "category": "Bills"
+        }
+      ]
+    },
+    {
+      "text": "ongkir shopee 12rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 12000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Shopping"
+        }
+      ]
+    },
+    {
+      "text": "jajan cilok 10rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 10000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Food"
+        }
+      ]
+    },
+    {
+      "text": "gym bulanan 300rb",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 300000,
+          "wallet": "Cash",
+          "date": "2026-10-10",
+          "category": "Health"
+        }
+      ]
+    },
+    {
+      "text": "servis motor 175rb kemarin",
+      "drafts": [
+        {
+          "type": "EXPENSE",
+          "amount": 175000,
+          "wallet": "Cash",
+          "date": "2026-10-09",
+          "category": "Transport"
+        }
+      ]
+    }
+  ]
+}

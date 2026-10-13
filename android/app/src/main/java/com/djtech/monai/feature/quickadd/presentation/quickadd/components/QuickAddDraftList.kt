@@ -102,7 +102,14 @@ private fun DraftCard(row: QuickAddDraftRow, today: LocalDate) {
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                 )
-                Text(meta, style = MonAITheme.typography.bodySmall, color = colors.textTertiary, maxLines = 1)
+                // Two lines, so the date still shows after a long wallet name.
+                Text(
+                    meta,
+                    style = MonAITheme.typography.bodySmall,
+                    color = colors.textTertiary,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
             DraftAmount(row.type, row.amount)
         }

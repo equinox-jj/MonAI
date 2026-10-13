@@ -186,12 +186,16 @@ private fun MainNavDisplay(
                         )
                     }
                 }
-                entry<QuickAddRoute> {
-                    QuickAddRoute(
-                        onClose = navigator::goBack,
-                        onOpenForm = navigator::openDraftForm,
-                        onOpenReview = navigator::openDraftReview,
-                    )
+                entry<QuickAddRoute>(metadata = formMetadata) {
+                    SideSheetEntry(asSideSheet = isExpanded) { sheetModifier ->
+                        QuickAddRoute(
+                            onClose = navigator::goBack,
+                            onOpenForm = navigator::openDraftForm,
+                            onOpenReview = navigator::openDraftReview,
+                            modifier = sheetModifier,
+                            isSideSheet = isExpanded,
+                        )
+                    }
                 }
                 entry<ScanReceiptRoute> {
                     ScanReceiptRoute(
@@ -210,13 +214,17 @@ private fun MainNavDisplay(
                         onSaved = navigator::showSavedReceipt,
                     )
                 }
-                entry<QuickAddReviewRoute> { key ->
-                    QuickAddReviewRoute(
-                        phrase = key.phrase,
-                        drafts = key.drafts.map { it.toModel() },
-                        onBack = navigator::goBack,
-                        onFinish = navigator::closeQuickAdd,
-                    )
+                entry<QuickAddReviewRoute>(metadata = formMetadata) { key ->
+                    SideSheetEntry(asSideSheet = isExpanded) { sheetModifier ->
+                        QuickAddReviewRoute(
+                            phrase = key.phrase,
+                            drafts = key.drafts.map { it.toModel() },
+                            onBack = navigator::goBack,
+                            onFinish = navigator::closeQuickAdd,
+                            modifier = sheetModifier,
+                            isSideSheet = isExpanded,
+                        )
+                    }
                 }
                 entry<TransactionSearchRoute> { key ->
                     SearchRoute(

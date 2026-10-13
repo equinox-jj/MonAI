@@ -5,10 +5,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
@@ -56,6 +58,7 @@ import kotlinx.coroutines.launch
 /**
  * @param onBack back to quick add (also "Start over").
  * @param onFinish "Back to home" after the last draft.
+ * @param isSideSheet shown as a side sheet on a wide screen, below no status bar.
  */
 @Composable
 fun QuickAddReviewRoute(
@@ -64,6 +67,7 @@ fun QuickAddReviewRoute(
     onBack: () -> Unit,
     onFinish: () -> Unit,
     modifier: Modifier = Modifier,
+    isSideSheet: Boolean = false,
     viewModel: QuickAddReviewViewModel = hiltViewModel<QuickAddReviewViewModel, QuickAddReviewViewModel.Factory>(
         key = "review-$phrase-${drafts.hashCode()}",
     ) {
@@ -83,7 +87,7 @@ fun QuickAddReviewRoute(
             }
         }
     }
-    QuickAddReviewScreen(state, viewModel::onIntent, modifier, snackbarHostState)
+    QuickAddReviewScreen(state, viewModel::onIntent, modifier, isSideSheet, snackbarHostState)
 }
 
 @Composable
@@ -91,6 +95,7 @@ fun QuickAddReviewScreen(
     state: QuickAddReviewState,
     onIntent: (QuickAddReviewIntent) -> Unit,
     modifier: Modifier = Modifier,
+    isSideSheet: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
@@ -109,6 +114,7 @@ fun QuickAddReviewScreen(
                 title = stringResource(R.string.quick_add_review_title),
                 onNavigationClick = { onIntent(QuickAddReviewIntent.Back) },
                 navigationContentDescription = stringResource(R.string.quick_add_review_back),
+                windowInsets = if (isSideSheet) WindowInsets(0) else WindowInsets.statusBars,
             ) {
                 Text(
                     if (state.isDone) {
@@ -165,10 +171,11 @@ private fun Actions(
                 modifier = Modifier.weight(1f),
                 variant = MonAIButtonVariant.Outlined,
             )
+            // Equal halves: "Start over" / "Mulai lagi" doesn't fit in a third.
             MonAIButton(
                 stringResource(R.string.quick_add_review_home),
                 onClick = { onIntent(QuickAddReviewIntent.Finish) },
-                modifier = Modifier.weight(2f),
+                modifier = Modifier.weight(1f),
             )
         } else {
             MonAIButton(

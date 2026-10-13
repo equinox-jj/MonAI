@@ -109,4 +109,38 @@ class TransactionDetailScreenTest {
 
         assertEquals(listOf<TransactionDetailIntent>(TransactionDetailIntent.Retry), intents)
     }
+
+    @Test
+    fun aTransactionWithoutAReceiptOffersToAddOne() {
+        setContent(state(TransactionTestData.transaction("t1", "Lunch")))
+
+        compose.onNodeWithText("Add receipt photo").assertIsDisplayed()
+        compose.onNodeWithText("Add").performClick()
+
+        assertEquals(listOf<TransactionDetailIntent>(TransactionDetailIntent.AddReceipt), intents)
+    }
+
+    @Test
+    fun anAttachedReceiptCanBeReplacedAndShowsUploadProgress() {
+        setContent(
+            state(TransactionTestData.transaction("t1", "Lunch", receiptUrl = "https://example.com/r.jpg"))
+                .copy(receiptUpload = 0.5f),
+        )
+
+        compose.onNodeWithText("Uploading… 50%").assertIsDisplayed()
+        compose.onNodeWithText("Replace").assertIsDisplayed()
+    }
+
+    @Test
+    fun thePhotoSheetOffersCameraAndGallery() {
+        setContent(state(TransactionTestData.transaction("t1", "Lunch")).copy(isPhotoSourceOpen = true))
+
+        compose.onNodeWithText("Take a photo").performClick()
+        compose.onNodeWithText("Choose from gallery").performClick()
+
+        assertEquals(
+            listOf(TransactionDetailIntent.TakeReceiptPhoto, TransactionDetailIntent.ChooseReceiptPhoto),
+            intents,
+        )
+    }
 }
