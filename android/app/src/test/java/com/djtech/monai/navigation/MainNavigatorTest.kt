@@ -88,6 +88,29 @@ class MainNavigatorTest {
         assertEquals(listOf(HomeRoute, TransactionsRoute), navigator.backStack)
     }
 
+    @Test
+    fun `only home is visible on home`() {
+        assertEquals(listOf(TopLevelDestination.Home), navigator.visibleTabs)
+    }
+
+    @Test
+    fun `another tab is visible above home`() {
+        navigator.selectTab(TopLevelDestination.Wallets)
+
+        assertEquals(listOf(TopLevelDestination.Home, TopLevelDestination.Wallets), navigator.visibleTabs)
+    }
+
+    @Test
+    fun `stackOf returns each tab's own stack`() {
+        navigator.selectTab(TopLevelDestination.Transactions)
+        navigator.navigate(Detail)
+
+        navigator.selectTab(TopLevelDestination.Wallets)
+
+        assertEquals(listOf(TransactionsRoute, Detail), navigator.stackOf(TopLevelDestination.Transactions))
+        assertEquals(listOf(WalletsRoute), navigator.stackOf(TopLevelDestination.Wallets))
+    }
+
     private data object Detail : NavKey
     private data object Detail2 : NavKey
 

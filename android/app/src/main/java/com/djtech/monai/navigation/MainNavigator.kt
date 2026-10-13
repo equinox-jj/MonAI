@@ -25,14 +25,20 @@ class MainNavigator(
 
     val currentTab: TopLevelDestination get() = currentTabState
 
-    /** What NavDisplay renders: Home's stack under the current tab's, so back from a tab root lands on Home. */
-    val backStack: List<NavKey>
-        get() {
-            val home = stack(TopLevelDestination.Home)
-            return if (currentTabState == TopLevelDestination.Home) home.toList() else home + stack(
-                currentTabState,
-            )
+    /** The tabs on screen, bottom first: Home under the current tab, so back from a tab root lands on Home. */
+    val visibleTabs: List<TopLevelDestination>
+        get() = if (currentTabState == TopLevelDestination.Home) {
+            listOf(TopLevelDestination.Home)
+        } else {
+            listOf(TopLevelDestination.Home, currentTabState)
         }
+
+    /** What is on screen: the [visibleTabs]' stacks, concatenated. */
+    val backStack: List<NavKey>
+        get() = visibleTabs.flatMap { stack(it) }
+
+    /** [tab]'s own stack, shown or not. */
+    fun stackOf(tab: TopLevelDestination): List<NavKey> = stack(tab)
 
     /** Selecting the tab already shown pops it to its root. */
     fun selectTab(tab: TopLevelDestination) {

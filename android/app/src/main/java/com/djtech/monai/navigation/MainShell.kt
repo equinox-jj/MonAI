@@ -16,9 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
-import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.djtech.monai.R
@@ -122,16 +120,10 @@ private fun MainNavDisplay(
     val openTransaction = { id: String -> navigator.navigate(TransactionDetailRoute(id)) }
     val editTransaction = { id: String -> navigator.navigate(TransactionFormRoute(id)) }
     Box(modifier) {
-        NavDisplay(
-            backStack = navigator.backStack,
-            onBack = navigator::goBack,
-            // Scopes each entry's ViewModel to the entry, so it is cleared when the entry is popped.
-            entryDecorators = listOf(
-                rememberSaveableStateHolderNavEntryDecorator(),
-                rememberViewModelStoreNavEntryDecorator(),
-            ),
-            sceneStrategies = listOf(DialogSceneStrategy()),
-            entryProvider = entryProvider {
+        // Each tab keeps its entries' ViewModels while another tab is shown, so switching tabs doesn't refetch.
+        val entries = rememberMainNavEntries(
+            navigator,
+            entryProvider {
                 entry<HomeRoute> { HomeRoute(onNavigate = navigator::openFromHome) }
                 entry<TransactionsRoute> {
                     TransactionsRoute(
@@ -219,6 +211,11 @@ private fun MainNavDisplay(
                 }
                 entry<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }
             },
+        )
+        NavDisplay(
+            entries = entries,
+            sceneStrategies = listOf(DialogSceneStrategy()),
+            onBack = navigator::goBack,
         )
         UndoDeleteRoute(Modifier.align(Alignment.BottomCenter))
     }
