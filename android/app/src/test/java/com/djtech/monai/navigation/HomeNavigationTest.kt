@@ -5,7 +5,11 @@ import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
 import com.djtech.monai.feature.home.presentation.home.HomeDestination
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
+import java.time.YearMonth
+
+private val OCTOBER: YearMonth = YearMonth.of(2026, 10)
 
 class HomeNavigationTest {
 
@@ -54,12 +58,25 @@ class HomeNavigationTest {
     }
 
     @Test
+    fun `the budget card and full report open home's month on top of home`() {
+        navigator.openFromHome(HomeDestination.Budget(OCTOBER))
+        navigator.openFromHome(HomeDestination.Report(OCTOBER))
+
+        assertEquals(TopLevelDestination.Home, navigator.currentTab)
+        assertEquals(listOf(HomeRoute, BudgetRoute("2026-10"), ReportRoute("2026-10")), navigator.backStack)
+    }
+
+    @Test
+    fun `budget and report are full screen`() {
+        assertTrue(BudgetRoute("2026-10").isFullScreen())
+        assertTrue(ReportRoute().isFullScreen())
+    }
+
+    @Test
     fun `destinations without a screen yet stay on home`() {
         val unbuilt = listOf(
             HomeDestination.QuickAdd,
             HomeDestination.ScanReceipt,
-            HomeDestination.Budget,
-            HomeDestination.Report,
         )
 
         unbuilt.forEach(navigator::openFromHome)

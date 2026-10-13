@@ -13,8 +13,11 @@ import com.djtech.monai.core.model.category
 import com.djtech.monai.core.model.transaction
 import com.djtech.monai.core.model.wallet
 import com.djtech.monai.feature.budgets.domain.repository.FakeBudgetRepository
+import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.repository.FakeCategoryRepository
+import com.djtech.monai.feature.categories.domain.usecase.CreateCategoryUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
+import com.djtech.monai.feature.categories.domain.usecase.ObserveCreatedCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveVisibleCategoriesUseCase
 import com.djtech.monai.feature.reports.domain.repository.FakeReportRepository
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
@@ -83,6 +86,7 @@ class TransactionFormViewModelTest {
             observeAllWallets = ObserveAllWalletsUseCase(wallets),
             observeCategories = ObserveCategoriesUseCase(categories),
             observeVisibleCategories = ObserveVisibleCategoriesUseCase(categories),
+            observeCreatedCategories = ObserveCreatedCategoriesUseCase(categories),
             clock = clock,
         )
     }
@@ -291,6 +295,47 @@ class TransactionFormViewModelTest {
         )
 
         assertEquals(LocalDate.of(2026, 9, 28), vm.state.value.date)
+    }
+
+    private fun newCategory(name: String, type: CategoryType) = CategoryInput(
+        name = name,
+        type = type,
+        icon = null,
+        color = null,
+    )
+
+    @Test
+    fun `new in the category picker opens the category form for the form's type`() = runFormTest { vm, effects ->
+        send(
+            vm,
+            TransactionFormIntent.SelectType(TransactionType.INCOME),
+            TransactionFormIntent.OpenCategoryPicker,
+            TransactionFormIntent.NewCategory,
+        )
+
+        assertEquals(listOf<TransactionFormEffect>(TransactionFormEffect.OpenNewCategory(CategoryType.INCOME)), effects)
+    }
+
+    @Test
+    fun `a category created from the picker is selected in it`() = runFormTest { vm, _ ->
+        send(vm, TransactionFormIntent.OpenCategoryPicker, TransactionFormIntent.NewCategory)
+
+        CreateCategoryUseCase(categories)(newCategory("Kopi", CategoryType.EXPENSE))
+        advanceUntilIdle()
+
+        val created = categories.categories.value.single { it.name == "Kopi" }
+        assertEquals(FormSheet.Category(created.id), vm.state.value.sheet)
+        assertTrue(created in vm.state.value.categories)
+    }
+
+    @Test
+    fun `a category created of another type is not selected`() = runFormTest { vm, _ ->
+        send(vm, TransactionFormIntent.OpenCategoryPicker)
+
+        CreateCategoryUseCase(categories)(newCategory("Bonus", CategoryType.INCOME))
+        advanceUntilIdle()
+
+        assertEquals(FormSheet.Category(null), vm.state.value.sheet)
     }
 
     @Test

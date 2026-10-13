@@ -136,13 +136,13 @@
         <item quantity="other">%1$d days left</item>
     </plurals>
     <string name="home_budget_last_day">Last day</string>
-    <string name="home_budget_percent">%1$d%%</string>
+    <string name="percent_value">%1$d%%</string>
     <string name="home_budget_progress">%1$s of %2$s</string>
-    <string name="home_budget_left">%1$s left</string>
-    <string name="home_budget_over">%1$s over</string>
-    <string name="home_budget_empty_title">No budget for %1$s</string>
-    <string name="home_budget_empty_body">Set a monthly limit to see how you\'re tracking.</string>
-    <string name="home_budget_set">Set</string>
+    <string name="budget_left">%1$s left</string>
+    <string name="budget_over">%1$s over</string>
+    <string name="budget_empty_title">No budget for %1$s</string>
+    <string name="budget_empty_body">Set a monthly limit to see how you\'re tracking.</string>
+    <string name="budget_set">Set</string>
     <string name="home_spending_title">Where it went</string>
     <string name="home_full_report">Full report</string>
     <string name="home_spending_description">%1$s spending: %2$s</string>
@@ -299,6 +299,7 @@
     <string name="transaction_picker_no_wallets">You have no wallets yet.</string>
     <string name="transaction_picker_category_title">Choose category</string>
     <string name="transaction_picker_use">Use %1$s</string>
+    <string name="transaction_picker_new_category">New</string>
     <string name="transaction_picker_date_title">Transaction date</string>
     <string name="transaction_picker_today">Today</string>
     <string name="transaction_picker_yesterday">Yesterday</string>
@@ -454,4 +455,103 @@
     <string name="archived_wallets_empty_body">Wallets you archive will show up here.</string>
     <string name="archived_wallets_restored">%1$s is back in your wallets</string>
     <string name="archived_wallets_view">View</string>
+
+    <!-- Budget -->
+    <string name="budget_title">%1$s budget</string>
+    <string name="budget_intro">One spending limit for the whole month. Transfers and income don\'t count toward it.</string>
+    <string name="budget_limit_label">Monthly limit</string>
+    <string name="budget_currency">Rp</string>
+    <string name="budget_limit_description">Monthly limit in rupiah</string>
+    <string name="budget_preview_title">Preview with this month\'s spending</string>
+    <string name="budget_preview_spent">%1$s spent</string>
+    <string name="budget_preview_over">Over by %1$s</string>
+    <string name="budget_legend_ok" formatted="false">Under 80% — on track</string>
+    <string name="budget_legend_warning" formatted="false">80% and up — warning</string>
+    <string name="budget_legend_exceeded" formatted="false">Over 100% — over budget</string>
+    <string name="budget_save">Save budget</string>
+    <string name="budget_remove">Remove budget for %1$s</string>
+    <string name="budget_remove_title">Remove the %1$s budget?</string>
+    <string name="budget_remove_message">Home and the monthly report will stop comparing spending with a limit for this month.</string>
+    <string name="budget_remove_confirm">Remove</string>
+    <string name="budget_cancel">Cancel</string>
+    <string name="budget_error_invalid_limit">Enter a limit between Rp 1 and Rp 999.999.999.999.</string>
+    <string name="budget_error_network">You\'re offline. Connect to the internet and try again.</string>
+    <string name="budget_error_unexpected">Something went wrong. Try again in a moment.</string>
+
+    <!-- Monthly report -->
+    <string name="report_title">Monthly report</string>
+    <string name="report_previous_month">Previous month, %1$s</string>
+    <string name="report_next_month">Next month, %1$s</string>
+    <string name="report_income">Income</string>
+    <string name="report_expense">Expense</string>
+    <string name="report_net">Net this month</string>
+    <string name="report_spent_less">Spent %1$d%% less than %2$s</string>
+    <string name="report_spent_more">Spent %1$d%% more than %2$s</string>
+    <string name="report_spent_same">Spent the same as %1$s</string>
+    <string name="report_breakdown_title">Spending by category</string>
+    <string name="report_breakdown_spent_in">spent in %1$s</string>
+    <string name="report_breakdown_description">Spending by category, %1$s: %2$s</string>
+    <string name="report_breakdown_share_description">%1$s %2$d percent</string>
+    <string name="report_breakdown_share">%1$d%% of spending</string>
+    <string name="report_change_less">↓ %1$d%% vs %2$s</string>
+    <string name="report_change_more">↑ %1$d%% vs %2$s</string>
+    <string name="report_change_same">Same as %1$s</string>
+    <string name="report_change_less_description">%1$d percent less than %2$s</string>
+    <string name="report_change_more_description">%1$d percent more than %2$s</string>
+    <string name="report_no_spending_title">No spending in %1$s</string>
+    <string name="report_no_spending_body">Expenses you add this month will show up here by category.</string>
+    <string name="report_budget_title">Budget</string>
+    <string name="report_budget_change">Change</string>
+    <string name="report_budget_progress">%1$d%% of %2$s</string>
+    <string name="report_error_title">Couldn\'t load the report</string>
+    <string name="report_try_again">Try again</string>
+    <string name="report_load_failed_network">You\'re offline. Connect to the internet to load this month.</string>
+    <string name="report_load_failed_unexpected">Something went wrong on our side. Your data is safe — try again in a moment.</string>
+    <string name="report_refresh_failed_network">You\'re offline. Showing saved data.</string>
+    <string name="report_refresh_failed_unexpected">Couldn\'t refresh the report. Showing saved data.</string>
+
+    <!-- Category form -->
+    <string name="category_form_new_title">New category</string>
+    <string name="category_form_save">Save</string>
+    <string name="category_form_close">Close</string>
+    <string name="category_form_name">Name</string>
+    <string name="category_form_name_placeholder">e.g. Kopi</string>
+    <string name="category_form_expense_caption">Expense category · %1$d/%2$d</string>
+    <string name="category_form_income_caption">Income category · %1$d/%2$d</string>
+    <string name="category_form_icon">Icon</string>
+    <string name="category_form_color">Color</string>
+    <string name="category_form_name_required">Enter a name.</string>
+    <string name="category_form_name_too_long">Use %1$d characters or fewer.</string>
+    <string name="category_form_name_taken">You already have a category with this name.</string>
+    <string name="category_form_name_invalid">This name can\'t be used. Try another.</string>
+    <string name="category_form_error_network">You\'re offline. Connect to the internet and try again.</string>
+    <string name="category_form_error_unexpected">Something went wrong. Try again in a moment.</string>
+    <string name="category_icon_coffee">Coffee</string>
+    <string name="category_icon_restaurant">Restaurant</string>
+    <string name="category_icon_meal">Meal</string>
+    <string name="category_icon_groceries">Groceries</string>
+    <string name="category_icon_car">Car</string>
+    <string name="category_icon_motorbike">Motorbike</string>
+    <string name="category_icon_bills">Bills</string>
+    <string name="category_icon_electricity">Electricity</string>
+    <string name="category_icon_shopping">Shopping</string>
+    <string name="category_icon_clothes">Clothes</string>
+    <string name="category_icon_health">Health</string>
+    <string name="category_icon_fitness">Fitness</string>
+    <string name="category_icon_movies">Movies</string>
+    <string name="category_icon_games">Games</string>
+    <string name="category_icon_education">Education</string>
+    <string name="category_icon_pets">Pets</string>
+    <string name="category_icon_home">Home</string>
+    <string name="category_icon_other">Other</string>
+    <string name="category_color_orange">Orange</string>
+    <string name="category_color_sky">Sky blue</string>
+    <string name="category_color_pink">Pink</string>
+    <string name="category_color_violet">Violet</string>
+    <string name="category_color_emerald">Emerald</string>
+    <string name="category_color_amber">Amber</string>
+    <string name="category_color_indigo">Indigo</string>
+    <string name="category_color_lime">Lime</string>
+    <string name="category_color_teal">Teal</string>
+    <string name="category_color_slate">Slate</string>
 </resources>

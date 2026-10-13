@@ -12,7 +12,11 @@ import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.categories.data.remote.CategoryApiService
 import com.djtech.monai.feature.categories.domain.model.CategoryError
+import com.djtech.monai.feature.categories.domain.model.CategoryInput
+import com.djtech.monai.feature.categories.domain.model.CategoryNameIssue
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import mockwebserver3.MockResponse
 import mockwebserver3.MockWebServer
@@ -168,6 +172,84 @@ class ApiCategoryRepositoryTest {
         assertSame(failure, errorLogger.errors.single())
     }
 
+    @Test
+    fun `createCategory posts the input, caches the created category and announces it`() = runTest {
+        val dao = FakeCategoryDao()
+        val repository = repository(dao)
+        val announced = async(UnconfinedTestDispatcher(testScheduler)) { repository.created.first() }
+        server.enqueue(MockResponse(code = 201, body = categoryBody(FOOD_JSON)))
+
+        val result = repository.createCategory(FOOD_INPUT)
+
+        assertEquals(Outcome.Success(FOOD), result)
+        val request = server.takeRequest()
+        assertEquals("POST", request.method)
+        assertEquals("/api/v1/categories", request.url.encodedPath)
+        assertEquals(
+            """{"name":"Food","type":"EXPENSE","icon":"restaurant","color":"#F97316"}""",
+            request.body?.utf8(),
+        )
+        assertEquals(listOf(FOOD), dao.categories.map { it.asModel() })
+        assertEquals(FOOD, announced.await())
+    }
+
+    @Test
+    fun `createCategory leaves out an icon and color it doesn't have`() = runTest {
+        server.enqueue(MockResponse(code = 201, body = categoryBody(FOOD_JSON)))
+
+        repository(FakeCategoryDao()).createCategory(FOOD_INPUT.copy(icon = null, color = null))
+
+        assertEquals("""{"name":"Food","type":"EXPENSE"}""", server.takeRequest().body?.utf8())
+    }
+
+    @Test
+    fun `createCategory with a name already in use fails with a taken name`() = runTest {
+        server.enqueue(errorResponse(status = 409, code = "conflict"))
+
+        val result = repository(FakeCategoryDao()).createCategory(FOOD_INPUT)
+
+        assertEquals(Outcome.Failure(CategoryError.InvalidName(CategoryNameIssue.ALREADY_EXISTS)), result)
+    }
+
+    @Test
+    fun `createCategory with a name the server rejects says why`() = runTest {
+        server.enqueue(
+            MockResponse(
+                code = 422,
+                body = """{"success":false,"message":"Failed","data":null,"error":{"code":"validation_failed",""" +
+                    """"fields":[{"field":"name","code":"max_length","message":"too long"}]}}""",
+            ),
+        )
+
+        val result = repository(FakeCategoryDao()).createCategory(FOOD_INPUT)
+
+        assertEquals(Outcome.Failure(CategoryError.InvalidName(CategoryNameIssue.TOO_LONG)), result)
+    }
+
+    @Test
+    fun `createCategory offline fails with a network error and caches nothing`() = runTest {
+        val dao = FakeCategoryDao()
+        val repository = repository(dao)
+        server.close()
+
+        val result = repository.createCategory(FOOD_INPUT)
+
+        assertEquals(Outcome.Failure(CategoryError.Network), result)
+        assertEquals(emptyList<CategoryEntity>(), dao.categories)
+    }
+
+    @Test
+    fun `createCategory fails as unexpected and logs when the category cannot be cached`() = runTest {
+        val failure = IOException("disk full")
+        val dao = FakeCategoryDao().apply { this.failure = failure }
+        server.enqueue(MockResponse(code = 201, body = categoryBody(FOOD_JSON)))
+
+        val result = repository(dao).createCategory(FOOD_INPUT)
+
+        assertEquals(Outcome.Failure(CategoryError.Unexpected), result)
+        assertSame(failure, errorLogger.errors.single())
+    }
+
     private fun repository(dao: FakeCategoryDao): ApiCategoryRepository {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
@@ -182,6 +264,13 @@ class ApiCategoryRepositoryTest {
             errorLogger = errorLogger,
         )
     }
+
+    private fun categoryBody(category: String) = """{"success":true,"message":"Created","data":$category}"""
+
+    private fun errorResponse(status: Int, code: String) = MockResponse(
+        code = status,
+        body = """{"success":false,"message":"Failed","data":null,"error":{"code":"$code"}}""",
+    )
 
     private fun categoriesBody(vararg categories: String) =
         """{"success":true,"message":"OK","data":[${categories.joinToString(",")}]}"""
@@ -218,6 +307,13 @@ class ApiCategoryRepositoryTest {
             isHidden = true,
             createdAt = CREATED_AT,
             updatedAt = Instant.parse("2026-10-11T08:15:30Z"),
+        )
+
+        val FOOD_INPUT = CategoryInput(
+            name = "Food",
+            type = CategoryType.EXPENSE,
+            icon = "restaurant",
+            color = "#F97316",
         )
 
         val SALARY = Category(

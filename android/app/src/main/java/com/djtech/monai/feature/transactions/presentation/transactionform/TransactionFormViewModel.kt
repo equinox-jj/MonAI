@@ -14,6 +14,7 @@ import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
+import com.djtech.monai.feature.categories.domain.usecase.ObserveCreatedCategoriesUseCase
 import com.djtech.monai.feature.categories.domain.usecase.ObserveVisibleCategoriesUseCase
 import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
@@ -75,6 +76,7 @@ class TransactionFormViewModel @AssistedInject constructor(
     observeAllWallets: ObserveAllWalletsUseCase,
     observeCategories: ObserveCategoriesUseCase,
     private val observeVisibleCategories: ObserveVisibleCategoriesUseCase,
+    private val observeCreatedCategories: ObserveCreatedCategoriesUseCase,
     private val clock: AppClock,
 ) : ViewModel() {
 
@@ -136,6 +138,7 @@ class TransactionFormViewModel @AssistedInject constructor(
         } else if (preset.type == TransactionType.TRANSFER) {
             prefillDestination()
         }
+        selectCreatedCategories()
     }
 
     fun onIntent(intent: TransactionFormIntent) {
@@ -168,6 +171,9 @@ class TransactionFormViewModel @AssistedInject constructor(
             is TransactionFormIntent.SheetPickCategory -> updateSheet<FormSheet.Category> {
                 it.copy(selectedId = intent.id)
             }
+
+            TransactionFormIntent.NewCategory ->
+                editor.value.draft.type.categoryType()?.let { send(TransactionFormEffect.OpenNewCategory(it)) }
 
             is TransactionFormIntent.SheetPickWallet -> updateSheet<FormSheet.Wallet> {
                 it.copy(selectedId = intent.id)
@@ -348,6 +354,17 @@ class TransactionFormViewModel @AssistedInject constructor(
             when (result) {
                 is Outcome.Success -> send(TransactionFormEffect.Deleted(id))
                 is Outcome.Failure -> send(TransactionFormEffect.ShowMessage(result.error.toMessage()))
+            }
+        }
+    }
+
+    /** A category made from the picker's "New" tile comes back selected in the still-open picker. */
+    private fun selectCreatedCategories() {
+        viewModelScope.launch {
+            observeCreatedCategories().collect { category ->
+                if (category.type == editor.value.draft.type.categoryType()) {
+                    updateSheet<FormSheet.Category> { it.copy(selectedId = category.id) }
+                }
             }
         }
     }

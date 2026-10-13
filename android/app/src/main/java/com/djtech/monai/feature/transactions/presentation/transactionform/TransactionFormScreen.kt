@@ -45,6 +45,7 @@ import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
 import com.djtech.monai.core.designsystem.component.transactionTypeSegments
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.presentation.transactionform.components.TransactionFormAmount
@@ -63,6 +64,7 @@ import kotlinx.coroutines.launch
  * @param transactionId the transaction to edit; null adds a new one.
  * @param preset how a new transaction starts; ignored when editing.
  * @param onDeleted the edited transaction was deleted from here.
+ * @param onNewCategory open the category form for a new category of this type.
  * @param isSideSheet shown as a side sheet over the list on a wide screen, below no status bar.
  */
 @Composable
@@ -70,6 +72,7 @@ fun TransactionFormRoute(
     transactionId: String?,
     onClose: () -> Unit,
     onDeleted: (String) -> Unit,
+    onNewCategory: (CategoryType) -> Unit,
     modifier: Modifier = Modifier,
     preset: TransactionFormPreset = TransactionFormPreset(),
     isSideSheet: Boolean = false,
@@ -87,6 +90,7 @@ fun TransactionFormRoute(
         when (effect) {
             TransactionFormEffect.Close -> onClose()
             is TransactionFormEffect.Deleted -> onDeleted(effect.id)
+            is TransactionFormEffect.OpenNewCategory -> onNewCategory(effect.type)
             is TransactionFormEffect.ShowMessage -> scope.launch {
                 snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
             }

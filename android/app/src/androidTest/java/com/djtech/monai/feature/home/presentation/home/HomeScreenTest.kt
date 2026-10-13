@@ -143,7 +143,7 @@ class HomeScreenTest {
         compose.onNodeWithText("Rp 585.000 left").assertIsDisplayed()
 
         compose.onNodeWithText("October budget").performClick()
-        assertEquals(listOf(HomeIntent.Open(HomeDestination.Budget)), intents)
+        assertEquals(listOf(HomeIntent.Open(HomeDestination.Budget(OCTOBER))), intents)
     }
 
     @Test
@@ -161,7 +161,7 @@ class HomeScreenTest {
 
         scrollTo("No budget for October").performClick()
 
-        assertEquals(listOf(HomeIntent.Open(HomeDestination.Budget)), intents)
+        assertEquals(listOf(HomeIntent.Open(HomeDestination.Budget(OCTOBER))), intents)
     }
 
     @Test
@@ -178,7 +178,7 @@ class HomeScreenTest {
         ).assertIsDisplayed()
 
         compose.onNodeWithText("Full report").performClick()
-        assertEquals(listOf(HomeIntent.Open(HomeDestination.Report)), intents)
+        assertEquals(listOf(HomeIntent.Open(HomeDestination.Report(OCTOBER))), intents)
     }
 
     @Test

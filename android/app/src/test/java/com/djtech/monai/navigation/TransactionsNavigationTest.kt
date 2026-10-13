@@ -3,6 +3,7 @@ package com.djtech.monai.navigation
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation3.runtime.NavBackStack
 import androidx.navigation3.runtime.NavKey
+import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.feature.transactions.presentation.transactions.TransactionsDestination
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -57,9 +58,10 @@ class TransactionsNavigationTest {
     }
 
     @Test
-    fun `detail, form and search are full screen, tab roots are not`() {
+    fun `detail, form, search and the category form are full screen, tab roots are not`() {
         assertTrue(TransactionDetailRoute("t1").isFullScreen())
         assertTrue(TransactionFormRoute().isFullScreen())
+        assertTrue(CategoryFormRoute(CategoryType.EXPENSE).isFullScreen())
         assertTrue(TransactionSearchRoute().isFullScreen())
         assertFalse(TransactionsRoute.isFullScreen())
         assertFalse(HomeRoute.isFullScreen())

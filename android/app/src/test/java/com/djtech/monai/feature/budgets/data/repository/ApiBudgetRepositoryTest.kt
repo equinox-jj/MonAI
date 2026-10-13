@@ -152,6 +152,90 @@ class ApiBudgetRepositoryTest {
         assertSame(failure, errorLogger.errors.single())
     }
 
+    @Test
+    fun `setBudget puts the limit for the month and caches the returned budget`() = runTest {
+        val dao = FakeBudgetDao()
+        server.enqueue(MockResponse(code = 200, body = budgetBody(OCTOBER_JSON)))
+
+        val result = repository(dao).setBudget(OCTOBER, 3_000_000)
+
+        assertEquals(Outcome.Success(Unit), result)
+        val request = server.takeRequest()
+        assertEquals("PUT", request.method)
+        assertEquals("/api/v1/budgets/2026-10", request.url.encodedPath)
+        assertEquals("""{"limit_amount":3000000}""", request.body?.utf8())
+        assertEquals(listOf(OCTOBER_BUDGET), dao.budgets.map(BudgetEntity::asModel))
+    }
+
+    @Test
+    fun `setBudget fails with an invalid limit when the server rejects the amount`() = runTest {
+        val dao = FakeBudgetDao()
+        server.enqueue(
+            MockResponse(
+                code = 422,
+                body = """{"success":false,"message":"Failed","data":null,"error":{"code":"validation_failed",""" +
+                    """"fields":[{"field":"limit_amount","code":"min","message":"Too small"}]}}""",
+            ),
+        )
+
+        val result = repository(dao).setBudget(OCTOBER, 3_000_000)
+
+        assertEquals(Outcome.Failure(BudgetError.InvalidLimit), result)
+        assertEquals(emptyList<BudgetEntity>(), dao.budgets)
+    }
+
+    @Test
+    fun `setBudget offline fails with a network error and keeps the cache`() = runTest {
+        val cached = entity(OCTOBER)
+        val dao = FakeBudgetDao(listOf(cached))
+        val repository = repository(dao)
+        server.close()
+
+        val result = repository.setBudget(OCTOBER, 3_000_000)
+
+        assertEquals(Outcome.Failure(BudgetError.Network), result)
+        assertEquals(listOf(cached), dao.budgets)
+    }
+
+    @Test
+    fun `deleteBudget deletes the month and clears its cached budget`() = runTest {
+        val september = entity(YearMonth.of(2026, 9))
+        val dao = FakeBudgetDao(listOf(entity(OCTOBER), september))
+        server.enqueue(MockResponse(code = 200, body = """{"success":true,"message":"Deleted","data":null}"""))
+
+        val result = repository(dao).deleteBudget(OCTOBER)
+
+        assertEquals(Outcome.Success(Unit), result)
+        val request = server.takeRequest()
+        assertEquals("DELETE", request.method)
+        assertEquals("/api/v1/budgets/2026-10", request.url.encodedPath)
+        assertEquals(listOf(september), dao.budgets)
+    }
+
+    @Test
+    fun `deleteBudget of a budget already gone clears the cache and succeeds`() = runTest {
+        val dao = FakeBudgetDao(listOf(entity(OCTOBER)))
+        server.enqueue(errorResponse(status = 404, code = "not_found"))
+
+        val result = repository(dao).deleteBudget(OCTOBER)
+
+        assertEquals(Outcome.Success(Unit), result)
+        assertEquals(emptyList<BudgetEntity>(), dao.budgets)
+    }
+
+    @Test
+    fun `deleteBudget offline fails with a network error and keeps the cache`() = runTest {
+        val cached = entity(OCTOBER)
+        val dao = FakeBudgetDao(listOf(cached))
+        val repository = repository(dao)
+        server.close()
+
+        val result = repository.deleteBudget(OCTOBER)
+
+        assertEquals(Outcome.Failure(BudgetError.Network), result)
+        assertEquals(listOf(cached), dao.budgets)
+    }
+
     private fun repository(dao: FakeBudgetDao): ApiBudgetRepository {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))

@@ -2,35 +2,18 @@ package com.djtech.monai.feature.home.presentation.home.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import com.djtech.monai.R
 import com.djtech.monai.core.common.format.MoneySign
 import com.djtech.monai.core.common.format.formatRupiahSigned
+import com.djtech.monai.core.designsystem.component.currentLocale
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.home.presentation.home.model.Greeting
 import com.djtech.monai.feature.home.presentation.home.model.RecentTransaction
 import com.djtech.monai.feature.home.presentation.home.model.TransactionDay
-import java.time.YearMonth
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
-import java.util.Locale
 
 // Display text shared by the Home sections. Month and day names follow the app's locale.
-
-@Composable
-@ReadOnlyComposable
-internal fun currentLocale(): Locale = LocalConfiguration.current.locales[0]
-
-/** `October`. */
-@Composable
-@ReadOnlyComposable
-internal fun YearMonth.monthName(): String = month.getDisplayName(TextStyle.FULL_STANDALONE, currentLocale())
-
-/** `Oct`. */
-@Composable
-@ReadOnlyComposable
-internal fun YearMonth.shortMonthName(): String = month.getDisplayName(TextStyle.SHORT_STANDALONE, currentLocale())
 
 @Composable
 @ReadOnlyComposable

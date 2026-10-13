@@ -1,6 +1,5 @@
 package com.djtech.monai.feature.home.presentation.home.components
 
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -16,10 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -29,7 +25,9 @@ import androidx.compose.ui.unit.dp
 import com.djtech.monai.R
 import com.djtech.monai.core.common.format.formatRupiahCompact
 import com.djtech.monai.core.designsystem.component.MonAICard
+import com.djtech.monai.core.designsystem.component.MonAIDonut
 import com.djtech.monai.core.designsystem.component.MonAISectionHeader
+import com.djtech.monai.core.designsystem.component.monthName
 import com.djtech.monai.core.designsystem.theme.CategoryColors
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.designsystem.theme.tabular
@@ -39,9 +37,6 @@ import kotlin.math.roundToInt
 
 private val DonutSize = 140.dp
 private val DonutStroke = 17.dp
-
-/** Gap between donut segments, in degrees. */
-private const val SEGMENT_GAP = 1.5f
 
 /** "Where it went": a donut of the month's expense by category with its legend. */
 @Composable
@@ -75,9 +70,10 @@ internal fun HomeSpendingCard(
                 shares.joinToString(", "),
             )
             Box(Modifier.size(DonutSize), contentAlignment = Alignment.Center) {
-                Donut(
+                MonAIDonut(
                     slices.map { it.sharePercent.toFloat() },
                     colors,
+                    DonutStroke,
                     Modifier
                         .fillMaxSize()
                         .semantics { contentDescription = description },
@@ -124,33 +120,8 @@ private fun LegendRow(name: String, percent: Int, color: Color) {
             overflow = TextOverflow.Ellipsis,
         )
         Text(
-            stringResource(R.string.home_budget_percent, percent),
+            stringResource(R.string.percent_value, percent),
             style = style.copy(fontWeight = FontWeight.SemiBold).tabular(),
         )
-    }
-}
-
-/** Ring segments clockwise from 12 o'clock; [shares] are percentages. */
-@Composable
-private fun Donut(shares: List<Float>, colors: List<Color>, modifier: Modifier = Modifier) {
-    Canvas(modifier) {
-        val stroke = DonutStroke.toPx()
-        val diameter = size.minDimension - stroke
-        val topLeft = Offset((size.width - diameter) / 2, (size.height - diameter) / 2)
-        val gap = if (shares.size > 1) SEGMENT_GAP else 0f
-        var start = -90f
-        shares.forEachIndexed { index, share ->
-            val sweep = share * 3.6f
-            drawArc(
-                color = colors[index],
-                startAngle = start,
-                sweepAngle = (sweep - gap).coerceAtLeast(0f),
-                useCenter = false,
-                topLeft = topLeft,
-                size = Size(diameter, diameter),
-                style = Stroke(width = stroke),
-            )
-            start += sweep
-        }
     }
 }

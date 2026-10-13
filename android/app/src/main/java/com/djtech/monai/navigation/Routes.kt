@@ -1,6 +1,7 @@
 package com.djtech.monai.navigation
 
 import androidx.navigation3.runtime.NavKey
+import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
 import kotlinx.serialization.Serializable
 
@@ -57,6 +58,18 @@ data class TransactionFormRoute(
 @Serializable
 data class TransactionSearchRoute(val month: String? = null) : NavKey
 
+/** [month] is `YYYY-MM`, the month whose budget to set or change. */
+@Serializable
+data class BudgetRoute(val month: String) : NavKey
+
+/** [month] is `YYYY-MM`, the month to open on; null for the current one. */
+@Serializable
+data class ReportRoute(val month: String? = null) : NavKey
+
+/** A new custom category of [type], from the transaction form's category picker. */
+@Serializable
+data class CategoryFormRoute(val type: CategoryType) : NavKey
+
 /** Screens that take the whole window on a phone, so the bottom bar hides under them. */
 internal fun NavKey.isFullScreen(): Boolean = when (this) {
     is TransactionDetailRoute,
@@ -65,6 +78,9 @@ internal fun NavKey.isFullScreen(): Boolean = when (this) {
     is WalletDetailRoute,
     is WalletFormRoute,
     ArchivedWalletsRoute,
+    is BudgetRoute,
+    is ReportRoute,
+    is CategoryFormRoute,
         -> true
 
     else -> false

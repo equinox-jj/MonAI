@@ -2,6 +2,7 @@ package com.djtech.monai.feature.transactions.presentation.transactionform.compo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,6 +26,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
@@ -80,15 +84,23 @@ internal fun TransactionFormCategoryPickerSheet(
                 .selectableGroup(),
             verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x4),
         ) {
-            categories.chunked(COLUMNS).forEach { row ->
+            // The "New" tile (null) follows the last category.
+            (categories + null).chunked(COLUMNS).forEach { row ->
                 Row(horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2)) {
                     row.forEach { category ->
-                        CategoryCell(
-                            category,
-                            selected = category.id == sheet.selectedId,
-                            onClick = { onIntent(TransactionFormIntent.SheetPickCategory(category.id)) },
-                            modifier = Modifier.weight(1f),
-                        )
+                        if (category == null) {
+                            NewCategoryCell(
+                                onClick = { onIntent(TransactionFormIntent.NewCategory) },
+                                modifier = Modifier.weight(1f),
+                            )
+                        } else {
+                            CategoryCell(
+                                category,
+                                selected = category.id == sheet.selectedId,
+                                onClick = { onIntent(TransactionFormIntent.SheetPickCategory(category.id)) },
+                                modifier = Modifier.weight(1f),
+                            )
+                        }
                     }
                     repeat(COLUMNS - row.size) { Spacer(Modifier.weight(1f)) }
                 }
@@ -159,6 +171,53 @@ private fun CategoryCell(
             color = colors.iconStrong,
             textAlign = TextAlign.Center,
             maxLines = 2,
+        )
+    }
+}
+
+/** A dashed circle with a plus: opens the category form. */
+@Composable
+private fun NewCategoryCell(onClick: () -> Unit, modifier: Modifier = Modifier) {
+    val colors = MonAITheme.colors
+    val dash = colors.textTertiary
+    Column(
+        modifier
+            .heightIn(min = 80.dp)
+            .clip(RoundedCornerShape(MonAITheme.radius.md))
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(vertical = MonAITheme.spacing.x1),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5),
+    ) {
+        Box(
+            Modifier
+                .padding(4.dp)
+                .size(48.dp)
+                .drawBehind {
+                    val stroke = 1.dp.toPx()
+                    drawCircle(
+                        color = dash,
+                        radius = (size.minDimension - stroke) / 2,
+                        style = Stroke(
+                            width = stroke,
+                            pathEffect = PathEffect.dashPathEffect(floatArrayOf(4.dp.toPx(), 3.dp.toPx())),
+                        ),
+                    )
+                },
+            contentAlignment = Alignment.Center,
+        ) {
+            Icon(
+                MonAIIcons.Add,
+                null,
+                Modifier.size(MonAITheme.sizes.icon),
+                tint = colors.textSecondary,
+            )
+        }
+        Text(
+            stringResource(R.string.transaction_picker_new_category),
+            style = MonAITheme.typography.labelMedium,
+            color = colors.accent,
+            textAlign = TextAlign.Center,
         )
     }
 }

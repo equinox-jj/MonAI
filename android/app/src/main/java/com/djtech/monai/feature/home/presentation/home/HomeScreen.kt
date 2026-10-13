@@ -157,7 +157,7 @@ private fun HomeDashboard(
                 HomeBudgetCard(
                     budget,
                     state.month,
-                    onClick = { onIntent(HomeIntent.Open(HomeDestination.Budget)) },
+                    onClick = { onIntent(HomeIntent.Open(HomeDestination.Budget(state.month))) },
                     modifier = horizontal,
                 )
             }
@@ -168,7 +168,7 @@ private fun HomeDashboard(
                     state.spending,
                     expenseTotal = state.summary?.expenseTotal ?: state.spending.sumOf(SpendingSlice::amount),
                     month = state.month,
-                    onOpenReport = { onIntent(HomeIntent.Open(HomeDestination.Report)) },
+                    onOpenReport = { onIntent(HomeIntent.Open(HomeDestination.Report(state.month))) },
                     modifier = horizontal,
                 )
             }

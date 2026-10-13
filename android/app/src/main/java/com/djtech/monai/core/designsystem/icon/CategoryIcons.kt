@@ -22,5 +22,15 @@ fun categoryIcon(name: String?): ImageVector = when (name) {
     "inventory_2" -> MonAIIcons.Inventory2
     "account_balance" -> MonAIIcons.AccountBalance
     "work" -> MonAIIcons.Work
+    "lunch_dining" -> MonAIIcons.LunchDining
+    "local_grocery_store" -> MonAIIcons.LocalGroceryStore
+    "two_wheeler" -> MonAIIcons.TwoWheeler
+    "bolt" -> MonAIIcons.Bolt
+    "checkroom" -> MonAIIcons.Checkroom
+    "fitness_center" -> MonAIIcons.FitnessCenter
+    "sports_esports" -> MonAIIcons.SportsEsports
+    "school" -> MonAIIcons.School
+    "pets" -> MonAIIcons.Pets
+    "home" -> MonAIIcons.Home
     else -> MonAIIcons.Category
 }

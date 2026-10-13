@@ -3,6 +3,7 @@ package com.djtech.monai.feature.transactions.presentation.transactionform
 import androidx.compose.runtime.Immutable
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Category
+import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
@@ -75,6 +76,9 @@ sealed interface TransactionFormIntent {
 
     data class SheetPickCategory(val id: String) : TransactionFormIntent
 
+    /** The category picker's "New" tile: creates a category of the form's type, then selects it. */
+    data object NewCategory : TransactionFormIntent
+
     data class SheetPickWallet(val id: String) : TransactionFormIntent
 
     data class SheetPickDate(val date: LocalDate) : TransactionFormIntent
@@ -108,4 +112,7 @@ sealed interface TransactionFormEffect {
     data class Deleted(val id: String) : TransactionFormEffect
 
     data class ShowMessage(val message: UiText) : TransactionFormEffect
+
+    /** Opens the category form; the category it creates comes back selected in the picker. */
+    data class OpenNewCategory(val type: CategoryType) : TransactionFormEffect
 }

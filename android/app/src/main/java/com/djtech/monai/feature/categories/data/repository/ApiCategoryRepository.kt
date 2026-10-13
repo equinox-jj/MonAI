@@ -12,11 +12,15 @@ import com.djtech.monai.core.network.ApiCaller
 import com.djtech.monai.feature.categories.data.dto.CategoryDto
 import com.djtech.monai.feature.categories.data.mapper.asModel
 import com.djtech.monai.feature.categories.data.mapper.toCategoryError
+import com.djtech.monai.feature.categories.data.mapper.toCreateRequest
 import com.djtech.monai.feature.categories.data.remote.CategoryApiService
 import com.djtech.monai.feature.categories.domain.model.CategoryError
+import com.djtech.monai.feature.categories.domain.model.CategoryInput
 import com.djtech.monai.feature.categories.domain.model.CategoryResult
 import com.djtech.monai.feature.categories.domain.repository.CategoryRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -29,6 +33,9 @@ class ApiCategoryRepository @Inject constructor(
     private val categoryDao: CategoryDao,
     private val errorLogger: ErrorLogger,
 ) : CategoryRepository {
+
+    private val createdCategories = MutableSharedFlow<Category>(extraBufferCapacity = 8)
+    override val created: Flow<Category> = createdCategories.asSharedFlow()
 
     override fun observeCategories(): Flow<List<Category>> =
         categoryDao.observeAll().map { entities -> entities.map(CategoryEntity::asModel) }
@@ -46,6 +53,30 @@ class ApiCategoryRepository @Inject constructor(
         }
         return when (result) {
             is Outcome.Success -> cache(result.data)
+            is Outcome.Failure -> Outcome.Failure(result.error.toCategoryError())
+        }
+    }
+
+    override suspend fun createCategory(input: CategoryInput): CategoryResult<Category> {
+        val body = input.toCreateRequest()
+        // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
+        val result = apiCaller.callRaw { categoryApiService.createCategory(body).data.asModel() }
+        return when (result) {
+            is Outcome.Success -> {
+                val category = result.data
+                try {
+                    categoryDao.upsertAll(listOf(category.asEntity()))
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    // Created on the server but not cached; the next refresh brings it in.
+                    errorLogger.log("Caching the created category failed", e)
+                    return Outcome.Failure(CategoryError.Unexpected)
+                }
+                createdCategories.tryEmit(category)
+                Outcome.Success(category)
+            }
+
             is Outcome.Failure -> Outcome.Failure(result.error.toCategoryError())
         }
     }

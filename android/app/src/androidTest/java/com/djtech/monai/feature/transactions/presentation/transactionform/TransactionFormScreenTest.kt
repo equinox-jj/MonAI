@@ -13,6 +13,7 @@ import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.presentation.TransactionTestData
+import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormMode
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.WalletTarget
 import org.junit.Assert.assertEquals
@@ -133,5 +134,14 @@ class TransactionFormScreenTest {
         compose.onNodeWithText("Discard").performClick()
 
         assertEquals(listOf<TransactionFormIntent>(TransactionFormIntent.ConfirmDiscard), intents)
+    }
+
+    @Test
+    fun theCategoryPickerOffersANewCategory() {
+        setContent(add.copy(sheet = FormSheet.Category(selectedId = null)))
+
+        compose.onNodeWithText("New").performClick()
+
+        assertEquals(listOf<TransactionFormIntent>(TransactionFormIntent.NewCategory), intents)
     }
 }

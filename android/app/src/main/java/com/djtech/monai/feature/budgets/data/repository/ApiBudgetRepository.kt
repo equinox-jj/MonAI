@@ -8,6 +8,7 @@ import com.djtech.monai.core.database.entity.asEntity
 import com.djtech.monai.core.database.entity.asModel
 import com.djtech.monai.core.model.Budget
 import com.djtech.monai.core.network.ApiCaller
+import com.djtech.monai.feature.budgets.data.dto.SetBudgetRequestDto
 import com.djtech.monai.feature.budgets.data.mapper.asModel
 import com.djtech.monai.feature.budgets.data.mapper.isNoBudgetSet
 import com.djtech.monai.feature.budgets.data.mapper.toBudgetError
@@ -42,6 +43,23 @@ class ApiBudgetRepository @Inject constructor(
             is Outcome.Failure -> Outcome.Failure(result.error.toBudgetError())
         }
     }
+
+    override suspend fun setBudget(month: YearMonth, limitAmount: Long): BudgetResult<Unit> {
+        val body = SetBudgetRequestDto(limitAmount)
+        val result = apiCaller.callRaw { budgetApiService.setBudget(month.toApiString(), body).data.asModel() }
+        return when (result) {
+            is Outcome.Success -> cache { budgetDao.upsert(result.data.asEntity()) }
+            is Outcome.Failure -> Outcome.Failure(result.error.toBudgetError())
+        }
+    }
+
+    override suspend fun deleteBudget(month: YearMonth): BudgetResult<Unit> =
+        when (val result = apiCaller.callRaw { budgetApiService.deleteBudget(month.toApiString()) }) {
+            is Outcome.Success -> cache { budgetDao.delete(month) }
+            // Removed already, maybe on another device.
+            is Outcome.Failure if result.error.isNoBudgetSet() -> cache { budgetDao.delete(month) }
+            is Outcome.Failure -> Outcome.Failure(result.error.toBudgetError())
+        }
 
     // ApiCaller covers network failures; this keeps a failed cache write from throwing too.
     private inline fun cache(write: () -> Unit): BudgetResult<Unit> = try {

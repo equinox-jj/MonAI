@@ -2,8 +2,8 @@ package com.djtech.monai.feature.wallets.presentation.archivedwallets
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djtech.monai.core.common.flow.WhileUiSubscribed
 import com.djtech.monai.R
+import com.djtech.monai.core.common.flow.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveArchivedWalletsUseCase
@@ -56,6 +56,7 @@ class ArchivedWalletsViewModel @Inject constructor(
                         id,
                         UiText.Resource(R.string.archived_wallets_restored, result.data.name),
                     )
+
                     is Outcome.Failure -> ArchivedWalletsEffect.ShowMessage(result.error.message())
                 },
             )

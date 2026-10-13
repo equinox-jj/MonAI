@@ -21,5 +21,8 @@ fun ApiError.isNoBudgetSet(): Boolean = this is ApiError.Http && status == 404 &
 
 fun ApiError.toBudgetError(): BudgetError = when (this) {
     ApiError.Network -> BudgetError.Network
+    is ApiError.Http if code == "validation_failed" && fields.any { it.field == "limit_amount" } ->
+        BudgetError.InvalidLimit
+
     is ApiError.Http, is ApiError.Unknown -> BudgetError.Unexpected
 }

@@ -66,8 +66,8 @@ sealed interface HomeDestination {
     data object Wallets : HomeDestination
     data class WalletDetail(val walletId: String) : HomeDestination
     data object AddWallet : HomeDestination
-    data object Budget : HomeDestination
-    data object Report : HomeDestination
+    data class Budget(val month: YearMonth) : HomeDestination
+    data class Report(val month: YearMonth) : HomeDestination
     data object Transactions : HomeDestination
     data class TransactionDetail(val transactionId: String) : HomeDestination
     data object AddTransaction : HomeDestination

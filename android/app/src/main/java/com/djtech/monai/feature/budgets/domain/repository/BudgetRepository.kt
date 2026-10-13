@@ -13,4 +13,10 @@ interface BudgetRepository {
 
     /** Fetches [month]'s budget. A month without one succeeds and clears any cached budget. */
     suspend fun refreshBudget(month: YearMonth): BudgetResult<Unit>
+
+    /** Sets or changes [month]'s limit (rupiah) and caches the budget the server returns. */
+    suspend fun setBudget(month: YearMonth, limitAmount: Long): BudgetResult<Unit>
+
+    /** Removes [month]'s budget. One that is already gone counts as removed. */
+    suspend fun deleteBudget(month: YearMonth): BudgetResult<Unit>
 }

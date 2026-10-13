@@ -54,6 +54,7 @@ class ApiWalletRepository @Inject constructor(
             is Outcome.Success -> cacheWrite("Caching wallets") {
                 walletDao.replaceAll(result.data.map(Wallet::asEntity))
             }
+
             is Outcome.Failure -> Outcome.Failure(result.error.toWalletError())
         }
     }

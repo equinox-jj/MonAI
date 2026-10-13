@@ -20,6 +20,8 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.scene.DialogSceneStrategy
 import androidx.navigation3.ui.NavDisplay
 import com.djtech.monai.R
+import com.djtech.monai.core.common.time.toApiString
+import com.djtech.monai.core.common.time.toYearMonthOrNull
 import com.djtech.monai.core.designsystem.component.MonAIBottomBar
 import com.djtech.monai.core.designsystem.component.MonAINavigationDrawer
 import com.djtech.monai.core.designsystem.component.MonAINavigationRail
@@ -28,7 +30,10 @@ import com.djtech.monai.core.designsystem.component.currentWidthClass
 import com.djtech.monai.core.designsystem.component.monAIMainNavItems
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.TransactionType
+import com.djtech.monai.feature.budgets.presentation.budget.BudgetRoute
+import com.djtech.monai.feature.categories.presentation.categoryform.CategoryFormRoute
 import com.djtech.monai.feature.home.presentation.home.HomeRoute
+import com.djtech.monai.feature.reports.presentation.report.ReportRoute
 import com.djtech.monai.feature.transactions.presentation.search.SearchRoute
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.TransactionDetailRoute
 import com.djtech.monai.feature.transactions.presentation.transactionform.TransactionFormRoute
@@ -39,6 +44,7 @@ import com.djtech.monai.feature.wallets.presentation.archivedwallets.ArchivedWal
 import com.djtech.monai.feature.wallets.presentation.walletdetail.WalletDetailRoute
 import com.djtech.monai.feature.wallets.presentation.walletform.WalletFormRoute
 import com.djtech.monai.feature.wallets.presentation.wallets.WalletsRoute
+import java.time.YearMonth
 
 /** The add/edit side sheet's width on a wide screen. */
 private val SideSheetWidth = 440.dp
@@ -152,6 +158,7 @@ private fun MainNavDisplay(
                             transactionId = key.id,
                             onClose = navigator::goBack,
                             onDeleted = navigator::closeDeletedTransaction,
+                            onNewCategory = { type -> navigator.navigate(CategoryFormRoute(type)) },
                             modifier = sheetModifier,
                             preset = TransactionFormPreset(
                                 type = key.presetType ?: TransactionType.EXPENSE,
@@ -208,6 +215,27 @@ private fun MainNavDisplay(
                         onBack = navigator::goBack,
                         onOpenWallet = { id -> navigator.navigate(WalletDetailRoute(id)) },
                     )
+                }
+                entry<CategoryFormRoute>(metadata = formMetadata) { key ->
+                    SideSheetEntry(asSideSheet = isExpanded) { sheetModifier ->
+                        CategoryFormRoute(
+                            type = key.type,
+                            onClose = navigator::goBack,
+                            modifier = sheetModifier,
+                            isSideSheet = isExpanded,
+                        )
+                    }
+                }
+                entry<ReportRoute> { key ->
+                    ReportRoute(
+                        initialMonth = key.month?.toYearMonthOrNull(),
+                        onOpenBudget = { month -> navigator.navigate(BudgetRoute(month.toApiString())) },
+                        onBack = navigator::goBack,
+                    )
+                }
+                entry<BudgetRoute> { key ->
+                    // Keys are only built with toApiString, so the month always parses.
+                    BudgetRoute(month = YearMonth.parse(key.month), onClose = navigator::goBack)
                 }
                 entry<SettingsRoute> { PlaceholderScreen(stringResource(R.string.nav_settings)) }
             },
