@@ -37,22 +37,27 @@ import javax.inject.Inject
  */
 @HiltViewModel
 class CategoriesViewModel @Inject constructor(
-    observeCategories: ObserveCategoriesUseCase,
     private val refreshCategories: RefreshCategoriesUseCase,
     private val setCategoryHidden: SetCategoryHiddenUseCase,
     private val deleteCategory: DeleteCategoryUseCase,
+    observeCategories: ObserveCategoriesUseCase,
 ) : ViewModel() {
 
     private val ui = MutableStateFlow(Ui())
 
     // Eager, so intents can look a category up even before the screen subscribes.
-    private val categories: StateFlow<List<Category>> =
-        observeCategories().stateIn(viewModelScope, SharingStarted.Eagerly, emptyList())
+    private val categories: StateFlow<List<Category>> = observeCategories().stateIn(
+        viewModelScope,
+        SharingStarted.Eagerly,
+        emptyList(),
+    )
 
     val state: StateFlow<CategoriesState> = combine(categories, ui) { all, ui ->
-        val rows = all.filter { it.type == ui.type }
+        val rows = all
+            .filter { it.type == ui.type }
             .sortedForList()
             .map { it.toRow(isBusy = it.id in ui.busyIds) }
+
         CategoriesState(
             type = ui.type,
             isLoading = all.isEmpty() && ui.isLoading,
@@ -60,7 +65,11 @@ class CategoriesViewModel @Inject constructor(
             rows = rows,
             deletion = ui.deletion,
         )
-    }.stateIn(viewModelScope, WhileUiSubscribed, CategoriesState())
+    }.stateIn(
+        viewModelScope,
+        WhileUiSubscribed,
+        CategoriesState(),
+    )
 
     private val effectChannel = Channel<CategoriesEffect>(Channel.BUFFERED)
     val effects: Flow<CategoriesEffect> = effectChannel.receiveAsFlow()
@@ -88,6 +97,7 @@ class CategoriesViewModel @Inject constructor(
             is CategoriesIntent.PickTarget -> ui.update {
                 it.copy(deletion = it.deletion?.copy(targetId = intent.id))
             }
+
             CategoriesIntent.DismissDelete -> if (ui.value.deletion?.isDeleting != true) {
                 ui.update { it.copy(deletion = null) }
             }

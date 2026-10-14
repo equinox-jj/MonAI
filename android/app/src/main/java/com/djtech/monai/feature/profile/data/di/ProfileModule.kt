@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.profile.data.di
 
 import com.djtech.monai.feature.profile.data.remote.ProfileApiService
-import com.djtech.monai.feature.profile.data.repository.ApiProfileRepository
+import com.djtech.monai.feature.profile.data.repository.ProfileRepositoryImpl
 import com.djtech.monai.feature.profile.domain.repository.ProfileRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class ProfileModule {
 
     @Binds
-    abstract fun bindProfileRepository(repository: ApiProfileRepository): ProfileRepository
+    abstract fun bindProfileRepository(repository: ProfileRepositoryImpl): ProfileRepository
 
     companion object {
 

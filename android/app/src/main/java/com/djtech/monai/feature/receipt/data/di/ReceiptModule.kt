@@ -2,7 +2,7 @@ package com.djtech.monai.feature.receipt.data.di
 
 import com.djtech.monai.feature.receipt.data.ocr.MlKitReceiptTextReader
 import com.djtech.monai.feature.receipt.data.remote.ReceiptApiService
-import com.djtech.monai.feature.receipt.data.repository.ApiReceiptRepository
+import com.djtech.monai.feature.receipt.data.repository.ReceiptRepositoryImpl
 import com.djtech.monai.feature.receipt.domain.ocr.ReceiptTextReader
 import com.djtech.monai.feature.receipt.domain.repository.ReceiptRepository
 import dagger.Binds
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 abstract class ReceiptModule {
 
     @Binds
-    abstract fun bindReceiptRepository(repository: ApiReceiptRepository): ReceiptRepository
+    abstract fun bindReceiptRepository(repository: ReceiptRepositoryImpl): ReceiptRepository
 
     @Binds
     abstract fun bindReceiptTextReader(reader: MlKitReceiptTextReader): ReceiptTextReader

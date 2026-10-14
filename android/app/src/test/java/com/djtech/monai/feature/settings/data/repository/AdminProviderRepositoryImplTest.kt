@@ -27,7 +27,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.time.Instant
 
-class ApiAdminProviderRepositoryTest {
+class AdminProviderRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -162,14 +162,14 @@ class ApiAdminProviderRepositoryTest {
         assertEquals(Outcome.Failure(AdminProviderError.Network), repository.listProviders())
     }
 
-    private fun repository(): ApiAdminProviderRepository {
+    private fun repository(): AdminProviderRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(AdminProviderApiService::class.java)
-        return ApiAdminProviderRepository(api, ApiCaller(ApiErrorMapper(NetworkJson), errorLogger))
+        return AdminProviderRepositoryImpl(api, ApiCaller(ApiErrorMapper(NetworkJson), errorLogger))
     }
 
     private fun providerJson(id: String, sortOrder: Int, isActive: Boolean = true) = """

@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.reports.data.di
 
 import com.djtech.monai.feature.reports.data.remote.ReportApiService
-import com.djtech.monai.feature.reports.data.repository.ApiReportRepository
+import com.djtech.monai.feature.reports.data.repository.ReportRepositoryImpl
 import com.djtech.monai.feature.reports.domain.repository.ReportRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class ReportModule {
 
     @Binds
-    abstract fun bindReportRepository(repository: ApiReportRepository): ReportRepository
+    abstract fun bindReportRepository(repository: ReportRepositoryImpl): ReportRepository
 
     companion object {
 

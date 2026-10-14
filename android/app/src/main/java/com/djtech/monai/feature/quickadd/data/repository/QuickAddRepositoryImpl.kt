@@ -17,7 +17,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiQuickAddRepository @Inject constructor(
+class QuickAddRepositoryImpl @Inject constructor(
     private val quickAddApiService: QuickAddApiService,
     private val apiCaller: ApiCaller,
 ) : QuickAddRepository {

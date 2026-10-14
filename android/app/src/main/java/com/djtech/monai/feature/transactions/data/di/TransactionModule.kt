@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.transactions.data.di
 
 import com.djtech.monai.feature.transactions.data.remote.TransactionApiService
-import com.djtech.monai.feature.transactions.data.repository.ApiTransactionRepository
+import com.djtech.monai.feature.transactions.data.repository.TransactionRepositoryImpl
 import com.djtech.monai.feature.transactions.domain.repository.TransactionRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class TransactionModule {
 
     @Binds
-    abstract fun bindTransactionRepository(repository: ApiTransactionRepository): TransactionRepository
+    abstract fun bindTransactionRepository(repository: TransactionRepositoryImpl): TransactionRepository
 
     companion object {
 

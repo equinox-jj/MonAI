@@ -10,19 +10,23 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 )
 
-// defaultCategories are created for every user on register (ERD §5).
+// defaultCategories are created for every user on register (ERD §5). Icons
+// are Material Symbols names and colors the light hex the app knows a dark
+// variant for (CategoryColors on Android).
 var defaultCategories = []Category{
-	{Name: "Food", Type: TypeExpense, IsDefault: true},
-	{Name: "Transport", Type: TypeExpense, IsDefault: true},
-	{Name: "Bills", Type: TypeExpense, IsDefault: true},
-	{Name: "Shopping", Type: TypeExpense, IsDefault: true},
-	{Name: "Health", Type: TypeExpense, IsDefault: true},
-	{Name: "Entertainment", Type: TypeExpense, IsDefault: true},
-	{Name: "Other", Type: TypeExpense, IsDefault: true, IsSystem: true},
-	{Name: "Salary", Type: TypeIncome, IsDefault: true},
-	{Name: "Bonus", Type: TypeIncome, IsDefault: true},
-	{Name: "Other Income", Type: TypeIncome, IsDefault: true, IsSystem: true},
+	{Name: "Food", Type: TypeExpense, Icon: ptr("restaurant"), Color: ptr("#F97316"), IsDefault: true},
+	{Name: "Transport", Type: TypeExpense, Icon: ptr("directions_car"), Color: ptr("#0EA5E9"), IsDefault: true},
+	{Name: "Bills", Type: TypeExpense, Icon: ptr("receipt_long"), Color: ptr("#8B5CF6"), IsDefault: true},
+	{Name: "Shopping", Type: TypeExpense, Icon: ptr("shopping_bag"), Color: ptr("#EC4899"), IsDefault: true},
+	{Name: "Health", Type: TypeExpense, Icon: ptr("favorite"), Color: ptr("#10B981"), IsDefault: true},
+	{Name: "Entertainment", Type: TypeExpense, Icon: ptr("movie"), Color: ptr("#F59E0B"), IsDefault: true},
+	{Name: "Other", Type: TypeExpense, Icon: ptr("inventory_2"), Color: ptr("#64748B"), IsDefault: true, IsSystem: true},
+	{Name: "Salary", Type: TypeIncome, Icon: ptr("payments"), Color: ptr("#14B8A6"), IsDefault: true},
+	{Name: "Bonus", Type: TypeIncome, Icon: ptr("redeem"), Color: ptr("#84CC16"), IsDefault: true},
+	{Name: "Other Income", Type: TypeIncome, Icon: ptr("savings"), Color: ptr("#6366F1"), IsDefault: true, IsSystem: true},
 }
+
+func ptr(s string) *string { return &s }
 
 type Service interface {
 	List(ctx context.Context, userID uuid.UUID, q ListCategoriesQuery) ([]CategoryResponse, error)

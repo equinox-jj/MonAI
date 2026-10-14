@@ -23,7 +23,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.time.LocalDate
 import java.time.ZoneId
 
-class ApiQuickAddRepositoryTest {
+class QuickAddRepositoryImplTest {
 
     private val server = MockWebServer()
 
@@ -97,13 +97,13 @@ class ApiQuickAddRepositoryTest {
     private fun errorBody(code: String) =
         """{"success":false,"message":"Failed","data":null,"error":{"code":"$code"}}"""
 
-    private fun repository(): ApiQuickAddRepository {
+    private fun repository(): QuickAddRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(QuickAddApiService::class.java)
-        return ApiQuickAddRepository(api, ApiCaller(ApiErrorMapper(NetworkJson), RecordingErrorLogger()))
+        return QuickAddRepositoryImpl(api, ApiCaller(ApiErrorMapper(NetworkJson), RecordingErrorLogger()))
     }
 }

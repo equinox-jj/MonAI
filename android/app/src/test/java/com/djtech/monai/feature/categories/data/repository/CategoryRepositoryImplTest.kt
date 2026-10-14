@@ -35,7 +35,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
 import java.time.Instant
 
-class ApiCategoryRepositoryTest {
+class CategoryRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -322,14 +322,14 @@ class ApiCategoryRepositoryTest {
     private fun repository(
         dao: FakeCategoryDao,
         transactionDao: FakeTransactionDao = FakeTransactionDao(),
-    ): ApiCategoryRepository {
+    ): CategoryRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(CategoryApiService::class.java)
-        return ApiCategoryRepository(
+        return CategoryRepositoryImpl(
             categoryApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             categoryDao = dao,

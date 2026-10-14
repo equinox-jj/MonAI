@@ -26,7 +26,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.time.LocalDate
 import java.time.ZoneId
 
-class ApiReceiptRepositoryTest {
+class ReceiptRepositoryImplTest {
 
     private val server = MockWebServer()
     private val today = LocalDate.of(2026, 10, 10)
@@ -100,13 +100,13 @@ class ApiReceiptRepositoryTest {
     private fun errorBody(code: String) =
         """{"success":false,"message":"Failed","data":null,"error":{"code":"$code"}}"""
 
-    private fun repository(): ApiReceiptRepository {
+    private fun repository(): ReceiptRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(ReceiptApiService::class.java)
-        return ApiReceiptRepository(api, ApiCaller(ApiErrorMapper(NetworkJson), RecordingErrorLogger()))
+        return ReceiptRepositoryImpl(api, ApiCaller(ApiErrorMapper(NetworkJson), RecordingErrorLogger()))
     }
 }

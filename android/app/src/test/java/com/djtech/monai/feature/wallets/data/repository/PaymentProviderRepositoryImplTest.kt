@@ -34,7 +34,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.File
 import java.io.IOException
 
-class ApiPaymentProviderRepositoryTest {
+class PaymentProviderRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -162,14 +162,14 @@ class ApiPaymentProviderRepositoryTest {
     private fun TestScope.repository(
         dao: FakePaymentProviderDao,
         seed: PaymentProviderSeed = PaymentProviderSeed { SEED_JSON },
-    ): ApiPaymentProviderRepository {
+    ): PaymentProviderRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(PaymentProviderApiService::class.java)
-        return ApiPaymentProviderRepository(
+        return PaymentProviderRepositoryImpl(
             paymentProviderApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             paymentProviderDao = dao,

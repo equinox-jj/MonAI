@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.settings.data.di
 
 import com.djtech.monai.feature.settings.data.remote.AdminProviderApiService
-import com.djtech.monai.feature.settings.data.repository.ApiAdminProviderRepository
+import com.djtech.monai.feature.settings.data.repository.AdminProviderRepositoryImpl
 import com.djtech.monai.feature.settings.domain.repository.AdminProviderRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class SettingsModule {
 
     @Binds
-    abstract fun bindAdminProviderRepository(repository: ApiAdminProviderRepository): AdminProviderRepository
+    abstract fun bindAdminProviderRepository(repository: AdminProviderRepositoryImpl): AdminProviderRepository
 
     companion object {
 

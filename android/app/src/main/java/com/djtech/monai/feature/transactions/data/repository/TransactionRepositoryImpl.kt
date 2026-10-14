@@ -57,7 +57,7 @@ import javax.inject.Singleton
 internal const val TRANSACTION_PAGE_SIZE = 20
 
 @Singleton
-class ApiTransactionRepository @Inject constructor(
+class TransactionRepositoryImpl @Inject constructor(
     private val transactionApiService: TransactionApiService,
     private val apiCaller: ApiCaller,
     private val transactionDao: TransactionDao,

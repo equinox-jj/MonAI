@@ -34,7 +34,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiProfileRepository @Inject constructor(
+class ProfileRepositoryImpl @Inject constructor(
     private val profileApiService: ProfileApiService,
     private val apiCaller: ApiCaller,
     private val userDao: UserDao,
@@ -45,11 +45,13 @@ class ApiProfileRepository @Inject constructor(
 
     override fun observeUser(): Flow<User?> = userDao.observe().map { it?.asModel() }
 
-    override suspend fun refreshUser(): ProfileResult<Unit> =
-        fetchUser { profileApiService.getMe().data.asModel() }.map { }
+    override suspend fun refreshUser(): ProfileResult<Unit> = fetchUser {
+        profileApiService.getMe().data.asModel()
+    }.map { }
 
-    override suspend fun updateProfile(changes: ProfileChanges): ProfileResult<User> =
-        fetchUser { profileApiService.updateMe(UpdateMeRequestDto(changes.name, changes.timezone)).data.asModel() }
+    override suspend fun updateProfile(changes: ProfileChanges): ProfileResult<User> = fetchUser {
+        profileApiService.updateMe(UpdateMeRequestDto(changes.name, changes.timezone)).data.asModel()
+    }
 
     override fun uploadAvatar(image: EncodedImage): Flow<AvatarUpload> = channelFlow {
         val part = filePart(image.bytes, image.mimeType) { trySend(AvatarUpload.Progress(it)) }
@@ -57,16 +59,15 @@ class ApiProfileRepository @Inject constructor(
         send(AvatarUpload.Done(result))
     }
 
-    override suspend fun removeAvatar(): ProfileResult<Unit> =
-        apiCaller.callRaw { profileApiService.deleteAvatar() }
-            .mapError(ApiError::toProfileError)
-            .flatMap {
-                // The response has no user, so the cached one just loses its photo.
-                cacheUser {
-                    val user = userDao.observe().first() ?: return@cacheUser
-                    userDao.upsert(user.copy(avatarUrl = null))
-                }
+    override suspend fun removeAvatar(): ProfileResult<Unit> = apiCaller.callRaw { profileApiService.deleteAvatar() }
+        .mapError(ApiError::toProfileError)
+        .flatMap {
+            // The response has no user, so the cached one just loses its photo.
+            cacheUser {
+                val user = userDao.observe().first() ?: return@cacheUser
+                userDao.upsert(user.copy(avatarUrl = null))
             }
+        }
 
     override suspend fun deleteAccount(password: String): ProfileResult<Unit> =
         apiCaller.callRaw { profileApiService.deleteMe(DeleteAccountRequestDto(password)) }
@@ -74,15 +75,14 @@ class ApiProfileRepository @Inject constructor(
             .flatMap { signOut() }
 
     // Mapped inside the call, so a value that fails to parse becomes an error, not an exception.
-    private suspend fun fetchUser(request: suspend () -> User): ProfileResult<User> =
-        apiCaller.callRaw(request)
-            .mapError(ApiError::toProfileError)
-            .flatMap { user ->
-                cacheUser {
-                    userDao.replace(user.asEntity())
-                    user
-                }
+    private suspend fun fetchUser(request: suspend () -> User): ProfileResult<User> = apiCaller.callRaw(request)
+        .mapError(ApiError::toProfileError)
+        .flatMap { user ->
+            cacheUser {
+                userDao.replace(user.asEntity())
+                user
             }
+        }
 
     /**
      * The account is gone on the server, so this device signs out whatever happens next: a token
@@ -95,6 +95,9 @@ class ApiProfileRepository @Inject constructor(
     }
 
     // ApiCaller covers network failures; this keeps a failed cache write from throwing too.
-    private inline fun <T> cacheUser(write: () -> T): ProfileResult<T> =
-        errorLogger.runLogged("Caching the user failed", ProfileError.Unexpected, write)
+    private inline fun <T> cacheUser(write: () -> T): ProfileResult<T> = errorLogger.runLogged(
+        "Caching the user failed",
+        ProfileError.Unexpected,
+        write,
+    )
 }

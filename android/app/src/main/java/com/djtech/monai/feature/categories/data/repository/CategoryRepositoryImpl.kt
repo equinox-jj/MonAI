@@ -30,7 +30,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiCategoryRepository @Inject constructor(
+class CategoryRepositoryImpl @Inject constructor(
     private val categoryApiService: CategoryApiService,
     private val apiCaller: ApiCaller,
     private val categoryDao: CategoryDao,

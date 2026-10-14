@@ -28,7 +28,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiAuthRepository @Inject constructor(
+class AuthRepositoryImpl @Inject constructor(
     private val authApiService: AuthApiService,
     private val apiCaller: ApiCaller,
     private val sessionStore: SessionStore,

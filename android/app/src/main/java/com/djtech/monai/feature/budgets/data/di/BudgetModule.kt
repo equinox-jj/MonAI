@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.budgets.data.di
 
 import com.djtech.monai.feature.budgets.data.remote.BudgetApiService
-import com.djtech.monai.feature.budgets.data.repository.ApiBudgetRepository
+import com.djtech.monai.feature.budgets.data.repository.BudgetRepositoryImpl
 import com.djtech.monai.feature.budgets.domain.repository.BudgetRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class BudgetModule {
 
     @Binds
-    abstract fun bindBudgetRepository(repository: ApiBudgetRepository): BudgetRepository
+    abstract fun bindBudgetRepository(repository: BudgetRepositoryImpl): BudgetRepository
 
     companion object {
 

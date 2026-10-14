@@ -25,7 +25,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiReportRepository @Inject constructor(
+class ReportRepositoryImpl @Inject constructor(
     private val reportApiService: ReportApiService,
     private val apiCaller: ApiCaller,
     private val monthlyReportDao: MonthlyReportDao,

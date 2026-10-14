@@ -16,7 +16,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiReceiptRepository @Inject constructor(
+class ReceiptRepositoryImpl @Inject constructor(
     private val receiptApiService: ReceiptApiService,
     private val apiCaller: ApiCaller,
 ) : ReceiptRepository {

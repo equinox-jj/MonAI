@@ -22,7 +22,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiAdminProviderRepository @Inject constructor(
+class AdminProviderRepositoryImpl @Inject constructor(
     private val adminProviderApiService: AdminProviderApiService,
     private val apiCaller: ApiCaller,
 ) : AdminProviderRepository {

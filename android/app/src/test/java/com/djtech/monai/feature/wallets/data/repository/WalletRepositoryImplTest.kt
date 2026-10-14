@@ -35,7 +35,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
 import java.time.Instant
 
-class ApiWalletRepositoryTest {
+class WalletRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -344,14 +344,14 @@ class ApiWalletRepositoryTest {
         assertSame(failure, errorLogger.errors.single())
     }
 
-    private fun repository(dao: FakeWalletDao): ApiWalletRepository {
+    private fun repository(dao: FakeWalletDao): WalletRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(WalletApiService::class.java)
-        return ApiWalletRepository(
+        return WalletRepositoryImpl(
             walletApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             walletDao = dao,

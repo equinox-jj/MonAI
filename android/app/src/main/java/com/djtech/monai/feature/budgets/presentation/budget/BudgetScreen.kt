@@ -54,8 +54,11 @@ fun BudgetRoute(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     isPane: Boolean = false,
-    viewModel: BudgetViewModel =
-        hiltViewModel<BudgetViewModel, BudgetViewModel.Factory>(key = month.toString()) { it.create(month) },
+    viewModel: BudgetViewModel = hiltViewModel<BudgetViewModel, BudgetViewModel.Factory>(key = month.toString()) {
+        it.create(
+            month,
+        )
+    },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }

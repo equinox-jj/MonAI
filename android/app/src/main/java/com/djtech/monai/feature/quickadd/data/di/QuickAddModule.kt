@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.quickadd.data.di
 
 import com.djtech.monai.feature.quickadd.data.remote.QuickAddApiService
-import com.djtech.monai.feature.quickadd.data.repository.ApiQuickAddRepository
+import com.djtech.monai.feature.quickadd.data.repository.QuickAddRepositoryImpl
 import com.djtech.monai.feature.quickadd.domain.repository.QuickAddRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class QuickAddModule {
 
     @Binds
-    abstract fun bindQuickAddRepository(repository: ApiQuickAddRepository): QuickAddRepository
+    abstract fun bindQuickAddRepository(repository: QuickAddRepositoryImpl): QuickAddRepository
 
     companion object {
 

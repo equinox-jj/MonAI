@@ -27,7 +27,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiBudgetRepository @Inject constructor(
+class BudgetRepositoryImpl @Inject constructor(
     private val budgetApiService: BudgetApiService,
     private val apiCaller: ApiCaller,
     private val budgetDao: BudgetDao,

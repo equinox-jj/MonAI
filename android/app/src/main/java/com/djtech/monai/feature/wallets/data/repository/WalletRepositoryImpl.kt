@@ -30,7 +30,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiWalletRepository @Inject constructor(
+class WalletRepositoryImpl @Inject constructor(
     private val walletApiService: WalletApiService,
     private val apiCaller: ApiCaller,
     private val walletDao: WalletDao,

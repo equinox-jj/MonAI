@@ -11,7 +11,7 @@ import com.djtech.monai.core.network.ApiCaller
 import com.djtech.monai.core.network.ApiErrorMapper
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.feature.budgets.data.remote.BudgetApiService
-import com.djtech.monai.feature.budgets.data.repository.ApiBudgetRepository
+import com.djtech.monai.feature.budgets.data.repository.BudgetRepositoryImpl
 import com.djtech.monai.feature.budgets.domain.model.BudgetError
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -30,7 +30,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
 import java.time.YearMonth
 
-class ApiBudgetRepositoryTest {
+class BudgetRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -237,14 +237,14 @@ class ApiBudgetRepositoryTest {
         assertEquals(listOf(cached), dao.budgets)
     }
 
-    private fun repository(dao: FakeBudgetDao): ApiBudgetRepository {
+    private fun repository(dao: FakeBudgetDao): BudgetRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(BudgetApiService::class.java)
-        return ApiBudgetRepository(
+        return BudgetRepositoryImpl(
             budgetApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             budgetDao = dao,

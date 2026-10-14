@@ -51,7 +51,7 @@ import java.io.IOException
 import java.time.Instant
 import kotlin.time.Duration.Companion.seconds
 
-class ApiAuthRepositoryTest {
+class AuthRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
 
@@ -459,7 +459,7 @@ class ApiAuthRepositoryTest {
 
     private fun TestScope.repository(
         cipher: TokenCipher = FakeTokenCipher,
-    ): Pair<ApiAuthRepository, SessionStore> {
+    ): Pair<AuthRepositoryImpl, SessionStore> {
         val store = SessionStore(
             dataStore = FailingWritesDataStore(
                 PreferenceDataStoreFactory.create(scope = dataStoreScope) {
@@ -477,7 +477,7 @@ class ApiAuthRepositoryTest {
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(AuthApiService::class.java)
-        val repository = ApiAuthRepository(
+        val repository = AuthRepositoryImpl(
             authApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             sessionStore = store,

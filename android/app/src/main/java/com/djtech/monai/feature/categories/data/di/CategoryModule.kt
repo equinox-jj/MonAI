@@ -1,7 +1,7 @@
 package com.djtech.monai.feature.categories.data.di
 
 import com.djtech.monai.feature.categories.data.remote.CategoryApiService
-import com.djtech.monai.feature.categories.data.repository.ApiCategoryRepository
+import com.djtech.monai.feature.categories.data.repository.CategoryRepositoryImpl
 import com.djtech.monai.feature.categories.domain.repository.CategoryRepository
 import dagger.Binds
 import dagger.Module
@@ -17,7 +17,7 @@ import javax.inject.Singleton
 abstract class CategoryModule {
 
     @Binds
-    abstract fun bindCategoryRepository(repository: ApiCategoryRepository): CategoryRepository
+    abstract fun bindCategoryRepository(repository: CategoryRepositoryImpl): CategoryRepository
 
     companion object {
 

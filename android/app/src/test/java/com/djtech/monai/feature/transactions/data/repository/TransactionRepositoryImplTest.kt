@@ -43,7 +43,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 
-class ApiTransactionRepositoryTest {
+class TransactionRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -539,14 +539,14 @@ class ApiTransactionRepositoryTest {
     private fun errorBody(code: String) =
         """{"success":false,"message":"Failed","data":null,"error":{"code":"$code"}}"""
 
-    private fun repository(dao: FakeTransactionDao): ApiTransactionRepository {
+    private fun repository(dao: FakeTransactionDao): TransactionRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(TransactionApiService::class.java)
-        return ApiTransactionRepository(
+        return TransactionRepositoryImpl(
             transactionApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             transactionDao = dao,

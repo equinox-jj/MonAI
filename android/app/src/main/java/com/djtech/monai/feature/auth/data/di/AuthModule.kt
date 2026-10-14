@@ -2,7 +2,7 @@ package com.djtech.monai.feature.auth.data.di
 
 import com.djtech.monai.core.network.auth.SessionExpiredHandler
 import com.djtech.monai.feature.auth.data.remote.AuthApiService
-import com.djtech.monai.feature.auth.data.repository.ApiAuthRepository
+import com.djtech.monai.feature.auth.data.repository.AuthRepositoryImpl
 import com.djtech.monai.feature.auth.data.session.ClearSessionOnExpiry
 import com.djtech.monai.feature.auth.domain.repository.AuthRepository
 import dagger.Binds
@@ -22,7 +22,7 @@ abstract class AuthModule {
     abstract fun bindSessionExpiredHandler(handler: ClearSessionOnExpiry): SessionExpiredHandler
 
     @Binds
-    abstract fun bindAuthRepository(repository: ApiAuthRepository): AuthRepository
+    abstract fun bindAuthRepository(repository: AuthRepositoryImpl): AuthRepository
 
     companion object {
 

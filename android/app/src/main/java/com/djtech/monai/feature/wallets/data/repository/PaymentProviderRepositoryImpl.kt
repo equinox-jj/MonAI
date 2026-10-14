@@ -40,7 +40,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class ApiPaymentProviderRepository @Inject constructor(
+class PaymentProviderRepositoryImpl @Inject constructor(
     private val paymentProviderApiService: PaymentProviderApiService,
     private val apiCaller: ApiCaller,
     private val paymentProviderDao: PaymentProviderDao,

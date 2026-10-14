@@ -41,7 +41,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
 import java.time.Instant
 
-class ApiProfileRepositoryTest {
+class ProfileRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -262,14 +262,14 @@ class ApiProfileRepositoryTest {
         """.trimIndent(),
     )
 
-    private fun TestScope.repository(dao: FakeUserDao = FakeUserDao()): ApiProfileRepository {
+    private fun TestScope.repository(dao: FakeUserDao = FakeUserDao()): ProfileRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(ProfileApiService::class.java)
-        return ApiProfileRepository(
+        return ProfileRepositoryImpl(
             profileApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             userDao = dao,

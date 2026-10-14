@@ -30,7 +30,7 @@ import retrofit2.converter.kotlinx.serialization.asConverterFactory
 import java.io.IOException
 import java.time.YearMonth
 
-class ApiReportRepositoryTest {
+class ReportRepositoryImplTest {
 
     private val errorLogger = RecordingErrorLogger()
     private val server = MockWebServer()
@@ -162,14 +162,14 @@ class ApiReportRepositoryTest {
         dao.replace(report.asEntity(), report.categoryEntities())
     }
 
-    private fun repository(): ApiReportRepository {
+    private fun repository(): ReportRepositoryImpl {
         val api = Retrofit.Builder()
             .baseUrl(server.url("/api/v1/"))
             .client(OkHttpClient())
             .addConverterFactory(NetworkJson.asConverterFactory("application/json".toMediaType()))
             .build()
             .create(ReportApiService::class.java)
-        return ApiReportRepository(
+        return ReportRepositoryImpl(
             reportApiService = api,
             apiCaller = ApiCaller(ApiErrorMapper(NetworkJson), errorLogger),
             monthlyReportDao = dao,
