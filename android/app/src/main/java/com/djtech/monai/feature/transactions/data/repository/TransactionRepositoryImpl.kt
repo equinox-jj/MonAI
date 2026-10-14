@@ -56,6 +56,9 @@ import javax.inject.Singleton
 /** Rows per page of a paged list; the API allows up to 100. */
 internal const val TRANSACTION_PAGE_SIZE = 20
 
+/** The most rows `GET /transactions` returns per page. */
+private const val MAX_PAGE_SIZE = 100
+
 @Singleton
 class TransactionRepositoryImpl @Inject constructor(
     private val transactionApiService: TransactionApiService,
@@ -84,6 +87,39 @@ class TransactionRepositoryImpl @Inject constructor(
                 )
             }
         }
+
+    override suspend fun fetchMonthTransactions(month: YearMonth): TransactionResult<List<Transaction>> =
+        apiCaller.callRaw {
+            val all = mutableListOf<Transaction>()
+            var cursor: String? = null
+            do {
+                val page = transactionApiService.getTransactions(
+                    month = month.toApiString(),
+                    limit = MAX_PAGE_SIZE,
+                    cursor = cursor,
+                )
+                all += page.data.map(TransactionDto::asModel)
+                cursor = page.meta.nextCursor.takeIf { page.meta.hasMore }
+            } while (cursor != null)
+            all.toList()
+        }.mapError(ApiError::toTransactionError).flatMap { transactions ->
+            cacheWrite("Caching a month of transactions failed") {
+                transactionDao.replaceRecent(
+                    from = month.atDay(1),
+                    to = month.atEndOfMonth(),
+                    transactions = transactions.map(Transaction::asEntity),
+                    hasMore = false,
+                )
+            }.map { transactions }
+        }
+
+    override suspend fun cachedTransactions(from: YearMonth, to: YearMonth): List<Transaction> =
+        catching { transactionDao.between(from.atDay(1), to.atEndOfMonth()).map(TransactionEntity::asModel) }
+            .getOrElse { e ->
+                // A failed cache read exports as nothing cached.
+                errorLogger.log("Reading cached transactions failed", e)
+                emptyList()
+            }
 
     @OptIn(ExperimentalPagingApi::class)
     override fun pagedTransactions(month: YearMonth, filter: TransactionFilter): Flow<PagingData<Transaction>> =

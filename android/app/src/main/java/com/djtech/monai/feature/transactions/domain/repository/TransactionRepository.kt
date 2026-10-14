@@ -28,6 +28,15 @@ interface TransactionRepository {
      */
     suspend fun refreshRecentTransactions(month: YearMonth, limit: Int): TransactionResult<Unit>
 
+    /**
+     * Fetches every transaction of [month], page by page, and replaces the month in the cache with
+     * them. Returns them newest first.
+     */
+    suspend fun fetchMonthTransactions(month: YearMonth): TransactionResult<List<Transaction>>
+
+    /** Every cached transaction from the start of [from] to the end of [to], newest first. Works offline. */
+    suspend fun cachedTransactions(from: YearMonth, to: YearMonth): List<Transaction>
+
     /** [month]'s transactions matching [filter], newest first, paged from the cache as the API fills it. */
     fun pagedTransactions(month: YearMonth, filter: TransactionFilter): Flow<PagingData<Transaction>>
 

@@ -103,6 +103,10 @@ interface TransactionDao {
     @Query("SELECT * FROM transactions WHERE date BETWEEN :from AND :to ORDER BY date DESC, id DESC LIMIT :limit")
     fun observeRecent(from: LocalDate, to: LocalDate, limit: Int): Flow<List<TransactionEntity>>
 
+    /** Every cached transaction dated between [from] and [to], for an export. */
+    @Query("SELECT * FROM transactions WHERE date BETWEEN :from AND :to ORDER BY date DESC, id DESC")
+    suspend fun between(from: LocalDate, to: LocalDate): List<TransactionEntity>
+
     /**
      * The category of the newest [type] transaction whose note or merchant, trimmed and lowercased,
      * is [text] (already lowercase). Newest by last edit, so a corrected category wins next time.

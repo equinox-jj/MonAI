@@ -45,6 +45,7 @@ object MonAIIcons {
     val Devices: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_devices)
     val DirectionsCar: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_directions_car)
     val DocumentScanner: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_document_scanner)
+    val Download: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_download)
     val Edit: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_edit)
     val EditNote: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_edit_note)
     val Error: ImageVector @Composable get() = ImageVector.vectorResource(R.drawable.ic_error)

@@ -12,7 +12,11 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -43,9 +47,16 @@ internal fun TransactionFormCategoryChips(
     val colors = MonAITheme.colors
     val ordered = categories.sortedByDescending { it.id == selectedId }
     val listState = rememberLazyListState()
-    // The keyed row would keep its old first chip in view after the reorder. Requesting the start
-    // during composition applies in the same remeasure as the new order, so the row never jumps.
-    remember(selectedId) { listState.requestScrollToItem(0) }
+    // The keyed row would keep its old first chip in view after the reorder. A SideEffect runs
+    // before this frame's layout, so the request applies in the same remeasure as the new order
+    // and the row never jumps (a LaunchedEffect would show one frame at the old position).
+    var scrolledFor by remember { mutableStateOf(selectedId) }
+    SideEffect {
+        if (scrolledFor != selectedId) {
+            scrolledFor = selectedId
+            listState.requestScrollToItem(0)
+        }
+    }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5)) {
         Row(
             Modifier

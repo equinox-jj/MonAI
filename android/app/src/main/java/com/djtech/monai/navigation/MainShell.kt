@@ -371,7 +371,7 @@ private fun SettingsDetailPane(
         )
 
         // Drawn by Settings itself.
-        SettingsPane.Theme, SettingsPane.Language -> Unit
+        SettingsPane.Theme, SettingsPane.Language, SettingsPane.Export -> Unit
     }
 }
 

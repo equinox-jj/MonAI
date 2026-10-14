@@ -51,6 +51,10 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
     val uploadedImages = mutableListOf<EncodedImage>()
     val attached = mutableListOf<Pair<String, String>>()
 
+    /** Answers [fetchMonthTransactions] per month; months not listed return the month's cached rows. */
+    val fetchResults = mutableMapOf<YearMonth, TransactionResult<List<Transaction>>>()
+    val fetchedMonths = mutableListOf<YearMonth>()
+
     /** Answers [findCategoryForNote] by lowercase text. */
     var noteCategories: Map<String, String> = emptyMap()
 
@@ -61,6 +65,16 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
         refreshes += month to limit
         return refreshResult
     }
+
+    override suspend fun fetchMonthTransactions(month: YearMonth): TransactionResult<List<Transaction>> {
+        fetchedMonths += month
+        gate?.await()
+        return fetchResults[month]
+            ?: Outcome.Success(transactions.value.filter { YearMonth.from(it.date) == month }.sorted())
+    }
+
+    override suspend fun cachedTransactions(from: YearMonth, to: YearMonth): List<Transaction> =
+        transactions.value.filter { YearMonth.from(it.date) in from..to }.sorted()
 
     override fun pagedTransactions(month: YearMonth, filter: TransactionFilter): Flow<PagingData<Transaction>> {
         pagedQueries += month to filter

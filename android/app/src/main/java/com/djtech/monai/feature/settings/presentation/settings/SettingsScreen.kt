@@ -41,6 +41,8 @@ import com.djtech.monai.core.designsystem.component.MonAIWidthClass
 import com.djtech.monai.core.designsystem.component.currentWidthClass
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
+import com.djtech.monai.feature.export.presentation.exportcsv.ExportCsvPaneRoute
+import com.djtech.monai.feature.export.presentation.exportcsv.ExportCsvSheetRoute
 import com.djtech.monai.feature.settings.presentation.settings.components.SettingsAccountGroup
 import com.djtech.monai.feature.settings.presentation.settings.components.SettingsAdminGroup
 import com.djtech.monai.feature.settings.presentation.settings.components.SettingsAppGroup
@@ -61,8 +63,8 @@ import java.time.YearMonth
 
 /**
  * @param detailPane draws [SettingsPane.Profile], [SettingsPane.Budget] (for the given month),
- *   [SettingsPane.Categories] and [SettingsPane.Providers] next to the menu on a wide screen; Theme
- *   and Language are drawn here.
+ *   [SettingsPane.Categories] and [SettingsPane.Providers] next to the menu on a wide screen; Theme,
+ *   Language and Export are drawn here.
  */
 @Composable
 fun SettingsRoute(
@@ -179,6 +181,11 @@ fun SettingsScreen(
                 onDismiss = { onIntent(SettingsIntent.DismissSheet) },
             )
 
+            SettingsSheet.Export -> ExportCsvSheetRoute(
+                onDismiss = { onIntent(SettingsIntent.DismissSheet) },
+                onExported = { onIntent(SettingsIntent.ExportFinished(it)) },
+            )
+
             null -> Unit
         }
     }
@@ -217,7 +224,10 @@ private fun SettingsList(
     }
 }
 
-/** The wide layout's right side: the theme and language pickers inline, other sections from [detailPane]. */
+/**
+ * The wide layout's right side: the theme and language pickers and the CSV export inline, other
+ * sections from [detailPane].
+ */
 @Composable
 private fun SettingsPaneContent(
     state: SettingsState,
@@ -251,6 +261,14 @@ private fun SettingsPaneContent(
                 )
             }
         }
+
+        SettingsPane.Export -> ExportCsvPaneRoute(
+            onExported = { onIntent(SettingsIntent.ExportFinished(it)) },
+            modifier = modifier
+                .verticalScroll(rememberScrollState())
+                .padding(contentPadding)
+                .padding(horizontal = spacing.x10),
+        )
 
         else -> detailPane(state.pane, state.month, modifier.fillMaxWidth())
     }

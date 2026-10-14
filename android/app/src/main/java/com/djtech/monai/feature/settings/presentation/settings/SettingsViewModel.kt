@@ -40,7 +40,7 @@ import javax.inject.Inject
 
 /**
  * The Settings hub: the profile card, this month's budget, counts of categories and wallets, the
- * theme and language, the admin section for provider managers, and signing out.
+ * theme and language, the CSV export, the admin section for provider managers, and signing out.
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -113,6 +113,10 @@ class SettingsViewModel @Inject constructor(
             }
 
             is SettingsIntent.PickLanguage -> pickLanguage(intent.language)
+            is SettingsIntent.ExportFinished -> if (!intent.isComplete) {
+                send(SettingsEffect.ShowMessage(UiText.Resource(R.string.export_partial_offline), isOffline = true))
+            }
+
             SettingsIntent.SignOut -> ui.update { it.copy(dialog = SettingsDialog.SignOut) }
             SettingsIntent.SignOutAllDevices -> ui.update { it.copy(dialog = SettingsDialog.SignOutAllDevices) }
             SettingsIntent.ConfirmDialog -> confirm()

@@ -4,4 +4,8 @@
     <cache-path
         name="camera"
         path="camera/" />
+    <!-- The latest CSV export, handed to the share sheet; replaced by the next one. -->
+    <cache-path
+        name="exports"
+        path="exports/" />
 </paths>

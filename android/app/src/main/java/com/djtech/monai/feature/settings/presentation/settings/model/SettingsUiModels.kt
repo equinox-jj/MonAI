@@ -15,10 +15,10 @@ data class SettingsProfile(
 )
 
 /** A bottom sheet over Settings. */
-enum class SettingsSheet { Theme, Language }
+enum class SettingsSheet { Theme, Language, Export }
 
 /** A confirmation over Settings. */
 enum class SettingsDialog { SignOut, SignOutAllDevices }
 
 /** What the detail pane shows next to the menu on a wide screen. */
-enum class SettingsPane { Profile, Budget, Categories, Theme, Language, Providers }
+enum class SettingsPane { Profile, Budget, Categories, Export, Theme, Language, Providers }

@@ -78,6 +78,9 @@ class FakeTransactionDao(initial: List<TransactionEntity> = emptyList()) : Trans
     override fun observeRecent(from: LocalDate, to: LocalDate, limit: Int): Flow<List<TransactionEntity>> =
         rows.map { all -> all.values.filter { it.date in from..to }.sorted().take(limit) }
 
+    override suspend fun between(from: LocalDate, to: LocalDate): List<TransactionEntity> =
+        rows.value.values.filter { it.date in from..to }.sorted()
+
     override suspend fun latestCategoryForText(text: String, type: TransactionType): String? =
         rows.value.values
             .filter { row ->

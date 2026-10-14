@@ -532,6 +532,72 @@ class TransactionRepositoryImplTest {
         assertEquals(null, repository.findCategoryForNote(" ", TransactionType.EXPENSE))
     }
 
+    @Test
+    fun `fetchMonthTransactions follows the cursor to the last page and replaces the month in the cache`() = runTest {
+        val dao = FakeTransactionDao(
+            listOf(
+                entity(id = "deleted", date = LocalDate.of(2026, 10, 1)),
+                entity(id = "sept", date = LocalDate.of(2026, 9, 30)),
+            ),
+        )
+        server.enqueue(MockResponse(code = 200, body = transactionsBody(LUNCH_JSON, hasMore = true)))
+        server.enqueue(MockResponse(code = 200, body = transactionsBody(TOP_UP_JSON, hasMore = false)))
+
+        val result = repository(dao).fetchMonthTransactions(OCTOBER)
+
+        assertEquals(Outcome.Success(listOf(LUNCH, TOP_UP)), result)
+        val first = server.takeRequest()
+        assertEquals("2026-10", first.url.queryParameter("month"))
+        assertEquals("100", first.url.queryParameter("limit"))
+        assertEquals(null, first.url.queryParameter("cursor"))
+        val second = server.takeRequest()
+        assertEquals("eyJkIjoiMjAyNi0xMC0xMCJ9", second.url.queryParameter("cursor"))
+        assertEquals("100", second.url.queryParameter("limit"))
+        assertEquals(listOf(LUNCH.id, TOP_UP.id, "sept"), dao.transactions.map { it.id })
+    }
+
+    @Test
+    fun `fetchMonthTransactions offline fails with a network error and keeps the cache`() = runTest {
+        val cached = entity(id = "a", date = LocalDate.of(2026, 10, 3))
+        val dao = FakeTransactionDao(listOf(cached))
+        val repository = repository(dao)
+        server.close()
+
+        val result = repository.fetchMonthTransactions(OCTOBER)
+
+        assertEquals(Outcome.Failure(TransactionError.Network), result)
+        assertEquals(listOf(cached), dao.transactions)
+    }
+
+    @Test
+    fun `fetchMonthTransactions fails as unexpected when a later page fails and keeps the cache`() = runTest {
+        val cached = entity(id = "a", date = LocalDate.of(2026, 10, 3))
+        val dao = FakeTransactionDao(listOf(cached))
+        server.enqueue(MockResponse(code = 200, body = transactionsBody(LUNCH_JSON, hasMore = true)))
+        server.enqueue(MockResponse(code = 500, body = errorBody("internal_error")))
+
+        val result = repository(dao).fetchMonthTransactions(OCTOBER)
+
+        assertEquals(Outcome.Failure(TransactionError.Unexpected), result)
+        assertEquals(listOf(cached), dao.transactions)
+    }
+
+    @Test
+    fun `cachedTransactions lists the cached rows of the months in range`() = runTest {
+        val dao = FakeTransactionDao(
+            listOf(
+                entity(id = "aug", date = LocalDate.of(2026, 8, 31)),
+                entity(id = "sept", date = LocalDate.of(2026, 9, 1)),
+                entity(id = "oct", date = LocalDate.of(2026, 10, 31)),
+                entity(id = "nov", date = LocalDate.of(2026, 11, 1)),
+            ),
+        )
+
+        val cached = repository(dao).cachedTransactions(YearMonth.of(2026, 9), OCTOBER)
+
+        assertEquals(listOf("oct", "sept"), cached.map(Transaction::id))
+    }
+
     private fun fileErrorBody(code: String) =
         """{"success":false,"message":"Invalid","data":null,"error":{"code":"validation_failed","fields":[""" +
             """{"field":"file","code":"$code","message":"bad file"}]}}"""

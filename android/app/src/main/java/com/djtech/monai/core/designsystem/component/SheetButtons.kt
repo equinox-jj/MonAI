@@ -16,6 +16,7 @@ fun MonAISheetButtons(
     primaryLabel: String,
     onPrimary: () -> Unit,
     modifier: Modifier = Modifier,
+    primaryLoading: Boolean = false,
 ) {
     Row(
         modifier
@@ -35,6 +36,7 @@ fun MonAISheetButtons(
             onPrimary,
             Modifier.weight(1f),
             size = MonAIButtonSize.Medium,
+            loading = primaryLoading,
         )
     }
 }

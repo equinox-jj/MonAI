@@ -219,4 +219,21 @@ class SettingsViewModelTest {
         send(vm, SettingsIntent.SelectPane(SettingsPane.Theme))
         assertEquals(SettingsPane.Theme, vm.state.value.pane)
     }
+
+    @Test
+    fun `an export made offline says only cached transactions went in`() = runSettingsTest { vm, effects ->
+        send(vm, SettingsIntent.ExportFinished(isComplete = false))
+
+        assertEquals(
+            listOf(SettingsEffect.ShowMessage(UiText.Resource(R.string.export_partial_offline), isOffline = true)),
+            effects,
+        )
+    }
+
+    @Test
+    fun `a complete export shows no message`() = runSettingsTest { vm, effects ->
+        send(vm, SettingsIntent.ExportFinished(isComplete = true))
+
+        assertTrue(effects.isEmpty())
+    }
 }

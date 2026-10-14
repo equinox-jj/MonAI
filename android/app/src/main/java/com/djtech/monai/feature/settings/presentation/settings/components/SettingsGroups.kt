@@ -18,7 +18,7 @@ import com.djtech.monai.feature.settings.presentation.settings.SettingsIntent
 import com.djtech.monai.feature.settings.presentation.settings.SettingsState
 import com.djtech.monai.feature.settings.presentation.settings.model.SettingsSheet
 
-/** Budget, categories and wallets, each with its current value. */
+/** Budget, categories and wallets, each with its current value, then the CSV export. */
 @Composable
 internal fun SettingsMoneyGroup(
     state: SettingsState,
@@ -43,6 +43,11 @@ internal fun SettingsMoneyGroup(
             MonAIIcons.AccountBalanceWallet,
             onClick = { onIntent(SettingsIntent.Open(SettingsDestination.Wallets)) },
             value = state.walletCount.toString(),
+        )
+        MonAISettingsRow(
+            stringResource(R.string.export_row),
+            MonAIIcons.Download,
+            onClick = { onIntent(SettingsIntent.ShowSheet(SettingsSheet.Export)) },
             showDivider = false,
         )
     }

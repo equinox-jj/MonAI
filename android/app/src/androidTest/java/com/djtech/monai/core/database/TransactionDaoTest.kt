@@ -35,6 +35,23 @@ class TransactionDaoTest {
     }
 
     @Test
+    fun betweenListsEveryRowOfTheRangeNewestFirst() = runTest {
+        dao.upsertAll(
+            listOf(
+                transaction("aug", date = LocalDate.of(2026, 8, 31)),
+                transaction("a", date = LocalDate.of(2026, 9, 1)),
+                transaction("b", date = LocalDate.of(2026, 10, 31)),
+                transaction("c", date = LocalDate.of(2026, 9, 1)),
+                transaction("nov", date = LocalDate.of(2026, 11, 1)),
+            ),
+        )
+
+        val rows = dao.between(LocalDate.of(2026, 9, 1), LocalDate.of(2026, 10, 31))
+
+        assertEquals(listOf("b", "c", "a"), rows.map { it.id })
+    }
+
+    @Test
     fun listsOneMonthNewestFirstThenById() = runTest {
         dao.upsertAll(
             listOf(

@@ -124,6 +124,14 @@ internal fun SettingsMenu(
                 state.walletCount.toString(),
                 onClick = { onIntent(SettingsIntent.Open(SettingsDestination.Wallets)) },
             )
+            MenuItem(
+                SettingsPane.Export,
+                MonAIIcons.Download,
+                stringResource(R.string.export_row),
+                null,
+                state,
+                onIntent,
+            )
             MenuHeader(stringResource(R.string.settings_group_app))
             MenuItem(
                 SettingsPane.Theme,

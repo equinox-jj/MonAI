@@ -48,6 +48,9 @@ sealed interface SettingsIntent {
 
     data class PickLanguage(val language: AppLanguage) : SettingsIntent
 
+    /** A CSV export reached the share sheet; [isComplete] is false when it held only cached transactions. */
+    data class ExportFinished(val isComplete: Boolean) : SettingsIntent
+
     /** Asks to confirm first. */
     data object SignOut : SettingsIntent
 
