@@ -46,10 +46,10 @@ class CategoriesViewModelTest {
         block: suspend TestScope.(CategoriesViewModel, MutableList<CategoriesEffect>) -> Unit,
     ) = runTest(mainDispatcherRule.dispatcher) {
         val viewModel = CategoriesViewModel(
-            ObserveCategoriesUseCase(categories),
             RefreshCategoriesUseCase(categories),
             SetCategoryHiddenUseCase(categories),
             DeleteCategoryUseCase(categories),
+            ObserveCategoriesUseCase(categories),
         )
         val effects = mutableListOf<CategoriesEffect>()
         backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { viewModel.state.collect {} }

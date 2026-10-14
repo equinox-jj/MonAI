@@ -5,10 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
@@ -214,6 +216,7 @@ fun TransactionFormScreen(
     if (state.showDiscardDialog) TransactionFormDiscardDialog(onIntent)
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun FormContent(
     state: TransactionFormState,
@@ -257,7 +260,8 @@ private fun FormContent(
                 )
             }
         }
-        TransactionFormKeypad(onIntent, horizontal)
+        // Only the note opens the keyboard; hide the keypad meanwhile so the two don't stack.
+        if (!WindowInsets.isImeVisible) TransactionFormKeypad(onIntent, horizontal)
         MonAIButton(
             text = stringResource(state.saveLabel()),
             onClick = { onIntent(TransactionFormIntent.Save) },

@@ -4,6 +4,7 @@ import com.djtech.monai.BuildConfig
 import com.djtech.monai.core.network.NetworkJson
 import com.djtech.monai.core.network.auth.AuthInterceptor
 import com.djtech.monai.core.network.auth.SessionAuthenticator
+import com.djtech.monai.core.network.logging.ResponseBodyLoggingInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -39,13 +40,14 @@ object NetworkModule {
         .authenticator(sessionAuthenticator)
         .apply {
             if (BuildConfig.DEBUG) {
-                // Headers only: bodies hold passwords and financial data.
+                // Headers both ways, response bodies only: request bodies hold passwords.
                 addInterceptor(
                     HttpLoggingInterceptor().apply {
                         level = HttpLoggingInterceptor.Level.HEADERS
                         redactHeader("Authorization")
                     },
                 )
+                addInterceptor(ResponseBodyLoggingInterceptor())
             }
         }
         .build()

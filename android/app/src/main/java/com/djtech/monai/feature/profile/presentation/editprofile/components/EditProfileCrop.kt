@@ -5,15 +5,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Slider
@@ -24,8 +21,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathFillType
@@ -183,7 +182,9 @@ private fun ZoomSlider(spec: CropSpec, onSpecChange: (CropSpec) -> Unit) {
 
 /**
  * The photo drawn as [spec] frames it: scaled so its short side fills the window at zoom 1, moved
- * by the offsets (fractions of the window) and turned. Outside the round mask is dimmed.
+ * by the offsets (fractions of the window) and turned. The canvas fills the space between the
+ * header and the controls and clips to it, so a zoomed photo never draws over them; everything
+ * outside the round window is dimmed.
  */
 @Composable
 private fun CropWindow(
@@ -193,58 +194,56 @@ private fun CropWindow(
 ) {
     val current by rememberUpdatedState(spec)
     val colors = MonAITheme.colors
-    BoxWithConstraints(Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-        val side = min(maxWidth.value, maxHeight.value).dp
-        Canvas(
-            Modifier
-                .size(side)
-                .aspectRatio(1f)
-                .pointerInput(image) {
-                    detectTransformGestures { _, pan, zoom, _ ->
-                        val window = size.width.toFloat()
-                        onSpecChange(
-                            current.copy(
-                                zoom = current.zoom * zoom,
-                                offsetX = current.offsetX + pan.x / window,
-                                offsetY = current.offsetY + pan.y / window,
-                            ),
-                        )
-                    }
-                },
-        ) {
-            val window = size.width
-            val (width, height) = rotatedSize(image.width, image.height, spec.quarterTurns)
-            val scale = window / min(width, height) * spec.zoom
-            translate(window / 2 + spec.offsetX * window, window / 2 + spec.offsetY * window) {
-                rotate(-90f * spec.quarterTurns, pivot = Offset.Zero) {
-                    scale(scale, pivot = Offset.Zero) {
-                        drawImage(image, topLeft = Offset(-image.width / 2f, -image.height / 2f))
-                    }
+    Canvas(
+        Modifier
+            .fillMaxSize()
+            .clipToBounds()
+            .pointerInput(image) {
+                detectTransformGestures { _, pan, zoom, _ ->
+                    val window = min(size.width, size.height).toFloat()
+                    onSpecChange(
+                        current.copy(
+                            zoom = current.zoom * zoom,
+                            offsetX = current.offsetX + pan.x / window,
+                            offsetY = current.offsetY + pan.y / window,
+                        ),
+                    )
+                }
+            },
+    ) {
+        val window = size.minDimension
+        val frame = Rect(center - Offset(window / 2, window / 2), Size(window, window))
+        val (width, height) = rotatedSize(image.width, image.height, spec.quarterTurns)
+        val scale = window / min(width, height) * spec.zoom
+        translate(center.x + spec.offsetX * window, center.y + spec.offsetY * window) {
+            rotate(-90f * spec.quarterTurns, pivot = Offset.Zero) {
+                scale(scale, pivot = Offset.Zero) {
+                    drawImage(image, topLeft = Offset(-image.width / 2f, -image.height / 2f))
                 }
             }
-            val mask = Path().apply {
-                fillType = PathFillType.EvenOdd
-                addRect(Rect(Offset.Zero, size))
-                addOval(Rect(Offset.Zero, size))
-            }
-            drawPath(mask, colors.scrim)
-            drawCircle(colors.highlight, radius = window / 2 - 1.dp.toPx(), style = Stroke(2.dp.toPx()))
-            // Rule-of-thirds guides inside the circle.
-            val third = window / 3
-            for (i in 1..2) {
-                drawLine(
-                    colors.onGradientMuted,
-                    Offset(third * i, 0f),
-                    Offset(third * i, window),
-                    1.dp.toPx(),
-                )
-                drawLine(
-                    colors.onGradientMuted,
-                    Offset(0f, third * i),
-                    Offset(window, third * i),
-                    1.dp.toPx(),
-                )
-            }
+        }
+        val mask = Path().apply {
+            fillType = PathFillType.EvenOdd
+            addRect(Rect(Offset.Zero, size))
+            addOval(frame)
+        }
+        drawPath(mask, colors.scrim)
+        drawCircle(colors.highlight, radius = window / 2 - 1.dp.toPx(), style = Stroke(2.dp.toPx()))
+        // Rule-of-thirds guides across the window.
+        val third = window / 3
+        for (i in 1..2) {
+            drawLine(
+                colors.onGradientMuted,
+                Offset(frame.left + third * i, frame.top),
+                Offset(frame.left + third * i, frame.bottom),
+                1.dp.toPx(),
+            )
+            drawLine(
+                colors.onGradientMuted,
+                Offset(frame.left, frame.top + third * i),
+                Offset(frame.right, frame.top + third * i),
+                1.dp.toPx(),
+            )
         }
     }
 }

@@ -8,9 +8,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -40,6 +42,10 @@ internal fun TransactionFormCategoryChips(
 ) {
     val colors = MonAITheme.colors
     val ordered = categories.sortedByDescending { it.id == selectedId }
+    val listState = rememberLazyListState()
+    // The keyed row would keep its old first chip in view after the reorder. Requesting the start
+    // during composition applies in the same remeasure as the new order, so the row never jumps.
+    remember(selectedId) { listState.requestScrollToItem(0) }
     Column(modifier, verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1_5)) {
         Row(
             Modifier
@@ -69,6 +75,7 @@ internal fun TransactionFormCategoryChips(
         } else {
             LazyRow(
                 Modifier.selectableGroup(),
+                state = listState,
                 contentPadding = PaddingValues(horizontal = MonAITheme.spacing.screenHorizontal),
                 horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2),
             ) {
