@@ -90,6 +90,9 @@ data class CategoryFormRoute(val type: CategoryType, val id: String? = null) : N
 data class EditProfileRoute(val focusDelete: Boolean = false) : NavKey
 
 @Serializable
+data object ChangePasswordRoute : NavKey
+
+@Serializable
 data object CategoriesRoute : NavKey
 
 @Serializable
@@ -115,6 +118,7 @@ internal fun NavKey.isFullScreen(): Boolean = when (this) {
     is ReportRoute,
     is CategoryFormRoute,
     is EditProfileRoute,
+    ChangePasswordRoute,
     CategoriesRoute,
     ManageProvidersRoute,
     is ProviderFormRoute,

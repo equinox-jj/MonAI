@@ -80,4 +80,6 @@ sealed interface SettingsDestination {
     data object Wallets : SettingsDestination
 
     data object ManageProviders : SettingsDestination
+
+    data object ChangePassword : SettingsDestination
 }

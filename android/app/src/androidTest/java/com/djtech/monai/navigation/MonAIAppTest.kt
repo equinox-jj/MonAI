@@ -39,7 +39,7 @@ class MonAIAppTest {
 
     private var sessionState by mutableStateOf<SessionState>(SessionState.Loading)
     private var onboardingCompleted by mutableStateOf(false)
-    private var expiryAcknowledgements = 0
+    private var noticeAcknowledgements = 0
 
     private fun setContent(initial: SessionState, onboardingDone: Boolean = false) {
         sessionState = initial
@@ -48,7 +48,7 @@ class MonAIAppTest {
             MonAITheme {
                 MonAIApp(
                     MainState(sessionState, onboardingCompleted),
-                    onSessionExpiredAcknowledged = { expiryAcknowledgements++ },
+                    onSignOutNoticeAcknowledged = { noticeAcknowledgements++ },
                 )
             }
         }
@@ -195,13 +195,29 @@ class MonAIAppTest {
         sessionState = SessionState.Expired
 
         compose.onNodeWithText("Sign in again").performClick()
-        assertEquals(1, expiryAcknowledgements)
+        assertEquals(1, noticeAcknowledgements)
         // MainViewModel acknowledges, which moves the session on to SignedOut.
         sessionState = SessionState.SignedOut
 
         compose.onNodeWithText("Welcome back").assertIsDisplayed()
         compose.onNodeWithText("Session expired").assertDoesNotExist()
         welcome().assertDoesNotExist()
+    }
+
+    @Test
+    fun aChangedPasswordShowsItsDialogThenSignIn() {
+        setContent(SessionState.SignedIn, onboardingDone = true)
+        sessionState = SessionState.PasswordChanged
+
+        compose.onNodeWithText("Password changed").assertIsDisplayed()
+        tab("Home").assertExists()
+
+        compose.onNodeWithText("Sign in").performClick()
+        assertEquals(1, noticeAcknowledgements)
+        sessionState = SessionState.SignedOut
+
+        compose.onNodeWithText("Welcome back").assertIsDisplayed()
+        compose.onNodeWithText("Password changed").assertDoesNotExist()
     }
 
     @Test

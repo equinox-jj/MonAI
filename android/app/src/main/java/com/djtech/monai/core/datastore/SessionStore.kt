@@ -35,6 +35,9 @@ sealed interface SessionState {
 
     /** The server rejected the token; signed out, but the UI tells the user before leaving. */
     data object Expired : SessionState
+
+    /** The password was changed, which signs out every device; the UI tells the user before leaving. */
+    data object PasswordChanged : SessionState
 }
 
 /**
@@ -59,8 +62,11 @@ class SessionStore @Inject constructor(
                 CachedToken.Unloaded -> SessionState.Loading
                 is CachedToken.Loaded -> when {
                     cache.token != null -> SessionState.SignedIn
-                    cache.expired -> SessionState.Expired
-                    else -> SessionState.SignedOut
+                    else -> when (cache.notice) {
+                        SignOutNotice.Expired -> SessionState.Expired
+                        SignOutNotice.PasswordChanged -> SessionState.PasswordChanged
+                        null -> SessionState.SignedOut
+                    }
                 }
             }
         }
@@ -99,27 +105,33 @@ class SessionStore @Inject constructor(
     /**
      * Clears [token] only if it is still the stored one; a newer login wins. Only called when the
      * server rejects the token, so the session becomes [SessionState.Expired] until
-     * [acknowledgeExpiry]. Returns whether it was cleared.
+     * [acknowledgeSignOutNotice]. Returns whether it was cleared.
      */
     suspend fun clearIfCurrent(token: String): Boolean = writeLock.withLock {
         val isCurrent = loadIfNeeded() == token
-        if (isCurrent) removeToken(expired = true)
+        if (isCurrent) removeToken(SignOutNotice.Expired)
         isCurrent
     }
 
-    /** The user saw the expiry notice; [SessionState.Expired] becomes [SessionState.SignedOut]. */
-    suspend fun acknowledgeExpiry() = writeLock.withLock {
+    /** Signs out after a password change: [SessionState.PasswordChanged] until [acknowledgeSignOutNotice]. */
+    suspend fun clearAfterPasswordChange() = writeLock.withLock { removeToken(SignOutNotice.PasswordChanged) }
+
+    /**
+     * The user saw why they were signed out: [SessionState.Expired] or [SessionState.PasswordChanged]
+     * becomes [SessionState.SignedOut].
+     */
+    suspend fun acknowledgeSignOutNotice() = writeLock.withLock {
         val cache = cached.value
-        if (cache is CachedToken.Loaded && cache.expired) cached.value = cache.copy(expired = false)
+        if (cache is CachedToken.Loaded && cache.notice != null) cached.value = cache.copy(notice = null)
     }
 
-    // The flag lives in memory only: after process death an expired session is plainly signed out.
-    private suspend fun removeToken(expired: Boolean = false) {
+    // The notice lives in memory only: after process death the session is plainly signed out.
+    private suspend fun removeToken(notice: SignOutNotice? = null) {
         dataStore.edit {
             it.remove(ACCESS_TOKEN)
             it.remove(EXPIRES_AT)
         }
-        cached.value = CachedToken.Loaded(null, expired)
+        cached.value = CachedToken.Loaded(null, notice)
     }
 
     private suspend fun loadIfNeeded(): String? = load().token
@@ -145,10 +157,13 @@ class SessionStore @Inject constructor(
         data object Unloaded : CachedToken
         data class Loaded(
             val token: String?,
-            val expired: Boolean = false,
+            val notice: SignOutNotice? = null,
             val expiresAt: Instant? = null,
         ) : CachedToken
     }
+
+    /** Why the token was removed, when the user should be told before reaching Sign in. */
+    private enum class SignOutNotice { Expired, PasswordChanged }
 
     internal companion object {
         val ACCESS_TOKEN = stringPreferencesKey("access_token")

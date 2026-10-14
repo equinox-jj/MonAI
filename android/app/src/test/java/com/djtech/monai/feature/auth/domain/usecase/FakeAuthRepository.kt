@@ -15,7 +15,7 @@ class FakeAuthRepository : AuthRepository {
 
     val calls = mutableListOf<String>()
 
-    /** When set, register and login suspend until it completes, to observe the in-flight state. */
+    /** When set, register, login and changePassword suspend until it completes, to observe the in-flight state. */
     var gate: CompletableDeferred<Unit>? = null
 
     override suspend fun register(name: String, email: String, password: String): AuthResult<User> {
@@ -46,6 +46,7 @@ class FakeAuthRepository : AuthRepository {
 
     override suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit> {
         calls += "changePassword($currentPassword, $newPassword)"
+        gate?.await()
         return unitResult
     }
 }

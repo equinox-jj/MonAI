@@ -16,6 +16,7 @@ import com.djtech.monai.MainState
 import com.djtech.monai.core.datastore.SessionState
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.auth.presentation.onboarding.OnboardingRoute
+import com.djtech.monai.feature.auth.presentation.passwordchanged.PasswordChangedDialog
 import com.djtech.monai.feature.auth.presentation.register.RegisterRoute
 import com.djtech.monai.feature.auth.presentation.sessionexpired.SessionExpiredDialog
 import com.djtech.monai.feature.auth.presentation.signin.SignInRoute
@@ -27,20 +28,21 @@ private enum class Graph { None, Auth, Main }
  * token (SessionStore clears it) all switch graphs here. Leaving a graph drops its
  * back stacks, so the next sign-in starts fresh on Home.
  *
- * An expired session keeps the main graph on screen under [SessionExpiredDialog]; confirming it
- * calls [onSessionExpiredAcknowledged], and the auth graph then opens on Sign in.
+ * An expired session or a changed password keeps the main graph on screen under
+ * [SessionExpiredDialog] or [PasswordChangedDialog]; confirming it calls [onSignOutNoticeAcknowledged],
+ * and the auth graph then opens on Sign in.
  */
 @Composable
 fun MonAIApp(
     state: MainState,
-    onSessionExpiredAcknowledged: () -> Unit,
+    onSignOutNoticeAcknowledged: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val graph = when (state.sessionState) {
         // MainActivity keeps the system splash on screen until the session is read.
         SessionState.Loading -> Graph.None
         SessionState.SignedOut -> Graph.Auth
-        SessionState.SignedIn, SessionState.Expired -> Graph.Main
+        SessionState.SignedIn, SessionState.Expired, SessionState.PasswordChanged -> Graph.Main
     }
     Crossfade(
         targetState = graph,
@@ -55,8 +57,10 @@ fun MonAIApp(
             Graph.Main -> MainShell()
         }
     }
-    if (state.sessionState == SessionState.Expired) {
-        SessionExpiredDialog(onSignInAgain = onSessionExpiredAcknowledged)
+    when (state.sessionState) {
+        SessionState.Expired -> SessionExpiredDialog(onSignInAgain = onSignOutNoticeAcknowledged)
+        SessionState.PasswordChanged -> PasswordChangedDialog(onSignIn = onSignOutNoticeAcknowledged)
+        SessionState.Loading, SessionState.SignedIn, SessionState.SignedOut -> Unit
     }
 }
 

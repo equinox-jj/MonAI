@@ -381,7 +381,7 @@ class AuthRepositoryImplTest {
     }
 
     @Test
-    fun `changing the password saves the new token`() = runTest {
+    fun `changing the password signs out here too and clears the cache`() = runTest {
         val (repository, store) = repository()
         store.saveToken("token-old")
         server.enqueue(MockResponse(code = 200, body = authBody(token = "token-new")))
@@ -389,8 +389,9 @@ class AuthRepositoryImplTest {
         val result = repository.changePassword("oldPass123", "newPass123")
 
         assertEquals(Outcome.Success(Unit), result)
-        assertEquals("token-new", store.accessToken())
-        assertEquals(0, localCache.clearCount)
+        assertNull(store.accessToken())
+        assertEquals(SessionState.PasswordChanged, store.sessionState.first())
+        assertEquals(1, localCache.clearCount)
         val request = server.takeRequest()
         assertEquals("PUT", request.method)
         assertEquals("/api/v1/auth/password", request.url.encodedPath)
@@ -398,17 +399,6 @@ class AuthRepositoryImplTest {
             json("""{"current_password":"oldPass123","new_password":"newPass123"}"""),
             request.jsonBody(),
         )
-    }
-
-    @Test
-    fun `changing the password records when the new token expires`() = runTest {
-        val (repository, store) = repository()
-        store.saveToken("token-old")
-        server.enqueue(MockResponse(code = 200, body = authBody(token = "token-new")))
-
-        repository.changePassword("oldPass123", "newPass123")
-
-        assertEquals("token-new", store.overdueToken(now = NOW.plusSeconds(TOKEN_LIFETIME_SECONDS)))
     }
 
     @Test
@@ -455,6 +445,7 @@ class AuthRepositoryImplTest {
 
         assertEquals(Outcome.Failure(AuthError.WrongCurrentPassword), result)
         assertEquals("token-old", store.accessToken())
+        assertEquals(0, localCache.clearCount)
     }
 
     private fun TestScope.repository(

@@ -35,6 +35,7 @@ import com.djtech.monai.core.designsystem.component.currentWidthClass
 import com.djtech.monai.core.designsystem.component.monAIMainNavItems
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.TransactionType
+import com.djtech.monai.feature.auth.presentation.changepassword.ChangePasswordRoute
 import com.djtech.monai.feature.budgets.presentation.budget.BudgetRoute
 import com.djtech.monai.feature.categories.presentation.categories.CategoriesRoute
 import com.djtech.monai.feature.categories.presentation.categoryform.CategoryFormRoute
@@ -330,6 +331,9 @@ private fun MainNavDisplay(
                 }
                 entry<EditProfileRoute> { key ->
                     EditProfileRoute(onClose = navigator::goBack, focusDelete = key.focusDelete)
+                }
+                entry<ChangePasswordRoute> {
+                    ChangePasswordRoute(onClose = navigator::goBack)
                 }
                 entry<CategoriesRoute> {
                     CategoriesRoute(onNavigate = navigator::openFromCategories, onBack = navigator::goBack)

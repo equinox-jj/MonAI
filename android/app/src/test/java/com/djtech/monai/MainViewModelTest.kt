@@ -64,7 +64,7 @@ class MainViewModelTest {
         advanceUntilIdle()
         assertEquals(SessionState.Expired, viewModel.state.value.sessionState)
 
-        viewModel.onSessionExpiredAcknowledged()
+        viewModel.onSignOutNoticeAcknowledged()
         advanceUntilIdle()
         assertEquals(SessionState.SignedOut, viewModel.state.value.sessionState)
     }

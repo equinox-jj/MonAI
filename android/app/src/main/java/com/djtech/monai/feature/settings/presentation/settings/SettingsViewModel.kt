@@ -40,7 +40,8 @@ import javax.inject.Inject
 
 /**
  * The Settings hub: the profile card, this month's budget, counts of categories and wallets, the
- * theme and language, the CSV export, the admin section for provider managers, and signing out.
+ * theme and language, the CSV export, the admin section for provider managers, changing the
+ * password and signing out.
  */
 @HiltViewModel
 class SettingsViewModel @Inject constructor(

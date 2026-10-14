@@ -67,11 +67,14 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun changePassword(currentPassword: String, newPassword: String): AuthResult<Unit> {
         val body = ChangePasswordRequestDto(currentPassword, newPassword)
         return storingSession {
-            // Older tokens are revoked; requests still carrying one 401 harmlessly,
-            // since SessionStore.clearIfCurrent keeps this newer token.
+            // The server revoked every older token. Its fresh one is dropped too: a changed password
+            // signs out here as well, and the user signs in again with the new one.
             apiCaller.call { authApiService.changePassword(body) }
-                .map { sessionStore.saveToken(it.accessToken, it.expiresAt()) }
                 .mapError(ApiError::toAuthError)
+                .map {
+                    sessionStore.clearAfterPasswordChange()
+                    clearCacheAfterSignOut()
+                }
         }
     }
 

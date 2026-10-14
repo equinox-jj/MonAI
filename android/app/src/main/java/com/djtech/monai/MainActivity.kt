@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             MonAITheme(darkTheme = darkTheme) {
-                MonAIApp(state, viewModel::onSessionExpiredAcknowledged)
+                MonAIApp(state, viewModel::onSignOutNoticeAcknowledged)
             }
         }
     }

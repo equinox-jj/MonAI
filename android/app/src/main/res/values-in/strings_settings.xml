@@ -40,4 +40,16 @@
     <string name="settings_cancel">Batal</string>
     <string name="settings_error_network">Kamu sedang offline. Sambungkan ke internet dan coba lagi.</string>
     <string name="settings_error_sign_out">Gagal keluar. Coba lagi sebentar lagi.</string>
+    <string name="settings_change_password">Ubah kata sandi</string>
+    <string name="password_changed_title">Kata sandi diubah</string>
+    <string name="password_changed_body">Kamu sudah dikeluarkan dari semua perangkat. Masuk lagi dengan kata sandi barumu.</string>
+    <string name="password_changed_sign_in">Masuk</string>
+    <string name="change_password_title">Ubah kata sandi</string>
+    <string name="change_password_back">Kembali</string>
+    <string name="change_password_save">Simpan</string>
+    <string name="change_password_current_label">Kata sandi saat ini</string>
+    <string name="change_password_current_placeholder">Masukkan kata sandi saat ini</string>
+    <string name="change_password_new_label">Kata sandi baru</string>
+    <string name="change_password_wrong_current">Kata sandi saat ini salah</string>
+    <string name="change_password_sign_out_note">Kamu akan dikeluarkan dari semua perangkat, termasuk yang ini. Lalu masuk dengan kata sandi barumu.</string>
 </resources>

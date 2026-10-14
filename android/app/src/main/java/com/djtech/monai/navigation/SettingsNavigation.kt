@@ -12,6 +12,7 @@ internal fun MainNavigator.openFromSettings(destination: SettingsDestination) {
         SettingsDestination.Categories -> navigate(CategoriesRoute)
         SettingsDestination.Wallets -> selectTab(TopLevelDestination.Wallets)
         SettingsDestination.ManageProviders -> navigate(ManageProvidersRoute)
+        SettingsDestination.ChangePassword -> navigate(ChangePasswordRoute)
     }
 }
 

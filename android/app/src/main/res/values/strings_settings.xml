@@ -40,4 +40,16 @@
     <string name="settings_cancel">Cancel</string>
     <string name="settings_error_network">You\'re offline. Connect to the internet and try again.</string>
     <string name="settings_error_sign_out">Couldn\'t sign out. Try again in a moment.</string>
+    <string name="settings_change_password">Change password</string>
+    <string name="password_changed_title">Password changed</string>
+    <string name="password_changed_body">You\'ve been signed out on every device. Sign in again with your new password.</string>
+    <string name="password_changed_sign_in">Sign in</string>
+    <string name="change_password_title">Change password</string>
+    <string name="change_password_back">Back</string>
+    <string name="change_password_save">Save</string>
+    <string name="change_password_current_label">Current password</string>
+    <string name="change_password_current_placeholder">Enter your current password</string>
+    <string name="change_password_new_label">New password</string>
+    <string name="change_password_wrong_current">Your current password is incorrect</string>
+    <string name="change_password_sign_out_note">You\'ll be signed out on every device, this one included. Then sign in with your new password.</string>
 </resources>

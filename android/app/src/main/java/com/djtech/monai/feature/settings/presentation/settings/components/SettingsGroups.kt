@@ -94,7 +94,10 @@ internal fun SettingsAdminGroup(onIntent: (SettingsIntent) -> Unit, modifier: Mo
     }
 }
 
-/** Sign out here or everywhere, and delete the account (on Edit profile, behind the password). */
+/**
+ * Change the password, sign out here or everywhere, and delete the account (on Edit profile, behind
+ * the password).
+ */
 @Composable
 internal fun SettingsAccountGroup(
     isSigningOut: Boolean,
@@ -104,6 +107,12 @@ internal fun SettingsAccountGroup(
     val colors = MonAITheme.colors
     Box(modifier) {
         MonAISettingsGroup(stringResource(R.string.settings_group_account)) {
+            MonAISettingsRow(
+                stringResource(R.string.settings_change_password),
+                MonAIIcons.Lock,
+                onClick = { onIntent(SettingsIntent.Open(SettingsDestination.ChangePassword)) },
+                iconTint = colors.textSecondary,
+            )
             MonAISettingsRow(
                 stringResource(R.string.settings_sign_out),
                 MonAIIcons.Logout,

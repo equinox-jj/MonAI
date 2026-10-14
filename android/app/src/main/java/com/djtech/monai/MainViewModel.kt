@@ -52,8 +52,8 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch { expireSessionIfDue() }
     }
 
-    /** The user dismissed the session-expired dialog: move on to the signed-out graph. */
-    fun onSessionExpiredAcknowledged() {
-        viewModelScope.launch { sessionStore.acknowledgeExpiry() }
+    /** The user dismissed the session-expired or password-changed dialog: move on to the signed-out graph. */
+    fun onSignOutNoticeAcknowledged() {
+        viewModelScope.launch { sessionStore.acknowledgeSignOutNotice() }
     }
 }

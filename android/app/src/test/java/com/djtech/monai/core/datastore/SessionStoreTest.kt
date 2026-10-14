@@ -185,7 +185,22 @@ class SessionStoreTest {
         assertEquals(SessionState.Expired, store.awaitLoaded())
         assertNull(store.accessToken())
 
-        store.acknowledgeExpiry()
+        store.acknowledgeSignOutNotice()
+
+        assertEquals(SessionState.SignedOut, store.awaitLoaded())
+    }
+
+    @Test
+    fun `clearAfterPasswordChange signs out with a notice until acknowledged`() = runTest {
+        val store = store()
+        store.saveToken("token-1")
+
+        store.clearAfterPasswordChange()
+
+        assertEquals(SessionState.PasswordChanged, store.awaitLoaded())
+        assertNull(store.accessToken())
+
+        store.acknowledgeSignOutNotice()
 
         assertEquals(SessionState.SignedOut, store.awaitLoaded())
     }
