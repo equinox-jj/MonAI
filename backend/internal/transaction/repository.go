@@ -56,6 +56,15 @@ type Repository interface {
 	// ErrNotFound when the row is missing, not deleted or belongs to another
 	// user.
 	Restore(ctx context.Context, userID, id uuid.UUID) (*Transaction, error)
+	// ExpiredReceiptKeys returns up to limit distinct receipt keys of
+	// transactions soft-deleted before cutoff that no other transaction still
+	// needs (one that is live or was deleted at or after cutoff). It never
+	// returns nil.
+	ExpiredReceiptKeys(ctx context.Context, cutoff time.Time, limit int) ([]string, error)
+	// ClearExpiredReceiptKey sets receipt_key to NULL on the transactions
+	// deleted before cutoff that use key, unless a transaction that still needs
+	// it does too, and returns how many rows changed.
+	ClearExpiredReceiptKey(ctx context.Context, key string, cutoff time.Time) (int64, error)
 }
 
 type repository struct {
@@ -188,6 +197,36 @@ func (r *repository) Restore(ctx context.Context, userID, id uuid.UUID) (*Transa
 	}
 
 	return &t, nil
+}
+
+// stillNeeded is true when another transaction using the receipt is live or
+// was deleted at or after the cutoff (bound to ?). It reads t.receipt_key.
+const stillNeeded = `EXISTS (
+	SELECT 1 FROM transactions o
+	WHERE o.receipt_key = t.receipt_key AND (o.deleted_at IS NULL OR o.deleted_at >= ?)
+)`
+
+func (r *repository) ExpiredReceiptKeys(ctx context.Context, cutoff time.Time, limit int) ([]string, error) {
+	keys := []string{}
+	err := database.Conn(ctx, r.db).
+		Raw(`SELECT DISTINCT t.receipt_key FROM transactions t
+			WHERE t.deleted_at < ? AND t.receipt_key IS NOT NULL
+			AND NOT `+stillNeeded+`
+			LIMIT ?`, cutoff, cutoff, limit).
+		Scan(&keys).Error
+
+	return keys, err
+}
+
+func (r *repository) ClearExpiredReceiptKey(ctx context.Context, key string, cutoff time.Time) (int64, error) {
+	// A concurrent restore locks the row first; Postgres then re-checks
+	// deleted_at and skips it, so a restored transaction keeps its receipt.
+	res := database.Conn(ctx, r.db).
+		Exec(`UPDATE transactions t SET receipt_key = NULL
+			WHERE t.receipt_key = ? AND t.deleted_at < ?
+			AND NOT `+stillNeeded, key, cutoff, cutoff)
+
+	return res.RowsAffected, res.Error
 }
 
 // refViolation maps the owner FKs (migration 000012) to the field errors the
