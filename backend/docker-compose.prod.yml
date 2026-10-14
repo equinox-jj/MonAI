@@ -1,0 +1,124 @@
+# Production stack for Dokploy (Compose Path: ./backend/docker-compose.prod.yml).
+# No host ports: Dokploy's Traefik routes the api (8080) and minio (9000)
+# domains, and Dokploy writes the Environment tab to .env next to this file.
+
+services:
+  monai-db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-monai}
+      POSTGRES_USER: ${POSTGRES_USER:-monai}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+      TZ: UTC
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    # Official MinIO images are no longer published; Chainguard builds it from source.
+    image: &minio-image cgr.dev/chainguard/minio@sha256:59667194421209c2c1eacbe761e24787e047985c5dfa96b15da9b59fe9b55cd0
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}
+      MC_CONFIG_DIR: /tmp/.mc
+    # Public files domain points here. The console (9001) stays internal.
+    expose:
+      - "9000"
+    volumes:
+      - minio-data:/data
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  # One-shot job: same as in docker-compose.dev.yml. Safe to rerun.
+  minio-init:
+    image: *minio-image
+    depends_on:
+      minio:
+        condition: service_healthy
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?set MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?set MINIO_ROOT_PASSWORD}
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?set MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?set MINIO_SECRET_KEY}
+      MINIO_BUCKET_PRIVATE: ${MINIO_BUCKET_PRIVATE:-expense-private}
+      MINIO_BUCKET_PUBLIC: ${MINIO_BUCKET_PUBLIC:-expense-public}
+      MC_CONFIG_DIR: /tmp/.mc
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        set -e
+        mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"
+        mc mb --ignore-existing "local/$$MINIO_BUCKET_PRIVATE"
+        mc mb --ignore-existing "local/$$MINIO_BUCKET_PUBLIC"
+        mc anonymous set download "local/$$MINIO_BUCKET_PUBLIC"
+        # Must match storage.PendingReceiptsPrefix.
+        echo '{"Rules":[{"ID":"expire-pending-receipts","Status":"Enabled","Filter":{"Prefix":"receipts-pending/"},"Expiration":{"Days":1}}]}' \
+          | mc ilm import "local/$$MINIO_BUCKET_PRIVATE"
+        cat > /tmp/monai-api-policy.json <<JSON
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": ["s3:GetBucketLocation", "s3:ListBucket"],
+              "Resource": ["arn:aws:s3:::$$MINIO_BUCKET_PRIVATE", "arn:aws:s3:::$$MINIO_BUCKET_PUBLIC"]
+            },
+            {
+              "Effect": "Allow",
+              "Action": ["s3:GetObject", "s3:PutObject", "s3:DeleteObject"],
+              "Resource": ["arn:aws:s3:::$$MINIO_BUCKET_PRIVATE/*", "arn:aws:s3:::$$MINIO_BUCKET_PUBLIC/*"]
+            }
+          ]
+        }
+        JSON
+        mc admin user add local "$$MINIO_ACCESS_KEY" "$$MINIO_SECRET_KEY"
+        mc admin policy create local monai-api /tmp/monai-api-policy.json
+        mc admin policy attach local monai-api --user "$$MINIO_ACCESS_KEY" || true
+    restart: "no"
+
+  # One-shot job: applies pending SQL migrations before the API starts.
+  migrate:
+    build: .
+    entrypoint: ["/migrate", "up"]
+    env_file: .env
+    environment: &api-env
+      APP_ENV: ${APP_ENV:-production}
+      DATABASE_URL: postgres://${POSTGRES_USER:-monai}:${POSTGRES_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
+      MINIO_ENDPOINT: minio:9000
+      MINIO_USE_SSL: "false"
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
+      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:?set MINIO_PUBLIC_URL to the public files domain}
+    depends_on:
+      monai-db:
+        condition: service_healthy
+    restart: "no"
+
+  api:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    environment: *api-env
+    expose:
+      - "${API_PORT:-8080}"
+    depends_on:
+      monai-db:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+      migrate:
+        condition: service_completed_successfully
+
+volumes:
+  postgres-data:
+  minio-data:

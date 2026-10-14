@@ -58,7 +58,7 @@ type minioStorage struct {
 }
 
 // New connects to MinIO and, on start, fails if a configured bucket is missing.
-// The buckets are created by minio-init in docker-compose.yml.
+// The buckets are created by minio-init in docker-compose.dev.yml and docker-compose.prod.yml.
 func New(lc fx.Lifecycle, cfg config.Config) (Storage, error) {
 	client, err := newClient(cfg, cfg.MinIO.Endpoint, cfg.MinIO.UseSSL)
 	if err != nil {

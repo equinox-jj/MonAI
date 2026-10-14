@@ -17,7 +17,7 @@ const (
 )
 
 // PendingReceiptsPrefix is where uploads wait until a transaction references
-// them. minio-init expires objects here after a day (docker-compose.yml).
+// them. minio-init expires objects here after a day (docker-compose.*.yml).
 const PendingReceiptsPrefix = pendingReceiptsDir
 
 func AvatarPrefix(userID uuid.UUID) string { return avatarsDir + userID.String() + "/" }
