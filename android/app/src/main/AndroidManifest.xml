@@ -20,8 +20,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MonAI">
+        <!-- Handles a language change in place (Compose re-reads LocalConfiguration) instead of
+             being recreated, which flashed the window background. -->
         <activity
             android:name=".MainActivity"
+            android:configChanges="locale|layoutDirection"
             android:exported="true"
             android:label="@string/app_name"
             android:theme="@style/Theme.MonAI.Starting"

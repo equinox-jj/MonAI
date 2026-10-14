@@ -9,7 +9,7 @@ import javax.inject.Inject
 interface AppLocaleManager {
     fun currentLanguage(): AppLanguage
 
-    /** Recreates the visible activities in the new language. */
+    /** Applies the new language to the visible activities (MainActivity handles it without recreating). */
     fun setLanguage(language: AppLanguage)
 }
 
