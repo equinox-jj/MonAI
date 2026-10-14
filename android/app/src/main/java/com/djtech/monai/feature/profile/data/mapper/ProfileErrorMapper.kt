@@ -26,6 +26,7 @@ private fun FieldError.toProfileError(): ProfileError? = when (field) {
             else -> NameIssue.INVALID
         },
     )
+
     "timezone" -> ProfileError.InvalidTimezone
     "file" -> if (code == "max_size") ProfileError.PhotoTooLarge else ProfileError.PhotoUnsupported
     "password" -> ProfileError.PasswordRequired

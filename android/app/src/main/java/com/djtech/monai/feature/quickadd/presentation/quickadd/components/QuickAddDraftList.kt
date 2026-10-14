@@ -76,6 +76,7 @@ private fun DraftCard(row: QuickAddDraftRow, today: LocalDate) {
         isTransfer -> listOfNotNull(row.walletName, row.toWalletName).joinToString(" → ")
         row.walletIsDefault && row.walletName != null ->
             stringResource(R.string.quick_add_default_wallet, row.walletName)
+
         else -> row.walletName
     }
     val meta = listOfNotNull(

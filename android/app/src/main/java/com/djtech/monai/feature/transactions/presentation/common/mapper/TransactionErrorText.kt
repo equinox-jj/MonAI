@@ -15,6 +15,7 @@ fun TransactionError.toMessage(): UiText = when (this) {
     is TransactionError.RateLimited -> retryAfter?.inWholeMinutes?.takeIf { it > 0 }?.let {
         UiText.Plural(R.plurals.transaction_error_rate_limited, it.toInt(), it.toInt())
     } ?: UiText.Resource(R.string.transaction_error_rate_limited_soon)
+
     is TransactionError.InvalidFields,
     TransactionError.Unexpected,
         -> UiText.Resource(R.string.transaction_error_unexpected)

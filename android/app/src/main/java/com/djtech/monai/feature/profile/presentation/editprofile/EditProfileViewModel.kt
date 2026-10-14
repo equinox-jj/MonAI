@@ -120,6 +120,7 @@ class EditProfileViewModel @Inject constructor(
             is EditProfileIntent.PasswordChanged -> ui.update {
                 it.copy(password = intent.password, passwordError = null)
             }
+
             EditProfileIntent.DeleteAccount -> confirmDelete()
             EditProfileIntent.ConfirmDeleteAccount -> delete()
             EditProfileIntent.DismissDeleteAccount -> ui.update { it.copy(isConfirmingDelete = false) }

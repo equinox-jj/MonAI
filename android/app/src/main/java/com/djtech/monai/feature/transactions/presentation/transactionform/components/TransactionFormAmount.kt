@@ -93,6 +93,7 @@ internal fun TransactionFormAmount(
                     color = colors.onWarningContainer,
                 )
             }
+
             originalAmount != null && originalAmount != amount -> Text(
                 stringResource(R.string.transaction_form_was, formatRupiah(originalAmount)),
                 style = MonAITheme.typography.bodySmall.tabular(),

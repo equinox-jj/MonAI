@@ -314,6 +314,7 @@ private fun FormSheets(state: TransactionFormState, onIntent: (TransactionFormIn
             onConfirm = { onIntent(TransactionFormIntent.ConfirmSheet) },
             onDismiss = { onIntent(TransactionFormIntent.DismissSheet) },
         )
+
         null -> Unit
     }
 }

@@ -75,7 +75,11 @@ class QuickAddGoldenTest {
             if (isTransfer) {
                 FieldCheck("category", walletName(actual.toWalletId) == expected.toWallet, confidence.wallet >= SURE)
             } else {
-                FieldCheck("category", categoryName(actual.categoryId) == expected.category, confidence.category >= SURE)
+                FieldCheck(
+                    "category",
+                    categoryName(actual.categoryId) == expected.category,
+                    confidence.category >= SURE,
+                )
             },
             FieldCheck("date", actual.date == LocalDate.parse(expected.date), confidence.date >= SURE),
         )
@@ -96,7 +100,8 @@ class QuickAddGoldenTest {
         }
         appendLine("  sure but wrong: ${checks.count { !it.correct && it.sure }} of ${checks.size} fields")
         results.filterNot { it.handledLocally }.forEach { result ->
-            val wrong = result.checks.filterNot { it.correct }.joinToString { it.field + if (it.sure) " (sure)" else "" }
+            val wrong =
+                result.checks.filterNot { it.correct }.joinToString { it.field + if (it.sure) " (sure)" else "" }
             val why = when {
                 !result.draftCountRight -> "wrong number of drafts"
                 wrong.isNotEmpty() -> "wrong: $wrong"

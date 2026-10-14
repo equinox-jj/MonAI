@@ -1,14 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Android 12+. Keeps the session token out of cloud backup and device transfer:
+<?xml version="1.0" encoding="utf-8"?><!-- Android 12+. Keeps the session token out of cloud backup and device transfer:
      its Keystore key stays on this device. The Room cache stays too; it holds
      financial data and is re-filled from the server. -->
 <data-extraction-rules>
     <cloud-backup>
-        <exclude domain="file" path="datastore/session.preferences_pb" />
-        <exclude domain="database" path="monai.db" />
+        <exclude
+            domain="file"
+            path="datastore/session.preferences_pb" />
+        <exclude
+            domain="database"
+            path="monai.db" />
     </cloud-backup>
     <device-transfer>
-        <exclude domain="file" path="datastore/session.preferences_pb" />
-        <exclude domain="database" path="monai.db" />
+        <exclude
+            domain="file"
+            path="datastore/session.preferences_pb" />
+        <exclude
+            domain="database"
+            path="monai.db" />
     </device-transfer>
 </data-extraction-rules>

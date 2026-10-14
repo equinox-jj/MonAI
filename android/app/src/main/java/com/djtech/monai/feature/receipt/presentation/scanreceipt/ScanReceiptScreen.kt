@@ -141,9 +141,18 @@ fun ScanReceiptScreen(
     ) {
         val phase = state.phase
         if (phase !is ScanPhase.Processing && state.permission == CameraPermission.GRANTED) camera()
-        Column(Modifier.fillMaxSize().statusBarsPadding()) {
+        Column(
+            Modifier
+                .fillMaxSize()
+                .statusBarsPadding(),
+        ) {
             Header(state, onIntent)
-            Box(Modifier.weight(1f).fillMaxWidth(), contentAlignment = Alignment.Center) {
+            Box(
+                Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.Center,
+            ) {
                 when {
                     phase is ScanPhase.Processing -> ScanReceiptProcessing(
                         phase.photoUri,

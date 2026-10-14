@@ -103,6 +103,7 @@ class ProviderFormViewModel @AssistedInject constructor(
             is ProviderFormIntent.LogoPicked -> intent.uri?.let { uri ->
                 form.update { it.copy(newLogoUri = uri) }
             }
+
             ProviderFormIntent.Delete -> form.update { it.copy(dialog = ProviderFormDialog.Delete) }
             ProviderFormIntent.ConfirmDialog -> when (form.value.dialog) {
                 ProviderFormDialog.Deactivate -> changeStatus(active = false)

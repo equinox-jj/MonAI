@@ -54,10 +54,11 @@ fun ApiError.toAdminProviderError(): AdminProviderError = when (this) {
                     if (field.code == "max_length") ProviderNameIssue.TOO_LONG else ProviderNameIssue.REQUIRED,
                 )
                 // `aliases` is the list itself; `aliases[2]` one alias.
-                field.field == "aliases" && field.code == "max_length" ->
-                    AdminProviderError.InvalidAliases(AliasIssue.TOO_MANY)
-                field.field.startsWith("aliases[") && field.code == "max_length" ->
-                    AdminProviderError.InvalidAliases(AliasIssue.TOO_LONG)
+                field.field == "aliases" && field.code == "max_length" -> AdminProviderError.InvalidAliases(AliasIssue.TOO_MANY)
+                field.field.startsWith("aliases[") && field.code == "max_length" -> AdminProviderError.InvalidAliases(
+                    AliasIssue.TOO_LONG,
+                )
+
                 field.field.startsWith("aliases") -> AdminProviderError.InvalidAliases(AliasIssue.INVALID)
                 field.field == "file" && field.code == "max_size" -> AdminProviderError.LogoTooLarge
                 field.field == "file" -> AdminProviderError.LogoUnsupported

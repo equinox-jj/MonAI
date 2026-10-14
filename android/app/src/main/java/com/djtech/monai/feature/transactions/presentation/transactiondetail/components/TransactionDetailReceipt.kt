@@ -87,6 +87,7 @@ internal fun TransactionDetailReceipt(
                             R.string.transaction_detail_receipt_uploading,
                             (upload * 100).roundToInt(),
                         )
+
                         receiptUrl != null -> stringResource(R.string.transaction_detail_receipt_meta)
                         else -> stringResource(R.string.transaction_detail_receipt_add_meta)
                     },

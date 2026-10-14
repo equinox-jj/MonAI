@@ -79,7 +79,7 @@ fun ApiError.toTransactionError(): TransactionError = when (this) {
             .mapNotNull { field -> API_FIELDS[field.field]?.let { TransactionFieldError(it, field.toFieldIssue()) } }
             .takeIf { it.isNotEmpty() }
             ?.let(TransactionError::InvalidFields)
-            ?: TransactionError.Unexpected
+        ?: TransactionError.Unexpected
 
         else -> TransactionError.Unexpected
     }

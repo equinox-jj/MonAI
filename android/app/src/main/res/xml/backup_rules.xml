@@ -1,8 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Android 11 and lower. The session token is encrypted with a Keystore key
+<?xml version="1.0" encoding="utf-8"?><!-- Android 11 and lower. The session token is encrypted with a Keystore key
      that is never backed up, so restoring it would only produce garbage. The
      Room cache holds financial data and is re-filled from the server. -->
 <full-backup-content>
-    <exclude domain="file" path="datastore/session.preferences_pb" />
-    <exclude domain="database" path="monai.db" />
+    <exclude
+        domain="file"
+        path="datastore/session.preferences_pb" />
+    <exclude
+        domain="database"
+        path="monai.db" />
 </full-backup-content>

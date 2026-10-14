@@ -14,6 +14,7 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionFieldIssue
 fun TransactionDraft.toHighlights(): Map<TransactionField, FieldHighlight> {
     fun mark(present: Boolean, confidence: Double) =
         if (!present || confidence.isLowConfidence()) FieldHighlight.Low else FieldHighlight.Ai
+
     val isTransfer = type == TransactionType.TRANSFER
     return buildMap {
         put(TransactionField.AMOUNT, mark(amount != null, confidence.amount))

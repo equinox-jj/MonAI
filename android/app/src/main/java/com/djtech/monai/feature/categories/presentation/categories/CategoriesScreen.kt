@@ -186,6 +186,7 @@ private fun CategoriesList(state: CategoriesState, onIntent: (CategoriesIntent) 
                     bottomStart = MonAITheme.radius.lg,
                     bottomEnd = MonAITheme.radius.lg,
                 )
+
                 else -> RoundedCornerShape(0)
             }
             Column(

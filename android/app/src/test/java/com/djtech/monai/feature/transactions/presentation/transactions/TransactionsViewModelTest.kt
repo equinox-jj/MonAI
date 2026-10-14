@@ -9,7 +9,6 @@ import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.core.model.NOW
 import com.djtech.monai.core.model.OCTOBER
-import com.djtech.monai.core.model.TransactionType
 import com.djtech.monai.core.model.category
 import com.djtech.monai.core.model.report
 import com.djtech.monai.core.model.transaction

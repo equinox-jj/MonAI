@@ -48,7 +48,8 @@ class ReceiptReviewScreenTest {
     fun showsTheReceiptsFieldsAndItems() {
         setContent(filled)
 
-        compose.onNodeWithText("We filled the marked fields from your receipt. Check them before saving.").assertIsDisplayed()
+        compose.onNodeWithText("We filled the marked fields from your receipt. Check them before saving.")
+            .assertIsDisplayed()
         compose.onNodeWithText("187.500").assertIsDisplayed()
         compose.onNodeWithText("Toko Sumber Rejeki").assertIsDisplayed()
         compose.onNodeWithText("Please check this value.").performScrollTo().assertIsDisplayed()
