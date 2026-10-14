@@ -34,7 +34,7 @@ object QuickAddParser {
         val phrase = text.lowercase().replace(Regex("""\s+"""), " ").trim()
         if (phrase.isEmpty()) return emptyList()
         val walletMatcher = WalletMatcher(context.wallets, context.providers)
-        val segments = PhraseSplitter.split(phrase) { readSegment(it, context, walletMatcher).amount != null }
+        val segments = PhraseSplitter.split(phrase) { readSegment(it, context, walletMatcher).amounts }
         val parts = segments.map { readSegment(it, context, walletMatcher) }
         // A date or a single wallet said once ("... kmrn", "... pakai gopay") applies to every part.
         val sharedDate = parts.firstNotNullOfOrNull { it.date }
@@ -50,21 +50,22 @@ object QuickAddParser {
 
     private class Segment(
         val text: String,
-        val amount: AmountMatch?,
+        val amounts: List<AmountMatch>,
         val date: DateMatch?,
         val wallets: List<WalletMatch>,
         val note: String?,
-    )
+    ) {
+        // "beli 2 kopi 50rb": the clearer amount wins; on a tie, the last one.
+        val amount = amounts.maxWithOrNull(compareBy<AmountMatch> { it.confidence }.thenBy { it.range.first })
+    }
 
     private fun readSegment(text: String, context: ParseContext, walletMatcher: WalletMatcher): Segment {
         val date = DateParser.find(text, context.today)
         val wallets = walletMatcher.findAll(text)
         val taken = listOfNotNull(date?.range) + wallets.map { it.range }
         val amounts = AmountParser.findAll(text).filter { amount -> taken.none { it.overlaps(amount.range) } }
-        // "beli 2 kopi 50rb": the clearer amount wins; on a tie, the last one.
-        val amount = amounts.maxWithOrNull(compareBy<AmountMatch> { it.confidence }.thenBy { it.range.first })
         val note = noteOf(text, taken + amounts.map { it.range })
-        return Segment(text, amount, date, wallets, note)
+        return Segment(text, amounts, date, wallets, note)
     }
 
     private fun Segment.toDraft(date: DateMatch?, wallets: List<WalletMatch>, context: ParseContext): TransactionDraft {

@@ -4,9 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -79,6 +84,12 @@ internal fun MainShell(modifier: Modifier = Modifier) {
     val onAddClick = remember(navigator) { { navigator.navigate(TransactionFormRoute()) } }
     val addLabel = stringResource(R.string.nav_add_transaction)
     val content = @Composable { modifier: Modifier -> MainNavDisplay(navigator, widthClass, modifier) }
+    // Without a bottom bar to sit on, the content keeps clear of the system navigation bar itself.
+    val railContentModifier = Modifier
+        .background(MonAITheme.colors.background)
+        .windowInsetsPadding(
+            WindowInsets.navigationBars.only(WindowInsetsSides.Bottom + WindowInsetsSides.End),
+        )
 
     when (widthClass) {
         MonAIWidthClass.Compact -> Column(modifier.fillMaxSize()) {
@@ -103,7 +114,11 @@ internal fun MainShell(modifier: Modifier = Modifier) {
                 onAddClick,
                 addLabel,
             )
-            content(Modifier.weight(1f))
+            content(
+                Modifier
+                    .weight(1f)
+                    .then(railContentModifier),
+            )
         }
 
         MonAIWidthClass.Expanded -> Row(modifier.fillMaxSize()) {
@@ -115,7 +130,11 @@ internal fun MainShell(modifier: Modifier = Modifier) {
                 onAddClick,
                 addLabel,
             )
-            content(Modifier.weight(1f))
+            content(
+                Modifier
+                    .weight(1f)
+                    .then(railContentModifier),
+            )
         }
     }
 }

@@ -66,6 +66,16 @@ class QuickAddParserTest {
     }
 
     @Test
+    fun `amounts without a separator make one draft each, not just the last`() {
+        val drafts = parse("makan siang 35rb pakai gopay 15rb 20rb 40 rb")
+
+        assertEquals(listOf(35_000L, 15_000L, 20_000L, 40_000L), drafts.map { it.amount })
+        assertEquals("Makan siang", drafts.first().note)
+        assertEquals("food", drafts.first().categoryId)
+        assertTrue(drafts.all { it.walletId == "w-gopay" })
+    }
+
+    @Test
     fun `without an amount the draft has none and falls back to Other`() {
         val draft = parse("bayar arisan ke tante via mandiri").single()
 

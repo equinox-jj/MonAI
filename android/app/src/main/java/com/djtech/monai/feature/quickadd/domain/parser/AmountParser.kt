@@ -5,7 +5,10 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 /** An amount found in lowercase quick-add text, with the characters it covers. */
-data class AmountMatch(val amount: Long, val range: IntRange, val confidence: Double)
+data class AmountMatch(val amount: Long, val range: IntRange, val confidence: Double) {
+    /** Written as money (`35rb`, `35.000`, `goceng`) rather than a bare or odd number. */
+    val isClear: Boolean get() = confidence >= AmountParser.PLAIN
+}
 
 /** Finds rupiah amounts such as `35rb`, `35.000`, `1,5jt` or `goceng`. */
 object AmountParser {
@@ -28,7 +31,7 @@ object AmountParser {
     )
 
     private const val EXPLICIT = 0.95
-    private const val PLAIN = 0.9
+    internal const val PLAIN = 0.9
     private const val BARE_SMALL = 0.4
     private const val ODD_DECIMAL = 0.3
 
