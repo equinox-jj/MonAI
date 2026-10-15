@@ -1,4 +1,4 @@
-name: monai
+name: monai-dev
 
 services:
   monai-db:
