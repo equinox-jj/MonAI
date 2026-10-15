@@ -20,11 +20,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -34,11 +31,11 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
+import com.djtech.monai.core.common.ui.rememberTakePicture
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAIAlertTone
 import com.djtech.monai.core.designsystem.component.MonAIIconButton
@@ -78,21 +75,17 @@ fun TransactionDetailRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    // Kept across process death: the camera app may outlive this one.
-    var cameraUri by rememberSaveable { mutableStateOf<String?>(null) }
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
-        viewModel.onIntent(TransactionDetailIntent.ReceiptPhotoPicked(cameraUri.takeIf { taken }))
-        cameraUri = null
-    }
+    val cameraDenied = stringResource(R.string.camera_permission_denied)
+    val takePicture = rememberTakePicture(
+        onDenied = { scope.launch { snackbarHostState.showSnackbar(MonAISnackbarVisuals(cameraDenied)) } },
+        onResult = { viewModel.onIntent(TransactionDetailIntent.ReceiptPhotoPicked(it)) },
+    )
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         viewModel.onIntent(TransactionDetailIntent.ReceiptPhotoPicked(uri?.toString()))
     }
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
-            is TransactionDetailEffect.LaunchCamera -> {
-                cameraUri = effect.uri
-                camera.launch(effect.uri.toUri())
-            }
+            is TransactionDetailEffect.LaunchCamera -> takePicture(effect.uri)
 
             TransactionDetailEffect.LaunchGallery ->
                 gallery.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))

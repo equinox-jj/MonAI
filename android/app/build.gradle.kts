@@ -29,6 +29,8 @@ android {
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
         }
         release {
+            // Debug key so the release build installs locally; use a real keystore for Play Store uploads.
+            signingConfig = signingConfigs.getByName("debug")
             val apiBaseUrl = providers.gradleProperty("monai.apiBaseUrl")
                 .getOrElse("https://api.monai.example/api/v1/")
             buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")

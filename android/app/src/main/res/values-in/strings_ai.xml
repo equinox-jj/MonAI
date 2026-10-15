@@ -74,6 +74,7 @@
     <string name="scan_permission_body">Izinkan kamera untuk memindai struk, atau pilih foto dari galeri.</string>
     <string name="scan_permission_allow">Izinkan kamera</string>
     <string name="scan_capture_failed">Foto gagal diambil. Coba lagi.</string>
+    <string name="camera_permission_denied">Izinkan kamera untuk mengambil foto, atau pilih dari galeri.</string>
     <string name="scan_reading">Membaca struk…</string>
     <string name="scan_reading_hint">Biasanya hanya beberapa detik</string>
     <string name="scan_step_text">Teks ditemukan di ponselmu</string>

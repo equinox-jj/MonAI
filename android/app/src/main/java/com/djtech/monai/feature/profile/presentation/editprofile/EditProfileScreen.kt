@@ -34,11 +34,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
+import com.djtech.monai.core.common.ui.rememberTakePicture
 import com.djtech.monai.core.designsystem.component.MonAIButton
 import com.djtech.monai.core.designsystem.component.MonAIButtonSize
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
@@ -75,12 +75,11 @@ fun EditProfileRoute(
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
     val savedMessage = stringResource(R.string.profile_saved)
-    // Kept across process death: the camera app may outlive this one.
-    var cameraUri by rememberSaveable { mutableStateOf<String?>(null) }
-    val camera = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { taken ->
-        viewModel.onIntent(EditProfileIntent.PhotoPicked(cameraUri.takeIf { taken }))
-        cameraUri = null
-    }
+    val cameraDenied = stringResource(R.string.camera_permission_denied)
+    val takePicture = rememberTakePicture(
+        onDenied = { scope.launch { snackbarHostState.showSnackbar(MonAISnackbarVisuals(cameraDenied)) } },
+        onResult = { viewModel.onIntent(EditProfileIntent.PhotoPicked(it)) },
+    )
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         viewModel.onIntent(EditProfileIntent.PhotoPicked(uri?.toString()))
     }
@@ -95,10 +94,7 @@ fun EditProfileRoute(
                 onClose()
             }
 
-            is EditProfileEffect.LaunchCamera -> {
-                cameraUri = effect.uri
-                camera.launch(effect.uri.toUri())
-            }
+            is EditProfileEffect.LaunchCamera -> takePicture(effect.uri)
 
             EditProfileEffect.LaunchGallery -> gallery.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),

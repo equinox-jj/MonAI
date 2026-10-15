@@ -77,6 +77,7 @@
     <string name="scan_permission_body">Allow the camera to scan a receipt, or pick a photo from your gallery.</string>
     <string name="scan_permission_allow">Allow camera</string>
     <string name="scan_capture_failed">The photo couldn\'t be taken. Try again.</string>
+    <string name="camera_permission_denied">Allow the camera to take a photo, or pick one from your gallery.</string>
     <string name="scan_reading">Reading receipt…</string>
     <string name="scan_reading_hint">Usually takes a few seconds</string>
     <string name="scan_step_text">Found text on your phone</string>

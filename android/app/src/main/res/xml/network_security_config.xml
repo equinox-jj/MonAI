@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
+    <!-- The Dokploy deployment has no TLS yet: the API and MinIO hosts are plain HTTP. Remove once on HTTPS. -->
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="false">monai-monaidockercompose-lv5z4f-f26645-100-86-64-35.sslip.io</domain>
+        <domain includeSubdomains="false">monai-monaidockercompose-lv5z4f-5b3c5c-100-86-64-35.sslip.io</domain>
+    </domain-config>
 </network-security-config>
