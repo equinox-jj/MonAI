@@ -35,8 +35,8 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
-import com.djtech.monai.core.common.ui.rememberTakePicture
 import com.djtech.monai.core.common.ui.UiText
+import com.djtech.monai.core.common.ui.rememberTakePicture
 import com.djtech.monai.core.designsystem.component.MonAIAlertTone
 import com.djtech.monai.core.designsystem.component.MonAIIconButton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
