@@ -1,5 +1,8 @@
 package com.djtech.monai.navigation
 
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -153,6 +156,8 @@ private fun MainNavDisplay(
     } else {
         emptyMap()
     }
+    // Back from a tab's root returns to Home: cross-fade like a tab switch instead of shrinking the screen away.
+    val tabRootMetadata = NavDisplay.predictivePopTransitionSpec { ContentTransform(fadeIn(), fadeOut()) }
     val openTransaction = { id: String -> navigator.navigate(TransactionDetailRoute(id)) }
     val editTransaction = { id: String -> navigator.navigate(TransactionFormRoute(id)) }
     Box(modifier) {
@@ -161,7 +166,7 @@ private fun MainNavDisplay(
             navigator,
             entryProvider {
                 entry<HomeRoute> { HomeRoute(onNavigate = navigator::openFromHome) }
-                entry<TransactionsRoute> {
+                entry<TransactionsRoute>(metadata = tabRootMetadata) {
                     TransactionsRoute(
                         onNavigate = navigator::openFromTransactions,
                         detailPane = { id, paneModifier ->
@@ -253,7 +258,7 @@ private fun MainNavDisplay(
                         onOpenTransaction = openTransaction,
                     )
                 }
-                entry<WalletsRoute> {
+                entry<WalletsRoute>(metadata = tabRootMetadata) {
                     WalletsRoute(
                         onNavigate = navigator::openFromWallets,
                         detailPane = { id, paneModifier ->
@@ -316,7 +321,7 @@ private fun MainNavDisplay(
                     // Keys are only built with toApiString, so the month always parses.
                     BudgetRoute(month = YearMonth.parse(key.month), onClose = navigator::goBack)
                 }
-                entry<SettingsRoute> {
+                entry<SettingsRoute>(metadata = tabRootMetadata) {
                     SettingsRoute(
                         onNavigate = navigator::openFromSettings,
                         detailPane = { pane, month, paneModifier ->

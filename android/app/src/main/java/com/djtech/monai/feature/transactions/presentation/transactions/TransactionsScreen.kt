@@ -18,8 +18,10 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -131,10 +133,17 @@ fun TransactionsScreen(
         onIntent(TransactionsIntent.Refresh)
     }
     val isWide = widthClass == MonAIWidthClass.Expanded
+    // The indicator is only for a pull; first loads and reloads after a save refresh quietly.
+    var isPulled by remember { mutableStateOf(false) }
+    val refresh = items.loadState.refresh
+    LaunchedEffect(refresh) {
+        if (refresh !is LoadState.Loading) isPulled = false
+    }
     val list = @Composable { listModifier: Modifier ->
         PullToRefreshBox(
-            isRefreshing = items.loadState.refresh is LoadState.Loading && items.itemCount > 0,
+            isRefreshing = isPulled && items.itemCount > 0,
             onRefresh = {
+                isPulled = true
                 items.refresh()
                 onIntent(TransactionsIntent.Refresh)
             },

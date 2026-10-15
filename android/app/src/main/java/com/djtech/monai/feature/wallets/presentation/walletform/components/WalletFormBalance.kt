@@ -9,9 +9,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import com.djtech.monai.R
 import com.djtech.monai.core.common.format.MoneySign
+import com.djtech.monai.core.common.format.RupiahVisualTransformation
 import com.djtech.monai.core.common.format.formatRupiah
 import com.djtech.monai.core.common.format.formatRupiahSigned
-import com.djtech.monai.core.common.format.formatThousands
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAIAlertTone
 import com.djtech.monai.core.designsystem.component.MonAIFieldTone
@@ -35,8 +35,8 @@ internal fun WalletFormBalance(
 ) {
     Column(modifier, verticalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x2)) {
         MonAITextField(
-            // Shown grouped ("Rp 1.250.000"); the ViewModel keeps only the digits of what is typed.
-            value = if (amount == 0L) "" else "Rp " + formatThousands(amount),
+            // Holds plain digits, shown grouped ("Rp 1.250.000") so the caret stays where the user types.
+            value = if (amount == 0L) "" else amount.toString(),
             onValueChange = onChange,
             label = stringResource(
                 if (isEdit) R.string.wallet_form_starting_balance else R.string.wallet_form_current_balance,
@@ -45,6 +45,7 @@ internal fun WalletFormBalance(
             supportingText = error?.asString()
                 ?: stringResource(R.string.wallet_form_current_balance_help).takeUnless { isEdit },
             tone = if (error != null) MonAIFieldTone.Error else MonAIFieldTone.Neutral,
+            visualTransformation = RupiahVisualTransformation,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         )
         if (shift != null) {

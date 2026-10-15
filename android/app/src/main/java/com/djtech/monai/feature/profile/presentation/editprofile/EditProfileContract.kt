@@ -97,13 +97,13 @@ sealed interface EditProfileEffect {
     /** Left without saving: close the screen. */
     data object Close : EditProfileEffect
 
-    /** Saved: a full screen closes, a pane says so. */
-    data object Saved : EditProfileEffect
-
     /** Open the camera, writing the photo to [uri]. */
     data class LaunchCamera(val uri: String) : EditProfileEffect
 
     data object LaunchGallery : EditProfileEffect
 
-    data class ShowMessage(val message: UiText) : EditProfileEffect
+    /** A save or photo change went through. */
+    data class ShowSuccess(val message: UiText) : EditProfileEffect
+
+    data class ShowError(val message: UiText) : EditProfileEffect
 }

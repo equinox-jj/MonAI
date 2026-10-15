@@ -45,6 +45,7 @@ import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
 import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.profile.presentation.editprofile.components.EditProfileAvatar
 import com.djtech.monai.feature.profile.presentation.editprofile.components.EditProfileCrop
@@ -58,9 +59,9 @@ import com.djtech.monai.feature.profile.presentation.editprofile.preview.EditPro
 import kotlinx.coroutines.launch
 
 /**
- * @param onClose left, or saved on a full screen.
+ * @param onClose left without saving.
  * @param focusDelete scrolls to the delete-account card once, for Settings' "Delete account".
- * @param isPane shown beside the Settings menu: no back button or status-bar inset, and saving stays here.
+ * @param isPane shown beside the Settings menu: no back button or status-bar inset.
  */
 @Composable
 fun EditProfileRoute(
@@ -74,7 +75,10 @@ fun EditProfileRoute(
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    val savedMessage = stringResource(R.string.profile_saved)
+    val successIcon = MonAIIcons.CheckCircle
+    val successTint = MonAITheme.colors.success
+    val errorIcon = MonAIIcons.Error
+    val errorTint = MonAITheme.colors.error
     val cameraDenied = stringResource(R.string.camera_permission_denied)
     val takePicture = rememberTakePicture(
         onDenied = { scope.launch { snackbarHostState.showSnackbar(MonAISnackbarVisuals(cameraDenied)) } },
@@ -86,22 +90,22 @@ fun EditProfileRoute(
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             EditProfileEffect.Close -> onClose()
-            EditProfileEffect.Saved -> if (isPane) {
-                scope.launch {
-                    snackbarHostState.showSnackbar(MonAISnackbarVisuals(savedMessage))
-                }
-            } else {
-                onClose()
-            }
-
             is EditProfileEffect.LaunchCamera -> takePicture(effect.uri)
 
             EditProfileEffect.LaunchGallery -> gallery.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
             )
 
-            is EditProfileEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
+            is EditProfileEffect.ShowSuccess -> scope.launch {
+                snackbarHostState.showSnackbar(
+                    MonAISnackbarVisuals(effect.message.asString(context), icon = successIcon, iconTint = successTint),
+                )
+            }
+
+            is EditProfileEffect.ShowError -> scope.launch {
+                snackbarHostState.showSnackbar(
+                    MonAISnackbarVisuals(effect.message.asString(context), icon = errorIcon, iconTint = errorTint),
+                )
             }
         }
     }

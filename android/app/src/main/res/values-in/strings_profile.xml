@@ -5,6 +5,8 @@
     <string name="profile_save">Simpan</string>
     <string name="profile_back">Kembali</string>
     <string name="profile_saved">Profil disimpan.</string>
+    <string name="profile_photo_updated">Foto profil diperbarui.</string>
+    <string name="profile_photo_removed">Foto profil dihapus.</string>
     <string name="profile_change_photo">Ganti foto</string>
     <string name="profile_change_photo_description">Ganti foto profil</string>
     <string name="profile_remove_photo">Hapus</string>

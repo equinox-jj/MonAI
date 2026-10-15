@@ -97,8 +97,25 @@ class EditProfileViewModelTest {
         send(vm, EditProfileIntent.Save)
 
         assertEquals(listOf(ProfileChanges(name = "Joshua P", timezone = "Asia/Makassar")), profiles.updates)
-        assertEquals(listOf<EditProfileEffect>(EditProfileEffect.Saved), effects)
+        assertEquals(
+            listOf<EditProfileEffect>(EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_saved))),
+            effects,
+        )
         assertFalse(vm.state.value.hasChanges)
+    }
+
+    @Test
+    fun `a failed save says why and keeps the typed values`() = runEditTest { vm, effects ->
+        profiles.updateError = ProfileError.Network
+
+        send(vm, EditProfileIntent.NameChanged("Joshua P"), EditProfileIntent.Save)
+
+        assertEquals(
+            listOf<EditProfileEffect>(EditProfileEffect.ShowError(UiText.Resource(R.string.profile_error_network))),
+            effects,
+        )
+        assertEquals("Joshua P", vm.state.value.name)
+        assertTrue(vm.state.value.canSave)
     }
 
     @Test
@@ -139,7 +156,7 @@ class EditProfileViewModelTest {
     }
 
     @Test
-    fun `a picked photo is framed, then uploaded with progress`() = runEditTest { vm, _ ->
+    fun `a picked photo is framed, then uploaded with progress`() = runEditTest { vm, effects ->
         send(vm, EditProfileIntent.PhotoPicked("content://photo"))
         assertEquals("content://photo", vm.state.value.crop?.uri)
         assertEquals(images.preview, vm.state.value.crop?.preview)
@@ -154,6 +171,10 @@ class EditProfileViewModelTest {
         assertNull(vm.state.value.uploadProgress)
         assertEquals(CropSpec(zoom = 2f, offsetX = 0.1f), images.crops.single().spec)
         assertEquals("https://cdn.example.com/avatars/new.webp", vm.state.value.avatarUrl)
+        assertEquals(
+            listOf<EditProfileEffect>(EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_photo_updated))),
+            effects,
+        )
     }
 
     @Test
@@ -180,7 +201,7 @@ class EditProfileViewModelTest {
 
         assertNull(vm.state.value.crop)
         assertEquals(
-            EditProfileEffect.ShowMessage(UiText.Resource(R.string.profile_crop_unreadable)),
+            EditProfileEffect.ShowError(UiText.Resource(R.string.profile_crop_unreadable)),
             effects.single(),
         )
     }
@@ -200,18 +221,35 @@ class EditProfileViewModelTest {
         send(vm, EditProfileIntent.ConfirmCrop)
 
         assertEquals(
-            EditProfileEffect.ShowMessage(UiText.Resource(R.string.profile_error_photo_too_large)),
+            EditProfileEffect.ShowError(UiText.Resource(R.string.profile_error_photo_too_large)),
             effects.single(),
         )
         assertEquals("https://cdn.example.com/a.webp", vm.state.value.avatarUrl)
     }
 
     @Test
-    fun `removing the photo goes back to initials`() = runEditTest { vm, _ ->
+    fun `removing the photo goes back to initials`() = runEditTest { vm, effects ->
         send(vm, EditProfileIntent.RemovePhoto)
 
         assertEquals(1, profiles.removeAvatarCount)
         assertFalse(vm.state.value.hasPhoto)
+        assertEquals(
+            listOf<EditProfileEffect>(EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_photo_removed))),
+            effects,
+        )
+    }
+
+    @Test
+    fun `a failed removal says why and keeps the photo`() = runEditTest { vm, effects ->
+        profiles.removeAvatarError = ProfileError.Network
+
+        send(vm, EditProfileIntent.RemovePhoto)
+
+        assertTrue(vm.state.value.hasPhoto)
+        assertEquals(
+            listOf<EditProfileEffect>(EditProfileEffect.ShowError(UiText.Resource(R.string.profile_error_network))),
+            effects,
+        )
     }
 
     @Test
@@ -255,7 +293,7 @@ class EditProfileViewModelTest {
         )
 
         assertEquals(
-            EditProfileEffect.ShowMessage(UiText.Resource(R.string.profile_error_last_admin)),
+            EditProfileEffect.ShowError(UiText.Resource(R.string.profile_error_last_admin)),
             effects.single(),
         )
     }

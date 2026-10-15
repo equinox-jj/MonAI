@@ -175,12 +175,12 @@ class EditProfileViewModel @Inject constructor(
                 is Outcome.Success -> {
                     // Back to following the cache, which now holds what was saved.
                     ui.update { it.copy(name = null, timezone = null) }
-                    send(EditProfileEffect.Saved)
+                    send(EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_saved)))
                 }
 
                 is Outcome.Failure -> when (val error = result.error) {
                     is ProfileError.InvalidName -> ui.update { it.copy(nameError = error.message()) }
-                    else -> send(EditProfileEffect.ShowMessage(error.message()))
+                    else -> send(EditProfileEffect.ShowError(error.message()))
                 }
             }
         }
@@ -193,7 +193,7 @@ class EditProfileViewModel @Inject constructor(
             val preview = imageProcessor.loadPreview(uri, PREVIEW_SIDE)
             if (preview == null) {
                 ui.update { it.copy(crop = null) }
-                send(EditProfileEffect.ShowMessage(UiText.Resource(R.string.profile_crop_unreadable)))
+                send(EditProfileEffect.ShowError(UiText.Resource(R.string.profile_crop_unreadable)))
             } else {
                 updateCrop { if (it.uri == uri) it.copy(preview = preview) else it }
             }
@@ -214,8 +214,14 @@ class EditProfileViewModel @Inject constructor(
                     is AvatarUpload.Progress -> ui.update { it.copy(uploadProgress = step.fraction) }
                     is AvatarUpload.Done -> {
                         ui.update { it.copy(uploadProgress = null) }
-                        val result = step.result
-                        if (result is Outcome.Failure) send(EditProfileEffect.ShowMessage(result.error.message()))
+                        send(
+                            when (val result = step.result) {
+                                is Outcome.Success ->
+                                    EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_photo_updated))
+
+                                is Outcome.Failure -> EditProfileEffect.ShowError(result.error.message())
+                            },
+                        )
                     }
                 }
             }
@@ -228,7 +234,14 @@ class EditProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val result = removeAvatar()
             ui.update { it.copy(isRemovingPhoto = false) }
-            if (result is Outcome.Failure) send(EditProfileEffect.ShowMessage(result.error.message()))
+            send(
+                when (result) {
+                    is Outcome.Success ->
+                        EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_photo_removed))
+
+                    is Outcome.Failure -> EditProfileEffect.ShowError(result.error.message())
+                },
+            )
         }
     }
 
@@ -253,7 +266,7 @@ class EditProfileViewModel @Inject constructor(
                     ProfileError.WrongPassword, ProfileError.PasswordRequired ->
                         ui.update { it.copy(passwordError = error.message()) }
 
-                    else -> send(EditProfileEffect.ShowMessage(error.message()))
+                    else -> send(EditProfileEffect.ShowError(error.message()))
                 }
             }
         }
