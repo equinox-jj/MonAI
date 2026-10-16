@@ -3,6 +3,7 @@ package com.djtech.monai.feature.quickadd.presentation.quickadd
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.feature.quickadd.domain.model.DraftEngine
 import com.djtech.monai.feature.quickadd.domain.model.needsAi
@@ -15,7 +16,6 @@ import com.djtech.monai.feature.quickadd.presentation.quickadd.mapper.toEngineNo
 import com.djtech.monai.feature.quickadd.presentation.quickadd.mapper.toRows
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -61,8 +60,8 @@ class QuickAddViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, QuickAddState())
 
-    private val effectChannel = Channel<QuickAddEffect>(Channel.BUFFERED)
-    val effects: Flow<QuickAddEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<QuickAddEffect>()
+    val effects: Flow<QuickAddEffect> = effectQueue.flow
 
     private var askJob: Job? = null
 
@@ -75,7 +74,7 @@ class QuickAddViewModel @Inject constructor(
             is QuickAddIntent.TextChanged -> setText(intent.text)
             is QuickAddIntent.PickExample -> setText(intent.text)
             QuickAddIntent.Submit -> submit()
-            QuickAddIntent.Close -> send(QuickAddEffect.Close)
+            QuickAddIntent.Close -> effectQueue.send(QuickAddEffect.Close)
         }
     }
 
@@ -130,13 +129,9 @@ class QuickAddViewModel @Inject constructor(
     private fun open(text: String, drafts: List<TransactionDraft>) {
         when {
             drafts.isEmpty() -> Unit
-            drafts.size == 1 -> send(QuickAddEffect.OpenForm(drafts.single()))
-            else -> send(QuickAddEffect.OpenReview(text.trim(), drafts))
+            drafts.size == 1 -> effectQueue.send(QuickAddEffect.OpenForm(drafts.single()))
+            else -> effectQueue.send(QuickAddEffect.OpenReview(text.trim(), drafts))
         }
-    }
-
-    private fun send(effect: QuickAddEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 
     private companion object {

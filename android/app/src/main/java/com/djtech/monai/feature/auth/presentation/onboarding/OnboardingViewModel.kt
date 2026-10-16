@@ -3,15 +3,14 @@ package com.djtech.monai.feature.auth.presentation.onboarding
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.datastore.OnboardingStore
 import com.djtech.monai.feature.auth.presentation.onboarding.model.OnboardingPage
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -26,8 +25,8 @@ class OnboardingViewModel @Inject constructor(
     private val mutableState = MutableStateFlow(OnboardingState(savedState[KEY_PAGE] ?: 0))
     val state: StateFlow<OnboardingState> = mutableState.asStateFlow()
 
-    private val effectChannel = Channel<OnboardingEffect>(Channel.BUFFERED)
-    val effects: Flow<OnboardingEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<OnboardingEffect>()
+    val effects: Flow<OnboardingEffect> = effectQueue.flow
 
     fun onIntent(intent: OnboardingIntent) {
         when (intent) {
@@ -57,7 +56,7 @@ class OnboardingViewModel @Inject constructor(
         finishing = true
         viewModelScope.launch {
             onboardingStore.markCompleted()
-            effectChannel.send(effect)
+            effectQueue.send(effect)
         }
     }
 

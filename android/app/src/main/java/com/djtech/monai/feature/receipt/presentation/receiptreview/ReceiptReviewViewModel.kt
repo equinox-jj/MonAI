@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.model.ReceiptDraft
@@ -31,7 +32,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -41,7 +41,6 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -103,8 +102,8 @@ class ReceiptReviewViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, ReceiptReviewState(today = clock.today(), photoUri = photoUri))
 
-    private val effectChannel = Channel<ReceiptReviewEffect>(Channel.BUFFERED)
-    val effects: Flow<ReceiptReviewEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<ReceiptReviewEffect>()
+    val effects: Flow<ReceiptReviewEffect> = effectQueue.flow
 
     init {
         suggestCategoriesFromMerchant()
@@ -148,8 +147,8 @@ class ReceiptReviewViewModel @AssistedInject constructor(
             }
 
             ReceiptReviewIntent.Save -> save()
-            ReceiptReviewIntent.Retake -> send(ReceiptReviewEffect.Retake)
-            ReceiptReviewIntent.Back -> send(ReceiptReviewEffect.Back)
+            ReceiptReviewIntent.Retake -> effectQueue.send(ReceiptReviewEffect.Retake)
+            ReceiptReviewIntent.Back -> effectQueue.send(ReceiptReviewEffect.Back)
         }
     }
 
@@ -217,13 +216,13 @@ class ReceiptReviewViewModel @AssistedInject constructor(
                     is ReceiptUpload.Done -> {
                         editor.update { it.copy(isSaving = false, uploadProgress = null) }
                         when (val result = step.result) {
-                            is Outcome.Success -> send(ReceiptReviewEffect.Saved(result.data.id))
+                            is Outcome.Success -> effectQueue.send(ReceiptReviewEffect.Saved(result.data.id))
                             is Outcome.Failure -> when (val error = result.error) {
                                 is TransactionError.InvalidFields -> editor.update {
                                     it.copy(errors = error.errors.toFieldMessages())
                                 }
 
-                                else -> send(ReceiptReviewEffect.ShowMessage(error.toMessage()))
+                                else -> effectQueue.send(ReceiptReviewEffect.ShowMessage(error.toMessage()))
                             }
                         }
                     }
@@ -255,10 +254,6 @@ class ReceiptReviewViewModel @AssistedInject constructor(
                     }
                 }
         }
-    }
-
-    private fun send(effect: ReceiptReviewEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 
     private companion object {

@@ -5,13 +5,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -19,10 +17,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -36,11 +32,12 @@ import com.djtech.monai.core.designsystem.component.MonAIAlertTone
 import com.djtech.monai.core.designsystem.component.MonAIButton
 import com.djtech.monai.core.designsystem.component.MonAIButtonSize
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
 import com.djtech.monai.core.designsystem.component.label
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.wallets.domain.model.WalletField
@@ -54,12 +51,10 @@ import com.djtech.monai.feature.wallets.presentation.walletform.components.Walle
 import com.djtech.monai.feature.wallets.presentation.walletform.components.WalletFormProviderGrid
 import com.djtech.monai.feature.wallets.presentation.walletform.components.WalletFormType
 import com.djtech.monai.feature.wallets.presentation.walletform.preview.WalletFormPreviewData
-import kotlinx.coroutines.launch
 
 /**
  * @param walletId the wallet to edit; null adds a new one.
  * @param onDeleted the edited wallet was deleted from here; close its screens.
- * @param isSideSheet shown as a side sheet over the list on a wide screen, below no status bar.
  */
 @Composable
 fun WalletFormRoute(
@@ -67,23 +62,19 @@ fun WalletFormRoute(
     onClose: () -> Unit,
     onDeleted: (String) -> Unit,
     modifier: Modifier = Modifier,
-    isSideSheet: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: WalletFormViewModel =
         hiltViewModel<WalletFormViewModel, WalletFormViewModel.Factory>(key = walletId ?: "new") {
             it.create(walletId)
         },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             WalletFormEffect.Close -> onClose()
             is WalletFormEffect.Deleted -> onDeleted(effect.id)
-            is WalletFormEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is WalletFormEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     BackHandler { viewModel.onIntent(WalletFormIntent.Close) }
@@ -91,8 +82,8 @@ fun WalletFormRoute(
         state,
         viewModel::onIntent,
         modifier,
-        isSideSheet = isSideSheet,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -101,7 +92,7 @@ fun WalletFormScreen(
     state: WalletFormState,
     onIntent: (WalletFormIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isSideSheet: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val isReady = !state.isLoading && state.loadError == null
@@ -124,7 +115,7 @@ fun WalletFormScreen(
                 onNavigationClick = { onIntent(WalletFormIntent.Close) },
                 navigationContentDescription = stringResource(R.string.wallet_form_close),
                 titleStyle = MonAITheme.typography.headlineSmall,
-                windowInsets = if (isSideSheet) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
             ) {
                 if (state.isEdit && isReady) {
                     MonAIButton(

@@ -2,10 +2,10 @@ package com.djtech.monai.feature.wallets.presentation.walletform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.format.parseAmount
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.theme.WalletColor
 import com.djtech.monai.core.model.PaymentProvider
@@ -18,13 +18,13 @@ import com.djtech.monai.feature.wallets.domain.model.WalletResult
 import com.djtech.monai.feature.wallets.domain.usecase.ArchiveWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.CreateWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.DeleteWalletUseCase
+import com.djtech.monai.feature.wallets.domain.usecase.GetWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.ObservePaymentProvidersUseCase
-import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletsUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.RefreshPaymentProvidersUseCase
-import com.djtech.monai.feature.wallets.domain.usecase.RefreshWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.UpdateWalletUseCase
 import com.djtech.monai.feature.wallets.domain.validation.MAX_WALLET_NAME_LENGTH
+import com.djtech.monai.feature.wallets.presentation.common.loadMessage
 import com.djtech.monai.feature.wallets.presentation.common.message
 import com.djtech.monai.feature.wallets.presentation.walletform.mapper.toFieldMessages
 import com.djtech.monai.feature.wallets.presentation.walletform.model.WalletFormDialog
@@ -33,13 +33,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,8 +50,7 @@ class WalletFormViewModel @AssistedInject constructor(
     @Assisted private val walletId: String?,
     observeProviders: ObservePaymentProvidersUseCase,
     private val refreshProviders: RefreshPaymentProvidersUseCase,
-    private val observeWallet: ObserveWalletUseCase,
-    private val refreshWallet: RefreshWalletUseCase,
+    private val getWallet: GetWalletUseCase,
     observeWallets: ObserveWalletsUseCase,
     private val createWallet: CreateWalletUseCase,
     private val updateWallet: UpdateWalletUseCase,
@@ -96,8 +92,8 @@ class WalletFormViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, WalletFormState(mode = mode, isLoading = walletId != null))
 
-    private val effectChannel = Channel<WalletFormEffect>(Channel.BUFFERED)
-    val effects: Flow<WalletFormEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<WalletFormEffect>()
+    val effects: Flow<WalletFormEffect> = effectQueue.flow
 
     init {
         if (walletId == null) {
@@ -134,7 +130,7 @@ class WalletFormViewModel @AssistedInject constructor(
             WalletFormIntent.Close -> close()
             WalletFormIntent.ConfirmDiscard -> {
                 editor.update { it.copy(dialog = null) }
-                send(WalletFormEffect.Close)
+                effectQueue.send(WalletFormEffect.Close)
             }
 
             WalletFormIntent.KeepEditing, WalletFormIntent.DismissDialog -> editor.update { it.copy(dialog = null) }
@@ -148,20 +144,15 @@ class WalletFormViewModel @AssistedInject constructor(
     private fun load(id: String) {
         editor.update { it.copy(isLoading = true, loadError = null) }
         viewModelScope.launch {
-            val wallet = observeWallet(id).first() ?: run {
-                val result = refreshWallet(id)
-                if (result is Outcome.Failure) {
-                    editor.update { it.copy(isLoading = false, loadError = result.error.loadMessage()) }
-                    return@launch
+            when (val result = getWallet(id)) {
+                is Outcome.Success -> {
+                    val draft = result.data.toDraft()
+                    editor.update { Editor(draft = draft, pristine = draft, original = result.data) }
                 }
-                observeWallet(id).first()
+
+                is Outcome.Failure ->
+                    editor.update { it.copy(isLoading = false, loadError = result.error.loadMessage()) }
             }
-            if (wallet == null) {
-                editor.update { it.copy(isLoading = false, loadError = WalletError.NotFound.loadMessage()) }
-                return@launch
-            }
-            val draft = wallet.toDraft()
-            editor.update { Editor(draft = draft, pristine = draft, original = wallet) }
         }
     }
 
@@ -193,10 +184,10 @@ class WalletFormViewModel @AssistedInject constructor(
             }
             editor.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(WalletFormEffect.Close)
+                is Outcome.Success -> effectQueue.send(WalletFormEffect.Close)
                 is Outcome.Failure -> when (val error = result.error) {
                     is WalletError.InvalidFields -> editor.update { it.copy(errors = error.errors.toFieldMessages()) }
-                    else -> send(WalletFormEffect.ShowMessage(error.message()))
+                    else -> effectQueue.send(WalletFormEffect.ShowMessage(error.message()))
                 }
             }
         }
@@ -207,7 +198,7 @@ class WalletFormViewModel @AssistedInject constructor(
         if (editor.draft != editor.pristine && !editor.isLoading) {
             this.editor.update { it.copy(dialog = WalletFormDialog.Discard) }
         } else {
-            send(WalletFormEffect.Close)
+            effectQueue.send(WalletFormEffect.Close)
         }
     }
 
@@ -219,8 +210,8 @@ class WalletFormViewModel @AssistedInject constructor(
             val result = archiveWallet(id)
             editor.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(WalletFormEffect.Close)
-                is Outcome.Failure -> send(WalletFormEffect.ShowMessage(result.error.message()))
+                is Outcome.Success -> effectQueue.send(WalletFormEffect.Close)
+                is Outcome.Failure -> effectQueue.send(WalletFormEffect.ShowMessage(result.error.message()))
             }
         }
     }
@@ -233,12 +224,12 @@ class WalletFormViewModel @AssistedInject constructor(
             val result = deleteWallet(id)
             editor.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(WalletFormEffect.Deleted(id))
+                is Outcome.Success -> effectQueue.send(WalletFormEffect.Deleted(id))
                 // Wallets with history can only be archived; offer that instead.
                 is Outcome.Failure -> if (result.error == WalletError.HasTransactions) {
                     editor.update { it.copy(dialog = WalletFormDialog.ArchiveInstead) }
                 } else {
-                    send(WalletFormEffect.ShowMessage(result.error.message()))
+                    effectQueue.send(WalletFormEffect.ShowMessage(result.error.message()))
                 }
             }
         }
@@ -249,10 +240,6 @@ class WalletFormViewModel @AssistedInject constructor(
         editor.update { editor ->
             editor.copy(draft = change(editor.draft), errors = field?.let { editor.errors - it } ?: editor.errors)
         }
-    }
-
-    private fun send(effect: WalletFormEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 
@@ -310,9 +297,3 @@ private fun Wallet.toDraft() = Draft(
     color = WalletColor.fromHex(color),
     isDefault = isDefault,
 )
-
-private fun WalletError.loadMessage(): UiText = when (this) {
-    WalletError.NotFound -> UiText.Resource(R.string.wallets_error_not_found)
-    WalletError.Network -> UiText.Resource(R.string.wallets_load_failed_network)
-    else -> UiText.Resource(R.string.wallets_load_failed_unexpected)
-}

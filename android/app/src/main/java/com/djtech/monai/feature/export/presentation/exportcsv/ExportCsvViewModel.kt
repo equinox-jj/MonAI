@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.feature.export.domain.model.ExportRange
 import com.djtech.monai.feature.export.domain.usecase.ExportTransactionsCsvUseCase
 import com.djtech.monai.feature.export.presentation.exportcsv.mapper.message
@@ -11,12 +12,10 @@ import com.djtech.monai.feature.export.presentation.exportcsv.mapper.withFrom
 import com.djtech.monai.feature.export.presentation.exportcsv.mapper.withTo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -34,8 +33,8 @@ class ExportCsvViewModel @Inject constructor(
     )
     val state: StateFlow<ExportCsvState> = mutableState.asStateFlow()
 
-    private val effectChannel = Channel<ExportCsvEffect>(Channel.BUFFERED)
-    val effects: Flow<ExportCsvEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<ExportCsvEffect>()
+    val effects: Flow<ExportCsvEffect> = effectQueue.flow
 
     private var exportJob: Job? = null
 
@@ -74,7 +73,7 @@ class ExportCsvViewModel @Inject constructor(
             when (val result = exportTransactionsCsv(current.range, current.delimiter)) {
                 is Outcome.Success -> {
                     mutableState.update { it.copy(isExporting = false) }
-                    effectChannel.send(ExportCsvEffect.Share(result.data.uri, result.data.isComplete))
+                    effectQueue.send(ExportCsvEffect.Share(result.data.uri, result.data.isComplete))
                 }
 
                 is Outcome.Failure -> mutableState.update {

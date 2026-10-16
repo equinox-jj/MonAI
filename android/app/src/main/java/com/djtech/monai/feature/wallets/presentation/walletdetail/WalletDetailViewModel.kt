@@ -9,6 +9,8 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
+import com.djtech.monai.core.common.ui.RefreshStatus
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.core.model.Wallet
@@ -25,6 +27,7 @@ import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.RefreshWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.SetDefaultWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.UnarchiveWalletUseCase
+import com.djtech.monai.feature.wallets.presentation.common.loadMessage
 import com.djtech.monai.feature.wallets.presentation.common.message
 import com.djtech.monai.feature.wallets.presentation.walletdetail.mapper.toOutflowDays
 import com.djtech.monai.feature.wallets.presentation.walletdetail.model.WalletDetailDialog
@@ -33,12 +36,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -91,8 +92,8 @@ class WalletDetailViewModel @AssistedInject constructor(
             month = month,
             today = today,
             wallet = wallet,
-            isLoading = wallet == null && (ui.isFetching || !ui.hasFetched),
-            loadError = if (wallet == null && !ui.isFetching) ui.fetchError?.loadMessage() else null,
+            isLoading = ui.fetch.isLoading(hasCache = wallet != null),
+            loadError = ui.fetch.loadFailure(hasCache = wallet != null)?.loadMessage(),
             outflows = outflows.toOutflowDays(month, today),
             outflowTotal = outflows.values.sum(),
             lookups = lookups,
@@ -101,8 +102,8 @@ class WalletDetailViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, WalletDetailState(month = month, today = today))
 
-    private val effectChannel = Channel<WalletDetailEffect>(Channel.BUFFERED)
-    val effects: Flow<WalletDetailEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<WalletDetailEffect>()
+    val effects: Flow<WalletDetailEffect> = effectQueue.flow
 
     init {
         fetch()
@@ -110,7 +111,7 @@ class WalletDetailViewModel @AssistedInject constructor(
 
     fun onIntent(intent: WalletDetailIntent) {
         when (intent) {
-            WalletDetailIntent.Back -> send(WalletDetailEffect.NavigateBack)
+            WalletDetailIntent.Back -> effectQueue.send(WalletDetailEffect.NavigateBack)
             WalletDetailIntent.Edit -> navigate(WalletDetailDestination.Edit(walletId))
             WalletDetailIntent.Transfer -> navigate(WalletDetailDestination.Transfer(walletId))
             is WalletDetailIntent.OpenTransaction -> navigate(WalletDetailDestination.Transaction(intent.id))
@@ -129,11 +130,11 @@ class WalletDetailViewModel @AssistedInject constructor(
     }
 
     private fun fetch() {
-        ui.update { it.copy(isFetching = true, fetchError = null) }
+        ui.update { it.copy(fetch = it.fetch.started()) }
         viewModelScope.launch {
             val error = (refreshWallet(walletId) as? Outcome.Failure)?.error
             // With the wallet cached a failed refetch keeps it on screen; only an empty screen shows the error.
-            ui.update { it.copy(isFetching = false, hasFetched = true, fetchError = error) }
+            ui.update { it.copy(fetch = it.fetch.finished(error)) }
         }
     }
 
@@ -144,7 +145,7 @@ class WalletDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             val result = action()
             ui.update { it.copy(isWorking = false) }
-            send(
+            effectQueue.send(
                 WalletDetailEffect.ShowMessage(
                     when (result) {
                         is Outcome.Success -> UiText.Resource(success, result.data.name)
@@ -162,35 +163,24 @@ class WalletDetailViewModel @AssistedInject constructor(
             val result = deleteWallet(walletId)
             ui.update { it.copy(isWorking = false) }
             when (result) {
-                is Outcome.Success -> send(WalletDetailEffect.Deleted(walletId))
+                is Outcome.Success -> effectQueue.send(WalletDetailEffect.Deleted(walletId))
                 // Wallets with history can only be archived; offer that instead.
                 is Outcome.Failure -> if (result.error == WalletError.HasTransactions) {
                     ui.update { it.copy(dialog = WalletDetailDialog.ArchiveInstead) }
                 } else {
-                    send(WalletDetailEffect.ShowMessage(result.error.message()))
+                    effectQueue.send(WalletDetailEffect.ShowMessage(result.error.message()))
                 }
             }
         }
     }
 
-    private fun navigate(destination: WalletDetailDestination) = send(WalletDetailEffect.Navigate(destination))
-
-    private fun send(effect: WalletDetailEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
-    }
+    private fun navigate(destination: WalletDetailDestination) =
+        effectQueue.send(WalletDetailEffect.Navigate(destination))
 }
 
 /** Screen-local state; the wallet itself comes from the cache. */
 private data class Ui(
-    val isFetching: Boolean = false,
-    val hasFetched: Boolean = false,
-    val fetchError: WalletError? = null,
+    val fetch: RefreshStatus<WalletError> = RefreshStatus(),
     val isWorking: Boolean = false,
     val dialog: WalletDetailDialog? = null,
 )
-
-private fun WalletError.loadMessage(): UiText = when (this) {
-    WalletError.NotFound -> UiText.Resource(R.string.wallets_error_not_found)
-    WalletError.Network -> UiText.Resource(R.string.wallets_load_failed_network)
-    else -> UiText.Resource(R.string.wallets_load_failed_unexpected)
-}

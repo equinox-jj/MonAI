@@ -7,12 +7,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -21,10 +19,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -40,10 +36,10 @@ import com.djtech.monai.core.common.ui.rememberTakePicture
 import com.djtech.monai.core.designsystem.component.MonAIAlertTone
 import com.djtech.monai.core.designsystem.component.MonAIIconButton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
-import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailActions
@@ -53,31 +49,23 @@ import com.djtech.monai.feature.transactions.presentation.transactiondetail.comp
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailReceipt
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailReceiptViewer
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.preview.TransactionDetailPreviewData
-import kotlinx.coroutines.launch
 
-/**
- * @param isPane shown beside the list on a wide screen: no back button, and the status bar
- *   inset is the list's concern.
- */
 @Composable
 fun TransactionDetailRoute(
     transactionId: String,
     onBack: () -> Unit,
     onEdit: (String) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: TransactionDetailViewModel =
         hiltViewModel<TransactionDetailViewModel, TransactionDetailViewModel.Factory>(key = transactionId) {
             it.create(transactionId)
         },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val cameraDenied = stringResource(R.string.camera_permission_denied)
+    val messenger = rememberMonAIMessenger()
     val takePicture = rememberTakePicture(
-        onDenied = { scope.launch { snackbarHostState.showSnackbar(MonAISnackbarVisuals(cameraDenied)) } },
+        onDenied = { messenger.show(UiText.Resource(R.string.camera_permission_denied)) },
         onResult = { viewModel.onIntent(TransactionDetailIntent.ReceiptPhotoPicked(it)) },
     )
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -92,17 +80,15 @@ fun TransactionDetailRoute(
 
             TransactionDetailEffect.NavigateBack -> onBack()
             is TransactionDetailEffect.OpenEdit -> onEdit(effect.id)
-            is TransactionDetailEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is TransactionDetailEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     TransactionDetailScreen(
         state,
         viewModel::onIntent,
         modifier,
-        isPane = isPane,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -111,7 +97,7 @@ fun TransactionDetailScreen(
     state: TransactionDetailState,
     onIntent: (TransactionDetailIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val transaction = state.transaction
@@ -123,10 +109,9 @@ fun TransactionDetailScreen(
         Column(Modifier.fillMaxSize()) {
             MonAITopBar(
                 title = stringResource(R.string.transaction_detail_title),
-                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
                 onNavigationClick = { onIntent(TransactionDetailIntent.Back) },
                 navigationContentDescription = stringResource(R.string.transaction_detail_back),
-                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
             ) {
                 if (transaction != null) {
                     MonAIIconButton(
@@ -145,7 +130,7 @@ fun TransactionDetailScreen(
             }
             when {
                 transaction != null -> DetailContent(state, onIntent, Modifier.weight(1f))
-                state.loadError != null -> DetailError(state.loadError, isPane, onIntent, Modifier.weight(1f))
+                state.loadError != null -> DetailError(state.loadError, placement, onIntent, Modifier.weight(1f))
                 else -> {
                     val description = stringResource(R.string.transaction_detail_loading)
                     Box(
@@ -218,7 +203,7 @@ private fun DetailContent(
 @Composable
 private fun DetailError(
     message: UiText,
-    isPane: Boolean,
+    placement: ScreenPlacement,
     onIntent: (TransactionDetailIntent) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -236,7 +221,8 @@ private fun DetailError(
             actionLabel = stringResource(R.string.transaction_try_again),
             actionIcon = MonAIIcons.Refresh,
             onAction = { onIntent(TransactionDetailIntent.Retry) },
-            secondaryActionLabel = if (isPane) null else stringResource(R.string.transaction_detail_back),
+            secondaryActionLabel = stringResource(R.string.transaction_detail_back)
+                .takeIf { placement != ScreenPlacement.Pane },
             onSecondaryAction = { onIntent(TransactionDetailIntent.Back) },
         )
     }

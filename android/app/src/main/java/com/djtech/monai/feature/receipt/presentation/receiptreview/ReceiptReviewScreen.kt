@@ -18,12 +18,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -39,7 +37,6 @@ import com.djtech.monai.core.designsystem.component.MonAICategoryPickerSheet
 import com.djtech.monai.core.designsystem.component.MonAIDatePickerSheet
 import com.djtech.monai.core.designsystem.component.MonAISegmentedControl
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAITextField
 import com.djtech.monai.core.designsystem.component.MonAITextLink
 import com.djtech.monai.core.designsystem.component.MonAITopBar
@@ -48,6 +45,7 @@ import com.djtech.monai.core.designsystem.component.MonAIWidthClass
 import com.djtech.monai.core.designsystem.component.MoneyDirection
 import com.djtech.monai.core.designsystem.component.currentLocale
 import com.djtech.monai.core.designsystem.component.currentWidthClass
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.component.transactionTypeSegments
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
@@ -60,7 +58,6 @@ import com.djtech.monai.feature.receipt.presentation.receiptreview.components.Re
 import com.djtech.monai.feature.receipt.presentation.receiptreview.model.ReceiptSheet
 import com.djtech.monai.feature.receipt.presentation.receiptreview.preview.ReceiptReviewPreviewData
 import com.djtech.monai.feature.transactions.domain.model.TransactionField
-import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
@@ -84,20 +81,16 @@ fun ReceiptReviewRoute(
     },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             is ReceiptReviewEffect.Saved -> onSaved(effect.id)
             ReceiptReviewEffect.Retake -> onRetake()
             ReceiptReviewEffect.Back -> onBack()
-            is ReceiptReviewEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is ReceiptReviewEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
-    ReceiptReviewScreen(state, viewModel::onIntent, modifier, snackbarHostState)
+    ReceiptReviewScreen(state, viewModel::onIntent, modifier, messenger.hostState)
 }
 
 @Composable

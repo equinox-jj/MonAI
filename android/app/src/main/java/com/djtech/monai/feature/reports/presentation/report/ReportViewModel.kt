@@ -6,6 +6,7 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.feature.budgets.domain.usecase.ObserveBudgetUseCase
 import com.djtech.monai.feature.budgets.domain.usecase.RefreshBudgetUseCase
@@ -21,14 +22,12 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.YearMonth
@@ -75,8 +74,8 @@ class ReportViewModel @AssistedInject constructor(
         }
     }.stateIn(viewModelScope, WhileUiSubscribed, ReportState(month = month.value))
 
-    private val effectChannel = Channel<ReportEffect>(Channel.BUFFERED)
-    val effects: Flow<ReportEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<ReportEffect>()
+    val effects: Flow<ReportEffect> = effectQueue.flow
 
     init {
         fetch(month.value)
@@ -86,9 +85,9 @@ class ReportViewModel @AssistedInject constructor(
         when (intent) {
             ReportIntent.PreviousMonth -> show(month.value.minusMonths(1))
             ReportIntent.NextMonth -> if (month.value < currentMonth) show(month.value.plusMonths(1))
-            ReportIntent.OpenBudget -> send(ReportEffect.OpenBudget(month.value))
+            ReportIntent.OpenBudget -> effectQueue.send(ReportEffect.OpenBudget(month.value))
             ReportIntent.Retry -> fetch(month.value)
-            ReportIntent.Back -> send(ReportEffect.NavigateBack)
+            ReportIntent.Back -> effectQueue.send(ReportEffect.NavigateBack)
         }
     }
 
@@ -108,13 +107,9 @@ class ReportViewModel @AssistedInject constructor(
             fetch.value = Fetch(month, isFetching = false, error = error)
             // With the report cached it stays on screen; say it may be out of date.
             if (error != null && observeMonthlyReport(month).first() != null) {
-                send(ReportEffect.ShowMessage(error.refreshMessage()))
+                effectQueue.send(ReportEffect.ShowMessage(error.refreshMessage()))
             }
         }
-    }
-
-    private fun send(effect: ReportEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 

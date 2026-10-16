@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
+import com.djtech.monai.core.common.ui.RefreshStatus
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
@@ -19,13 +21,11 @@ import com.djtech.monai.feature.categories.presentation.categories.mapper.toRow
 import com.djtech.monai.feature.categories.presentation.categories.model.CategoryDeletion
 import com.djtech.monai.feature.categories.presentation.categories.model.CategoryKind
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -60,8 +60,8 @@ class CategoriesViewModel @Inject constructor(
 
         CategoriesState(
             type = ui.type,
-            isLoading = all.isEmpty() && ui.isLoading,
-            loadError = ui.loadError.takeIf { all.isEmpty() },
+            isLoading = ui.load.isLoading(hasCache = all.isNotEmpty()),
+            loadError = ui.load.loadFailure(hasCache = all.isNotEmpty())?.message(),
             rows = rows,
             deletion = ui.deletion,
         )
@@ -71,8 +71,8 @@ class CategoriesViewModel @Inject constructor(
         CategoriesState(),
     )
 
-    private val effectChannel = Channel<CategoriesEffect>(Channel.BUFFERED)
-    val effects: Flow<CategoriesEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<CategoriesEffect>()
+    val effects: Flow<CategoriesEffect> = effectQueue.flow
 
     init {
         refresh()
@@ -82,10 +82,12 @@ class CategoriesViewModel @Inject constructor(
         when (intent) {
             is CategoriesIntent.SelectType -> ui.update { it.copy(type = intent.type) }
             CategoriesIntent.Retry -> refresh()
-            CategoriesIntent.Back -> send(CategoriesEffect.Close)
-            CategoriesIntent.Add -> send(CategoriesEffect.Navigate(CategoriesDestination.New(ui.value.type)))
+            CategoriesIntent.Back -> effectQueue.send(CategoriesEffect.Close)
+            CategoriesIntent.Add ->
+                effectQueue.send(CategoriesEffect.Navigate(CategoriesDestination.New(ui.value.type)))
+
             is CategoriesIntent.Edit -> find(intent.id)?.takeIf { !it.isSystem }?.let {
-                send(CategoriesEffect.Navigate(CategoriesDestination.Edit(it.type, it.id)))
+                effectQueue.send(CategoriesEffect.Navigate(CategoriesDestination.Edit(it.type, it.id)))
             }
 
             is CategoriesIntent.SetHidden -> setHidden(intent.id, intent.hidden)
@@ -107,15 +109,10 @@ class CategoriesViewModel @Inject constructor(
     private fun find(id: String): Category? = categories.value.firstOrNull { it.id == id }
 
     private fun refresh() {
-        ui.update { it.copy(isLoading = true, loadError = null) }
+        ui.update { it.copy(load = it.load.started()) }
         viewModelScope.launch {
-            val result = refreshCategories()
-            ui.update {
-                it.copy(
-                    isLoading = false,
-                    loadError = (result as? Outcome.Failure)?.error?.message(),
-                )
-            }
+            val error = (refreshCategories() as? Outcome.Failure)?.error
+            ui.update { it.copy(load = it.load.finished(error)) }
         }
     }
 
@@ -125,7 +122,7 @@ class CategoriesViewModel @Inject constructor(
         viewModelScope.launch {
             val result = setCategoryHidden(id, hidden)
             ui.update { it.copy(busyIds = it.busyIds - id) }
-            if (result is Outcome.Failure) send(CategoriesEffect.ShowMessage(result.error.message()))
+            if (result is Outcome.Failure) effectQueue.send(CategoriesEffect.ShowMessage(result.error.message()))
         }
     }
 
@@ -134,23 +131,22 @@ class CategoriesViewModel @Inject constructor(
         if (deletion.isDeleting || (deletion.needsTarget && deletion.targetId == null)) return
         ui.update { it.copy(deletion = deletion.copy(isDeleting = true)) }
         viewModelScope.launch {
-            val result = deleteCategory(deletion.category.id, deletion.targetId)
-            when {
-                result is Outcome.Success -> {
+            when (val result = deleteCategory(deletion.category.id, deletion.targetId)) {
+                is Outcome.Success -> {
                     ui.update { it.copy(deletion = null) }
-                    send(
+                    effectQueue.send(
                         CategoriesEffect.ShowMessage(
                             UiText.Resource(R.string.categories_deleted, deletion.category.name),
                         ),
                     )
                 }
 
-                result is Outcome.Failure && result.error == CategoryError.HasTransactions ->
+                is Outcome.Failure if result.error == CategoryError.HasTransactions ->
                     ui.update { it.copy(deletion = deletion.withTargets()) }
 
-                result is Outcome.Failure -> {
+                is Outcome.Failure -> {
                     ui.update { it.copy(deletion = null) }
-                    send(CategoriesEffect.ShowMessage(result.error.message()))
+                    effectQueue.send(CategoriesEffect.ShowMessage(result.error.message()))
                 }
             }
         }
@@ -170,17 +166,12 @@ class CategoriesViewModel @Inject constructor(
             isDeleting = false,
         )
     }
-
-    private fun send(effect: CategoriesEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
-    }
 }
 
 /** Screen-local state; the categories come from the cache. */
 private data class Ui(
     val type: CategoryType = CategoryType.EXPENSE,
-    val isLoading: Boolean = true,
-    val loadError: UiText? = null,
+    val load: RefreshStatus<CategoryError> = RefreshStatus(),
     val busyIds: Set<String> = emptySet(),
     val deletion: CategoryDeletion? = null,
 )

@@ -16,10 +16,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -29,7 +27,7 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.home.presentation.home.components.HomeBalanceCard
@@ -44,7 +42,6 @@ import com.djtech.monai.feature.home.presentation.home.components.HomeWallets
 import com.djtech.monai.feature.home.presentation.home.model.Greeting
 import com.djtech.monai.feature.home.presentation.home.model.SpendingSlice
 import com.djtech.monai.feature.home.presentation.home.preview.HomePreviewData
-import kotlinx.coroutines.launch
 
 internal object HomeTestTags {
     const val LIST = "home_list"
@@ -58,28 +55,20 @@ fun HomeRoute(
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     val offlineIcon = MonAIIcons.CloudOff
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             is HomeEffect.Navigate -> onNavigate(effect.destination)
-            is HomeEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(
-                    MonAISnackbarVisuals(
-                        effect.message.asString(context),
-                        icon = if (effect.isOffline) offlineIcon else null,
-                    ),
-                )
-            }
+            is HomeEffect.ShowMessage ->
+                messenger.show(effect.message, icon = if (effect.isOffline) offlineIcon else null)
         }
     }
     HomeScreen(
         state,
         viewModel::onIntent,
         modifier,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
     )
 }
 

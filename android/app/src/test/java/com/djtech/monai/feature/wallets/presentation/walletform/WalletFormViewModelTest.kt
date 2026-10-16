@@ -19,11 +19,10 @@ import com.djtech.monai.feature.wallets.domain.repository.FakeWalletRepository
 import com.djtech.monai.feature.wallets.domain.usecase.ArchiveWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.CreateWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.DeleteWalletUseCase
+import com.djtech.monai.feature.wallets.domain.usecase.GetWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.ObservePaymentProvidersUseCase
-import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletsUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.RefreshPaymentProvidersUseCase
-import com.djtech.monai.feature.wallets.domain.usecase.RefreshWalletUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.UpdateWalletUseCase
 import com.djtech.monai.feature.wallets.presentation.walletform.model.BalanceShift
 import com.djtech.monai.feature.wallets.presentation.walletform.model.WalletFormDialog
@@ -72,8 +71,7 @@ class WalletFormViewModelTest {
         walletId = id,
         observeProviders = ObservePaymentProvidersUseCase(providers),
         refreshProviders = RefreshPaymentProvidersUseCase(providers),
-        observeWallet = ObserveWalletUseCase(wallets),
-        refreshWallet = RefreshWalletUseCase(wallets),
+        getWallet = GetWalletUseCase(wallets),
         observeWallets = ObserveWalletsUseCase(wallets),
         createWallet = CreateWalletUseCase(wallets, providers),
         updateWallet = UpdateWalletUseCase(wallets),

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,11 +22,9 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -41,48 +38,42 @@ import com.djtech.monai.core.designsystem.component.MonAIDivider
 import com.djtech.monai.core.designsystem.component.MonAISearchField
 import com.djtech.monai.core.designsystem.component.MonAISkeleton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITag
 import com.djtech.monai.core.designsystem.component.MonAITopBar
-import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.settings.presentation.manageproviders.components.ManageProvidersRow
 import com.djtech.monai.feature.settings.presentation.manageproviders.preview.ManageProvidersPreviewData
-import kotlinx.coroutines.launch
 
 /**
  * @param onOpenForm opens the provider form; a null id adds one.
- * @param isPane shown beside the Settings menu: no back button, no status-bar inset.
  */
 @Composable
 fun ManageProvidersRoute(
     onOpenForm: (id: String?) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: ManageProvidersViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             ManageProvidersEffect.Close -> onBack()
             is ManageProvidersEffect.OpenForm -> onOpenForm(effect.id)
-            is ManageProvidersEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is ManageProvidersEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     ManageProvidersScreen(
         state,
         viewModel::onIntent,
         modifier,
-        isPane = isPane,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -93,7 +84,7 @@ fun ManageProvidersScreen(
     state: ManageProvidersState,
     onIntent: (ManageProvidersIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
@@ -105,10 +96,9 @@ fun ManageProvidersScreen(
         Column(Modifier.fillMaxSize()) {
             MonAITopBar(
                 title = stringResource(R.string.providers_title),
-                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
                 onNavigationClick = { onIntent(ManageProvidersIntent.Back) },
                 navigationContentDescription = stringResource(R.string.providers_back),
-                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
                 actions = { MonAITag(stringResource(R.string.providers_admin).uppercase()) },
             )
             MonAISearchField(

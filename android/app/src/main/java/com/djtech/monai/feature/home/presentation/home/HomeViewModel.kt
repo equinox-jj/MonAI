@@ -8,6 +8,8 @@ import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.format.initialsOf
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
+import com.djtech.monai.core.common.ui.RefreshStatus
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Budget
 import com.djtech.monai.core.model.Category
@@ -45,7 +47,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +56,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -109,8 +109,8 @@ class HomeViewModel @Inject constructor(
     )
         .stateIn(viewModelScope, WhileUiSubscribed, HomeState(month = moment.value.month))
 
-    private val effectChannel = Channel<HomeEffect>(Channel.BUFFERED)
-    val effects: Flow<HomeEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<HomeEffect>()
+    val effects: Flow<HomeEffect> = effectQueue.flow
 
     init {
         refresh(userInitiated = false)
@@ -120,7 +120,7 @@ class HomeViewModel @Inject constructor(
         when (intent) {
             HomeIntent.Refresh -> refresh(userInitiated = true)
             HomeIntent.ToggleBalanceVisibility -> savedState[KEY_BALANCE_HIDDEN] = !isBalanceHidden.value
-            is HomeIntent.Open -> send(HomeEffect.Navigate(intent.destination))
+            is HomeIntent.Open -> effectQueue.send(HomeEffect.Navigate(intent.destination))
         }
     }
 
@@ -143,11 +143,11 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun refresh(userInitiated: Boolean) {
-        if (load.value.isRunning) return
+        if (load.value.refresh.isRunning) return
         val current = readMoment()
         val month = current.month
         moment.value = current
-        load.update { it.copy(isRunning = true, isUserInitiated = userInitiated, failure = null) }
+        load.update { it.copy(refresh = it.refresh.started(userInitiated)) }
 
         viewModelScope.launch {
             val (budget, recent, others) = coroutineScope {
@@ -164,17 +164,16 @@ class HomeViewModel @Inject constructor(
             val failure = failureOf(listOf(budget, recent) + others)
             load.update {
                 it.copy(
-                    isRunning = false,
-                    isUserInitiated = false,
-                    hasFinishedOnce = true,
-                    failure = failure,
+                    refresh = it.refresh.finished(failure),
                     budgetLoadedFor = if (budget is Outcome.Success) month else it.budgetLoadedFor,
                     transactionsLoadedFor = if (recent is Outcome.Success) month else it.transactionsLoadedFor,
                 )
             }
             // With nothing cached the state shows the error itself, so there's no message too.
             if (failure != null && hasCachedContent()) {
-                send(HomeEffect.ShowMessage(failure.refreshMessage(), isOffline = failure == LoadFailure.NETWORK))
+                effectQueue.send(
+                    HomeEffect.ShowMessage(failure.refreshMessage(), isOffline = failure == LoadFailure.NETWORK),
+                )
             }
         }
     }
@@ -202,9 +201,9 @@ class HomeViewModel @Inject constructor(
         val nothingThisMonth = load.transactionsLoadedFor == content.month && recent.isEmpty()
         return HomeState(
             month = content.month,
-            isLoading = !hasCache && (load.isRunning || !load.hasFinishedOnce),
-            loadError = if (!hasCache && !load.isRunning) load.failure?.loadMessage() else null,
-            isRefreshing = hasCache && load.isRunning && load.isUserInitiated,
+            isLoading = load.refresh.isLoading(hasCache),
+            loadError = load.refresh.loadFailure(hasCache)?.loadMessage(),
+            isRefreshing = load.refresh.isRefreshing(hasCache),
             greeting = if (nothingThisMonth) Greeting.WELCOME else greetingFor(moment.time),
             userName = content.user?.name.orEmpty(),
             initials = initialsOf(content.user?.name.orEmpty()),
@@ -224,10 +223,6 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun readMoment() = Moment(clock.today(), clock.localTime())
-
-    private fun send(effect: HomeEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
-    }
 
     private companion object {
         const val KEY_BALANCE_HIDDEN = "balance_hidden"
@@ -251,15 +246,11 @@ private data class HomeContent(
 )
 
 /**
- * @param failure how the last finished refresh failed; null when it succeeded or one is running.
  * @param budgetLoadedFor the month whose budget was last fetched, so a missing one means "not set".
  * @param transactionsLoadedFor the month whose transactions were last fetched, so an empty list means "none yet".
  */
 private data class LoadStatus(
-    val isRunning: Boolean = false,
-    val isUserInitiated: Boolean = false,
-    val hasFinishedOnce: Boolean = false,
-    val failure: LoadFailure? = null,
+    val refresh: RefreshStatus<LoadFailure> = RefreshStatus(),
     val budgetLoadedFor: YearMonth? = null,
     val transactionsLoadedFor: YearMonth? = null,
 )

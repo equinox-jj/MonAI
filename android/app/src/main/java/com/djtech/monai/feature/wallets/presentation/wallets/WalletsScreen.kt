@@ -22,10 +22,8 @@ import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -36,9 +34,9 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIWidthClass
 import com.djtech.monai.core.designsystem.component.currentWidthClass
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.wallets.presentation.wallets.components.WalletsArchivedLink
@@ -49,7 +47,6 @@ import com.djtech.monai.feature.wallets.presentation.wallets.components.WalletsL
 import com.djtech.monai.feature.wallets.presentation.wallets.components.WalletsSkeleton
 import com.djtech.monai.feature.wallets.presentation.wallets.components.WalletsTotalCard
 import com.djtech.monai.feature.wallets.presentation.wallets.preview.WalletsPreviewData
-import kotlinx.coroutines.launch
 
 internal object WalletsTestTags {
     const val LIST = "wallets_list"
@@ -68,21 +65,13 @@ fun WalletsRoute(
     viewModel: WalletsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     val offlineIcon = MonAIIcons.CloudOff
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             is WalletsEffect.Navigate -> onNavigate(effect.destination)
-            is WalletsEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(
-                    MonAISnackbarVisuals(
-                        effect.message.asString(context),
-                        icon = if (effect.isOffline) offlineIcon else null,
-                    ),
-                )
-            }
+            is WalletsEffect.ShowMessage ->
+                messenger.show(effect.message, icon = if (effect.isOffline) offlineIcon else null)
         }
     }
     WalletsScreen(
@@ -90,7 +79,7 @@ fun WalletsRoute(
         viewModel::onIntent,
         modifier,
         widthClass = currentWidthClass(),
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
         detailPane = detailPane,
     )
 }

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.SnackbarHostState
@@ -18,12 +17,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,9 +38,9 @@ import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAICard
 import com.djtech.monai.core.designsystem.component.MonAISectionHeader
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAITopBar
-import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.feature.wallets.presentation.walletdetail.components.WalletDetailActions
@@ -57,7 +54,6 @@ import com.djtech.monai.feature.wallets.presentation.walletdetail.components.Wal
 import com.djtech.monai.feature.wallets.presentation.walletdetail.mapper.toWalletRow
 import com.djtech.monai.feature.wallets.presentation.walletdetail.preview.WalletDetailPreviewData
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 internal object WalletDetailTestTags {
     const val LIST = "wallet_detail_list"
@@ -65,7 +61,6 @@ internal object WalletDetailTestTags {
 
 /**
  * @param onDeleted the wallet was deleted from here; close its screens.
- * @param isPane shown beside the wallet list on a wide screen: no back button, no status-bar inset.
  */
 @Composable
 fun WalletDetailRoute(
@@ -74,23 +69,19 @@ fun WalletDetailRoute(
     onBack: () -> Unit,
     onDeleted: (String) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: WalletDetailViewModel =
         hiltViewModel<WalletDetailViewModel, WalletDetailViewModel.Factory>(key = walletId) { it.create(walletId) },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val items = viewModel.transactions.collectAsLazyPagingItems()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             WalletDetailEffect.NavigateBack -> onBack()
             is WalletDetailEffect.Navigate -> onNavigate(effect.destination)
             is WalletDetailEffect.Deleted -> onDeleted(effect.id)
-            is WalletDetailEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is WalletDetailEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     WalletDetailScreen(
@@ -98,8 +89,8 @@ fun WalletDetailRoute(
         items,
         viewModel::onIntent,
         modifier,
-        isPane = isPane,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -110,7 +101,7 @@ fun WalletDetailScreen(
     items: LazyPagingItems<Transaction>,
     onIntent: (WalletDetailIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     Box(
@@ -121,9 +112,8 @@ fun WalletDetailScreen(
         Column(Modifier.fillMaxSize()) {
             MonAITopBar(
                 title = stringResource(R.string.wallet_detail_title),
-                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
                 onNavigationClick = { onIntent(WalletDetailIntent.Back) },
-                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
                 actions = { WalletDetailMenu(state, onIntent) },
             )
             val wallet = state.wallet

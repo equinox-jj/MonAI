@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.feature.budgets.domain.model.BudgetError
 import com.djtech.monai.feature.budgets.domain.usecase.DeleteBudgetUseCase
@@ -17,12 +18,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -68,8 +67,8 @@ class BudgetViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, BudgetState(month = month))
 
-    private val effectChannel = Channel<BudgetEffect>(Channel.BUFFERED)
-    val effects: Flow<BudgetEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<BudgetEffect>()
+    val effects: Flow<BudgetEffect> = effectQueue.flow
 
     init {
         // Failures keep what is cached; the preview just uses older spending.
@@ -85,7 +84,7 @@ class BudgetViewModel @AssistedInject constructor(
             BudgetIntent.Delete -> ui.update { it.copy(isConfirmingDelete = true) }
             BudgetIntent.ConfirmDelete -> delete()
             BudgetIntent.DismissDelete -> ui.update { it.copy(isConfirmingDelete = false) }
-            BudgetIntent.Back -> send(BudgetEffect.Close)
+            BudgetIntent.Back -> effectQueue.send(BudgetEffect.Close)
         }
     }
 
@@ -98,11 +97,11 @@ class BudgetViewModel @AssistedInject constructor(
             val result = setBudget(month, limit)
             ui.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(BudgetEffect.Close)
+                is Outcome.Success -> effectQueue.send(BudgetEffect.Close)
                 is Outcome.Failure if result.error == BudgetError.InvalidLimit ->
                     ui.update { it.copy(limitError = UiText.Resource(R.string.budget_error_invalid_limit)) }
 
-                is Outcome.Failure -> send(BudgetEffect.ShowMessage(result.error.message()))
+                is Outcome.Failure -> effectQueue.send(BudgetEffect.ShowMessage(result.error.message()))
             }
         }
     }
@@ -114,14 +113,10 @@ class BudgetViewModel @AssistedInject constructor(
             val result = deleteBudget(month)
             ui.update { it.copy(isDeleting = false) }
             when (result) {
-                is Outcome.Success -> send(BudgetEffect.Close)
-                is Outcome.Failure -> send(BudgetEffect.ShowMessage(result.error.message()))
+                is Outcome.Success -> effectQueue.send(BudgetEffect.Close)
+                is Outcome.Failure -> effectQueue.send(BudgetEffect.ShowMessage(result.error.message()))
             }
         }
-    }
-
-    private fun send(effect: BudgetEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 

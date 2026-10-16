@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,11 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -40,46 +37,40 @@ import com.djtech.monai.core.designsystem.component.MonAISegment
 import com.djtech.monai.core.designsystem.component.MonAISegmentedControl
 import com.djtech.monai.core.designsystem.component.MonAISkeleton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
-import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.feature.categories.presentation.categories.components.CategoriesDeleteSheet
 import com.djtech.monai.feature.categories.presentation.categories.components.CategoriesRow
 import com.djtech.monai.feature.categories.presentation.categories.preview.CategoriesPreviewData
-import kotlinx.coroutines.launch
 
-/** @param isPane shown beside the Settings menu: no back button, no status-bar inset. */
 @Composable
 fun CategoriesRoute(
     onNavigate: (CategoriesDestination) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: CategoriesViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             CategoriesEffect.Close -> onBack()
             is CategoriesEffect.Navigate -> onNavigate(effect.destination)
-            is CategoriesEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is CategoriesEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     CategoriesScreen(
         state,
         viewModel::onIntent,
         modifier,
-        isPane = isPane,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -89,7 +80,7 @@ fun CategoriesScreen(
     state: CategoriesState,
     onIntent: (CategoriesIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
@@ -102,10 +93,9 @@ fun CategoriesScreen(
         Column(Modifier.fillMaxSize()) {
             MonAITopBar(
                 title = stringResource(R.string.categories_title),
-                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
                 onNavigationClick = { onIntent(CategoriesIntent.Back) },
                 navigationContentDescription = stringResource(R.string.categories_back),
-                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
                 actions = {
                     MonAIButton(
                         stringResource(R.string.categories_new),

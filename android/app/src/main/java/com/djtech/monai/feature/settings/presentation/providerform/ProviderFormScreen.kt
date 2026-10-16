@@ -8,13 +8,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
@@ -22,11 +20,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -40,10 +36,11 @@ import com.djtech.monai.core.designsystem.component.MonAIButtonSize
 import com.djtech.monai.core.designsystem.component.MonAIButtonVariant
 import com.djtech.monai.core.designsystem.component.MonAISkeleton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.settings.presentation.providerform.components.ProviderFormActive
@@ -54,29 +51,25 @@ import com.djtech.monai.feature.settings.presentation.providerform.components.Pr
 import com.djtech.monai.feature.settings.presentation.providerform.components.ProviderFormSortOrder
 import com.djtech.monai.feature.settings.presentation.providerform.components.ProviderFormType
 import com.djtech.monai.feature.settings.presentation.providerform.preview.ProviderFormPreviewData
-import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
 
 /**
  * @param providerId the provider to edit; null adds one.
  * @param onClose saved, deleted or closed.
- * @param isSideSheet shown as a side sheet over the screen behind it: no status-bar inset.
  */
 @Composable
 fun ProviderFormRoute(
     providerId: String?,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
-    isSideSheet: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: ProviderFormViewModel =
         hiltViewModel<ProviderFormViewModel, ProviderFormViewModel.Factory>(key = providerId ?: "new") {
             it.create(providerId)
         },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     val logoPicker = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
         viewModel.onIntent(ProviderFormIntent.LogoPicked(uri?.toString()))
     }
@@ -87,17 +80,15 @@ fun ProviderFormRoute(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
             )
 
-            is ProviderFormEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is ProviderFormEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     ProviderFormScreen(
         state,
         viewModel::onIntent,
         modifier,
-        isSideSheet = isSideSheet,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -107,7 +98,7 @@ fun ProviderFormScreen(
     state: ProviderFormState,
     onIntent: (ProviderFormIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isSideSheet: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
@@ -129,7 +120,7 @@ fun ProviderFormScreen(
                 navigation = MonAITopBarNavigation.Close,
                 onNavigationClick = { onIntent(ProviderFormIntent.Close) },
                 navigationContentDescription = stringResource(R.string.provider_form_close),
-                windowInsets = if (isSideSheet) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
                 actions = {
                     if (state.isEditing) {
                         MonAIButton(

@@ -8,25 +8,21 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.feature.transactions.presentation.common.preview.TransactionPreviewData
 import com.djtech.monai.feature.transactions.presentation.common.title
 import com.djtech.monai.feature.transactions.presentation.undodelete.components.UndoDeleteSnackbar
-import kotlinx.coroutines.launch
 
 /**
  * The undo bar for deleted transactions, laid over the signed-in app just above its navigation so
@@ -35,19 +31,15 @@ import kotlinx.coroutines.launch
 @Composable
 fun UndoDeleteRoute(modifier: Modifier = Modifier, viewModel: UndoDeleteViewModel = hiltViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
-            is UndoDeleteEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is UndoDeleteEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     Column(modifier) {
         UndoDeleteScreen(state, viewModel::onIntent)
-        MonAISnackbarHost(snackbarHostState)
+        MonAISnackbarHost(messenger.hostState)
     }
 }
 

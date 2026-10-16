@@ -8,6 +8,7 @@ import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.locale.AppLocaleManager
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.datastore.ThemePreferenceStore
 import com.djtech.monai.core.model.AppLanguage
@@ -27,12 +28,10 @@ import com.djtech.monai.feature.settings.presentation.settings.model.SettingsPan
 import com.djtech.monai.feature.settings.presentation.settings.model.SettingsSheet
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -92,8 +91,8 @@ class SettingsViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, SettingsState(month = month))
 
-    private val effectChannel = Channel<SettingsEffect>(Channel.BUFFERED)
-    val effects: Flow<SettingsEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<SettingsEffect>()
+    val effects: Flow<SettingsEffect> = effectQueue.flow
 
     init {
         // Failures keep what is cached; every row has a sensible empty value.
@@ -104,7 +103,7 @@ class SettingsViewModel @Inject constructor(
 
     fun onIntent(intent: SettingsIntent) {
         when (intent) {
-            is SettingsIntent.Open -> send(SettingsEffect.Navigate(intent.destination))
+            is SettingsIntent.Open -> effectQueue.send(SettingsEffect.Navigate(intent.destination))
             is SettingsIntent.SelectPane -> ui.update { it.copy(pane = intent.pane) }
             is SettingsIntent.ShowSheet -> ui.update { it.copy(sheet = intent.sheet) }
             SettingsIntent.DismissSheet -> ui.update { it.copy(sheet = null) }
@@ -115,7 +114,9 @@ class SettingsViewModel @Inject constructor(
 
             is SettingsIntent.PickLanguage -> pickLanguage(intent.language)
             is SettingsIntent.ExportFinished -> if (!intent.isComplete) {
-                send(SettingsEffect.ShowMessage(UiText.Resource(R.string.export_partial_offline), isOffline = true))
+                effectQueue.send(
+                    SettingsEffect.ShowMessage(UiText.Resource(R.string.export_partial_offline), isOffline = true),
+                )
             }
 
             SettingsIntent.SignOut -> ui.update { it.copy(dialog = SettingsDialog.SignOut) }
@@ -143,7 +144,7 @@ class SettingsViewModel @Inject constructor(
             // On success the session ends and the app leaves for Sign in.
             ui.update { it.copy(isSigningOut = false) }
             if (result is Outcome.Failure) {
-                send(
+                effectQueue.send(
                     SettingsEffect.ShowMessage(
                         UiText.Resource(
                             if (result.error == AuthError.Network) {
@@ -157,10 +158,6 @@ class SettingsViewModel @Inject constructor(
                 )
             }
         }
-    }
-
-    private fun send(effect: SettingsEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 

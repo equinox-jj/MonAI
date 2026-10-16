@@ -6,15 +6,16 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.media.ImageProcessor
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.transactions.domain.model.ReceiptUpload
-import com.djtech.monai.feature.transactions.domain.model.TransactionError
 import com.djtech.monai.feature.transactions.domain.usecase.AttachReceiptUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.DeleteTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
+import com.djtech.monai.feature.transactions.presentation.common.mapper.loadMessage
 import com.djtech.monai.feature.transactions.presentation.common.mapper.toMessage
 import com.djtech.monai.feature.transactions.presentation.common.model.TransactionLookups
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveAllWalletsUseCase
@@ -22,12 +23,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -74,8 +73,8 @@ class TransactionDetailViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, TransactionDetailState(today = clock.today()))
 
-    private val effectChannel = Channel<TransactionDetailEffect>(Channel.BUFFERED)
-    val effects: Flow<TransactionDetailEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<TransactionDetailEffect>()
+    val effects: Flow<TransactionDetailEffect> = effectQueue.flow
 
     init {
         fetch()
@@ -83,8 +82,8 @@ class TransactionDetailViewModel @AssistedInject constructor(
 
     fun onIntent(intent: TransactionDetailIntent) {
         when (intent) {
-            TransactionDetailIntent.Back -> send(TransactionDetailEffect.NavigateBack)
-            TransactionDetailIntent.Edit -> send(TransactionDetailEffect.OpenEdit(transactionId))
+            TransactionDetailIntent.Back -> effectQueue.send(TransactionDetailEffect.NavigateBack)
+            TransactionDetailIntent.Edit -> effectQueue.send(TransactionDetailEffect.OpenEdit(transactionId))
             TransactionDetailIntent.Delete -> delete()
             TransactionDetailIntent.Retry -> fetch()
             TransactionDetailIntent.OpenReceipt -> ui.update { it.copy(isReceiptOpen = true) }
@@ -95,12 +94,12 @@ class TransactionDetailViewModel @AssistedInject constructor(
 
             TransactionDetailIntent.TakeReceiptPhoto -> {
                 ui.update { it.copy(isPhotoSourceOpen = false) }
-                send(TransactionDetailEffect.LaunchCamera(imageProcessor.newCameraUri()))
+                effectQueue.send(TransactionDetailEffect.LaunchCamera(imageProcessor.newCameraUri()))
             }
 
             TransactionDetailIntent.ChooseReceiptPhoto -> {
                 ui.update { it.copy(isPhotoSourceOpen = false) }
-                send(TransactionDetailEffect.LaunchGallery)
+                effectQueue.send(TransactionDetailEffect.LaunchGallery)
             }
 
             TransactionDetailIntent.DismissPhotoSource -> ui.update { it.copy(isPhotoSourceOpen = false) }
@@ -125,8 +124,8 @@ class TransactionDetailViewModel @AssistedInject constructor(
             val result = deleteTransaction(transactionId)
             ui.update { it.copy(isDeleting = false) }
             when (result) {
-                is Outcome.Success -> send(TransactionDetailEffect.NavigateBack)
-                is Outcome.Failure -> send(TransactionDetailEffect.ShowMessage(result.error.toMessage()))
+                is Outcome.Success -> effectQueue.send(TransactionDetailEffect.NavigateBack)
+                is Outcome.Failure -> effectQueue.send(TransactionDetailEffect.ShowMessage(result.error.toMessage()))
             }
         }
     }
@@ -145,15 +144,11 @@ class TransactionDetailViewModel @AssistedInject constructor(
                             is Outcome.Success -> UiText.Resource(R.string.transaction_detail_receipt_added)
                             is Outcome.Failure -> result.error.toMessage()
                         }
-                        send(TransactionDetailEffect.ShowMessage(message))
+                        effectQueue.send(TransactionDetailEffect.ShowMessage(message))
                     }
                 }
             }
         }
-    }
-
-    private fun send(effect: TransactionDetailEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 
     private data class Ui(
@@ -164,9 +159,4 @@ class TransactionDetailViewModel @AssistedInject constructor(
         val isPhotoSourceOpen: Boolean = false,
         val receiptUpload: Float? = null,
     )
-}
-
-private fun TransactionError.loadMessage(): UiText = when (this) {
-    TransactionError.Network -> UiText.Resource(R.string.transactions_load_failed_network)
-    else -> toMessage()
 }

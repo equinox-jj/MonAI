@@ -8,12 +8,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
@@ -25,12 +23,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.dp
@@ -38,13 +34,14 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
+import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.common.ui.rememberTakePicture
 import com.djtech.monai.core.designsystem.component.MonAIButton
 import com.djtech.monai.core.designsystem.component.MonAIButtonSize
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAITopBar
-import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.profile.presentation.editprofile.components.EditProfileAvatar
@@ -56,32 +53,27 @@ import com.djtech.monai.feature.profile.presentation.editprofile.components.Edit
 import com.djtech.monai.feature.profile.presentation.editprofile.components.EditProfileTimezoneSheet
 import com.djtech.monai.feature.profile.presentation.editprofile.model.EditProfileSheet
 import com.djtech.monai.feature.profile.presentation.editprofile.preview.EditProfilePreviewData
-import kotlinx.coroutines.launch
 
 /**
  * @param onClose left without saving.
  * @param focusDelete scrolls to the delete-account card once, for Settings' "Delete account".
- * @param isPane shown beside the Settings menu: no back button or status-bar inset.
  */
 @Composable
 fun EditProfileRoute(
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
     focusDelete: Boolean = false,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: EditProfileViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     val successIcon = MonAIIcons.CheckCircle
     val successTint = MonAITheme.colors.success
     val errorIcon = MonAIIcons.Error
     val errorTint = MonAITheme.colors.error
-    val cameraDenied = stringResource(R.string.camera_permission_denied)
     val takePicture = rememberTakePicture(
-        onDenied = { scope.launch { snackbarHostState.showSnackbar(MonAISnackbarVisuals(cameraDenied)) } },
+        onDenied = { messenger.show(UiText.Resource(R.string.camera_permission_denied)) },
         onResult = { viewModel.onIntent(EditProfileIntent.PhotoPicked(it)) },
     )
     val gallery = rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri: Uri? ->
@@ -96,17 +88,10 @@ fun EditProfileRoute(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
             )
 
-            is EditProfileEffect.ShowSuccess -> scope.launch {
-                snackbarHostState.showSnackbar(
-                    MonAISnackbarVisuals(effect.message.asString(context), icon = successIcon, iconTint = successTint),
-                )
-            }
+            is EditProfileEffect.ShowSuccess ->
+                messenger.show(effect.message, icon = successIcon, iconTint = successTint)
 
-            is EditProfileEffect.ShowError -> scope.launch {
-                snackbarHostState.showSnackbar(
-                    MonAISnackbarVisuals(effect.message.asString(context), icon = errorIcon, iconTint = errorTint),
-                )
-            }
+            is EditProfileEffect.ShowError -> messenger.show(effect.message, icon = errorIcon, iconTint = errorTint)
         }
     }
     EditProfileScreen(
@@ -114,8 +99,8 @@ fun EditProfileRoute(
         viewModel::onIntent,
         modifier,
         focusDelete = focusDelete,
-        isPane = isPane,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -126,7 +111,7 @@ fun EditProfileScreen(
     onIntent: (EditProfileIntent) -> Unit,
     modifier: Modifier = Modifier,
     focusDelete: Boolean = false,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
@@ -150,10 +135,9 @@ fun EditProfileScreen(
         ) {
             MonAITopBar(
                 title = stringResource(R.string.profile_title),
-                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
                 onNavigationClick = { onIntent(EditProfileIntent.Back) },
                 navigationContentDescription = stringResource(R.string.profile_back),
-                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
                 actions = {
                     MonAIButton(
                         stringResource(R.string.profile_save),

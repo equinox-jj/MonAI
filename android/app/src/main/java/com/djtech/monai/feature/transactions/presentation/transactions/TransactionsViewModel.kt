@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
@@ -33,7 +34,6 @@ import com.djtech.monai.feature.wallets.domain.usecase.ObserveAllWalletsUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.RefreshWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +42,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -125,8 +124,8 @@ class TransactionsViewModel @Inject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, initialState())
 
-    private val effectChannel = Channel<TransactionsEffect>(Channel.BUFFERED)
-    val effects: Flow<TransactionsEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<TransactionsEffect>()
+    val effects: Flow<TransactionsEffect> = effectQueue.flow
 
     init {
         refreshSupportingData()
@@ -149,7 +148,7 @@ class TransactionsViewModel @Inject constructor(
             TransactionsIntent.Refresh -> refreshSupportingData()
             is TransactionsIntent.Select -> selectedId.value = intent.id
             is TransactionsIntent.Delete -> delete(intent.id)
-            is TransactionsIntent.Open -> send(TransactionsEffect.Navigate(intent.destination))
+            is TransactionsIntent.Open -> effectQueue.send(TransactionsEffect.Navigate(intent.destination))
         }
     }
 
@@ -176,7 +175,9 @@ class TransactionsViewModel @Inject constructor(
         viewModelScope.launch {
             val result = deleteTransaction(id)
             if (result is Outcome.Failure) {
-                send(TransactionsEffect.ShowMessage(result.error.toMessage(), result.error == TransactionError.Network))
+                effectQueue.send(
+                    TransactionsEffect.ShowMessage(result.error.toMessage(), result.error == TransactionError.Network),
+                )
             }
         }
     }
@@ -189,10 +190,6 @@ class TransactionsViewModel @Inject constructor(
             today = today,
             zone = clock.zone(),
         )
-    }
-
-    private fun send(effect: TransactionsEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 

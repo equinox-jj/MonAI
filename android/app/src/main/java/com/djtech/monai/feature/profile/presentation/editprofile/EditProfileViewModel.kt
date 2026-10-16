@@ -7,6 +7,7 @@ import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.format.initialsOf
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.media.CropSpec
 import com.djtech.monai.core.media.ImageProcessor
@@ -31,12 +32,10 @@ import com.djtech.monai.feature.profile.presentation.editprofile.model.EditProfi
 import com.djtech.monai.feature.profile.presentation.editprofile.model.TimezoneOption
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,8 +65,8 @@ class EditProfileViewModel @Inject constructor(
     val state: StateFlow<EditProfileState> = combine(observeUser(), ui) { user, ui -> toState(user, ui) }
         .stateIn(viewModelScope, WhileUiSubscribed, EditProfileState())
 
-    private val effectChannel = Channel<EditProfileEffect>(Channel.BUFFERED)
-    val effects: Flow<EditProfileEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<EditProfileEffect>()
+    val effects: Flow<EditProfileEffect> = effectQueue.flow
 
     private var cropJob: Job? = null
 
@@ -82,19 +81,19 @@ class EditProfileViewModel @Inject constructor(
             }
 
             EditProfileIntent.Save -> save()
-            EditProfileIntent.Back -> send(EditProfileEffect.Close)
+            EditProfileIntent.Back -> effectQueue.send(EditProfileEffect.Close)
             is EditProfileIntent.ShowSheet -> ui.update { it.copy(sheet = intent.sheet, timezoneQuery = "") }
             EditProfileIntent.DismissSheet -> ui.update { it.copy(sheet = null) }
             is EditProfileIntent.TimezoneQueryChanged -> ui.update { it.copy(timezoneQuery = intent.query) }
             is EditProfileIntent.PickTimezone -> ui.update { it.copy(timezone = intent.id, sheet = null) }
             EditProfileIntent.TakePhoto -> {
                 ui.update { it.copy(sheet = null) }
-                send(EditProfileEffect.LaunchCamera(imageProcessor.newCameraUri()))
+                effectQueue.send(EditProfileEffect.LaunchCamera(imageProcessor.newCameraUri()))
             }
 
             EditProfileIntent.ChooseFromGallery -> {
                 ui.update { it.copy(sheet = null) }
-                send(EditProfileEffect.LaunchGallery)
+                effectQueue.send(EditProfileEffect.LaunchGallery)
             }
 
             is EditProfileIntent.PhotoPicked -> intent.uri?.let(::startCrop)
@@ -175,12 +174,12 @@ class EditProfileViewModel @Inject constructor(
                 is Outcome.Success -> {
                     // Back to following the cache, which now holds what was saved.
                     ui.update { it.copy(name = null, timezone = null) }
-                    send(EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_saved)))
+                    effectQueue.send(EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_saved)))
                 }
 
                 is Outcome.Failure -> when (val error = result.error) {
                     is ProfileError.InvalidName -> ui.update { it.copy(nameError = error.message()) }
-                    else -> send(EditProfileEffect.ShowError(error.message()))
+                    else -> effectQueue.send(EditProfileEffect.ShowError(error.message()))
                 }
             }
         }
@@ -193,7 +192,7 @@ class EditProfileViewModel @Inject constructor(
             val preview = imageProcessor.loadPreview(uri, PREVIEW_SIDE)
             if (preview == null) {
                 ui.update { it.copy(crop = null) }
-                send(EditProfileEffect.ShowError(UiText.Resource(R.string.profile_crop_unreadable)))
+                effectQueue.send(EditProfileEffect.ShowError(UiText.Resource(R.string.profile_crop_unreadable)))
             } else {
                 updateCrop { if (it.uri == uri) it.copy(preview = preview) else it }
             }
@@ -214,7 +213,7 @@ class EditProfileViewModel @Inject constructor(
                     is AvatarUpload.Progress -> ui.update { it.copy(uploadProgress = step.fraction) }
                     is AvatarUpload.Done -> {
                         ui.update { it.copy(uploadProgress = null) }
-                        send(
+                        effectQueue.send(
                             when (val result = step.result) {
                                 is Outcome.Success ->
                                     EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_photo_updated))
@@ -234,7 +233,7 @@ class EditProfileViewModel @Inject constructor(
         viewModelScope.launch {
             val result = removeAvatar()
             ui.update { it.copy(isRemovingPhoto = false) }
-            send(
+            effectQueue.send(
                 when (result) {
                     is Outcome.Success ->
                         EditProfileEffect.ShowSuccess(UiText.Resource(R.string.profile_photo_removed))
@@ -266,14 +265,10 @@ class EditProfileViewModel @Inject constructor(
                     ProfileError.WrongPassword, ProfileError.PasswordRequired ->
                         ui.update { it.copy(passwordError = error.message()) }
 
-                    else -> send(EditProfileEffect.ShowError(error.message()))
+                    else -> effectQueue.send(EditProfileEffect.ShowError(error.message()))
                 }
             }
         }
-    }
-
-    private fun send(effect: EditProfileEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 
     private companion object {

@@ -37,9 +37,8 @@ import com.djtech.monai.feature.transactions.domain.repository.FakeTransactionRe
 import com.djtech.monai.feature.transactions.domain.usecase.CreateTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.DeleteTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.FindCategoryForNoteUseCase
-import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionUseCase
+import com.djtech.monai.feature.transactions.domain.usecase.GetTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionDependentsUseCase
-import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.UpdateTransactionUseCase
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.FormSheet
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
@@ -88,8 +87,7 @@ class TransactionFormViewModelTest {
         return TransactionFormViewModel(
             transactionId = id,
             preset = preset,
-            observeTransaction = ObserveTransactionUseCase(transactions),
-            refreshTransaction = RefreshTransactionUseCase(transactions),
+            getTransaction = GetTransactionUseCase(transactions),
             createTransaction = CreateTransactionUseCase(transactions, dependents, clock),
             updateTransaction = UpdateTransactionUseCase(transactions, dependents, clock),
             deleteTransaction = DeleteTransactionUseCase(transactions, TransactionDeletionEvents(), dependents),

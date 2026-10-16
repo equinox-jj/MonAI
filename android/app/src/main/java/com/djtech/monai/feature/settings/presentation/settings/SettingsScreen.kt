@@ -22,10 +22,8 @@ import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
@@ -36,9 +34,9 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.designsystem.component.MonAIScreenTitle
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIWidthClass
 import com.djtech.monai.core.designsystem.component.currentWidthClass
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.export.presentation.exportcsv.ExportCsvPaneRoute
@@ -58,7 +56,6 @@ import com.djtech.monai.feature.settings.presentation.settings.components.Settin
 import com.djtech.monai.feature.settings.presentation.settings.model.SettingsPane
 import com.djtech.monai.feature.settings.presentation.settings.model.SettingsSheet
 import com.djtech.monai.feature.settings.presentation.settings.preview.SettingsPreviewData
-import kotlinx.coroutines.launch
 import java.time.YearMonth
 
 /**
@@ -74,21 +71,13 @@ fun SettingsRoute(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     val offlineIcon = MonAIIcons.CloudOff
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             is SettingsEffect.Navigate -> onNavigate(effect.destination)
-            is SettingsEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(
-                    MonAISnackbarVisuals(
-                        effect.message.asString(context),
-                        icon = if (effect.isOffline) offlineIcon else null,
-                    ),
-                )
-            }
+            is SettingsEffect.ShowMessage ->
+                messenger.show(effect.message, icon = if (effect.isOffline) offlineIcon else null)
         }
     }
     SettingsScreen(
@@ -96,7 +85,7 @@ fun SettingsRoute(
         viewModel::onIntent,
         modifier,
         widthClass = currentWidthClass(),
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
         detailPane = detailPane,
     )
 }

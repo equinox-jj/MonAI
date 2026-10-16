@@ -7,6 +7,7 @@ import androidx.paging.cachedIn
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.time.AppClock
 import com.djtech.monai.core.common.time.toYearMonthOrNull
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.datastore.SearchHistoryStore
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
@@ -28,7 +29,6 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -119,8 +118,8 @@ class SearchViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, initialState())
 
-    private val effectChannel = Channel<SearchEffect>(Channel.BUFFERED)
-    val effects: Flow<SearchEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<SearchEffect>()
+    val effects: Flow<SearchEffect> = effectQueue.flow
 
     fun onIntent(intent: SearchIntent) {
         when (intent) {
@@ -144,10 +143,10 @@ class SearchViewModel @AssistedInject constructor(
 
             is SearchIntent.OpenResult -> {
                 remember(query.value)
-                send(SearchEffect.OpenTransaction(intent.id))
+                effectQueue.send(SearchEffect.OpenTransaction(intent.id))
             }
 
-            SearchIntent.Back -> send(SearchEffect.NavigateBack)
+            SearchIntent.Back -> effectQueue.send(SearchEffect.NavigateBack)
         }
     }
 
@@ -162,8 +161,4 @@ class SearchViewModel @AssistedInject constructor(
         today = clock.today(),
         zone = clock.zone(),
     )
-
-    private fun send(effect: SearchEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
-    }
 }

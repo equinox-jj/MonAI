@@ -5,17 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveArchivedWalletsUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.UnarchiveWalletUseCase
 import com.djtech.monai.feature.wallets.presentation.common.message
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -33,14 +32,14 @@ class ArchivedWalletsViewModel @Inject constructor(
         combine(observeArchivedWallets(), restoringId, ::ArchivedWalletsState)
             .stateIn(viewModelScope, WhileUiSubscribed, ArchivedWalletsState())
 
-    private val effectChannel = Channel<ArchivedWalletsEffect>(Channel.BUFFERED)
-    val effects: Flow<ArchivedWalletsEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<ArchivedWalletsEffect>()
+    val effects: Flow<ArchivedWalletsEffect> = effectQueue.flow
 
     fun onIntent(intent: ArchivedWalletsIntent) {
         when (intent) {
-            ArchivedWalletsIntent.Back -> send(ArchivedWalletsEffect.NavigateBack)
+            ArchivedWalletsIntent.Back -> effectQueue.send(ArchivedWalletsEffect.NavigateBack)
             is ArchivedWalletsIntent.Unarchive -> unarchive(intent.id)
-            is ArchivedWalletsIntent.View -> send(ArchivedWalletsEffect.OpenWallet(intent.id))
+            is ArchivedWalletsIntent.View -> effectQueue.send(ArchivedWalletsEffect.OpenWallet(intent.id))
         }
     }
 
@@ -50,7 +49,7 @@ class ArchivedWalletsViewModel @Inject constructor(
         viewModelScope.launch {
             val result = unarchiveWallet(id)
             restoringId.value = null
-            send(
+            effectQueue.send(
                 when (result) {
                     is Outcome.Success -> ArchivedWalletsEffect.Restored(
                         id,
@@ -61,9 +60,5 @@ class ArchivedWalletsViewModel @Inject constructor(
                 },
             )
         }
-    }
-
-    private fun send(effect: ArchivedWalletsEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }

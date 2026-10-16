@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.feature.auth.domain.model.AuthError
 import com.djtech.monai.feature.auth.domain.model.AuthField
 import com.djtech.monai.feature.auth.domain.usecase.LoginUseCase
@@ -13,12 +14,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -34,8 +33,8 @@ class SignInViewModel @AssistedInject constructor(
     private val mutableState = MutableStateFlow(SignInState(email = savedState[KEY_EMAIL] ?: initialEmail))
     val state: StateFlow<SignInState> = mutableState.asStateFlow()
 
-    private val effectChannel = Channel<SignInEffect>(Channel.BUFFERED)
-    val effects: Flow<SignInEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<SignInEffect>()
+    val effects: Flow<SignInEffect> = effectQueue.flow
 
     fun onIntent(intent: SignInIntent) {
         when (intent) {
@@ -49,7 +48,7 @@ class SignInViewModel @AssistedInject constructor(
             }
 
             SignInIntent.Submit -> submit()
-            SignInIntent.CreateAccount -> send(SignInEffect.NavigateToRegister(mutableState.value.email))
+            SignInIntent.CreateAccount -> effectQueue.send(SignInEffect.NavigateToRegister(mutableState.value.email))
         }
     }
 
@@ -64,7 +63,7 @@ class SignInViewModel @AssistedInject constructor(
                 is Outcome.Success -> Unit
                 is Outcome.Failure -> {
                     mutableState.update { it.withError(result.error) }
-                    mutableState.value.firstInvalidField()?.let { send(SignInEffect.FocusField(it)) }
+                    mutableState.value.firstInvalidField()?.let { effectQueue.send(SignInEffect.FocusField(it)) }
                 }
             }
         }
@@ -85,10 +84,6 @@ class SignInViewModel @AssistedInject constructor(
         )
 
         else -> copy(isSubmitting = false, formError = error.toFormErrorText())
-    }
-
-    private fun send(effect: SignInEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 
     @AssistedFactory

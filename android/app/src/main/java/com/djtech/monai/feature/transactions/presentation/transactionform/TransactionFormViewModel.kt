@@ -2,12 +2,12 @@ package com.djtech.monai.feature.transactions.presentation.transactionform
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.format.appendDigit
 import com.djtech.monai.core.common.format.deleteDigit
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.FieldHighlight
 import com.djtech.monai.core.model.Category
@@ -25,10 +25,10 @@ import com.djtech.monai.feature.transactions.domain.model.TransactionField
 import com.djtech.monai.feature.transactions.domain.model.TransactionInput
 import com.djtech.monai.feature.transactions.domain.usecase.CreateTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.DeleteTransactionUseCase
-import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionUseCase
-import com.djtech.monai.feature.transactions.domain.usecase.RefreshTransactionUseCase
+import com.djtech.monai.feature.transactions.domain.usecase.GetTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.UpdateTransactionUseCase
 import com.djtech.monai.feature.transactions.domain.validation.MAX_NOTE_LENGTH
+import com.djtech.monai.feature.transactions.presentation.common.mapper.loadMessage
 import com.djtech.monai.feature.transactions.presentation.common.mapper.toFieldMessages
 import com.djtech.monai.feature.transactions.presentation.common.mapper.toHighlights
 import com.djtech.monai.feature.transactions.presentation.common.mapper.toMessage
@@ -45,7 +45,6 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -55,11 +54,9 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -77,8 +74,7 @@ import java.time.YearMonth
 class TransactionFormViewModel @AssistedInject constructor(
     @Assisted private val transactionId: String?,
     @Assisted private val preset: TransactionFormPreset,
-    private val observeTransaction: ObserveTransactionUseCase,
-    private val refreshTransaction: RefreshTransactionUseCase,
+    private val getTransaction: GetTransactionUseCase,
     private val createTransaction: CreateTransactionUseCase,
     private val updateTransaction: UpdateTransactionUseCase,
     private val deleteTransaction: DeleteTransactionUseCase,
@@ -151,8 +147,8 @@ class TransactionFormViewModel @AssistedInject constructor(
         )
     }.stateIn(viewModelScope, WhileUiSubscribed, TransactionFormState(mode = mode, today = clock.today()))
 
-    private val effectChannel = Channel<TransactionFormEffect>(Channel.BUFFERED)
-    val effects: Flow<TransactionFormEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<TransactionFormEffect>()
+    val effects: Flow<TransactionFormEffect> = effectQueue.flow
 
     init {
         if (transactionId != null) {
@@ -197,7 +193,9 @@ class TransactionFormViewModel @AssistedInject constructor(
             }
 
             TransactionFormIntent.NewCategory ->
-                editor.value.draft.type.categoryType()?.let { send(TransactionFormEffect.OpenNewCategory(it)) }
+                editor.value.draft.type.categoryType()?.let {
+                    effectQueue.send(TransactionFormEffect.OpenNewCategory(it))
+                }
 
             is TransactionFormIntent.SheetPickWallet -> updateSheet<FormSheet.Wallet> {
                 it.copy(selectedId = intent.id)
@@ -217,34 +215,28 @@ class TransactionFormViewModel @AssistedInject constructor(
             TransactionFormIntent.Close -> close()
             TransactionFormIntent.ConfirmDiscard -> {
                 editor.update { it.copy(showDiscardDialog = false) }
-                send(TransactionFormEffect.Close)
+                effectQueue.send(TransactionFormEffect.Close)
             }
 
             TransactionFormIntent.KeepEditing -> editor.update { it.copy(showDiscardDialog = false) }
             TransactionFormIntent.Delete -> delete()
             TransactionFormIntent.Retry -> transactionId?.let(::load)
-            TransactionFormIntent.Scan -> send(TransactionFormEffect.OpenScan)
+            TransactionFormIntent.Scan -> effectQueue.send(TransactionFormEffect.OpenScan)
         }
     }
 
     private fun load(id: String) {
         editor.update { it.copy(isLoading = true, loadError = null) }
         viewModelScope.launch {
-            val cached = observeTransaction(id).first()
-            val transaction = cached ?: run {
-                val result = refreshTransaction(id)
-                if (result is Outcome.Failure) {
-                    editor.update { it.copy(isLoading = false, loadError = result.error.loadMessage()) }
-                    return@launch
+            when (val result = getTransaction(id)) {
+                is Outcome.Success -> {
+                    val draft = result.data.toDraft()
+                    editor.update { it.copy(draft = draft, original = draft, isLoading = false) }
                 }
-                observeTransaction(id).firstOrNull()
+
+                is Outcome.Failure ->
+                    editor.update { it.copy(isLoading = false, loadError = result.error.loadMessage()) }
             }
-            if (transaction == null) {
-                editor.update { it.copy(isLoading = false, loadError = TransactionError.NotFound.toMessage()) }
-                return@launch
-            }
-            val draft = transaction.toDraft()
-            editor.update { it.copy(draft = draft, original = draft, isLoading = false) }
         }
     }
 
@@ -333,13 +325,13 @@ class TransactionFormViewModel @AssistedInject constructor(
             }
             editor.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(TransactionFormEffect.Saved(result.data.id))
+                is Outcome.Success -> effectQueue.send(TransactionFormEffect.Saved(result.data.id))
                 is Outcome.Failure -> when (val error = result.error) {
                     is TransactionError.InvalidFields -> editor.update {
                         it.copy(errors = error.errors.toFieldMessages())
                     }
 
-                    else -> send(TransactionFormEffect.ShowMessage(error.toMessage()))
+                    else -> effectQueue.send(TransactionFormEffect.ShowMessage(error.toMessage()))
                 }
             }
         }
@@ -413,7 +405,7 @@ class TransactionFormViewModel @AssistedInject constructor(
         if (editor.draft != initial && !editor.isLoading) {
             this.editor.update { it.copy(showDiscardDialog = true) }
         } else {
-            send(TransactionFormEffect.Close)
+            effectQueue.send(TransactionFormEffect.Close)
         }
     }
 
@@ -425,8 +417,8 @@ class TransactionFormViewModel @AssistedInject constructor(
             val result = deleteTransaction(id)
             editor.update { it.copy(isDeleting = false) }
             when (result) {
-                is Outcome.Success -> send(TransactionFormEffect.Deleted(id))
-                is Outcome.Failure -> send(TransactionFormEffect.ShowMessage(result.error.toMessage()))
+                is Outcome.Success -> effectQueue.send(TransactionFormEffect.Deleted(id))
+                is Outcome.Failure -> effectQueue.send(TransactionFormEffect.ShowMessage(result.error.toMessage()))
             }
         }
     }
@@ -440,10 +432,6 @@ class TransactionFormViewModel @AssistedInject constructor(
                 }
             }
         }
-    }
-
-    private fun send(effect: TransactionFormEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 
@@ -494,8 +482,3 @@ private fun Transaction.toDraft() = Draft(
 private const val SUGGEST_DELAY_MS = 600L
 
 private fun List<Wallet>.defaultWallet(): Wallet? = firstOrNull(Wallet::isDefault) ?: firstOrNull()
-
-private fun TransactionError.loadMessage(): UiText = when (this) {
-    TransactionError.Network -> UiText.Resource(R.string.transactions_load_failed_network)
-    else -> toMessage()
-}

@@ -35,6 +35,9 @@ class FakeWalletRepository(wallets: List<Wallet> = emptyList()) : WalletReposito
     val refreshedIds = mutableListOf<String>()
     var refreshWalletResult: WalletResult<Unit> = Outcome.Success(Unit)
 
+    /** The server's copies: a successful refreshWallet caches the one asked for, like the real repository. */
+    var remoteWallets: List<Wallet> = emptyList()
+
     override fun observeWallets(): Flow<List<Wallet>> = wallets.map { list -> list.filterNot(Wallet::isArchived) }
 
     override fun observeAllWallets(): Flow<List<Wallet>> = wallets
@@ -49,6 +52,10 @@ class FakeWalletRepository(wallets: List<Wallet> = emptyList()) : WalletReposito
 
     override suspend fun refreshWallet(id: String): WalletResult<Unit> {
         refreshedIds += id
+        val fetched = remoteWallets.find { it.id == id }
+        if (refreshWalletResult is Outcome.Success && fetched != null) {
+            wallets.value = wallets.value.filterNot { it.id == id } + fetched
+        }
         return refreshWalletResult
     }
 

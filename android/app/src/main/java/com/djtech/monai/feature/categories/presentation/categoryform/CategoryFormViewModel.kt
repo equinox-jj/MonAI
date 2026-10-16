@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Category
 import com.djtech.monai.core.model.CategoryType
@@ -21,13 +22,11 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -54,8 +53,8 @@ class CategoryFormViewModel @AssistedInject constructor(
     )
     val state: StateFlow<CategoryFormState> = mutableState.asStateFlow()
 
-    private val effectChannel = Channel<CategoryFormEffect>(Channel.BUFFERED)
-    val effects: Flow<CategoryFormEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<CategoryFormEffect>()
+    val effects: Flow<CategoryFormEffect> = effectQueue.flow
 
     /** The category being edited, as cached when the form opened. */
     private var original: Category? = null
@@ -69,7 +68,7 @@ class CategoryFormViewModel @AssistedInject constructor(
         if (category == null) {
             // Deleted elsewhere since the list was shown.
             showMessage(R.string.category_form_error_not_found)
-            send(CategoryFormEffect.Close)
+            effectQueue.send(CategoryFormEffect.Close)
             return
         }
         original = category
@@ -95,7 +94,7 @@ class CategoryFormViewModel @AssistedInject constructor(
             is CategoryFormIntent.PickIcon -> mutableState.update { it.copy(icon = intent.icon) }
             is CategoryFormIntent.PickColor -> mutableState.update { it.copy(color = intent.color) }
             CategoryFormIntent.Save -> save()
-            CategoryFormIntent.Close -> send(CategoryFormEffect.Close)
+            CategoryFormIntent.Close -> effectQueue.send(CategoryFormEffect.Close)
         }
     }
 
@@ -114,7 +113,7 @@ class CategoryFormViewModel @AssistedInject constructor(
             val result = if (editing != null) updateCategory(editing, input) else createCategory(input)
             mutableState.update { it.copy(isSaving = false) }
             when (result) {
-                is Outcome.Success -> send(CategoryFormEffect.Close)
+                is Outcome.Success -> effectQueue.send(CategoryFormEffect.Close)
                 is Outcome.Failure -> when (val error = result.error) {
                     is CategoryError.InvalidName -> mutableState.update { it.copy(nameError = error.issue.message()) }
                     CategoryError.Network -> showMessage(R.string.category_form_error_network)
@@ -128,11 +127,8 @@ class CategoryFormViewModel @AssistedInject constructor(
         }
     }
 
-    private fun showMessage(@StringRes message: Int) = send(CategoryFormEffect.ShowMessage(UiText.Resource(message)))
-
-    private fun send(effect: CategoryFormEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
-    }
+    private fun showMessage(@StringRes message: Int) =
+        effectQueue.send(CategoryFormEffect.ShowMessage(UiText.Resource(message)))
 }
 
 private fun CategoryNameIssue.message(): UiText = when (this) {

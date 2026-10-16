@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.TransactionDraft
 import com.djtech.monai.core.model.TransactionSource
@@ -29,12 +30,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -94,8 +93,8 @@ class QuickAddReviewViewModel @AssistedInject constructor(
         QuickAddReviewState(today = clock.today(), phrase = phrase, total = drafts.size),
     )
 
-    private val effectChannel = Channel<QuickAddReviewEffect>(Channel.BUFFERED)
-    val effects: Flow<QuickAddReviewEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<QuickAddReviewEffect>()
+    val effects: Flow<QuickAddReviewEffect> = effectQueue.flow
 
     fun onIntent(intent: QuickAddReviewIntent) {
         when (intent) {
@@ -138,8 +137,8 @@ class QuickAddReviewViewModel @AssistedInject constructor(
 
             QuickAddReviewIntent.Save -> save()
             QuickAddReviewIntent.Skip -> pass(ReviewOutcome.SKIPPED)
-            QuickAddReviewIntent.Back -> send(QuickAddReviewEffect.Back)
-            QuickAddReviewIntent.Finish -> send(QuickAddReviewEffect.Finish)
+            QuickAddReviewIntent.Back -> effectQueue.send(QuickAddReviewEffect.Back)
+            QuickAddReviewIntent.Finish -> effectQueue.send(QuickAddReviewEffect.Finish)
         }
     }
 
@@ -210,7 +209,7 @@ class QuickAddReviewViewModel @AssistedInject constructor(
                         it.copy(errors = error.errors.toFieldMessages())
                     }
 
-                    else -> send(QuickAddReviewEffect.ShowMessage(error.toMessage()))
+                    else -> effectQueue.send(QuickAddReviewEffect.ShowMessage(error.toMessage()))
                 }
             }
         }
@@ -236,10 +235,6 @@ class QuickAddReviewViewModel @AssistedInject constructor(
                 sheet = null,
             )
         }
-    }
-
-    private fun send(effect: QuickAddReviewEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 }
 

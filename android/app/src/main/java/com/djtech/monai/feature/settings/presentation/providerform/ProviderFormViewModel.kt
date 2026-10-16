@@ -7,6 +7,7 @@ import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.format.walletMonogram
 import com.djtech.monai.core.common.result.Outcome
 import com.djtech.monai.core.common.time.AppClock
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Permissions
 import com.djtech.monai.core.model.User
@@ -29,12 +30,10 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -66,8 +65,8 @@ class ProviderFormViewModel @AssistedInject constructor(
     val state: StateFlow<ProviderFormState> = combine(observeUser(), form) { user, form -> toState(user, form) }
         .stateIn(viewModelScope, WhileUiSubscribed, toState(null, form.value))
 
-    private val effectChannel = Channel<ProviderFormEffect>(Channel.BUFFERED)
-    val effects: Flow<ProviderFormEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<ProviderFormEffect>()
+    val effects: Flow<ProviderFormEffect> = effectQueue.flow
 
     init {
         load()
@@ -99,7 +98,7 @@ class ProviderFormViewModel @AssistedInject constructor(
             }
 
             is ProviderFormIntent.SetActive -> setActive(intent.active)
-            ProviderFormIntent.PickLogo -> send(ProviderFormEffect.LaunchLogoPicker)
+            ProviderFormIntent.PickLogo -> effectQueue.send(ProviderFormEffect.LaunchLogoPicker)
             is ProviderFormIntent.LogoPicked -> intent.uri?.let { uri ->
                 form.update { it.copy(newLogoUri = uri) }
             }
@@ -114,7 +113,7 @@ class ProviderFormViewModel @AssistedInject constructor(
             ProviderFormIntent.DismissDialog -> form.update { it.copy(dialog = null) }
             ProviderFormIntent.Save -> save()
             ProviderFormIntent.Retry -> load()
-            ProviderFormIntent.Close -> send(ProviderFormEffect.Close)
+            ProviderFormIntent.Close -> effectQueue.send(ProviderFormEffect.Close)
         }
     }
 
@@ -188,7 +187,7 @@ class ProviderFormViewModel @AssistedInject constructor(
                     it.copy(isActive = result.data.isActive, original = result.data)
                 }
 
-                is Outcome.Failure -> send(ProviderFormEffect.ShowMessage(result.error.message()))
+                is Outcome.Failure -> effectQueue.send(ProviderFormEffect.ShowMessage(result.error.message()))
             }
         }
     }
@@ -201,9 +200,9 @@ class ProviderFormViewModel @AssistedInject constructor(
             form.update { it.copy(isDeleting = false) }
             when (result) {
                 // The list reloads through the change events and no longer shows it.
-                is Outcome.Success -> send(ProviderFormEffect.Close)
+                is Outcome.Success -> effectQueue.send(ProviderFormEffect.Close)
 
-                is Outcome.Failure -> send(ProviderFormEffect.ShowMessage(result.error.message()))
+                is Outcome.Failure -> effectQueue.send(ProviderFormEffect.ShowMessage(result.error.message()))
             }
         }
     }
@@ -235,26 +234,22 @@ class ProviderFormViewModel @AssistedInject constructor(
                 is Outcome.Success -> {
                     val logoError = result.data.logoError
                     if (logoError == null) {
-                        send(ProviderFormEffect.Close)
+                        effectQueue.send(ProviderFormEffect.Close)
                     } else {
                         // Saved, but the logo wasn't: stay, now editing the saved provider, so it can be retried.
                         form.update { it.filledFrom(result.data.provider).copy(newLogoUri = current.newLogoUri) }
                         val message = UiText.Resource(R.string.provider_form_saved_logo_failed)
-                        send(ProviderFormEffect.ShowMessage(message))
+                        effectQueue.send(ProviderFormEffect.ShowMessage(message))
                     }
                 }
 
                 is Outcome.Failure -> when (val error = result.error) {
                     is AdminProviderError.InvalidName -> form.update { it.copy(nameError = error.message()) }
                     is AdminProviderError.InvalidAliases -> form.update { it.copy(aliasError = error.message()) }
-                    else -> send(ProviderFormEffect.ShowMessage(error.message()))
+                    else -> effectQueue.send(ProviderFormEffect.ShowMessage(error.message()))
                 }
             }
         }
-    }
-
-    private fun send(effect: ProviderFormEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
     }
 
     private companion object {

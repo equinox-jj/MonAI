@@ -13,10 +13,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -26,8 +24,8 @@ import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAITopBar
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.reports.presentation.report.components.ReportBudgetCard
 import com.djtech.monai.feature.reports.presentation.report.components.ReportCategoryBreakdown
@@ -36,7 +34,6 @@ import com.djtech.monai.feature.reports.presentation.report.components.ReportMon
 import com.djtech.monai.feature.reports.presentation.report.components.ReportSkeleton
 import com.djtech.monai.feature.reports.presentation.report.components.ReportTotals
 import com.djtech.monai.feature.reports.presentation.report.preview.ReportPreviewData
-import kotlinx.coroutines.launch
 import java.time.YearMonth
 
 /** @param initialMonth the month to open on; null for the current one. */
@@ -52,23 +49,19 @@ fun ReportRoute(
         },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             ReportEffect.NavigateBack -> onBack()
             is ReportEffect.OpenBudget -> onOpenBudget(effect.month)
-            is ReportEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is ReportEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     ReportScreen(
         state,
         viewModel::onIntent,
         modifier,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
     )
 }
 

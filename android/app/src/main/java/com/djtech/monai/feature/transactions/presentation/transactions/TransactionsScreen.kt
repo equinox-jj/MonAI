@@ -20,11 +20,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
@@ -41,6 +39,7 @@ import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
 import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIWidthClass
 import com.djtech.monai.core.designsystem.component.currentWidthClass
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.transactions.presentation.common.TransactionFilterSheetHost
@@ -50,7 +49,6 @@ import com.djtech.monai.feature.transactions.presentation.transactions.component
 import com.djtech.monai.feature.transactions.presentation.transactions.components.TransactionsList
 import com.djtech.monai.feature.transactions.presentation.transactions.preview.TransactionsPreviewData
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 
 /**
  * @param detailPane the detail screen for the transaction picked on a wide screen; the list sits
@@ -65,21 +63,13 @@ fun TransactionsRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val items = viewModel.transactions.collectAsLazyPagingItems()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     val offlineIcon = MonAIIcons.CloudOff
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             is TransactionsEffect.Navigate -> onNavigate(effect.destination)
-            is TransactionsEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(
-                    MonAISnackbarVisuals(
-                        effect.message.asString(context),
-                        icon = if (effect.isOffline) offlineIcon else null,
-                    ),
-                )
-            }
+            is TransactionsEffect.ShowMessage ->
+                messenger.show(effect.message, icon = if (effect.isOffline) offlineIcon else null)
         }
     }
     // A failed refresh over cached rows keeps them and says so; with nothing cached the list shows the error.
@@ -89,7 +79,7 @@ fun TransactionsRoute(
     LaunchedEffect(refresh) {
         if (refresh is LoadState.Error && items.itemCount > 0) {
             val offline = refresh.error.isOffline()
-            snackbarHostState.showSnackbar(
+            messenger.hostState.showSnackbar(
                 MonAISnackbarVisuals(
                     if (offline) offlineMessage else failedMessage,
                     icon = if (offline) offlineIcon else null,
@@ -103,7 +93,7 @@ fun TransactionsRoute(
         viewModel::onIntent,
         modifier,
         widthClass = currentWidthClass(),
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
         detailPane = detailPane,
     )
 }

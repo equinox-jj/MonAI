@@ -35,6 +35,9 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
     var restoreResult: TransactionResult<Transaction>? = null
     var refreshTransactionResult: TransactionResult<Unit> = Outcome.Success(Unit)
 
+    /** The server's copies: a successful refreshTransaction caches the one asked for, like the real repository. */
+    var remoteTransactions: List<Transaction> = emptyList()
+
     /** When set, writes suspend until it completes, to observe the in-flight state. */
     var gate: CompletableDeferred<Unit>? = null
 
@@ -118,6 +121,10 @@ class FakeTransactionRepository(transactions: List<Transaction> = emptyList()) :
 
     override suspend fun refreshTransaction(id: String): TransactionResult<Unit> {
         refreshedIds += id
+        val fetched = remoteTransactions.find { it.id == id }
+        if (refreshTransactionResult is Outcome.Success && fetched != null) {
+            transactions.value = transactions.value.filterNot { it.id == id } + fetched
+        }
         return refreshTransactionResult
     }
 

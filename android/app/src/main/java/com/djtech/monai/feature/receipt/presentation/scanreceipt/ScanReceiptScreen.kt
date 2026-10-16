@@ -22,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,12 +34,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
+import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.designsystem.component.MonAIButton
 import com.djtech.monai.core.designsystem.component.MonAIButtonSize
 import com.djtech.monai.core.designsystem.component.MonAIButtonVariant
 import com.djtech.monai.core.designsystem.component.MonAIIconButton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.ReceiptDraft
@@ -54,7 +54,6 @@ import com.djtech.monai.feature.receipt.presentation.scanreceipt.components.take
 import com.djtech.monai.feature.receipt.presentation.scanreceipt.model.CameraPermission
 import com.djtech.monai.feature.receipt.presentation.scanreceipt.model.ProcessingStep
 import com.djtech.monai.feature.receipt.presentation.scanreceipt.model.ScanPhase
-import kotlinx.coroutines.launch
 
 /**
  * @param onOpenReview a photo was read: review the draft, [Boolean] true when the AI couldn't help.
@@ -70,9 +69,7 @@ fun ScanReceiptRoute(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val captureFailed = stringResource(R.string.scan_capture_failed)
+    val messenger = rememberMonAIMessenger()
     val imageCapture = remember {
         ImageCapture.Builder().setCaptureMode(ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY).build()
     }
@@ -101,7 +98,7 @@ fun ScanReceiptRoute(
                     viewModel.onIntent(ScanReceiptIntent.PhotoTaken(effect.uri))
                 } else {
                     viewModel.onIntent(ScanReceiptIntent.CaptureFailed)
-                    scope.launch { snackbarHostState.showSnackbar(MonAISnackbarVisuals(captureFailed)) }
+                    messenger.show(UiText.Resource(R.string.scan_capture_failed))
                 }
             }
 
@@ -118,7 +115,7 @@ fun ScanReceiptRoute(
         onIntent = viewModel::onIntent,
         onAllowCamera = { permissionLauncher.launch(Manifest.permission.CAMERA) },
         modifier = modifier,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
         camera = { ScanReceiptCamera(imageCapture, Modifier.fillMaxSize()) },
     )
 }

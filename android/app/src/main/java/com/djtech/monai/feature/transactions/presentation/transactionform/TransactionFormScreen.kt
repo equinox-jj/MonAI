@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -21,10 +20,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -45,11 +42,12 @@ import com.djtech.monai.core.designsystem.component.MonAIIconButton
 import com.djtech.monai.core.designsystem.component.MonAIInlineAlert
 import com.djtech.monai.core.designsystem.component.MonAISegmentedControl
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
 import com.djtech.monai.core.designsystem.component.MonAIWalletPickerSheet
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.component.transactionTypeSegments
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
@@ -67,7 +65,6 @@ import com.djtech.monai.feature.transactions.presentation.transactionform.model.
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.TransactionFormPreset
 import com.djtech.monai.feature.transactions.presentation.transactionform.model.WalletTarget
 import com.djtech.monai.feature.transactions.presentation.transactionform.preview.TransactionFormPreviewData
-import kotlinx.coroutines.launch
 
 /**
  * @param transactionId the transaction to edit; null adds a new one.
@@ -76,7 +73,6 @@ import kotlinx.coroutines.launch
  * @param onNewCategory open the category form for a new category of this type.
  * @param onSaved the transaction was saved; closes the form unless the caller does more.
  * @param onScan the add form's Scan chip; hidden when null.
- * @param isSideSheet shown as a side sheet over the list on a wide screen, below no status bar.
  */
 @Composable
 fun TransactionFormRoute(
@@ -88,7 +84,7 @@ fun TransactionFormRoute(
     preset: TransactionFormPreset = TransactionFormPreset(),
     onSaved: (String) -> Unit = { onClose() },
     onScan: (() -> Unit)? = null,
-    isSideSheet: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: TransactionFormViewModel = hiltViewModel<TransactionFormViewModel, TransactionFormViewModel.Factory>(
         key = transactionId ?: "new-${preset.type}-${preset.walletId}-${preset.draft.hashCode()}",
     ) {
@@ -96,9 +92,7 @@ fun TransactionFormRoute(
     },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             TransactionFormEffect.Close -> onClose()
@@ -106,9 +100,7 @@ fun TransactionFormRoute(
             TransactionFormEffect.OpenScan -> onScan?.invoke()
             is TransactionFormEffect.Deleted -> onDeleted(effect.id)
             is TransactionFormEffect.OpenNewCategory -> onNewCategory(effect.type)
-            is TransactionFormEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is TransactionFormEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     BackHandler { viewModel.onIntent(TransactionFormIntent.Close) }
@@ -116,9 +108,9 @@ fun TransactionFormRoute(
         state,
         viewModel::onIntent,
         modifier,
-        isSideSheet = isSideSheet,
+        placement = placement,
         canScan = onScan != null,
-        snackbarHostState = snackbarHostState,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -127,7 +119,7 @@ fun TransactionFormScreen(
     state: TransactionFormState,
     onIntent: (TransactionFormIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isSideSheet: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     canScan: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
@@ -156,7 +148,7 @@ fun TransactionFormScreen(
                     },
                 ),
                 titleStyle = MonAITheme.typography.headlineSmall,
-                windowInsets = if (isSideSheet) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
             ) {
                 if (!state.isEdit && canScan) {
                     MonAIButton(

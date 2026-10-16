@@ -4,12 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.SnackbarHostState
@@ -17,10 +15,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -28,10 +24,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.R
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
-import com.djtech.monai.core.designsystem.component.MonAISnackbarVisuals
 import com.djtech.monai.core.designsystem.component.MonAITopBar
-import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
+import com.djtech.monai.core.designsystem.component.ScreenPlacement
 import com.djtech.monai.core.designsystem.component.monthName
+import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.budgets.presentation.budget.components.BudgetActions
 import com.djtech.monai.feature.budgets.presentation.budget.components.BudgetLegend
@@ -41,19 +37,17 @@ import com.djtech.monai.feature.budgets.presentation.budget.components.BudgetPre
 import com.djtech.monai.feature.budgets.presentation.budget.components.BudgetRemoveDialog
 import com.djtech.monai.feature.budgets.presentation.budget.model.BudgetPresetLimits
 import com.djtech.monai.feature.budgets.presentation.budget.preview.BudgetPreviewData
-import kotlinx.coroutines.launch
 import java.time.YearMonth
 
 /**
  * @param onClose the budget was saved or removed, or the user went back.
- * @param isPane shown beside the Settings menu: no back button, no status-bar inset.
  */
 @Composable
 fun BudgetRoute(
     month: YearMonth,
     onClose: () -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     viewModel: BudgetViewModel = hiltViewModel<BudgetViewModel, BudgetViewModel.Factory>(key = month.toString()) {
         it.create(
             month,
@@ -61,23 +55,19 @@ fun BudgetRoute(
     },
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
+    val messenger = rememberMonAIMessenger()
     CollectEffects(viewModel.effects) { effect ->
         when (effect) {
             BudgetEffect.Close -> onClose()
-            is BudgetEffect.ShowMessage -> scope.launch {
-                snackbarHostState.showSnackbar(MonAISnackbarVisuals(effect.message.asString(context)))
-            }
+            is BudgetEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
     BudgetScreen(
         state,
         viewModel::onIntent,
         modifier,
-        isPane = isPane,
-        snackbarHostState = snackbarHostState,
+        placement = placement,
+        snackbarHostState = messenger.hostState,
     )
 }
 
@@ -87,7 +77,7 @@ fun BudgetScreen(
     state: BudgetState,
     onIntent: (BudgetIntent) -> Unit,
     modifier: Modifier = Modifier,
-    isPane: Boolean = false,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
@@ -103,9 +93,8 @@ fun BudgetScreen(
         ) {
             MonAITopBar(
                 title = stringResource(R.string.budget_title, state.month.monthName()),
-                navigation = if (isPane) MonAITopBarNavigation.None else MonAITopBarNavigation.Back,
                 onNavigationClick = { onIntent(BudgetIntent.Back) },
-                windowInsets = if (isPane) WindowInsets(0) else WindowInsets.statusBars,
+                placement = placement,
             )
             Column(
                 Modifier

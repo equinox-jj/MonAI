@@ -152,9 +152,22 @@ fun MonAIGradientCard(
 
 enum class MonAITopBarNavigation { Back, Close, None }
 
+/** Where a screen is shown, which decides its top bar's status-bar inset and navigation button. */
+enum class ScreenPlacement {
+    /** Its own screen: the top bar sits below the status bar. */
+    FullScreen,
+
+    /** Beside a list or menu on a wide screen: no navigation button, and the host owns the status bar. */
+    Pane,
+
+    /** A side sheet over the screen behind it on a wide screen, which owns the status bar. */
+    SideSheet,
+}
+
 /**
- * Screen header for pushed screens and full-screen forms: back/close, title, actions.
- * Applies the status-bar inset by default; pass `WindowInsets(0)` when the parent handles it.
+ * Screen header for pushed screens and full-screen forms: back/close, title, actions. Only a
+ * [ScreenPlacement.FullScreen] bar pads for the status bar, and a [ScreenPlacement.Pane] has no
+ * navigation button.
  */
 @Composable
 fun MonAITopBar(
@@ -164,20 +177,21 @@ fun MonAITopBar(
     onNavigationClick: () -> Unit = {},
     navigationContentDescription: String = if (navigation == MonAITopBarNavigation.Close) "Close" else "Back",
     titleStyle: TextStyle = MonAITheme.typography.titleLarge,
-    windowInsets: WindowInsets = WindowInsets.statusBars,
+    placement: ScreenPlacement = ScreenPlacement.FullScreen,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
+    val insets = if (placement == ScreenPlacement.FullScreen) WindowInsets.statusBars else WindowInsets(0)
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .windowInsetsPadding(windowInsets)
+            .windowInsetsPadding(insets)
             .height(56.dp)
             // 44dp buttons sit 6dp in, so their icons line up with the 16dp content edge.
             .padding(horizontal = MonAITheme.spacing.x1_5),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(MonAITheme.spacing.x1),
     ) {
-        when (navigation) {
+        when (if (placement == ScreenPlacement.Pane) MonAITopBarNavigation.None else navigation) {
             MonAITopBarNavigation.Back -> MonAIIconButton(
                 MonAIIcons.ArrowBack,
                 navigationContentDescription,
@@ -300,7 +314,7 @@ private fun SurfacesPreview() {
                 .padding(bottom = 16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            MonAITopBar("Transaction", windowInsets = WindowInsets(0)) {
+            MonAITopBar("Transaction", placement = ScreenPlacement.SideSheet) {
                 MonAIIconButton(MonAIIcons.Edit, "Edit", onClick = {})
                 MonAIIconButton(
                     MonAIIcons.Delete,

@@ -5,6 +5,8 @@ import androidx.lifecycle.viewModelScope
 import com.djtech.monai.R
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
+import com.djtech.monai.core.common.ui.RefreshStatus
 import com.djtech.monai.core.common.ui.UiText
 import com.djtech.monai.core.model.Wallet
 import com.djtech.monai.feature.wallets.domain.model.WalletError
@@ -13,13 +15,11 @@ import com.djtech.monai.feature.wallets.domain.model.totalBalance
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveAllWalletsUseCase
 import com.djtech.monai.feature.wallets.domain.usecase.RefreshWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,14 +35,14 @@ class WalletsViewModel @Inject constructor(
     private val refreshWallets: RefreshWalletsUseCase,
 ) : ViewModel() {
 
-    private val load = MutableStateFlow(LoadStatus())
+    private val load = MutableStateFlow(RefreshStatus<WalletError>())
     private val selectedId = MutableStateFlow<String?>(null)
 
     val state: StateFlow<WalletsState> = combine(observeAllWallets(), load, selectedId, ::toState)
         .stateIn(viewModelScope, WhileUiSubscribed, WalletsState())
 
-    private val effectChannel = Channel<WalletsEffect>(Channel.BUFFERED)
-    val effects: Flow<WalletsEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<WalletsEffect>()
+    val effects: Flow<WalletsEffect> = effectQueue.flow
 
     init {
         refresh(userInitiated = false)
@@ -52,30 +52,32 @@ class WalletsViewModel @Inject constructor(
         when (intent) {
             WalletsIntent.Refresh -> refresh(userInitiated = true)
             is WalletsIntent.Select -> selectedId.value = intent.id
-            is WalletsIntent.Open -> send(WalletsEffect.Navigate(intent.destination))
+            is WalletsIntent.Open -> effectQueue.send(WalletsEffect.Navigate(intent.destination))
         }
     }
 
     private fun refresh(userInitiated: Boolean) {
         if (load.value.isRunning) return
-        load.update { it.copy(isRunning = true, isUserInitiated = userInitiated, failure = null) }
+        load.update { it.started(userInitiated) }
         viewModelScope.launch {
             val failure = (refreshWallets() as? Outcome.Failure)?.error
-            load.update { LoadStatus(hasFinishedOnce = true, failure = failure) }
+            load.update { it.finished(failure) }
             // With nothing cached the state shows the error itself, so there's no message too.
             if (failure != null && observeAllWallets().first().isNotEmpty()) {
-                send(WalletsEffect.ShowMessage(failure.refreshMessage(), isOffline = failure == WalletError.Network))
+                effectQueue.send(
+                    WalletsEffect.ShowMessage(failure.refreshMessage(), isOffline = failure == WalletError.Network),
+                )
             }
         }
     }
 
-    private fun toState(all: List<Wallet>, load: LoadStatus, selected: String?): WalletsState {
+    private fun toState(all: List<Wallet>, load: RefreshStatus<WalletError>, selected: String?): WalletsState {
         val active = all.filterNot(Wallet::isArchived)
         val hasCache = all.isNotEmpty()
         return WalletsState(
-            isLoading = !hasCache && (load.isRunning || !load.hasFinishedOnce),
-            loadError = if (!hasCache && !load.isRunning) load.failure?.loadMessage() else null,
-            isRefreshing = hasCache && load.isRunning && load.isUserInitiated,
+            isLoading = load.isLoading(hasCache),
+            loadError = load.loadFailure(hasCache)?.loadMessage(),
+            isRefreshing = load.isRefreshing(hasCache),
             wallets = active,
             totalBalance = active.totalBalance(),
             shares = active.balanceSharesByType(),
@@ -84,19 +86,7 @@ class WalletsViewModel @Inject constructor(
             selectedId = selected?.takeIf { id -> active.any { it.id == id } } ?: active.firstOrNull()?.id,
         )
     }
-
-    private fun send(effect: WalletsEffect) {
-        viewModelScope.launch { effectChannel.send(effect) }
-    }
 }
-
-/** @param failure how the last finished refresh failed; null when it succeeded or one is running. */
-private data class LoadStatus(
-    val isRunning: Boolean = false,
-    val isUserInitiated: Boolean = false,
-    val hasFinishedOnce: Boolean = false,
-    val failure: WalletError? = null,
-)
 
 private fun WalletError.refreshMessage(): UiText = UiText.Resource(
     when (this) {

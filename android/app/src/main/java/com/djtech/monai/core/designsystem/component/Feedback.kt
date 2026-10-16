@@ -258,8 +258,8 @@ data class MonAISnackbarVisuals(
 ) : SnackbarVisuals
 
 /**
- * Renders [SnackbarHostState] messages as [MonAISnackbar]. Show with
- * `hostState.showSnackbar(MonAISnackbarVisuals(...))` to pass an icon.
+ * Renders [SnackbarHostState] messages as [MonAISnackbar]. Routes show them with
+ * [rememberMonAIMessenger]; [MonAISnackbarVisuals] carries the icon.
  */
 @Composable
 fun MonAISnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {

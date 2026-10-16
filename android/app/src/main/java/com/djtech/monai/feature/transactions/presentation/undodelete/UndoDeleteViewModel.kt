@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.djtech.monai.core.common.coroutines.WhileUiSubscribed
 import com.djtech.monai.core.common.result.Outcome
+import com.djtech.monai.core.common.ui.EffectQueue
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.feature.categories.domain.usecase.ObserveCategoriesUseCase
 import com.djtech.monai.feature.transactions.domain.usecase.ObserveTransactionDeletionsUseCase
@@ -13,13 +14,11 @@ import com.djtech.monai.feature.transactions.presentation.common.model.Transacti
 import com.djtech.monai.feature.wallets.domain.usecase.ObserveAllWalletsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,8 +48,8 @@ class UndoDeleteViewModel @Inject constructor(
     ) { offer, lookups -> UndoDeleteState(offer.deleted, lookups, offer.isRestoring) }
         .stateIn(viewModelScope, WhileUiSubscribed, UndoDeleteState())
 
-    private val effectChannel = Channel<UndoDeleteEffect>(Channel.BUFFERED)
-    val effects: Flow<UndoDeleteEffect> = effectChannel.receiveAsFlow()
+    private val effectQueue = EffectQueue<UndoDeleteEffect>()
+    val effects: Flow<UndoDeleteEffect> = effectQueue.flow
 
     init {
         viewModelScope.launch { observeTransactionDeletions().collect(::offerUndo) }
@@ -80,7 +79,7 @@ class UndoDeleteViewModel @Inject constructor(
         viewModelScope.launch {
             val result = restoreTransaction(deleted.id)
             clear()
-            if (result is Outcome.Failure) effectChannel.send(UndoDeleteEffect.ShowMessage(result.error.toMessage()))
+            if (result is Outcome.Failure) effectQueue.send(UndoDeleteEffect.ShowMessage(result.error.toMessage()))
         }
     }
 

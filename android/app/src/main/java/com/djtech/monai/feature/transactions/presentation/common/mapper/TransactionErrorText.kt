@@ -21,5 +21,11 @@ fun TransactionError.toMessage(): UiText = when (this) {
         -> UiText.Resource(R.string.transaction_error_unexpected)
 }
 
+/** Why a transaction couldn't be loaded, for a screen that has nothing to show instead. */
+fun TransactionError.loadMessage(): UiText = when (this) {
+    TransactionError.Network -> UiText.Resource(R.string.transactions_load_failed_network)
+    else -> toMessage()
+}
+
 /** Whether a paged list failed because the device is offline. */
 fun Throwable.isOffline(): Boolean = (this as? TransactionLoadException)?.error == TransactionError.Network
