@@ -23,17 +23,30 @@ android {
         testInstrumentationRunner = "com.djtech.monai.HiltTestRunner"
     }
 
-    buildTypes {
-        debug {
+    flavorDimensions += "environment"
+    productFlavors {
+        create("dev") {
+            dimension = "environment"
+            // Installs next to prod; src/dev renames the app and allows cleartext to the local backend.
+            applicationIdSuffix = ".dev"
+            versionNameSuffix = "-dev"
             // 10.0.2.2 is the host machine as seen from the Android emulator.
             buildConfigField("String", "API_BASE_URL", "\"http://10.0.2.2:8080/api/v1/\"")
         }
+        create("prod") {
+            dimension = "environment"
+            val apiBaseUrl = providers
+                .gradleProperty("monai.apiBaseUrl")
+                .getOrElse("https://api.monai.example/api/v1/")
+
+            buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
+        }
+    }
+
+    buildTypes {
         release {
             // Debug key so the release build installs locally; use a real keystore for Play Store uploads.
             signingConfig = signingConfigs.getByName("debug")
-            val apiBaseUrl = providers.gradleProperty("monai.apiBaseUrl")
-                .getOrElse("https://api.monai.example/api/v1/")
-            buildConfigField("String", "API_BASE_URL", "\"$apiBaseUrl\"")
             optimization {
                 enable = true
                 packageScope = setOf("androidx.**", "kotlin.**", "kotlinx.**")
@@ -60,7 +73,7 @@ room3 {
 
 // Debug avatar, receipt and logo URLs are signed for localhost:9000 (the backend's MINIO_PUBLIC_URL).
 // Forwarding the device's localhost:9000 to this machine lets the emulator or a USB phone load them.
-// Runs after every debug build, which Android Studio's Run also does; without a single connected
+// Runs after every dev debug build, which Android Studio's Run also does; without a single connected
 // device it only prints adb's message.
 val adbReverseMinio = tasks.register<Exec>("adbReverseMinio") {
     group = "install"
@@ -70,7 +83,7 @@ val adbReverseMinio = tasks.register<Exec>("adbReverseMinio") {
     isIgnoreExitValue = true
 }
 
-tasks.matching { it.name == "assembleDebug" || it.name == "installDebug" }.configureEach {
+tasks.matching { it.name == "assembleDevDebug" || it.name == "installDevDebug" }.configureEach {
     finalizedBy(adbReverseMinio)
 }
 
@@ -112,17 +125,21 @@ dependencies {
     implementation(libs.mlkit.text.recognition)
     implementation(libs.androidx.sqlite.bundled)
     ksp(libs.androidx.room.compiler)
+
     testImplementation(libs.junit)
     testImplementation(libs.okhttp.mockwebserver)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.paging.testing)
+
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.hilt.android.testing)
+
     kspAndroidTest(libs.hilt.compiler)
+
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

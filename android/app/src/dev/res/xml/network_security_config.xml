@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><!-- Debug only: lets the app reach the local backend over plain HTTP. -->
+<?xml version="1.0" encoding="utf-8"?><!-- Dev flavor only: lets the app reach the local backend over plain HTTP. -->
 <network-security-config>
     <base-config cleartextTrafficPermitted="false" />
     <domain-config cleartextTrafficPermitted="true">
