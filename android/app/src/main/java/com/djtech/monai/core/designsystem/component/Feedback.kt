@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +31,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -258,15 +260,17 @@ data class MonAISnackbarVisuals(
 ) : SnackbarVisuals
 
 /**
- * Renders [SnackbarHostState] messages as [MonAISnackbar]. Routes show them with
- * [rememberMonAIMessenger]; [MonAISnackbarVisuals] carries the icon.
+ * Renders [SnackbarHostState] messages as [MonAISnackbar] at [snackbarPlacement]. Routes show them with
+ * [rememberMonAIMessenger]; [MonAISnackbarVisuals] carries the icon. A screen with controls pinned to
+ * its bottom passes an [anchor] so the snackbar sits above them.
  */
 @Composable
-fun MonAISnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier) {
-    SnackbarHost(
-        hostState,
-        modifier.padding(horizontal = MonAITheme.spacing.screenHorizontal),
-    ) { data: SnackbarData ->
+fun MonAISnackbarHost(
+    hostState: SnackbarHostState,
+    modifier: Modifier = Modifier,
+    anchor: SnackbarAnchor? = null,
+) {
+    SnackbarHost(hostState, modifier.snackbarPlacement(anchor)) { data: SnackbarData ->
         val visuals = data.visuals as? MonAISnackbarVisuals
         MonAISnackbar(
             message = data.visuals.message,
@@ -276,6 +280,26 @@ fun MonAISnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifie
             onAction = data::performAction,
         )
     }
+}
+
+/**
+ * Where a snackbar sits at the bottom of the screen: within the side margins, 20dp above the system
+ * navigation bar or the keyboard, or above the controls marked for [anchor]. Content above a bar that
+ * already clears the navigation bar (the tab shell's bottom bar) consumes those insets, so the snackbar
+ * keeps just the 20dp above that bar.
+ */
+fun Modifier.snackbarPlacement(anchor: SnackbarAnchor? = null): Modifier = composed {
+    val clearance = if (anchor?.hasControls == true) {
+        Modifier.liftAboveSnackbarAnchor(anchor)
+    } else {
+        Modifier
+            .navigationBarsPadding()
+            .imePadding()
+    }
+    (if (anchor != null) trackSnackbarAnchor(anchor) else this)
+        .then(clearance)
+        .padding(horizontal = MonAITheme.spacing.screenHorizontal)
+        .padding(bottom = MonAITheme.spacing.x5)
 }
 
 /**

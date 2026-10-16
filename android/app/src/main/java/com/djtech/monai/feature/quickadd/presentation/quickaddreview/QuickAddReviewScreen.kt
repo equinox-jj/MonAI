@@ -37,6 +37,8 @@ import com.djtech.monai.core.designsystem.component.MonAIWalletPickerSheet
 import com.djtech.monai.core.designsystem.component.MoneyDirection
 import com.djtech.monai.core.designsystem.component.ScreenPlacement
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.TransactionDraft
@@ -90,6 +92,7 @@ fun QuickAddReviewScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
+    val snackbarAnchor = rememberSnackbarAnchor()
     Box(
         modifier
             .fillMaxSize()
@@ -141,9 +144,15 @@ fun QuickAddReviewScreen(
                     QuickAddReviewSummary(state.summary, state.savedCount, state.today)
                 }
             }
-            Actions(state, onIntent, Modifier.padding(horizontal = spacing.screenHorizontal, vertical = spacing.x4))
+            Actions(
+                state,
+                onIntent,
+                Modifier
+                    .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x4)
+                    .snackbarAnchor(snackbarAnchor),
+            )
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     ReviewSheets(state, onIntent)
 }

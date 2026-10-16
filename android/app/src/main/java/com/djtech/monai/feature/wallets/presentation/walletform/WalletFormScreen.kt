@@ -36,8 +36,11 @@ import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
 import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.SnackbarAnchor
 import com.djtech.monai.core.designsystem.component.label
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.wallets.domain.model.WalletField
@@ -96,6 +99,7 @@ fun WalletFormScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val isReady = !state.isLoading && state.loadError == null
+    val snackbarAnchor = rememberSnackbarAnchor()
     Box(
         modifier
             .fillMaxSize()
@@ -156,10 +160,10 @@ fun WalletFormScreen(
                     ) { CircularProgressIndicator(color = MonAITheme.colors.primary) }
                 }
 
-                else -> FormContent(state, onIntent, Modifier.weight(1f))
+                else -> FormContent(state, onIntent, snackbarAnchor, Modifier.weight(1f))
             }
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     WalletFormDialogs(state.dialog, state.wallet?.name ?: state.name, onIntent)
 }
@@ -168,6 +172,7 @@ fun WalletFormScreen(
 private fun FormContent(
     state: WalletFormState,
     onIntent: (WalletFormIntent) -> Unit,
+    snackbarAnchor: SnackbarAnchor,
     modifier: Modifier = Modifier,
 ) {
     val spacing = MonAITheme.spacing
@@ -246,12 +251,15 @@ private fun FormContent(
                 enabled = !state.isSaving,
                 onArchive = { onIntent(WalletFormIntent.Archive) },
                 onDelete = { onIntent(WalletFormIntent.Delete) },
+                modifier = Modifier.snackbarAnchor(snackbarAnchor),
             )
         } else {
             MonAIButton(
                 stringResource(R.string.wallet_form_add),
                 onClick = { onIntent(WalletFormIntent.Save) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .snackbarAnchor(snackbarAnchor),
                 loading = state.isSaving,
             )
         }

@@ -39,7 +39,10 @@ import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
 import com.djtech.monai.core.designsystem.component.MonAIStateMessage
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.SnackbarAnchor
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.transactions.presentation.transactiondetail.components.TransactionDetailActions
@@ -101,6 +104,7 @@ fun TransactionDetailScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val transaction = state.transaction
+    val snackbarAnchor = rememberSnackbarAnchor()
     Box(
         modifier
             .fillMaxSize()
@@ -129,7 +133,7 @@ fun TransactionDetailScreen(
                 }
             }
             when {
-                transaction != null -> DetailContent(state, onIntent, Modifier.weight(1f))
+                transaction != null -> DetailContent(state, onIntent, snackbarAnchor, Modifier.weight(1f))
                 state.loadError != null -> DetailError(state.loadError, placement, onIntent, Modifier.weight(1f))
                 else -> {
                     val description = stringResource(R.string.transaction_detail_loading)
@@ -143,7 +147,7 @@ fun TransactionDetailScreen(
                 }
             }
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     val receiptUrl = transaction?.receiptUrl
     if (state.isReceiptOpen && receiptUrl != null) {
@@ -162,6 +166,7 @@ fun TransactionDetailScreen(
 private fun DetailContent(
     state: TransactionDetailState,
     onIntent: (TransactionDetailIntent) -> Unit,
+    snackbarAnchor: SnackbarAnchor,
     modifier: Modifier = Modifier,
 ) {
     val transaction = state.transaction ?: return
@@ -195,7 +200,8 @@ private fun DetailContent(
             onEdit = { onIntent(TransactionDetailIntent.Edit) },
             modifier = Modifier
                 .widthIn(max = 560.dp)
-                .padding(top = MonAITheme.spacing.x4),
+                .padding(top = MonAITheme.spacing.x4)
+                .snackbarAnchor(snackbarAnchor),
         )
     }
 }

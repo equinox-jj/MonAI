@@ -28,6 +28,8 @@ import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.ScreenPlacement
 import com.djtech.monai.core.designsystem.component.monthName
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.budgets.presentation.budget.components.BudgetActions
 import com.djtech.monai.feature.budgets.presentation.budget.components.BudgetLegend
@@ -81,6 +83,7 @@ fun BudgetScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
+    val snackbarAnchor = rememberSnackbarAnchor()
     Box(
         modifier
             .fillMaxSize()
@@ -127,10 +130,11 @@ fun BudgetScreen(
                 onRemove = { onIntent(BudgetIntent.Delete) },
                 modifier = Modifier
                     .navigationBarsPadding()
-                    .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x4),
+                    .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x4)
+                    .snackbarAnchor(snackbarAnchor),
             )
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     if (state.isConfirmingDelete) {
         BudgetRemoveDialog(

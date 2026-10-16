@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.only
@@ -57,9 +58,15 @@ internal fun MainShell(modifier: Modifier = Modifier) {
 
     when (widthClass) {
         MonAIWidthClass.Compact -> Column(modifier.fillMaxSize()) {
-            content(Modifier.weight(1f))
             // Detail, form and search take the whole phone screen.
-            if (!navigator.backStack.last().isFullScreen()) {
+            val hasBottomBar = !navigator.backStack.last().isFullScreen()
+            // The bottom bar clears the system navigation bar, so the content above it needn't.
+            content(
+                Modifier
+                    .weight(1f)
+                    .then(if (hasBottomBar) Modifier.consumeWindowInsets(WindowInsets.navigationBars) else Modifier),
+            )
+            if (hasBottomBar) {
                 MonAIBottomBar(
                     items,
                     selectedIndex,

@@ -6,11 +6,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -18,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.djtech.monai.core.common.ui.CollectEffects
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.snackbarPlacement
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.Transaction
 import com.djtech.monai.feature.transactions.presentation.common.preview.TransactionPreviewData
@@ -37,9 +37,10 @@ fun UndoDeleteRoute(modifier: Modifier = Modifier, viewModel: UndoDeleteViewMode
             is UndoDeleteEffect.ShowMessage -> messenger.show(effect.message)
         }
     }
-    Column(modifier) {
-        UndoDeleteScreen(state, viewModel::onIntent)
+    // Same spot: a failed undo's message shows once the bar has gone, and a newer bar covers it.
+    Box(modifier, contentAlignment = Alignment.BottomCenter) {
         MonAISnackbarHost(messenger.hostState)
+        UndoDeleteScreen(state, viewModel::onIntent)
     }
 }
 
@@ -64,10 +65,7 @@ fun UndoDeleteScreen(
                 windowMillis = UNDO_WINDOW_MS,
                 enabled = !state.isRestoring,
                 onUndo = { onIntent(UndoDeleteIntent.Undo) },
-                modifier = Modifier.padding(
-                    horizontal = MonAITheme.spacing.screenHorizontal,
-                    vertical = MonAITheme.spacing.x3,
-                ),
+                modifier = Modifier.snackbarPlacement(),
             )
         }
     }

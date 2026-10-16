@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?><!-- Android 12+. Keeps the session token out of cloud backup and device transfer:
      its Keystore key stays on this device. The Room cache stays too; it holds
-     financial data and is re-filled from the server. -->
+     financial data and is re-filled from the server. So do the app preferences
+     (onboarding done, theme, search history), so a reinstall starts fresh with onboarding. -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude
             domain="file"
             path="datastore/session.preferences_pb" />
+        <exclude
+            domain="file"
+            path="datastore/app.preferences_pb" />
         <exclude
             domain="database"
             path="monai.db" />
@@ -14,6 +18,9 @@
         <exclude
             domain="file"
             path="datastore/session.preferences_pb" />
+        <exclude
+            domain="file"
+            path="datastore/app.preferences_pb" />
         <exclude
             domain="database"
             path="monai.db" />

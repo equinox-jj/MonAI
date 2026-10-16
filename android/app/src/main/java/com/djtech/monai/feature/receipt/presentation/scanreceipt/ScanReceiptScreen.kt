@@ -41,6 +41,8 @@ import com.djtech.monai.core.designsystem.component.MonAIButtonVariant
 import com.djtech.monai.core.designsystem.component.MonAIIconButton
 import com.djtech.monai.core.designsystem.component.MonAISnackbarHost
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.core.model.ReceiptDraft
@@ -130,6 +132,7 @@ fun ScanReceiptScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     camera: @Composable () -> Unit = {},
 ) {
+    val snackbarAnchor = rememberSnackbarAnchor()
     // The camera is always shown on black, whatever the theme.
     Box(
         modifier
@@ -173,7 +176,8 @@ fun ScanReceiptScreen(
                     onClick = { onIntent(ScanReceiptIntent.Retake) },
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(bottom = MonAITheme.spacing.x10),
+                        .padding(bottom = MonAITheme.spacing.x10)
+                        .snackbarAnchor(snackbarAnchor),
                     variant = MonAIButtonVariant.Outlined,
                     size = MonAIButtonSize.Medium,
                 )
@@ -183,10 +187,11 @@ fun ScanReceiptScreen(
                     onGallery = { onIntent(ScanReceiptIntent.OpenGallery) },
                     onCapture = { onIntent(ScanReceiptIntent.Capture) },
                     onTypeInstead = { onIntent(ScanReceiptIntent.TypeInstead) },
+                    modifier = Modifier.snackbarAnchor(snackbarAnchor),
                 )
             }
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     if (state.phase == ScanPhase.NoText) {
         ScanReceiptNoText(

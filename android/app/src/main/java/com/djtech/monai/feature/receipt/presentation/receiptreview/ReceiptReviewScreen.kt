@@ -46,6 +46,8 @@ import com.djtech.monai.core.designsystem.component.MoneyDirection
 import com.djtech.monai.core.designsystem.component.currentLocale
 import com.djtech.monai.core.designsystem.component.currentWidthClass
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.component.transactionTypeSegments
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
@@ -101,6 +103,7 @@ fun ReceiptReviewScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
+    val snackbarAnchor = rememberSnackbarAnchor()
     // On a wide screen the photo sits beside the form, as on the tablet artboard.
     val wide = currentWidthClass() == MonAIWidthClass.Expanded
     Box(
@@ -154,12 +157,13 @@ fun ReceiptReviewScreen(
                 onClick = { onIntent(ReceiptReviewIntent.Save) },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x4),
+                    .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x4)
+                    .snackbarAnchor(snackbarAnchor),
                 leadingIcon = MonAIIcons.Check,
                 loading = state.isSaving,
             )
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     ReviewSheets(state, onIntent)
 }

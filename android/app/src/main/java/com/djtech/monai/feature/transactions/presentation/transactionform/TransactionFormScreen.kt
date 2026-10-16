@@ -47,7 +47,10 @@ import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.MonAITopBarNavigation
 import com.djtech.monai.core.designsystem.component.MonAIWalletPickerSheet
 import com.djtech.monai.core.designsystem.component.ScreenPlacement
+import com.djtech.monai.core.designsystem.component.SnackbarAnchor
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.component.transactionTypeSegments
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
@@ -123,6 +126,7 @@ fun TransactionFormScreen(
     canScan: Boolean = false,
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
+    val snackbarAnchor = rememberSnackbarAnchor()
     Box(
         modifier
             .fillMaxSize()
@@ -199,10 +203,10 @@ fun TransactionFormScreen(
                     ) { CircularProgressIndicator() }
                 }
 
-                else -> FormContent(state, onIntent, Modifier.weight(1f))
+                else -> FormContent(state, onIntent, snackbarAnchor, Modifier.weight(1f))
             }
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
     FormSheets(state, onIntent)
     if (state.showDiscardDialog) TransactionFormDiscardDialog(onIntent)
@@ -213,6 +217,7 @@ fun TransactionFormScreen(
 private fun FormContent(
     state: TransactionFormState,
     onIntent: (TransactionFormIntent) -> Unit,
+    snackbarAnchor: SnackbarAnchor,
     modifier: Modifier = Modifier,
 ) {
     val spacing = MonAITheme.spacing
@@ -252,17 +257,19 @@ private fun FormContent(
                 )
             }
         }
-        // Only the note opens the keyboard; hide the keypad meanwhile so the two don't stack.
-        if (!WindowInsets.isImeVisible) TransactionFormKeypad(onIntent, horizontal)
-        MonAIButton(
-            text = stringResource(state.saveLabel()),
-            onClick = { onIntent(TransactionFormIntent.Save) },
-            modifier = horizontal
-                .fillMaxWidth()
-                .padding(bottom = spacing.x4),
-            leadingIcon = MonAIIcons.Check,
-            loading = state.isSaving,
-        )
+        Column(Modifier.snackbarAnchor(snackbarAnchor), verticalArrangement = Arrangement.spacedBy(spacing.x3)) {
+            // Only the note opens the keyboard; hide the keypad meanwhile so the two don't stack.
+            if (!WindowInsets.isImeVisible) TransactionFormKeypad(onIntent, horizontal)
+            MonAIButton(
+                text = stringResource(state.saveLabel()),
+                onClick = { onIntent(TransactionFormIntent.Save) },
+                modifier = horizontal
+                    .fillMaxWidth()
+                    .padding(bottom = spacing.x4),
+                leadingIcon = MonAIIcons.Check,
+                loading = state.isSaving,
+            )
+        }
     }
 }
 

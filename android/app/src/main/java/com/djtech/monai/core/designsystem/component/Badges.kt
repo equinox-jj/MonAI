@@ -12,6 +12,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,6 +25,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import coil3.compose.LocalPlatformContext
+import coil3.request.ImageRequest
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 
@@ -96,7 +99,8 @@ fun MonAIDirectionPill(text: String, direction: MoneyDirection, modifier: Modifi
 
 /**
  * Initials on a light-indigo circle, or the photo at [imageUrl] once it loads. The initials stay
- * while it loads and when it fails (presigned URLs expire). Font size scales with [size]
+ * while it loads and when it fails (presigned URLs expire). The image is cached by [avatarCacheKey], so
+ * a refresh that signs the URL again keeps showing the photo. Font size scales with [size]
  * (44dp → 15sp, 64dp → 22sp).
  */
 @Composable
@@ -123,8 +127,19 @@ fun MonAIAvatar(
             color = MonAITheme.colors.accent,
         )
         if (imageUrl != null) {
+            val context = LocalPlatformContext.current
+            val request = remember(imageUrl, context) {
+                val key = avatarCacheKey(imageUrl)
+                ImageRequest.Builder(context)
+                    .data(imageUrl)
+                    .memoryCacheKey(key)
+                    .diskCacheKey(key)
+                    // A smaller copy decoded for another screen stands in while this size decodes.
+                    .placeholderMemoryCacheKey(key)
+                    .build()
+            }
             AsyncImage(
-                model = imageUrl,
+                model = request,
                 contentDescription = null,
                 modifier = Modifier.matchParentSize(),
                 contentScale = ContentScale.Crop,
@@ -132,6 +147,12 @@ fun MonAIAvatar(
         }
     }
 }
+
+/**
+ * The photo's URL without its query. The backend signs the URL again on every `GET /me`, so only the
+ * query changes between refreshes; a new photo is stored under a new path and gets a new key.
+ */
+internal fun avatarCacheKey(url: String): String = url.substringBefore('?')
 
 /** Wallet/provider monogram ("BCA", "GP") on a circle. Default: white circle for gradients. */
 @Composable

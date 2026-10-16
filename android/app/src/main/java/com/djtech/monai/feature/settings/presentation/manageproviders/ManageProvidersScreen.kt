@@ -43,6 +43,8 @@ import com.djtech.monai.core.designsystem.component.MonAITag
 import com.djtech.monai.core.designsystem.component.MonAITopBar
 import com.djtech.monai.core.designsystem.component.ScreenPlacement
 import com.djtech.monai.core.designsystem.component.rememberMonAIMessenger
+import com.djtech.monai.core.designsystem.component.rememberSnackbarAnchor
+import com.djtech.monai.core.designsystem.component.snackbarAnchor
 import com.djtech.monai.core.designsystem.icon.MonAIIcons
 import com.djtech.monai.core.designsystem.theme.MonAITheme
 import com.djtech.monai.feature.settings.presentation.manageproviders.components.ManageProvidersRow
@@ -88,6 +90,7 @@ fun ManageProvidersScreen(
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
 ) {
     val spacing = MonAITheme.spacing
+    val snackbarAnchor = rememberSnackbarAnchor()
     Box(
         modifier
             .fillMaxSize()
@@ -136,12 +139,13 @@ fun ManageProvidersScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .navigationBarsPadding()
-                        .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x3),
+                        .padding(horizontal = spacing.screenHorizontal, vertical = spacing.x3)
+                        .snackbarAnchor(snackbarAnchor),
                     leadingIcon = MonAIIcons.Add,
                 )
             }
         }
-        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter))
+        MonAISnackbarHost(snackbarHostState, Modifier.align(Alignment.BottomCenter), snackbarAnchor)
     }
 }
 
