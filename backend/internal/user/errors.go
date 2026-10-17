@@ -14,11 +14,4 @@ var (
 		"invalid_password",
 		"The password is incorrect",
 	)
-
-	ErrNameBlank = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
-		Field:   "name",
-		Code:    "required",
-		Message: "must not be blank",
-	})
-	ErrNoFields = httpx.ErrValidationFailed.WithMessage("At least one field is required")
 )

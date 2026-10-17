@@ -19,7 +19,7 @@ const (
 
 // UpdateMeRequest is the body of PATCH /me. Absent fields are left unchanged.
 type UpdateMeRequest struct {
-	Name     *string `json:"name" validate:"omitempty,min=1,max=100"`
+	Name     *string `json:"name" validate:"omitempty,min=1,notblank,max=100"`
 	Timezone *string `json:"timezone" validate:"omitempty,max=64,timezone"`
 }
 

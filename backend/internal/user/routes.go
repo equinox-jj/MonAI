@@ -13,21 +13,21 @@ import (
 const (
 	avatarUploadMax    = 10
 	avatarUploadWindow = time.Hour
-
-	deleteFailMax    = 5
-	deleteFailWindow = 15 * time.Minute
+	deleteFailMax      = 5
+	deleteFailWindow   = 15 * time.Minute
 )
 
 // RegisterRoutes mounts the user endpoints on the /api/v1 router.
-func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
+func RegisterRoutes(r fiber.Router, ctrl *Controller, auth httpx.RequireAuth) {
 	me := r.Group("/me", fiber.Handler(auth))
-	me.Get("/", h.GetMe)
-	me.Patch("/", h.UpdateMe)
-	me.Delete("/",
+	me.Get("/", ctrl.GetMe)
+	me.Patch("/", ctrl.UpdateMe)
+	me.Delete(
+		"/",
 		httpx.RateLimitFailures(deleteFailMax, deleteFailWindow, httpx.ByUser),
 		httpx.ErrorStatus,
-		h.DeleteMe,
+		ctrl.DeleteMe,
 	)
-	me.Put("/avatar", httpx.RateLimit(avatarUploadMax, avatarUploadWindow, httpx.ByUser), h.SetAvatar)
-	me.Delete("/avatar", h.DeleteAvatar)
+	me.Put("/avatar", httpx.RateLimit(avatarUploadMax, avatarUploadWindow, httpx.ByUser), ctrl.SetAvatar)
+	me.Delete("/avatar", ctrl.DeleteAvatar)
 }

@@ -6,29 +6,21 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 )
 
-type Handler interface {
-	List(c fiber.Ctx) error
-	Get(c fiber.Ctx) error
-	Create(c fiber.Ctx) error
-	Update(c fiber.Ctx) error
-	Delete(c fiber.Ctx) error
-}
-
-type handler struct {
+type Controller struct {
 	svc Service
 }
 
-func NewHandler(svc Service) Handler {
-	return &handler{svc: svc}
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
 }
 
-func (h *handler) List(c fiber.Ctx) error {
+func (ctrl *Controller) List(c fiber.Ctx) error {
 	var q ListWalletsQuery
 	if err := c.Bind().Query(&q); err != nil {
 		return err
 	}
 
-	resp, meta, err := h.svc.List(c.Context(), httpx.UserID(c), q)
+	resp, meta, err := ctrl.svc.List(c.Context(), httpx.UserID(c), q)
 	if err != nil {
 		return err
 	}
@@ -36,13 +28,13 @@ func (h *handler) List(c fiber.Ctx) error {
 	return httpx.OKWithMeta(c, "Wallets retrieved successfully.", resp, meta)
 }
 
-func (h *handler) Get(c fiber.Ctx) error {
+func (ctrl *Controller) Get(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Get(c.Context(), httpx.UserID(c), id)
+	resp, err := ctrl.svc.Get(c.Context(), httpx.UserID(c), id)
 	if err != nil {
 		return err
 	}
@@ -50,13 +42,13 @@ func (h *handler) Get(c fiber.Ctx) error {
 	return httpx.OK(c, "Wallet retrieved successfully.", resp)
 }
 
-func (h *handler) Create(c fiber.Ctx) error {
+func (ctrl *Controller) Create(c fiber.Ctx) error {
 	var req CreateWalletRequest
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Create(c.Context(), httpx.UserID(c), req)
+	resp, err := ctrl.svc.Create(c.Context(), httpx.UserID(c), req)
 	if err != nil {
 		return err
 	}
@@ -64,7 +56,7 @@ func (h *handler) Create(c fiber.Ctx) error {
 	return httpx.Created(c, "Wallet created successfully.", resp)
 }
 
-func (h *handler) Update(c fiber.Ctx) error {
+func (ctrl *Controller) Update(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
@@ -75,7 +67,7 @@ func (h *handler) Update(c fiber.Ctx) error {
 		return err
 	}
 
-	resp, err := h.svc.Update(c.Context(), httpx.UserID(c), id, req)
+	resp, err := ctrl.svc.Update(c.Context(), httpx.UserID(c), id, req)
 	if err != nil {
 		return err
 	}
@@ -83,13 +75,13 @@ func (h *handler) Update(c fiber.Ctx) error {
 	return httpx.OK(c, "Wallet updated successfully.", resp)
 }
 
-func (h *handler) Delete(c fiber.Ctx) error {
+func (ctrl *Controller) Delete(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	if err := h.svc.Delete(c.Context(), httpx.UserID(c), id); err != nil {
+	if err := ctrl.svc.Delete(c.Context(), httpx.UserID(c), id); err != nil {
 		return err
 	}
 

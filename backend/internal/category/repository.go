@@ -102,26 +102,12 @@ func (r *repository) Update(ctx context.Context, c *Category) error {
 			"is_hidden":  c.IsHidden,
 			"updated_at": time.Now(),
 		})
-	if res.Error != nil {
-		return nameTaken(res.Error)
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return nameTaken(database.Affected(res, ErrNotFound))
 }
 
 func (r *repository) Delete(ctx context.Context, userID, id uuid.UUID) error {
 	res := database.Conn(ctx, r.db).Delete(&Category{}, "id = ? AND user_id = ?", id, userID)
-	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return database.Affected(res, ErrNotFound)
 }
 
 // HasTransactions and MoveTransactions query the transactions table directly

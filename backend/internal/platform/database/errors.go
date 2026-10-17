@@ -18,6 +18,20 @@ func NotFound(err, notFound error) error {
 	return err
 }
 
+// Affected returns res.Error, or notFound when the statement succeeded but
+// matched no row (e.g. an UPDATE, DELETE or Scan scoped to a missing or
+// foreign ID).
+func Affected(res *gorm.DB, notFound error) error {
+	if res.Error != nil {
+		return res.Error
+	}
+	if res.RowsAffected == 0 {
+		return notFound
+	}
+
+	return nil
+}
+
 var likeEscaper = strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`)
 
 // EscapeLike escapes LIKE wildcards with PostgreSQL's default escape

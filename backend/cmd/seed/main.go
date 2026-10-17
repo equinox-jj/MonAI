@@ -51,8 +51,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Feature modules register HTTP routes, so only the needed constructors
-	// are provided here.
+	// Feature Modules register HTTP routes, so only their Providers are used.
 	var s *seeder
 	app := fx.New(
 		fx.NopLogger,
@@ -62,15 +61,13 @@ func main() {
 		security.Module,
 		storage.Module,
 		rbac.Module,
-		fx.Provide(
-			user.NewRepository, user.NewService,
-			wallet.NewRepository, wallet.NewService,
-			category.NewRepository, category.NewService,
-			transaction.NewRepository, transaction.NewService,
-			provider.NewRepository,
-			auth.NewService,
-			newSeeder,
-		),
+		user.Providers,
+		wallet.Providers,
+		category.Providers,
+		transaction.Providers,
+		provider.Providers,
+		auth.Providers,
+		fx.Provide(newSeeder),
 		fx.Populate(&s),
 	)
 	if err := app.Err(); err != nil {

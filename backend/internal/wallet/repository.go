@@ -99,11 +99,8 @@ func (r *repository) ListActive(ctx context.Context, userID uuid.UUID) ([]Wallet
 func (r *repository) FindDetailByID(ctx context.Context, userID, id uuid.UUID) (*Detail, error) {
 	var d Detail
 	res := r.detailQuery(ctx, userID).Where("w.id = ?", id).Scan(&d)
-	if res.Error != nil {
-		return nil, res.Error
-	}
-	if res.RowsAffected == 0 {
-		return nil, ErrNotFound
+	if err := database.Affected(res, ErrNotFound); err != nil {
+		return nil, err
 	}
 
 	return &d, nil
@@ -150,14 +147,7 @@ func (r *repository) Update(ctx context.Context, w *Wallet) error {
 			"is_archived":     w.IsArchived,
 			"updated_at":      time.Now(),
 		})
-	if res.Error != nil {
-		return uniqueViolation(res.Error)
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return uniqueViolation(database.Affected(res, ErrNotFound))
 }
 
 func (r *repository) ClearDefault(ctx context.Context, userID uuid.UUID) error {
@@ -172,14 +162,7 @@ func (r *repository) ClearDefault(ctx context.Context, userID uuid.UUID) error {
 
 func (r *repository) Delete(ctx context.Context, userID, id uuid.UUID) error {
 	res := database.Conn(ctx, r.db).Delete(&Wallet{}, "id = ? AND user_id = ?", id, userID)
-	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return database.Affected(res, ErrNotFound)
 }
 
 // HasTransactions queries the transactions table directly to avoid importing

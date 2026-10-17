@@ -22,7 +22,7 @@ func NewPasswordHasher() PasswordHasher {
 }
 
 // Hash returns bcrypt.ErrPasswordTooLong for passwords over 72 bytes; request
-// validation should reject those first.
+// DTOs reject those first with the maxbytes tag.
 func (passwordHasher) Hash(plain string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(plain), bcryptCost)
 	if err != nil {

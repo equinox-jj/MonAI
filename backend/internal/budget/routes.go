@@ -8,9 +8,9 @@ import (
 
 // RegisterRoutes mounts the budget endpoints on the /api/v1 router. Every
 // route requires a Bearer token.
-func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
+func RegisterRoutes(r fiber.Router, ctrl *Controller, auth httpx.RequireAuth) {
 	g := r.Group("/budgets", fiber.Handler(auth))
-	g.Get("/:month", h.Get)
-	g.Put("/:month", h.Set)
-	g.Delete("/:month", h.Delete)
+	g.Get("/:month", ctrl.Get)
+	g.Put("/:month", ctrl.Set)
+	g.Delete("/:month", ctrl.Delete)
 }

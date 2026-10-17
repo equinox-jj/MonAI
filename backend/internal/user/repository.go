@@ -93,18 +93,12 @@ func (r *repository) UpdateProfile(ctx context.Context, id uuid.UUID, name, time
 }
 
 func (r *repository) Timezone(ctx context.Context, id uuid.UUID) (string, error) {
-	var zones []string
-	if err := database.Conn(ctx, r.db).
-		Model(&User{}).
-		Where("id = ?", id).
-		Pluck("timezone", &zones).Error; err != nil {
-		return "", err
-	}
-	if len(zones) == 0 {
-		return "", ErrNotFound
+	var u User
+	if err := database.Conn(ctx, r.db).Select("timezone").Take(&u, "id = ?", id).Error; err != nil {
+		return "", database.NotFound(err, ErrNotFound)
 	}
 
-	return zones[0], nil
+	return u.Timezone, nil
 }
 
 func (r *repository) UpdateAvatarKey(ctx context.Context, id uuid.UUID, key *string) (*User, error) {
@@ -123,18 +117,12 @@ func (r *repository) UpdatePassword(ctx context.Context, id uuid.UUID, hash stri
 }
 
 func (r *repository) TokenVersion(ctx context.Context, id uuid.UUID) (int, error) {
-	var versions []int
-	if err := database.Conn(ctx, r.db).
-		Model(&User{}).
-		Where("id = ?", id).
-		Pluck("token_version", &versions).Error; err != nil {
-		return 0, err
-	}
-	if len(versions) == 0 {
-		return 0, ErrNotFound
+	var u User
+	if err := database.Conn(ctx, r.db).Select("token_version").Take(&u, "id = ?", id).Error; err != nil {
+		return 0, database.NotFound(err, ErrNotFound)
 	}
 
-	return versions[0], nil
+	return u.TokenVersion, nil
 }
 
 func (r *repository) BumpTokenVersion(ctx context.Context, id uuid.UUID) error {
@@ -144,14 +132,7 @@ func (r *repository) BumpTokenVersion(ctx context.Context, id uuid.UUID) error {
 
 func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
 	res := database.Conn(ctx, r.db).Delete(&User{}, "id = ?", id)
-	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return database.Affected(res, ErrNotFound)
 }
 
 // update writes cols (a map, so nil values become NULL) plus updated_at and
@@ -165,11 +146,8 @@ func (r *repository) update(ctx context.Context, id uuid.UUID, cols map[string]a
 		Clauses(clause.Returning{}).
 		Where("id = ?", id).
 		Updates(cols)
-	if res.Error != nil {
-		return nil, res.Error
-	}
-	if res.RowsAffected == 0 {
-		return nil, ErrNotFound
+	if err := database.Affected(res, ErrNotFound); err != nil {
+		return nil, err
 	}
 
 	return &u, nil

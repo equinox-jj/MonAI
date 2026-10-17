@@ -1,8 +1,35 @@
 # Production stack for Dokploy (Compose Path: ./backend/docker-compose.prod.yml).
 # No host ports: Dokploy's Traefik routes the api (8080) and minio (9000)
-# domains, and Dokploy writes the Environment tab to .env next to this file.
+# domains, and Dokploy writes the Environment tab to .env next to this file,
+# which compose reads for the ${...} values below.
 
 name: monai-prod
+
+# Settings the Go binaries (api, migrate) load; see .env.example. They are
+# listed one by one instead of env_file, so MINIO_ROOT_* never reach the API.
+# Each service sets its own DATABASE_URL.
+x-app-env: &app-env
+  APP_ENV: ${APP_ENV:-production}
+  API_PORT: ${API_PORT:-8080}
+  # Traefik's IPs or network CIDR. Without it every client shares Traefik's IP,
+  # so the per-IP rate limits (login, register) would apply to everyone at once.
+  TRUSTED_PROXIES: ${TRUSTED_PROXIES:?set TRUSTED_PROXIES to the reverse proxy's IPs or network CIDR}
+  DB_MAX_OPEN_CONNS: ${DB_MAX_OPEN_CONNS:-20}
+  DB_MAX_IDLE_CONNS: ${DB_MAX_IDLE_CONNS:-10}
+  DB_CONN_MAX_LIFETIME: ${DB_CONN_MAX_LIFETIME:-30m}
+  MINIO_ENDPOINT: minio:9000
+  MINIO_USE_SSL: "false"
+  MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:?set MINIO_ACCESS_KEY}
+  MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:?set MINIO_SECRET_KEY}
+  MINIO_BUCKET_PRIVATE: ${MINIO_BUCKET_PRIVATE:-expense-private}
+  MINIO_BUCKET_PUBLIC: ${MINIO_BUCKET_PUBLIC:-expense-public}
+  MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:?set MINIO_PUBLIC_URL to the public files domain}
+  JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+  JWT_ISSUER: ${JWT_ISSUER:-monai}
+  JWT_ACCESS_TTL: ${JWT_ACCESS_TTL:-168h}
+  GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+  GEMINI_MODEL: ${GEMINI_MODEL:-gemini-flash-lite-latest}
+  GEMINI_TIMEOUT: ${GEMINI_TIMEOUT:-10s}
 
 services:
   monai-db:
@@ -41,6 +68,19 @@ services:
       timeout: 5s
       retries: 10
 
+  # One-shot job: applies pending SQL migrations before the API starts. It
+  # connects as the owner, since migrations change the schema.
+  migrate:
+    build: .
+    entrypoint: ["/migrate", "up"]
+    environment:
+      <<: *app-env
+      DATABASE_URL: postgres://${POSTGRES_USER:-monai}:${POSTGRES_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
+    depends_on:
+      monai-db:
+        condition: service_healthy
+    restart: "no"
+
   # One-shot job: same as in docker-compose.dev.yml. Safe to rerun.
   minio-init:
     image: *minio-image
@@ -62,7 +102,21 @@ services:
         mc alias set local http://minio:9000 "$$MINIO_ROOT_USER" "$$MINIO_ROOT_PASSWORD"
         mc mb --ignore-existing "local/$$MINIO_BUCKET_PRIVATE"
         mc mb --ignore-existing "local/$$MINIO_BUCKET_PUBLIC"
-        mc anonymous set download "local/$$MINIO_BUCKET_PUBLIC"
+        # Anonymous clients may read objects but not list the bucket.
+        cat > /tmp/monai-public-read.json <<JSON
+        {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {"AWS": ["*"]},
+              "Action": ["s3:GetObject"],
+              "Resource": ["arn:aws:s3:::$$MINIO_BUCKET_PUBLIC/*"]
+            }
+          ]
+        }
+        JSON
+        mc anonymous set-json /tmp/monai-public-read.json "local/$$MINIO_BUCKET_PUBLIC"
         # Must match storage.PendingReceiptsPrefix.
         echo '{"Rules":[{"ID":"expire-pending-receipts","Status":"Enabled","Filter":{"Prefix":"receipts-pending/"},"Expiration":{"Days":1}}]}' \
           | mc ilm import "local/$$MINIO_BUCKET_PRIVATE"
@@ -88,29 +142,50 @@ services:
         mc admin policy attach local monai-api --user "$$MINIO_ACCESS_KEY" || true
     restart: "no"
 
-  # One-shot job: applies pending SQL migrations before the API starts.
-  migrate:
-    build: .
-    entrypoint: ["/migrate", "up"]
-    env_file: .env
-    environment: &api-env
-      APP_ENV: ${APP_ENV:-production}
-      DATABASE_URL: postgres://${POSTGRES_USER:-monai}:${POSTGRES_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
-      MINIO_ENDPOINT: minio:9000
-      MINIO_USE_SSL: "false"
-      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
-      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY}
-      MINIO_PUBLIC_URL: ${MINIO_PUBLIC_URL:?set MINIO_PUBLIC_URL to the public files domain}
+  # One-shot job: creates the API's own database role, limited to reading and
+  # writing rows (no DDL, not a superuser like POSTGRES_USER). Migrations keep
+  # using the owner; default privileges cover the tables they create later.
+  # Safe to rerun; it also resets the role's password to DB_APP_PASSWORD.
+  db-init:
+    image: postgres:18-alpine
     depends_on:
       monai-db:
         condition: service_healthy
+    environment:
+      PGHOST: monai-db
+      PGUSER: ${POSTGRES_USER:-monai}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-monai}
+      DB_APP_USER: ${DB_APP_USER:-monai_app}
+      DB_APP_PASSWORD: ${DB_APP_PASSWORD:?set DB_APP_PASSWORD}
+    entrypoint: ["sh", "-c"]
+    command:
+      - |
+        set -e
+        psql -v ON_ERROR_STOP=1 -v app_user="$$DB_APP_USER" -v app_password="$$DB_APP_PASSWORD" \
+          -v owner="$$PGUSER" -v db="$$PGDATABASE" <<'SQL'
+        SELECT format('CREATE ROLE %I LOGIN', :'app_user')
+          WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname = :'app_user') \gexec
+        SELECT format('ALTER ROLE %I WITH LOGIN NOSUPERUSER NOCREATEDB NOCREATEROLE PASSWORD %L',
+          :'app_user', :'app_password') \gexec
+        GRANT CONNECT ON DATABASE :"db" TO :"app_user";
+        GRANT USAGE ON SCHEMA public TO :"app_user";
+        GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO :"app_user";
+        GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO :"app_user";
+        ALTER DEFAULT PRIVILEGES FOR ROLE :"owner" IN SCHEMA public
+          GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO :"app_user";
+        ALTER DEFAULT PRIVILEGES FOR ROLE :"owner" IN SCHEMA public
+          GRANT USAGE, SELECT ON SEQUENCES TO :"app_user";
+        SQL
     restart: "no"
 
   api:
     build: .
     restart: unless-stopped
-    env_file: .env
-    environment: *api-env
+    environment:
+      <<: *app-env
+      # The limited role from db-init.
+      DATABASE_URL: postgres://${DB_APP_USER:-monai_app}:${DB_APP_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
     expose:
       - "${API_PORT:-8080}"
     depends_on:
@@ -119,6 +194,8 @@ services:
       minio-init:
         condition: service_completed_successfully
       migrate:
+        condition: service_completed_successfully
+      db-init:
         condition: service_completed_successfully
 
 volumes:

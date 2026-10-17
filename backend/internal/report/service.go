@@ -9,8 +9,6 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/period"
 )
 
-const monthLayout = "2006-01"
-
 type Service interface {
 	// Monthly returns the report for month (YYYY-MM) compared with the
 	// previous month, or ErrMonthInvalid.
@@ -42,12 +40,12 @@ func (s *service) Monthly(ctx context.Context, userID uuid.UUID, month string) (
 	}
 
 	return MonthlyReportResponse{
-		Month:        from.Format(monthLayout),
+		Month:        from.Format(period.MonthLayout),
 		IncomeTotal:  cur.Income,
 		ExpenseTotal: cur.Expense,
 		Net:          cur.Income - cur.Expense,
 		Previous: PreviousMonth{
-			Month:        prevFrom.Format(monthLayout),
+			Month:        prevFrom.Format(period.MonthLayout),
 			IncomeTotal:  prev.Income,
 			ExpenseTotal: prev.Expense,
 		},

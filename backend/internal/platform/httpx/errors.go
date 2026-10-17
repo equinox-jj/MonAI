@@ -65,3 +65,6 @@ var (
 	ErrRateLimited      = NewError(fiber.StatusTooManyRequests, "rate_limited", "Too many requests. Please try again later")
 	ErrInternal         = NewError(fiber.StatusInternalServerError, "internal_error", "Something went wrong")
 )
+
+// ErrNoFields is a PATCH body that sets no field (spec: minProperties 1).
+var ErrNoFields = ErrValidationFailed.WithMessage("At least one field is required")

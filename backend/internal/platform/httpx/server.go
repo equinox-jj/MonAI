@@ -30,7 +30,8 @@ const (
 
 // NewApp creates the Fiber app. c.Bind() runs v on every decoded request, and
 // every error returned by a handler or middleware is written by NewErrorHandler.
-// Every request gets an X-Request-ID, security headers, and panic recovery.
+// Every request gets an X-Request-ID, an access log line, security headers, and
+// panic recovery.
 func NewApp(v *Validator, log *slog.Logger, cfg config.Config) *fiber.App {
 	fc := fiber.Config{
 		AppName:         "MonAI API",
@@ -53,6 +54,7 @@ func NewApp(v *Validator, log *slog.Logger, cfg config.Config) *fiber.App {
 	app := fiber.New(fc)
 	app.Use(
 		requestid.New(),
+		accessLog(log),
 		recover.New(recover.Config{
 			EnableStackTrace: true,
 			StackTraceHandler: func(c fiber.Ctx, e any) {
@@ -69,6 +71,32 @@ func NewApp(v *Validator, log *slog.Logger, cfg config.Config) *fiber.App {
 	)
 
 	return app
+}
+
+// accessLog logs one line per request: method, path, status, latency and
+// client IP. It never logs the query string (search text), headers (tokens) or
+// bodies (passwords, financial data). It runs before recover, so a panic is
+// logged here as the 500 the error handler writes.
+func accessLog(log *slog.Logger) fiber.Handler {
+	return func(c fiber.Ctx) error {
+		start := time.Now()
+		err := c.Next()
+
+		status := c.Response().StatusCode()
+		if err != nil {
+			status = toError(err).Status
+		}
+		log.Info("request",
+			"request_id", requestid.FromContext(c),
+			"method", c.Method(),
+			"path", c.Path(),
+			"status", status,
+			"latency", time.Since(start),
+			"ip", ByIP(c),
+		)
+
+		return err
+	}
 }
 
 // NewAPIRouter returns the /api/v1 group that feature routes register on.

@@ -9,6 +9,7 @@ import (
 
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/storage"
 	"github.com/equinox-jj/MonAI/backend/internal/provider"
 )
@@ -20,6 +21,14 @@ const (
 	cashProviderSlug = "cash"
 	cashWalletName   = "Cash"
 )
+
+// PaymentProviders is the part of the provider feature the service uses, so a
+// test fake implements two methods instead of the whole repository. module.go
+// adapts provider.Repository to it.
+type PaymentProviders interface {
+	FindByID(ctx context.Context, id uuid.UUID) (*provider.PaymentProvider, error)
+	FindBySlug(ctx context.Context, slug string) (*provider.PaymentProvider, error)
+}
 
 type Service interface {
 	// List returns the user's wallets and the total balance of the
@@ -41,14 +50,14 @@ type Service interface {
 
 type service struct {
 	repo      Repository
-	providers provider.Repository
+	providers PaymentProviders
 	tx        database.TxManager
 	logoURL   logoURLFunc // public URL of a provider logo key
 }
 
 func NewService(
 	repo Repository,
-	providers provider.Repository,
+	providers PaymentProviders,
 	tx database.TxManager,
 	store storage.Storage,
 	cfg config.Config,
@@ -120,7 +129,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, req CreateWallet
 
 func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateWalletRequest) (WalletResponse, error) {
 	if req.empty() {
-		return WalletResponse{}, ErrNoFields
+		return WalletResponse{}, httpx.ErrNoFields
 	}
 
 	var resp WalletResponse
@@ -198,11 +207,7 @@ func (s *service) SeedDefault(ctx context.Context, userID uuid.UUID) error {
 // be active.
 func (s *service) applyNameAndType(ctx context.Context, w *Wallet, req CreateWalletRequest) error {
 	if req.Name != nil {
-		name := strings.TrimSpace(*req.Name)
-		if name == "" {
-			return ErrNameBlank
-		}
-		w.Name = name
+		w.Name = strings.TrimSpace(*req.Name)
 	}
 	if req.Type != nil {
 		w.Type = *req.Type
@@ -243,11 +248,7 @@ func (s *service) applyNameAndType(ctx context.Context, w *Wallet, req CreateWal
 // and archive rules against the resulting state.
 func applyUpdate(w *Wallet, req UpdateWalletRequest) error {
 	if req.Name != nil {
-		name := strings.TrimSpace(*req.Name)
-		if name == "" {
-			return ErrNameBlank
-		}
-		w.Name = name
+		w.Name = strings.TrimSpace(*req.Name)
 	}
 	if req.Type != nil {
 		w.Type = *req.Type

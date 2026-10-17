@@ -20,12 +20,6 @@ var (
 	ErrDeactivateSystem = ErrSystemLocked.WithMessage("System providers cannot be deactivated")
 	ErrSlugSystem       = ErrSystemLocked.WithMessage("The slug of a system provider cannot be changed")
 
-	ErrNoFields  = httpx.ErrValidationFailed.WithMessage("At least one field is required")
-	ErrNameBlank = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
-		Field:   "name",
-		Code:    "required",
-		Message: "must not be blank",
-	})
 	ErrSlugInvalid = httpx.ErrValidationFailed.WithFields(httpx.FieldError{
 		Field:   "slug",
 		Code:    "invalid",

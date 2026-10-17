@@ -8,11 +8,11 @@ import (
 
 // RegisterRoutes mounts the wallet endpoints on the /api/v1 router. Every
 // route requires a Bearer token.
-func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
+func RegisterRoutes(r fiber.Router, ctrl *Controller, auth httpx.RequireAuth) {
 	g := r.Group("/wallets", fiber.Handler(auth))
-	g.Get("", h.List)
-	g.Post("", h.Create)
-	g.Get("/:id", h.Get)
-	g.Patch("/:id", h.Update)
-	g.Delete("/:id", h.Delete)
+	g.Get("", ctrl.List)
+	g.Post("", ctrl.Create)
+	g.Get("/:id", ctrl.Get)
+	g.Patch("/:id", ctrl.Update)
+	g.Delete("/:id", ctrl.Delete)
 }

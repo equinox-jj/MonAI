@@ -18,7 +18,7 @@ type ListCategoriesQuery struct {
 
 // CreateCategoryRequest is the body of POST /categories.
 type CreateCategoryRequest struct {
-	Name  string  `json:"name" validate:"required,min=1,max=30"`
+	Name  string  `json:"name" validate:"required,min=1,notblank,max=30"`
 	Type  Type    `json:"type" validate:"required,oneof=EXPENSE INCOME"`
 	Icon  *string `json:"icon" validate:"omitempty,max=50"`
 	Color *string `json:"color" validate:"omitempty,len=7,hexcolor"`
@@ -27,7 +27,7 @@ type CreateCategoryRequest struct {
 // UpdateCategoryRequest is the body of PATCH /categories/{id}. Absent fields
 // are left unchanged; icon and color accept null to clear them.
 type UpdateCategoryRequest struct {
-	Name     *string                 `json:"name" validate:"omitempty,min=1,max=30"`
+	Name     *string                 `json:"name" validate:"omitempty,min=1,notblank,max=30"`
 	Icon     httpx.Optional[*string] `json:"icon" validate:"omitempty,max=50"`
 	Color    httpx.Optional[*string] `json:"color" validate:"omitempty,len=7,hexcolor"`
 	IsHidden *bool                   `json:"is_hidden"`

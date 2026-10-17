@@ -6,31 +6,21 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 )
 
-type Handler interface {
-	List(c fiber.Ctx) error
-	Get(c fiber.Ctx) error
-	Create(c fiber.Ctx) error
-	Update(c fiber.Ctx) error
-	Delete(c fiber.Ctx) error
-	Restore(c fiber.Ctx) error
-	UploadReceipt(c fiber.Ctx) error
-}
-
-type handler struct {
+type Controller struct {
 	svc Service
 }
 
-func NewHandler(svc Service) Handler {
-	return &handler{svc: svc}
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
 }
 
-func (h *handler) List(c fiber.Ctx) error {
+func (ctrl *Controller) List(c fiber.Ctx) error {
 	var q ListTransactionsQuery
 	if err := c.Bind().Query(&q); err != nil {
 		return err
 	}
 
-	resp, meta, err := h.svc.List(c.Context(), httpx.UserID(c), q)
+	resp, meta, err := ctrl.svc.List(c.Context(), httpx.UserID(c), q)
 	if err != nil {
 		return err
 	}
@@ -38,13 +28,13 @@ func (h *handler) List(c fiber.Ctx) error {
 	return httpx.CursorPaginated(c, "Transactions retrieved successfully.", resp, meta)
 }
 
-func (h *handler) Get(c fiber.Ctx) error {
+func (ctrl *Controller) Get(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Get(c.Context(), httpx.UserID(c), id)
+	resp, err := ctrl.svc.Get(c.Context(), httpx.UserID(c), id)
 	if err != nil {
 		return err
 	}
@@ -52,13 +42,13 @@ func (h *handler) Get(c fiber.Ctx) error {
 	return httpx.OK(c, "Transaction retrieved successfully.", resp)
 }
 
-func (h *handler) Create(c fiber.Ctx) error {
+func (ctrl *Controller) Create(c fiber.Ctx) error {
 	var req CreateTransactionRequest
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Create(c.Context(), httpx.UserID(c), req)
+	resp, err := ctrl.svc.Create(c.Context(), httpx.UserID(c), req)
 	if err != nil {
 		return err
 	}
@@ -66,7 +56,7 @@ func (h *handler) Create(c fiber.Ctx) error {
 	return httpx.Created(c, "Transaction created successfully.", resp)
 }
 
-func (h *handler) Update(c fiber.Ctx) error {
+func (ctrl *Controller) Update(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
@@ -77,7 +67,7 @@ func (h *handler) Update(c fiber.Ctx) error {
 		return err
 	}
 
-	resp, err := h.svc.Update(c.Context(), httpx.UserID(c), id, req)
+	resp, err := ctrl.svc.Update(c.Context(), httpx.UserID(c), id, req)
 	if err != nil {
 		return err
 	}
@@ -85,26 +75,26 @@ func (h *handler) Update(c fiber.Ctx) error {
 	return httpx.OK(c, "Transaction updated successfully.", resp)
 }
 
-func (h *handler) Delete(c fiber.Ctx) error {
+func (ctrl *Controller) Delete(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	if err := h.svc.Delete(c.Context(), httpx.UserID(c), id); err != nil {
+	if err := ctrl.svc.Delete(c.Context(), httpx.UserID(c), id); err != nil {
 		return err
 	}
 
 	return httpx.Deleted(c)
 }
 
-func (h *handler) Restore(c fiber.Ctx) error {
+func (ctrl *Controller) Restore(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Restore(c.Context(), httpx.UserID(c), id)
+	resp, err := ctrl.svc.Restore(c.Context(), httpx.UserID(c), id)
 	if err != nil {
 		return err
 	}
@@ -112,14 +102,14 @@ func (h *handler) Restore(c fiber.Ctx) error {
 	return httpx.OK(c, "Transaction restored successfully.", resp)
 }
 
-func (h *handler) UploadReceipt(c fiber.Ctx) error {
+func (ctrl *Controller) UploadReceipt(c fiber.Ctx) error {
 	f, err := httpx.FormFile(c)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
 
-	resp, err := h.svc.UploadReceipt(c.Context(), httpx.UserID(c), f)
+	resp, err := ctrl.svc.UploadReceipt(c.Context(), httpx.UserID(c), f)
 	if err != nil {
 		return err
 	}

@@ -7,18 +7,44 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/equinox-jj/MonAI/backend/internal/category"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/security"
 	"github.com/equinox-jj/MonAI/backend/internal/rbac"
 	"github.com/equinox-jj/MonAI/backend/internal/user"
-	"github.com/equinox-jj/MonAI/backend/internal/wallet"
 )
 
 // dummyHash is a cost-12 bcrypt hash of a random string. Login verifies
 // against it when the email is unknown, so that path takes as long as a wrong
 // password and does not reveal which accounts exist.
 const dummyHash = "$2a$12$jzIdCIei52/B540l5Nk2re4NwCvTRnfw/TldVrk5WBnkzvPzcLVCG"
+
+// The parts of other features the service uses, so a test fake implements only
+// what is called. module.go adapts the real repositories and services to them.
+type (
+	Users interface {
+		Create(ctx context.Context, u *user.User) error
+		FindByID(ctx context.Context, id uuid.UUID) (*user.User, error)
+		FindByEmail(ctx context.Context, email string) (*user.User, error)
+		UpdatePassword(ctx context.Context, id uuid.UUID, hash string) (*user.User, error)
+		BumpTokenVersion(ctx context.Context, id uuid.UUID) error
+	}
+
+	Profiles interface {
+		GetMe(ctx context.Context, userID uuid.UUID) (user.MeResponse, error)
+	}
+
+	Roles interface {
+		DefaultRole(ctx context.Context) (*rbac.Role, error)
+	}
+
+	WalletSeeder interface {
+		SeedDefault(ctx context.Context, userID uuid.UUID) error
+	}
+
+	CategorySeeder interface {
+		SeedDefaults(ctx context.Context, userID uuid.UUID) error
+	}
+)
 
 type Service interface {
 	// Register creates the user with the default role and returns a token.
@@ -34,22 +60,22 @@ type Service interface {
 }
 
 type service struct {
-	users      user.Repository
-	me         user.Service
-	roles      rbac.Service
-	categories category.Service
-	wallets    wallet.Service
+	users      Users
+	me         Profiles
+	roles      Roles
+	categories CategorySeeder
+	wallets    WalletSeeder
 	jwt        security.JWTManager
 	hasher     security.PasswordHasher
 	tx         database.TxManager
 }
 
 func NewService(
-	users user.Repository,
-	me user.Service,
-	roles rbac.Service,
-	categories category.Service,
-	wallets wallet.Service,
+	users Users,
+	me Profiles,
+	roles Roles,
+	categories CategorySeeder,
+	wallets WalletSeeder,
 	jwt security.JWTManager,
 	hasher security.PasswordHasher,
 	tx database.TxManager,
@@ -67,11 +93,6 @@ func NewService(
 }
 
 func (s *service) Register(ctx context.Context, req RegisterRequest) (AuthResponse, error) {
-	name := strings.TrimSpace(req.Name)
-	if name == "" {
-		return AuthResponse{}, user.ErrNameBlank
-	}
-
 	// Hash outside the transaction: bcrypt is slow.
 	hash, err := s.hasher.Hash(req.Password)
 	if err != nil {
@@ -79,7 +100,7 @@ func (s *service) Register(ctx context.Context, req RegisterRequest) (AuthRespon
 	}
 
 	u := &user.User{
-		Name:         name,
+		Name:         strings.TrimSpace(req.Name),
 		Email:        normalizeEmail(req.Email),
 		PasswordHash: hash,
 	}

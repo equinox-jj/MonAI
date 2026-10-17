@@ -27,7 +27,7 @@ type ListProvidersQuery struct {
 // CreateProviderRequest is the body of POST /admin/payment-providers. The
 // slug is generated from the name when omitted.
 type CreateProviderRequest struct {
-	Name      string   `json:"name" validate:"required,min=1,max=50"`
+	Name      string   `json:"name" validate:"required,min=1,notblank,max=50"`
 	Slug      *string  `json:"slug" validate:"omitempty,max=50"`
 	Type      Type     `json:"type" validate:"required,oneof=CASH BANK E_WALLET OTHER"`
 	Aliases   []string `json:"aliases" validate:"omitempty,max=20,dive,min=1,max=50"`
@@ -37,7 +37,7 @@ type CreateProviderRequest struct {
 // UpdateProviderRequest is the body of PATCH /admin/payment-providers/{id}.
 // Absent fields are left unchanged; aliases, when sent, replaces the list.
 type UpdateProviderRequest struct {
-	Name      *string   `json:"name" validate:"omitempty,min=1,max=50"`
+	Name      *string   `json:"name" validate:"omitempty,min=1,notblank,max=50"`
 	Slug      *string   `json:"slug" validate:"omitempty,max=50"`
 	Type      *Type     `json:"type" validate:"omitempty,oneof=CASH BANK E_WALLET OTHER"`
 	Aliases   *[]string `json:"aliases" validate:"omitempty,max=20,dive,min=1,max=50"`

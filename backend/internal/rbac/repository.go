@@ -2,7 +2,6 @@ package rbac
 
 import (
 	"context"
-	"errors"
 
 	"github.com/google/uuid"
 	"gorm.io/gorm"
@@ -101,27 +100,21 @@ func (r *repository) CountFullAdminsExcept(ctx context.Context, userID uuid.UUID
 }
 
 func (r *repository) FindUserRoleID(ctx context.Context, userID uuid.UUID) (int64, error) {
-	var roleIDs []int64
+	var u struct{ RoleID int64 }
 	if err := database.Conn(ctx, r.db).
-		Raw(`SELECT role_id FROM users WHERE id = ?`, userID).
-		Scan(&roleIDs).Error; err != nil {
-		return 0, err
-	}
-	if len(roleIDs) == 0 {
-		return 0, ErrUserNotFound
+		Table("users").
+		Select("role_id").
+		Take(&u, "id = ?", userID).Error; err != nil {
+		return 0, database.NotFound(err, ErrUserNotFound)
 	}
 
-	return roleIDs[0], nil
+	return u.RoleID, nil
 }
 
 func (r *repository) findRole(ctx context.Context, query string, args ...any) (*Role, error) {
 	var role Role
 	if err := database.Conn(ctx, r.db).Where(query, args...).First(&role).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			return nil, ErrRoleNotFound
-		}
-
-		return nil, err
+		return nil, database.NotFound(err, ErrRoleNotFound)
 	}
 
 	return &role, nil

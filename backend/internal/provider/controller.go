@@ -13,27 +13,16 @@ import (
 // briefly before revalidating with its ETag.
 const catalogCacheControl = "public, max-age=300"
 
-type Handler interface {
-	Catalog(c fiber.Ctx) error
-	List(c fiber.Ctx) error
-	Get(c fiber.Ctx) error
-	Create(c fiber.Ctx) error
-	Update(c fiber.Ctx) error
-	Delete(c fiber.Ctx) error
-	SetStatus(c fiber.Ctx) error
-	SetLogo(c fiber.Ctx) error
-}
-
-type handler struct {
+type Controller struct {
 	svc Service
 }
 
-func NewHandler(svc Service) Handler {
-	return &handler{svc: svc}
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
 }
 
-func (h *handler) Catalog(c fiber.Ctx) error {
-	version, err := h.svc.CatalogVersion(c.Context())
+func (ctrl *Controller) Catalog(c fiber.Ctx) error {
+	version, err := ctrl.svc.CatalogVersion(c.Context())
 	if err != nil {
 		return err
 	}
@@ -45,7 +34,7 @@ func (h *handler) Catalog(c fiber.Ctx) error {
 		return c.SendStatus(fiber.StatusNotModified)
 	}
 
-	resp, err := h.svc.Catalog(c.Context())
+	resp, err := ctrl.svc.Catalog(c.Context())
 	if err != nil {
 		return err
 	}
@@ -59,13 +48,13 @@ func (h *handler) Catalog(c fiber.Ctx) error {
 	return httpx.OK(c, "Payment providers retrieved successfully.", resp)
 }
 
-func (h *handler) List(c fiber.Ctx) error {
+func (ctrl *Controller) List(c fiber.Ctx) error {
 	var q ListProvidersQuery
 	if err := c.Bind().Query(&q); err != nil {
 		return err
 	}
 
-	resp, meta, err := h.svc.List(c.Context(), q)
+	resp, meta, err := ctrl.svc.List(c.Context(), q)
 	if err != nil {
 		return err
 	}
@@ -73,13 +62,13 @@ func (h *handler) List(c fiber.Ctx) error {
 	return httpx.Paginated(c, "Payment providers retrieved successfully.", resp, meta)
 }
 
-func (h *handler) Get(c fiber.Ctx) error {
+func (ctrl *Controller) Get(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Get(c.Context(), id)
+	resp, err := ctrl.svc.Get(c.Context(), id)
 	if err != nil {
 		return err
 	}
@@ -87,13 +76,13 @@ func (h *handler) Get(c fiber.Ctx) error {
 	return httpx.OK(c, "Payment provider retrieved successfully.", resp)
 }
 
-func (h *handler) Create(c fiber.Ctx) error {
+func (ctrl *Controller) Create(c fiber.Ctx) error {
 	var req CreateProviderRequest
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	resp, err := h.svc.Create(c.Context(), httpx.UserID(c), req)
+	resp, err := ctrl.svc.Create(c.Context(), httpx.UserID(c), req)
 	if err != nil {
 		return err
 	}
@@ -101,7 +90,7 @@ func (h *handler) Create(c fiber.Ctx) error {
 	return httpx.Created(c, "Payment provider created successfully.", resp)
 }
 
-func (h *handler) Update(c fiber.Ctx) error {
+func (ctrl *Controller) Update(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
@@ -112,7 +101,7 @@ func (h *handler) Update(c fiber.Ctx) error {
 		return err
 	}
 
-	resp, err := h.svc.Update(c.Context(), httpx.UserID(c), id, req)
+	resp, err := ctrl.svc.Update(c.Context(), httpx.UserID(c), id, req)
 	if err != nil {
 		return err
 	}
@@ -120,20 +109,20 @@ func (h *handler) Update(c fiber.Ctx) error {
 	return httpx.OK(c, "Payment provider updated successfully.", resp)
 }
 
-func (h *handler) Delete(c fiber.Ctx) error {
+func (ctrl *Controller) Delete(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
 	}
 
-	if err := h.svc.Delete(c.Context(), id); err != nil {
+	if err := ctrl.svc.Delete(c.Context(), id); err != nil {
 		return err
 	}
 
 	return httpx.Deleted(c)
 }
 
-func (h *handler) SetStatus(c fiber.Ctx) error {
+func (ctrl *Controller) SetStatus(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
@@ -144,7 +133,7 @@ func (h *handler) SetStatus(c fiber.Ctx) error {
 		return err
 	}
 
-	resp, err := h.svc.SetStatus(c.Context(), httpx.UserID(c), id, *req.IsActive)
+	resp, err := ctrl.svc.SetStatus(c.Context(), httpx.UserID(c), id, *req.IsActive)
 	if err != nil {
 		return err
 	}
@@ -152,7 +141,7 @@ func (h *handler) SetStatus(c fiber.Ctx) error {
 	return httpx.OK(c, "Payment provider status updated successfully.", resp)
 }
 
-func (h *handler) SetLogo(c fiber.Ctx) error {
+func (ctrl *Controller) SetLogo(c fiber.Ctx) error {
 	id, err := httpx.ParamUUID(c, "id")
 	if err != nil {
 		return err
@@ -164,7 +153,7 @@ func (h *handler) SetLogo(c fiber.Ctx) error {
 	}
 	defer f.Close()
 
-	resp, err := h.svc.SetLogo(c.Context(), httpx.UserID(c), id, f)
+	resp, err := ctrl.svc.SetLogo(c.Context(), httpx.UserID(c), id, f)
 	if err != nil {
 		return err
 	}

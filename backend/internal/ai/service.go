@@ -11,8 +11,24 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/category"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/config"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/period"
-	"github.com/equinox-jj/MonAI/backend/internal/provider"
 	"github.com/equinox-jj/MonAI/backend/internal/wallet"
+)
+
+// Wallets, Categories and ProviderAliases are the parts of other features the
+// service uses, so a test fake implements one method instead of a whole
+// repository. module.go adapts the real repositories to them.
+type (
+	Wallets interface {
+		ListActive(ctx context.Context, userID uuid.UUID) ([]wallet.Wallet, error)
+	}
+
+	Categories interface {
+		List(ctx context.Context, userID uuid.UUID, filter category.ListFilter) ([]category.Category, error)
+	}
+
+	ProviderAliases interface {
+		ActiveAliases(ctx context.Context, ids []uuid.UUID) (map[uuid.UUID][]string, error)
+	}
 )
 
 type Service interface {
@@ -31,9 +47,9 @@ const phraseTimeout = 3 * time.Second
 
 type service struct {
 	parser     TransactionParser
-	wallets    wallet.Repository
-	categories category.Repository
-	providers  provider.Repository
+	wallets    Wallets
+	categories Categories
+	providers  ProviderAliases
 	timeout    time.Duration
 	now        func() time.Time
 	zones      period.Locations
@@ -41,9 +57,9 @@ type service struct {
 
 func NewService(
 	parser TransactionParser,
-	wallets wallet.Repository,
-	categories category.Repository,
-	providers provider.Repository,
+	wallets Wallets,
+	categories Categories,
+	providers ProviderAliases,
 	cfg config.Config,
 ) Service {
 	return &service{

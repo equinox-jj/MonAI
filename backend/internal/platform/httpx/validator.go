@@ -9,6 +9,7 @@ import (
 	"unicode"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/go-playground/validator/v10/non-standard/validators"
 	"github.com/google/uuid"
 )
 
@@ -63,6 +64,16 @@ func NewValidator() *Validator {
 	// requires_digit: the string contains at least one digit (passwords).
 	_ = v.RegisterValidation("requires_digit", func(fl validator.FieldLevel) bool {
 		return strings.ContainsFunc(fl.Field().String(), unicode.IsDigit)
+	})
+
+	// notblank: the string is not empty after trimming whitespace (names).
+	_ = v.RegisterValidation("notblank", validators.NotBlank)
+
+	// maxbytes: the string is at most N bytes long. max counts characters, but
+	// bcrypt's 72 limit is in bytes, so passwords use this.
+	_ = v.RegisterValidation("maxbytes", func(fl validator.FieldLevel) bool {
+		n, err := strconv.Atoi(fl.Param())
+		return err == nil && len(fl.Field().String()) <= n
 	})
 
 	// Every Optional type used in a request DTO must be registered here, or
@@ -153,6 +164,13 @@ func toFieldError(fe validator.FieldError) FieldError {
 
 		out.Code, out.Message = "not_equal", "must be different from "+other
 		out.Params = map[string]any{"other": other}
+
+	case "maxbytes":
+		out.Code, out.Message = "max_length", fmt.Sprintf("must be at most %s bytes", param)
+		out.Params = map[string]any{"max": number(param)}
+
+	case "notblank":
+		out.Code, out.Message = "required", "must not be blank"
 
 	case "requires_digit":
 		out.Code, out.Message = "requires_digit", "must contain at least one digit"

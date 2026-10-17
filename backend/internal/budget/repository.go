@@ -63,14 +63,7 @@ func (r *repository) Upsert(ctx context.Context, b *Budget) error {
 
 func (r *repository) Delete(ctx context.Context, userID uuid.UUID, month string) error {
 	res := database.Conn(ctx, r.db).Delete(&Budget{}, "user_id = ? AND month = ?", userID, month)
-	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return database.Affected(res, ErrNotFound)
 }
 
 // SpentBetween queries the transactions table directly to avoid importing the

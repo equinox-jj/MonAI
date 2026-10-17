@@ -16,6 +16,6 @@ const (
 )
 
 // RegisterRoutes mounts the health check on the /api/v1 router. It is public.
-func RegisterRoutes(r fiber.Router, h Handler) {
-	r.Get("/health", httpx.RateLimit(checkMax, checkWindow, httpx.ByIP), h.Check)
+func RegisterRoutes(r fiber.Router, ctrl *Controller) {
+	r.Get("/health", httpx.RateLimit(checkMax, checkWindow, httpx.ByIP), ctrl.Check)
 }

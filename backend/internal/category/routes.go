@@ -8,10 +8,10 @@ import (
 
 // RegisterRoutes mounts the category endpoints on the /api/v1 router. Every
 // route requires a Bearer token.
-func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
+func RegisterRoutes(r fiber.Router, ctrl *Controller, auth httpx.RequireAuth) {
 	g := r.Group("/categories", fiber.Handler(auth))
-	g.Get("", h.List)
-	g.Post("", h.Create)
-	g.Patch("/:id", h.Update)
-	g.Delete("/:id", h.Delete)
+	g.Get("", ctrl.List)
+	g.Post("", ctrl.Create)
+	g.Patch("/:id", ctrl.Update)
+	g.Delete("/:id", ctrl.Delete)
 }

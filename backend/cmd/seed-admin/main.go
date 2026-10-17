@@ -28,8 +28,7 @@ func main() {
 		os.Exit(2)
 	}
 
-	// Feature modules register HTTP routes, so only the needed constructors
-	// are provided here.
+	// Feature Modules register HTTP routes, so only their Providers are used.
 	var p *promoter
 	app := fx.New(
 		fx.NopLogger,
@@ -37,7 +36,8 @@ func main() {
 		logger.Module,
 		database.Module,
 		rbac.Module,
-		fx.Provide(user.NewRepository, newPromoter),
+		user.Providers,
+		fx.Provide(newPromoter),
 		fx.Populate(&p),
 	)
 	if err := app.Err(); err != nil {

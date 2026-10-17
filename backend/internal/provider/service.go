@@ -33,7 +33,7 @@ var (
 )
 
 type Service interface {
-	// CatalogVersion returns the catalog version, so the handler can answer
+	// CatalogVersion returns the catalog version, so the controller can answer
 	// If-None-Match with 304 without loading the catalog.
 	CatalogVersion(ctx context.Context) (int64, error)
 	// Catalog returns the active providers and the catalog version.
@@ -132,9 +132,6 @@ func (s *service) Get(ctx context.Context, id uuid.UUID) (AdminProviderResponse,
 
 func (s *service) Create(ctx context.Context, actorID uuid.UUID, req CreateProviderRequest) (AdminProviderResponse, error) {
 	name := strings.TrimSpace(req.Name)
-	if name == "" {
-		return AdminProviderResponse{}, ErrNameBlank
-	}
 
 	var slug string
 	if req.Slug != nil {
@@ -179,16 +176,9 @@ func (s *service) Create(ctx context.Context, actorID uuid.UUID, req CreateProvi
 
 func (s *service) Update(ctx context.Context, actorID, id uuid.UUID, req UpdateProviderRequest) (AdminProviderResponse, error) {
 	if req.empty() {
-		return AdminProviderResponse{}, ErrNoFields
+		return AdminProviderResponse{}, httpx.ErrNoFields
 	}
 
-	var name string
-	if req.Name != nil {
-		name = strings.TrimSpace(*req.Name)
-		if name == "" {
-			return AdminProviderResponse{}, ErrNameBlank
-		}
-	}
 	if req.Slug != nil && !slugPattern.MatchString(*req.Slug) {
 		return AdminProviderResponse{}, ErrSlugInvalid
 	}
@@ -209,7 +199,7 @@ func (s *service) Update(ctx context.Context, actorID, id uuid.UUID, req UpdateP
 			p.Slug = *req.Slug
 		}
 		if req.Name != nil {
-			p.Name = name
+			p.Name = strings.TrimSpace(*req.Name)
 		}
 		if req.Type != nil {
 			p.Type = *req.Type

@@ -16,15 +16,17 @@ const (
 	pingTimeout = 2 * time.Second
 )
 
-// Database is satisfied by *sql.DB.
-type Database interface {
-	PingContext(ctx context.Context) error
-}
+type (
+	// Database is satisfied by *sql.DB.
+	Database interface {
+		PingContext(ctx context.Context) error
+	}
 
-// Storage is satisfied by storage.Storage.
-type Storage interface {
-	Ping(ctx context.Context) error
-}
+	// Storage is satisfied by storage.Storage.
+	Storage interface {
+		Ping(ctx context.Context) error
+	}
+)
 
 type Service interface {
 	// Check pings every dependency concurrently. It returns ErrUnavailable,
@@ -44,9 +46,8 @@ func NewService(db Database, store Storage) Service {
 func (s *service) Check(ctx context.Context) (HealthResponse, error) {
 	var dbErr, storeErr error
 	var wg sync.WaitGroup
-	wg.Add(2)
-	go func() { defer wg.Done(); dbErr = ping(ctx, s.db.PingContext) }()
-	go func() { defer wg.Done(); storeErr = ping(ctx, s.store.Ping) }()
+	wg.Go(func() { dbErr = ping(ctx, s.db.PingContext) })
+	wg.Go(func() { storeErr = ping(ctx, s.store.Ping) })
 	wg.Wait()
 
 	resp := HealthResponse{Status: statusOK, Database: status(dbErr), Storage: status(storeErr)}

@@ -1,6 +1,7 @@
 package httpx
 
 import (
+	"net/netip"
 	"time"
 
 	"github.com/gofiber/fiber/v3"
@@ -48,8 +49,17 @@ func newLimiter(max int, window time.Duration, key KeyFunc, failuresOnly bool) f
 
 // ByIP keys requests by client IP: the connecting IP, or the X-Forwarded-For
 // client when the request comes through a trusted proxy (TRUSTED_PROXIES).
+// IPv6 clients are keyed by their /64, since one subscriber or VPS usually
+// holds a whole /64 and could otherwise use a fresh address per request.
 func ByIP(c fiber.Ctx) string {
-	return c.IP()
+	ip := c.IP()
+	addr, err := netip.ParseAddr(ip)
+	if err != nil || !addr.Is6() || addr.Is4In6() {
+		return ip
+	}
+
+	prefix, _ := addr.Prefix(64) // cannot fail for an IPv6 address
+	return prefix.String()
 }
 
 // ByUser keys requests by the authenticated user. Put it after RequireAuth.

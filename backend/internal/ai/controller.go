@@ -6,26 +6,21 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 )
 
-type Handler interface {
-	ParseTransaction(c fiber.Ctx) error
-	ParseReceipt(c fiber.Ctx) error
-}
-
-type handler struct {
+type Controller struct {
 	svc Service
 }
 
-func NewHandler(svc Service) Handler {
-	return &handler{svc: svc}
+func NewController(svc Service) *Controller {
+	return &Controller{svc: svc}
 }
 
-func (h *handler) ParseTransaction(c fiber.Ctx) error {
+func (ctrl *Controller) ParseTransaction(c fiber.Ctx) error {
 	var req ParseTransactionRequest
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	resp, err := h.svc.ParseTransaction(c.Context(), httpx.UserID(c), req)
+	resp, err := ctrl.svc.ParseTransaction(c.Context(), httpx.UserID(c), req)
 	if err != nil {
 		return err
 	}
@@ -33,13 +28,13 @@ func (h *handler) ParseTransaction(c fiber.Ctx) error {
 	return httpx.OK(c, "Drafts generated successfully.", resp)
 }
 
-func (h *handler) ParseReceipt(c fiber.Ctx) error {
+func (ctrl *Controller) ParseReceipt(c fiber.Ctx) error {
 	var req ParseReceiptRequest
 	if err := c.Bind().Body(&req); err != nil {
 		return err
 	}
 
-	resp, err := h.svc.ParseReceipt(c.Context(), httpx.UserID(c), req)
+	resp, err := ctrl.svc.ParseReceipt(c.Context(), httpx.UserID(c), req)
 	if err != nil {
 		return err
 	}

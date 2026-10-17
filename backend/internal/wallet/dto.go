@@ -20,7 +20,7 @@ type ListWalletsQuery struct {
 // required.
 type CreateWalletRequest struct {
 	ProviderID     *uuid.UUID `json:"provider_id"`
-	Name           *string    `json:"name" validate:"omitempty,min=1,max=30"`
+	Name           *string    `json:"name" validate:"omitempty,min=1,notblank,max=30"`
 	Type           *Type      `json:"type" validate:"omitempty,oneof=CASH BANK E_WALLET OTHER"`
 	InitialBalance int64      `json:"initial_balance" validate:"min=0,max=999999999999999"`
 	Icon           *string    `json:"icon" validate:"omitempty,max=50"`
@@ -31,7 +31,7 @@ type CreateWalletRequest struct {
 // UpdateWalletRequest is the body of PATCH /wallets/{id}. Absent fields are
 // left unchanged; icon and color accept null to clear them.
 type UpdateWalletRequest struct {
-	Name           *string                 `json:"name" validate:"omitempty,min=1,max=30"`
+	Name           *string                 `json:"name" validate:"omitempty,min=1,notblank,max=30"`
 	Type           *Type                   `json:"type" validate:"omitempty,oneof=CASH BANK E_WALLET OTHER"`
 	InitialBalance *int64                  `json:"initial_balance" validate:"omitempty,min=0,max=999999999999999"`
 	Icon           httpx.Optional[*string] `json:"icon" validate:"omitempty,max=50"`

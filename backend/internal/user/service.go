@@ -25,6 +25,14 @@ var avatarRule = httpx.FileRule{
 	},
 }
 
+// Roles is the part of rbac the service uses, so a test fake implements three
+// methods instead of the whole service. module.go adapts rbac.Service to it.
+type Roles interface {
+	GetRole(ctx context.Context, id int64) (*rbac.Role, error)
+	PermissionCodes(ctx context.Context, roleID int64) ([]string, error)
+	EnsureNotLastAdmin(ctx context.Context, userID uuid.UUID, roleID int64) error
+}
+
 type Service interface {
 	GetMe(ctx context.Context, userID uuid.UUID) (MeResponse, error)
 	UpdateMe(ctx context.Context, userID uuid.UUID, req UpdateMeRequest) (MeResponse, error)
@@ -40,7 +48,7 @@ type Service interface {
 
 type service struct {
 	repo   Repository
-	roles  rbac.Service
+	roles  Roles
 	store  storage.Storage
 	hasher security.PasswordHasher
 	tx     database.TxManager
@@ -50,7 +58,7 @@ type service struct {
 
 func NewService(
 	repo Repository,
-	roles rbac.Service,
+	roles Roles,
 	store storage.Storage,
 	hasher security.PasswordHasher,
 	tx database.TxManager,
@@ -79,16 +87,12 @@ func (s *service) GetMe(ctx context.Context, userID uuid.UUID) (MeResponse, erro
 
 func (s *service) UpdateMe(ctx context.Context, userID uuid.UUID, req UpdateMeRequest) (MeResponse, error) {
 	if req.empty() {
-		return MeResponse{}, ErrNoFields
+		return MeResponse{}, httpx.ErrNoFields
 	}
 
 	var name *string
 	if req.Name != nil {
-		n := strings.TrimSpace(*req.Name)
-		if n == "" {
-			return MeResponse{}, ErrNameBlank
-		}
-		name = &n
+		name = new(strings.TrimSpace(*req.Name))
 	}
 
 	u, err := s.repo.UpdateProfile(ctx, userID, name, req.Timezone)

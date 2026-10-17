@@ -7,14 +7,16 @@ import (
 )
 
 // RegisterRoutes mounts the ai endpoints on the /api/v1 router. Every route
-// requires a Bearer token; the per-user limit runs before the global one so
+// requires a Bearer token; the per-user limits run before the global one so
 // one user over their limit does not use up the shared bucket.
-func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
-	g := r.Group("/ai",
+func RegisterRoutes(r fiber.Router, ctrl *Controller, auth httpx.RequireAuth) {
+	g := r.Group(
+		"/ai",
 		fiber.Handler(auth),
+		httpx.RateLimit(userDailyMax, dailyWindow, httpx.ByUser),
 		httpx.RateLimit(userMax, window, httpx.ByUser),
 		httpx.RateLimit(globalMax, window, globalKey),
 	)
-	g.Post("/parse-transaction", h.ParseTransaction)
-	g.Post("/parse-receipt", h.ParseReceipt)
+	g.Post("/parse-transaction", ctrl.ParseTransaction)
+	g.Post("/parse-receipt", ctrl.ParseReceipt)
 }

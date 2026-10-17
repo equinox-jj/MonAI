@@ -6,10 +6,13 @@ import (
 	"time"
 )
 
+// MonthLayout is the API's YYYY-MM month format.
+const MonthLayout = "2006-01"
+
 // Month returns the half-open date range [from, to) of a YYYY-MM month, at
 // UTC midnight so it compares with DATE values.
 func Month(month string) (from, to time.Time, err error) {
-	from, err = time.Parse("2006-01", month)
+	from, err = time.Parse(MonthLayout, month)
 	if err != nil {
 		return time.Time{}, time.Time{}, err
 	}

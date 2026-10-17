@@ -16,7 +16,6 @@ import (
 	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/period"
 	"github.com/equinox-jj/MonAI/backend/internal/platform/storage"
-	"github.com/equinox-jj/MonAI/backend/internal/user"
 	"github.com/equinox-jj/MonAI/backend/internal/wallet"
 )
 
@@ -28,6 +27,24 @@ var receiptRule = httpx.FileRule{
 		"image/webp": ".webp",
 	},
 }
+
+type (
+	// Wallets, Categories and Timezones are the parts of other features the
+	// service uses, so a test fake implements one method instead of a whole
+	// repository. module.go adapts the real repositories to them.
+	Wallets interface {
+		FindByID(ctx context.Context, userID, id uuid.UUID) (*wallet.Wallet, error)
+	}
+
+	Categories interface {
+		FindByID(ctx context.Context, userID, id uuid.UUID) (*category.Category, error)
+	}
+
+	Timezones interface {
+		// Timezone returns the user's IANA timezone name.
+		Timezone(ctx context.Context, userID uuid.UUID) (string, error)
+	}
+)
 
 type Service interface {
 	// List returns one page of the user's transactions for a month (default:
@@ -55,9 +72,9 @@ type Service interface {
 
 type service struct {
 	repo       Repository
-	wallets    wallet.Repository
-	categories category.Repository
-	users      user.Repository // for the user's timezone
+	wallets    Wallets
+	categories Categories
+	users      Timezones
 	tx         database.TxManager
 	store      storage.Storage
 	log        *slog.Logger
@@ -68,9 +85,9 @@ type service struct {
 
 func NewService(
 	repo Repository,
-	wallets wallet.Repository,
-	categories category.Repository,
-	users user.Repository,
+	wallets Wallets,
+	categories Categories,
+	users Timezones,
 	tx database.TxManager,
 	store storage.Storage,
 	log *slog.Logger,
@@ -192,7 +209,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, req CreateTransa
 
 func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateTransactionRequest) (TransactionResponse, error) {
 	if req.empty() {
-		return TransactionResponse{}, ErrNoFields
+		return TransactionResponse{}, httpx.ErrNoFields
 	}
 
 	var t *Transaction
@@ -466,12 +483,12 @@ func (s *service) monthStart(ctx context.Context, userID uuid.UUID, v string) (t
 		return time.Date(y, m, 1, 0, 0, 0, 0, time.UTC), nil
 	}
 
-	d, err := time.Parse("2006-01", v)
+	from, _, err := period.Month(v)
 	if err != nil {
 		return time.Time{}, ErrMonthInvalid
 	}
 
-	return d, nil
+	return from, nil
 }
 
 // today is the user's current local date in their stored timezone, at UTC

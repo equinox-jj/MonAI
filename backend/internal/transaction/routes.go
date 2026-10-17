@@ -17,16 +17,16 @@ const (
 
 // RegisterRoutes mounts the transaction endpoints on the /api/v1 router.
 // Every route requires a Bearer token.
-func RegisterRoutes(r fiber.Router, h Handler, auth httpx.RequireAuth) {
+func RegisterRoutes(r fiber.Router, ctrl *Controller, auth httpx.RequireAuth) {
 	g := r.Group("/transactions", fiber.Handler(auth))
-	g.Get("", h.List)
-	g.Post("", h.Create)
+	g.Get("", ctrl.List)
+	g.Post("", ctrl.Create)
 	g.Post("/receipt", // before the /:id routes
 		httpx.RateLimit(receiptUploadMax, receiptUploadWindow, httpx.ByUser),
-		h.UploadReceipt,
+		ctrl.UploadReceipt,
 	)
-	g.Get("/:id", h.Get)
-	g.Patch("/:id", h.Update)
-	g.Delete("/:id", h.Delete)
-	g.Post("/:id/restore", h.Restore)
+	g.Get("/:id", ctrl.Get)
+	g.Patch("/:id", ctrl.Update)
+	g.Delete("/:id", ctrl.Delete)
+	g.Post("/:id/restore", ctrl.Restore)
 }

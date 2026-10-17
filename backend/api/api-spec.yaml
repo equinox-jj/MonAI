@@ -1310,14 +1310,25 @@ components:
       properties:
         name: { type: string, minLength: 1, maxLength: 100, example: Joshua }
         email: { type: string, format: email, maxLength: 254, example: joshua@example.com }
-        password: { type: string, minLength: 8, maxLength: 72, example: s3cretPass }
+        password:
+          type: string
+          minLength: 8
+          maxLength: 72
+          example: s3cretPass
+          description: >-
+            At most 72 UTF-8 bytes (bcrypt's limit), which is fewer than 72 characters when
+            the password has non-ASCII characters (field error `max_length`).
 
     LoginRequest:
       type: object
       required: [email, password]
       properties:
         email: { type: string, format: email }
-        password: { type: string }
+        password:
+          type: string
+          description: >-
+            No minimum, so a short password fails like any wrong one (`invalid_credentials`).
+            More than 72 UTF-8 bytes is a validation error (`max_length`).
 
     AuthData:
       type: object
@@ -1401,7 +1412,9 @@ components:
           type: string
           minLength: 8
           maxLength: 72
-          description: Must differ from current_password (field error `not_equal`).
+          description: >-
+            Must differ from current_password (field error `not_equal`). At most 72 UTF-8
+            bytes (field error `max_length`).
 
     # ------------------------------------------------ Uploads
     FileUploadRequest:

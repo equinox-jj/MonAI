@@ -8,25 +8,24 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/equinox-jj/MonAI/backend/internal/platform/database"
+	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 )
 
 // defaultCategories are created for every user on register (ERD §5). Icons
 // are Material Symbols names and colors the light hex the app knows a dark
 // variant for (CategoryColors on Android).
 var defaultCategories = []Category{
-	{Name: "Food", Type: TypeExpense, Icon: ptr("restaurant"), Color: ptr("#F97316"), IsDefault: true},
-	{Name: "Transport", Type: TypeExpense, Icon: ptr("directions_car"), Color: ptr("#0EA5E9"), IsDefault: true},
-	{Name: "Bills", Type: TypeExpense, Icon: ptr("receipt_long"), Color: ptr("#8B5CF6"), IsDefault: true},
-	{Name: "Shopping", Type: TypeExpense, Icon: ptr("shopping_bag"), Color: ptr("#EC4899"), IsDefault: true},
-	{Name: "Health", Type: TypeExpense, Icon: ptr("favorite"), Color: ptr("#10B981"), IsDefault: true},
-	{Name: "Entertainment", Type: TypeExpense, Icon: ptr("movie"), Color: ptr("#F59E0B"), IsDefault: true},
-	{Name: "Other", Type: TypeExpense, Icon: ptr("inventory_2"), Color: ptr("#64748B"), IsDefault: true, IsSystem: true},
-	{Name: "Salary", Type: TypeIncome, Icon: ptr("payments"), Color: ptr("#14B8A6"), IsDefault: true},
-	{Name: "Bonus", Type: TypeIncome, Icon: ptr("redeem"), Color: ptr("#84CC16"), IsDefault: true},
-	{Name: "Other Income", Type: TypeIncome, Icon: ptr("savings"), Color: ptr("#6366F1"), IsDefault: true, IsSystem: true},
+	{Name: "Food", Type: TypeExpense, Icon: new("restaurant"), Color: new("#F97316"), IsDefault: true},
+	{Name: "Transport", Type: TypeExpense, Icon: new("directions_car"), Color: new("#0EA5E9"), IsDefault: true},
+	{Name: "Bills", Type: TypeExpense, Icon: new("receipt_long"), Color: new("#8B5CF6"), IsDefault: true},
+	{Name: "Shopping", Type: TypeExpense, Icon: new("shopping_bag"), Color: new("#EC4899"), IsDefault: true},
+	{Name: "Health", Type: TypeExpense, Icon: new("favorite"), Color: new("#10B981"), IsDefault: true},
+	{Name: "Entertainment", Type: TypeExpense, Icon: new("movie"), Color: new("#F59E0B"), IsDefault: true},
+	{Name: "Other", Type: TypeExpense, Icon: new("inventory_2"), Color: new("#64748B"), IsDefault: true, IsSystem: true},
+	{Name: "Salary", Type: TypeIncome, Icon: new("payments"), Color: new("#14B8A6"), IsDefault: true},
+	{Name: "Bonus", Type: TypeIncome, Icon: new("redeem"), Color: new("#84CC16"), IsDefault: true},
+	{Name: "Other Income", Type: TypeIncome, Icon: new("savings"), Color: new("#6366F1"), IsDefault: true, IsSystem: true},
 }
-
-func ptr(s string) *string { return &s }
 
 type Service interface {
 	List(ctx context.Context, userID uuid.UUID, q ListCategoriesQuery) ([]CategoryResponse, error)
@@ -62,14 +61,9 @@ func (s *service) List(ctx context.Context, userID uuid.UUID, q ListCategoriesQu
 }
 
 func (s *service) Create(ctx context.Context, userID uuid.UUID, req CreateCategoryRequest) (CategoryResponse, error) {
-	name := strings.TrimSpace(req.Name)
-	if name == "" {
-		return CategoryResponse{}, ErrNameBlank
-	}
-
 	cs := []Category{{
 		UserID: userID,
-		Name:   name,
+		Name:   strings.TrimSpace(req.Name),
 		Type:   req.Type,
 		Icon:   req.Icon,
 		Color:  req.Color,
@@ -83,7 +77,7 @@ func (s *service) Create(ctx context.Context, userID uuid.UUID, req CreateCatego
 
 func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateCategoryRequest) (CategoryResponse, error) {
 	if req.empty() {
-		return CategoryResponse{}, ErrNoFields
+		return CategoryResponse{}, httpx.ErrNoFields
 	}
 
 	c, err := s.repo.FindByID(ctx, userID, id)
@@ -92,11 +86,7 @@ func (s *service) Update(ctx context.Context, userID, id uuid.UUID, req UpdateCa
 	}
 
 	if req.Name != nil {
-		name := strings.TrimSpace(*req.Name)
-		if name == "" {
-			return CategoryResponse{}, ErrNameBlank
-		}
-		c.Name = name
+		c.Name = strings.TrimSpace(*req.Name)
 	}
 	if req.Icon.Set {
 		c.Icon = req.Icon.Value

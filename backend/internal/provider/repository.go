@@ -17,6 +17,10 @@ const (
 	aliasPrimaryKey = "provider_aliases_pkey"
 )
 
+// errCatalogMissing means the catalog_versions row is gone. Migration 000003
+// seeds it, so this is a broken schema, not a client error.
+var errCatalogMissing = errors.New("provider: catalog_versions row missing")
+
 // orderBy is the catalog order for both the public and the admin lists.
 const orderBy = "sort_order, lower(name)"
 
@@ -173,26 +177,12 @@ func (r *repository) Update(ctx context.Context, p *PaymentProvider) error {
 			"updated_by": p.UpdatedBy,
 			"updated_at": time.Now(),
 		})
-	if res.Error != nil {
-		return slugTaken(res.Error)
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return slugTaken(database.Affected(res, ErrNotFound))
 }
 
 func (r *repository) Delete(ctx context.Context, id uuid.UUID) error {
 	res := database.Conn(ctx, r.db).Delete(&PaymentProvider{}, "id = ?", id)
-	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		return ErrNotFound
-	}
-
-	return nil
+	return database.Affected(res, ErrNotFound)
 }
 
 func (r *repository) ReplaceAliases(ctx context.Context, id uuid.UUID, aliases []string) error {
@@ -234,15 +224,7 @@ func (r *repository) BumpCatalogVersion(ctx context.Context) error {
 			"version":    gorm.Expr("version + 1"),
 			"updated_at": time.Now(),
 		})
-	if res.Error != nil {
-		return res.Error
-	}
-	if res.RowsAffected == 0 {
-		// Seeded by migration 000003, so a missing row is a broken schema.
-		return errors.New("provider: catalog_versions row missing")
-	}
-
-	return nil
+	return database.Affected(res, errCatalogMissing)
 }
 
 func (r *repository) findOne(db *gorm.DB, query string, arg any) (*PaymentProvider, error) {

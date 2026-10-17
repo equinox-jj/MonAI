@@ -5,6 +5,8 @@ import (
 	"time"
 
 	"github.com/gofiber/fiber/v3"
+
+	"github.com/equinox-jj/MonAI/backend/internal/platform/httpx"
 )
 
 // Auth rate limits. The IP limit counts every login attempt. The email limits
@@ -44,11 +46,11 @@ func loginEmailIPKey(c fiber.Ctx) string {
 		return ""
 	}
 
-	return "login:" + email + "|" + c.IP()
+	return "login:" + email + "|" + httpx.ByIP(c)
 }
 
 // loginEmail returns the body's normalized email, or "" for a malformed body
-// or a missing email, which skips the limit; the handler then rejects the
+// or a missing email, which skips the limit; the controller then rejects the
 // request.
 func loginEmail(c fiber.Ctx) string {
 	var body struct {
