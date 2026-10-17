@@ -146,7 +146,7 @@ services:
   # writing rows (no DDL, not a superuser like POSTGRES_USER). Migrations keep
   # using the owner; default privileges cover the tables they create later.
   # Safe to rerun; it also resets the role's password to DB_APP_PASSWORD.
-  db-init:
+  monai-db-init:
     image: postgres:18-alpine
     depends_on:
       monai-db:
@@ -184,7 +184,7 @@ services:
     restart: unless-stopped
     environment:
       <<: *app-env
-      # The limited role from db-init.
+      # The limited role from monai-db-init.
       DATABASE_URL: postgres://${DB_APP_USER:-monai_app}:${DB_APP_PASSWORD}@monai-db:5432/${POSTGRES_DB:-monai}?sslmode=disable&timezone=UTC
     expose:
       - "${API_PORT:-8080}"
@@ -195,7 +195,7 @@ services:
         condition: service_completed_successfully
       migrate:
         condition: service_completed_successfully
-      db-init:
+      monai-db-init:
         condition: service_completed_successfully
 
 volumes:
