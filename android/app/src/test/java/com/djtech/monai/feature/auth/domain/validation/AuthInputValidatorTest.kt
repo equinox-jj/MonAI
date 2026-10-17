@@ -121,11 +121,12 @@ class AuthInputValidatorTest {
     }
 
     @Test
-    fun `login applies the server's password length rules`() {
-        assertEquals(
-            listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooShort(8))),
-            AuthInputValidator.login("joshua@example.com", "short12"),
-        )
+    fun `login has no password minimum, so a short one fails as wrong credentials`() {
+        assertEquals(noErrors, AuthInputValidator.login("joshua@example.com", "short12"))
+    }
+
+    @Test
+    fun `login caps the password at 72 bytes`() {
         assertEquals(
             listOf(AuthFieldError(AuthField.PASSWORD, FieldIssue.TooLong(72))),
             AuthInputValidator.login("joshua@example.com", "a".repeat(73)),

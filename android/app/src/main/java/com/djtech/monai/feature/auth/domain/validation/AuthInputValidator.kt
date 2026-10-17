@@ -25,13 +25,13 @@ object AuthInputValidator {
     fun register(name: String, email: String, password: String): List<AuthFieldError> = buildList {
         addIssue(AuthField.NAME, nameIssue(name))
         addIssue(AuthField.EMAIL, emailIssue(email, max = EMAIL_MAX))
-        addIssue(AuthField.PASSWORD, passwordIssue(password))
+        addIssue(AuthField.PASSWORD, passwordIssue(password, min = PASSWORD_MIN))
     }
 
-    // The server applies the full password rules on login too, so checking them here hides nothing.
+    // The server has no password minimum on login, so a short one fails as wrong credentials.
     fun login(email: String, password: String): List<AuthFieldError> = buildList {
         addIssue(AuthField.EMAIL, emailIssue(email, max = null))
-        addIssue(AuthField.PASSWORD, passwordIssue(password))
+        addIssue(AuthField.PASSWORD, passwordIssue(password, min = null))
     }
 
     fun changePassword(currentPassword: String, newPassword: String): List<AuthFieldError> =
@@ -39,7 +39,7 @@ object AuthInputValidator {
             if (currentPassword.isEmpty()) add(AuthFieldError(AuthField.CURRENT_PASSWORD, FieldIssue.Required))
             addIssue(
                 AuthField.NEW_PASSWORD,
-                passwordIssue(newPassword)
+                passwordIssue(newPassword, min = PASSWORD_MIN)
                     ?: FieldIssue.SameAsCurrent.takeIf { newPassword == currentPassword },
             )
         }
@@ -61,11 +61,10 @@ object AuthInputValidator {
         else -> null
     }
 
-    private fun passwordIssue(password: String): FieldIssue? = when {
+    private fun passwordIssue(password: String, min: Int?): FieldIssue? = when {
         password.isEmpty() -> FieldIssue.Required
-        !isPasswordLongEnough(password) -> FieldIssue.TooShort(PASSWORD_MIN)
-        // bcrypt takes at most 72 bytes. The server's validator counts runes, so a longer
-        // non-ASCII password would pass it and then fail hashing with a 500.
+        min != null && password.codePointLength() < min -> FieldIssue.TooShort(min)
+        // bcrypt takes at most 72 bytes, so the server caps bytes (maxbytes), not characters.
         password.encodeToByteArray().size > PASSWORD_MAX_BYTES -> FieldIssue.TooLong(PASSWORD_MAX_BYTES)
 
         else -> null

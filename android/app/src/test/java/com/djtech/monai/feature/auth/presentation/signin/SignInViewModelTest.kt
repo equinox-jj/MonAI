@@ -139,7 +139,6 @@ class SignInViewModelTest {
     @Test
     fun `a local password error focuses the password`() = runTest(mainDispatcherRule.dispatcher) {
         viewModel.onIntent(SignInIntent.EmailChanged("joshua@example.com"))
-        viewModel.onIntent(SignInIntent.PasswordChanged("short"))
 
         viewModel.onIntent(SignInIntent.Submit)
 
