@@ -9,6 +9,29 @@ This repository is a monorepo with two apps:
 | [`android/`](android/README.md) | The Android client | Kotlin, Jetpack Compose, Material 3, Hilt, Room, Retrofit |
 | [`backend/`](backend/README.md) | The REST API | Go, Fiber v3, Uber fx, GORM, PostgreSQL 18, MinIO, Gemini |
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center"><img src="android/screenshots/03_home.png" width="200" alt="Home"/><br/><sub>Home</sub></td>
+    <td align="center"><img src="android/screenshots/07_quick_add_ai.png" width="200" alt="AI quick add"/><br/><sub>AI quick add</sub></td>
+    <td align="center"><img src="android/screenshots/08_review_drafts.png" width="200" alt="Review drafts"/><br/><sub>Review drafts</sub></td>
+    <td align="center"><img src="android/screenshots/09_new_transaction.png" width="200" alt="New transaction"/><br/><sub>New transaction</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="android/screenshots/04_transactions.png" width="200" alt="Transactions"/><br/><sub>Transactions</sub></td>
+    <td align="center"><img src="android/screenshots/05_wallets.png" width="200" alt="Wallets"/><br/><sub>Wallets</sub></td>
+    <td align="center"><img src="android/screenshots/06_monthly_report.png" width="200" alt="Monthly report"/><br/><sub>Monthly report</sub></td>
+    <td align="center"><img src="android/screenshots/01_onboarding.png" width="200" alt="Onboarding"/><br/><sub>Onboarding</sub></td>
+  </tr>
+  <tr>
+    <td align="center"><img src="android/screenshots/02_sign_in.png" width="200" alt="Sign in"/><br/><sub>Sign in</sub></td>
+    <td align="center"><img src="android/screenshots/10_home_dark.png" width="200" alt="Home, dark mode"/><br/><sub>Home (dark)</sub></td>
+    <td align="center"><img src="android/screenshots/11_monthly_report_dark.png" width="200" alt="Monthly report, dark mode"/><br/><sub>Monthly report (dark)</sub></td>
+    <td></td>
+  </tr>
+</table>
+
 ## Features
 
 - **Wallets:** cash, bank, e-wallet and other wallets, each linked to a provider from a shared catalog. Balances are always calculated from the transactions.
