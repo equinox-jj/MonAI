@@ -1,0 +1,30 @@
+import 'transactions_table.dart';
+
+-- Full-text index over note and merchant for offline search, kept in sync
+-- with `transactions` by the triggers below; join on rowid. unicode61 folds
+-- case beyond ASCII. Write transactions with upserts only: INSERT OR REPLACE
+-- deletes without firing the delete trigger and leaves stale index rows.
+CREATE VIRTUAL TABLE transactions_fts USING fts5(
+  note,
+  merchant,
+  content='transactions',
+  content_rowid='rowid',
+  tokenize='unicode61'
+);
+
+CREATE TRIGGER transactions_fts_after_insert AFTER INSERT ON transactions BEGIN
+  INSERT INTO transactions_fts(rowid, note, merchant)
+    VALUES (new.rowid, new.note, new.merchant);
+END;
+
+CREATE TRIGGER transactions_fts_after_delete AFTER DELETE ON transactions BEGIN
+  INSERT INTO transactions_fts(transactions_fts, rowid, note, merchant)
+    VALUES ('delete', old.rowid, old.note, old.merchant);
+END;
+
+CREATE TRIGGER transactions_fts_after_update AFTER UPDATE ON transactions BEGIN
+  INSERT INTO transactions_fts(transactions_fts, rowid, note, merchant)
+    VALUES ('delete', old.rowid, old.note, old.merchant);
+  INSERT INTO transactions_fts(rowid, note, merchant)
+    VALUES (new.rowid, new.note, new.merchant);
+END;

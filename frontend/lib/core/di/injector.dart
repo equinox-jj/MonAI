@@ -1,6 +1,15 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
+import 'package:monai/core/database/daos/budget_dao.dart';
+import 'package:monai/core/database/daos/category_dao.dart';
+import 'package:monai/core/database/daos/monthly_report_dao.dart';
+import 'package:monai/core/database/daos/payment_provider_dao.dart';
+import 'package:monai/core/database/daos/transaction_dao.dart';
+import 'package:monai/core/database/daos/user_dao.dart';
+import 'package:monai/core/database/daos/wallet_dao.dart';
+import 'package:monai/core/database/local_cache.dart';
+import 'package:monai/core/database/monai_database.dart';
 import 'package:monai/core/network/dio_client.dart';
 import 'package:monai/core/network/interceptors/auth_interceptor.dart';
 import 'package:monai/core/network/interceptors/unauthorized_interceptor.dart';
@@ -65,6 +74,25 @@ Future<void> configureDependencies() async {
       authInterceptor: sl<AuthInterceptor>(),
       unauthorizedInterceptor: sl<UnauthorizedInterceptor>(),
     ).dio,
+  );
+
+  // ---- Database ----
+  sl.registerLazySingleton<MonAIDatabase>(MonAIDatabase.open);
+  sl.registerLazySingleton<WalletDao>(() => sl<MonAIDatabase>().walletDao);
+  sl.registerLazySingleton<CategoryDao>(() => sl<MonAIDatabase>().categoryDao);
+  sl.registerLazySingleton<TransactionDao>(
+    () => sl<MonAIDatabase>().transactionDao,
+  );
+  sl.registerLazySingleton<BudgetDao>(() => sl<MonAIDatabase>().budgetDao);
+  sl.registerLazySingleton<PaymentProviderDao>(
+    () => sl<MonAIDatabase>().paymentProviderDao,
+  );
+  sl.registerLazySingleton<MonthlyReportDao>(
+    () => sl<MonAIDatabase>().monthlyReportDao,
+  );
+  sl.registerLazySingleton<UserDao>(() => sl<MonAIDatabase>().userDao);
+  sl.registerLazySingleton<LocalCache>(
+    () => DriftLocalCache(sl<MonAIDatabase>()),
   );
 
   // ---- Features ----
