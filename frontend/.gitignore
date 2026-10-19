@@ -49,3 +49,4 @@ app.*.map.json
 docs/
 .env
 CLAUDE.md
+.mason/
