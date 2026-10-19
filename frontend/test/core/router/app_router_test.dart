@@ -55,6 +55,46 @@ void main() {
     });
   });
 
+  group('launchRedirect', () {
+    test('a signed-in user starts on Home without reading the flag', () async {
+      // Arrange
+      var flagRead = false;
+      Future<bool> isOnboardingCompleted() async => flagRead = true;
+
+      // Act
+      final target = await launchRedirect(.signedIn, isOnboardingCompleted);
+
+      // Assert
+      expect(target, AppRoutes.home);
+      expect(flagRead, isFalse);
+    });
+
+    test(
+      'a signed-out user who finished onboarding starts on Sign in',
+      () async {
+        // Arrange
+        Future<bool> isOnboardingCompleted() async => true;
+
+        // Act
+        final target = await launchRedirect(.signedOut, isOnboardingCompleted);
+
+        // Assert
+        expect(target, AppRoutes.signIn);
+      },
+    );
+
+    test('a signed-out user new to the app starts on Onboarding', () async {
+      // Arrange
+      Future<bool> isOnboardingCompleted() async => false;
+
+      // Act
+      final target = await launchRedirect(.signedOut, isOnboardingCompleted);
+
+      // Assert
+      expect(target, AppRoutes.onboarding);
+    });
+  });
+
   group('email hand-off', () {
     test('carries the email as a query parameter', () {
       // Arrange

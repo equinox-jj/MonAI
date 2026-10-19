@@ -13,19 +13,15 @@ import 'package:monai/features/auth/presentation/pages/session_expired/session_e
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
-  // An unreadable token means signing in again rather than blocking launch.
-  final signedIn = (await sl<RestoreSessionUseCase>()(const NoParams()))
-      .getOrElse((_) => false);
-  // An unreadable flag shows onboarding again rather than blocking launch.
-  final onboarded = (await sl<IsOnboardingCompletedUseCase>()(const NoParams()))
-      .getOrElse((_) => false);
+  // Restores before routing so the launch redirect sees the session. An
+  // unreadable token leaves it signed out rather than blocking launch.
+  await sl<RestoreSessionUseCase>()(const NoParams());
   final router = createAppRouter(
-    initialLocation: signedIn
-        ? AppRoutes.home
-        : onboarded
-        ? AppRoutes.signIn
-        : AppRoutes.onboarding,
     sessionManager: sl<SessionManager>(),
+    // An unreadable flag shows onboarding again rather than blocking launch.
+    isOnboardingCompleted: () async =>
+        (await sl<IsOnboardingCompletedUseCase>()(const NoParams()))
+            .getOrElse((_) => false),
   );
 
   runApp(MyApp(router: router));

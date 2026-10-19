@@ -51,8 +51,9 @@ void main() {
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: createAppRouter(
-          initialLocation: AppRoutes.onboarding,
           sessionManager: SessionManager(),
+          isOnboardingCompleted: () async => false,
+          initialLocation: AppRoutes.onboarding,
         ),
       ),
     );

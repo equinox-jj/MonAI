@@ -8,6 +8,9 @@ import 'package:monai/features/home/presentation/pages/home/home_page.dart';
 
 /// The app's route paths.
 abstract final class AppRoutes {
+  /// Where the app starts; it only redirects to the first screen.
+  static const launch = '/';
+
   /// First-launch introduction.
   static const onboarding = '/onboarding';
 
@@ -41,18 +44,27 @@ abstract final class AppRoutes {
 
 /// Builds the app's router, starting at [initialLocation].
 ///
-/// Navigation follows [sessionManager]: a sign-in leaves the auth screens for
-/// Home, and a sign-out returns to Sign in. An expired session stays put
-/// under the session-expired dialog until the user signs in again.
+/// The [AppRoutes.launch] route picks the first screen with
+/// [launchRedirect], asking [isOnboardingCompleted] only for a signed-out
+/// user. After that, navigation follows [sessionManager]: a sign-in leaves the
+/// auth screens for Home, and a sign-out returns to Sign in. An expired
+/// session stays put under the session-expired dialog until the user signs in
+/// again.
 GoRouter createAppRouter({
-  required String initialLocation,
   required SessionManager sessionManager,
+  required Future<bool> Function() isOnboardingCompleted,
+  String initialLocation = AppRoutes.launch,
 }) => GoRouter(
   initialLocation: initialLocation,
   refreshListenable: sessionManager.status,
   redirect: (_, state) =>
       sessionRedirect(sessionManager.status.value, state.matchedLocation),
   routes: [
+    GoRoute(
+      path: AppRoutes.launch,
+      redirect: (_, _) =>
+          launchRedirect(sessionManager.status.value, isOnboardingCompleted),
+    ),
     GoRoute(
       path: AppRoutes.onboarding,
       builder: (_, _) => const OnboardingPage(),
@@ -82,3 +94,16 @@ String? sessionRedirect(SessionStatus status, String location) {
     .signedIn || .signedOut || .expired => null,
   };
 }
+
+/// The first screen for a user whose session is [status] at launch.
+///
+/// A signed-in user starts on Home; anyone else starts on Sign in once
+/// [isOnboardingCompleted], and on Onboarding before that.
+Future<String> launchRedirect(
+  SessionStatus status,
+  Future<bool> Function() isOnboardingCompleted,
+) async => switch (status) {
+  .signedIn => AppRoutes.home,
+  .signedOut || .expired when await isOnboardingCompleted() => AppRoutes.signIn,
+  .signedOut || .expired => AppRoutes.onboarding,
+};
