@@ -1,0 +1,8 @@
+name: feature
+description: template feature
+version: 0.0.1
+vars:
+  name:
+    type: string
+    description: feature name
+    prompt: What is this feature called ?
