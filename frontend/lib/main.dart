@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 
+import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/l10n/l10n.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await configureDependencies();
   runApp(const MyApp());
 }
 
