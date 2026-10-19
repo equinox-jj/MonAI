@@ -1,6 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:go_router/go_router.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:monai/core/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/router/app_router.dart';
+import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
+import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
+import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
+import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
+
+class _MockCompleteOnboardingUseCase extends Mock
+    implements CompleteOnboardingUseCase {}
+
+class _MockLoginUseCase extends Mock implements LoginUseCase {}
 
 void main() {
   group('sessionRedirect', () {
@@ -35,6 +50,17 @@ void main() {
     test('a signed-out user may stay on the auth screens', () {
       // Arrange
       const location = AppRoutes.register;
+
+      // Act
+      final target = sessionRedirect(.signedOut, location);
+
+      // Assert
+      expect(target, isNull);
+    });
+
+    test('leaves the launch route to pick the first screen', () {
+      // Arrange
+      const location = AppRoutes.launch;
 
       // Act
       final target = sessionRedirect(.signedOut, location);
@@ -92,6 +118,77 @@ void main() {
 
       // Assert
       expect(target, AppRoutes.onboarding);
+    });
+  });
+
+  group('launch', () {
+    setUp(() {
+      sl
+        ..registerFactory(
+          () => OnboardingBloc(_MockCompleteOnboardingUseCase()),
+        )
+        ..registerFactory(() => SignInBloc(_MockLoginUseCase()));
+    });
+
+    tearDown(sl.reset);
+
+    Future<GoRouter> pumpLaunch(
+      WidgetTester tester, {
+      required bool onboardingCompleted,
+    }) async {
+      final router = createAppRouter(
+        sessionManager: SessionManager(),
+        isOnboardingCompleted: () async => onboardingCompleted,
+      );
+      await tester.pumpWidget(
+        MaterialApp.router(
+          theme: MonAITheme.light(),
+          locale: const Locale('en'),
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: router,
+        ),
+      );
+      await tester.pumpAndSettle();
+      return router;
+    }
+
+    testWidgets('a signed-out user new to the app lands on Onboarding', (
+      tester,
+    ) async {
+      // Arrange
+      const onboardingCompleted = false;
+
+      // Act
+      final router = await pumpLaunch(
+        tester,
+        onboardingCompleted: onboardingCompleted,
+      );
+
+      // Assert
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.onboarding,
+      );
+    });
+
+    testWidgets('a signed-out user who finished onboarding lands on Sign in', (
+      tester,
+    ) async {
+      // Arrange
+      const onboardingCompleted = true;
+
+      // Act
+      final router = await pumpLaunch(
+        tester,
+        onboardingCompleted: onboardingCompleted,
+      );
+
+      // Assert
+      expect(
+        router.routerDelegate.currentConfiguration.uri.path,
+        AppRoutes.signIn,
+      );
     });
   });
 

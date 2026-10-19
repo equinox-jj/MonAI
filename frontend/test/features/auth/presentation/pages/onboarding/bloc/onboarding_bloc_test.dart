@@ -20,7 +20,7 @@ void main() {
   setUp(() {
     completeOnboarding = _MockCompleteOnboardingUseCase();
     when(() => completeOnboarding(any()))
-        .thenAnswer((_) async => const Right(unit));
+        .thenAnswer((_) async => const Right(true));
     bloc = OnboardingBloc(completeOnboarding);
   });
 

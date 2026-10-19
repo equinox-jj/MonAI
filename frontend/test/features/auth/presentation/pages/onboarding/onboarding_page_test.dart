@@ -30,7 +30,7 @@ void main() {
   setUp(() {
     completeOnboarding = _MockCompleteOnboardingUseCase();
     when(() => completeOnboarding(any()))
-        .thenAnswer((_) async => const Right(unit));
+        .thenAnswer((_) async => const Right(true));
     sl
       ..registerFactory(() => OnboardingBloc(completeOnboarding))
       ..registerFactory(() => SignInBloc(_MockLoginUseCase()))

@@ -155,4 +155,67 @@ void main() {
       expect(enoughResult, isTrue);
     });
   });
+
+  group('changePassword', () {
+    test('a different new password long enough is valid', () {
+      // Arrange
+      const current = 'old-secret';
+      const next = 'new-secret';
+
+      // Act
+      final errors = AuthInputValidator.changePassword(
+        currentPassword: current,
+        newPassword: next,
+      );
+
+      // Assert
+      expect(errors, isEmpty);
+    });
+
+    test('both passwords are required', () {
+      // Arrange
+      const empty = '';
+
+      // Act
+      final errors = AuthInputValidator.changePassword(
+        currentPassword: empty,
+        newPassword: empty,
+      );
+
+      // Assert
+      expect(_codes(errors), [
+        ('current_password', 'required'),
+        ('new_password', 'required'),
+      ]);
+    });
+
+    test('the new password follows the register minimum', () {
+      // Arrange
+      const short = 'short';
+
+      // Act
+      final errors = AuthInputValidator.changePassword(
+        currentPassword: 'old-secret',
+        newPassword: short,
+      );
+
+      // Assert
+      expect(_codes(errors), [('new_password', 'min_length')]);
+    });
+
+    test('the new password must differ from the current one', () {
+      // Arrange
+      const same = 'same-secret';
+
+      // Act
+      final errors = AuthInputValidator.changePassword(
+        currentPassword: same,
+        newPassword: same,
+      );
+
+      // Assert
+      expect(_codes(errors), [('new_password', 'not_equal')]);
+      expect(errors.single.params, {'other': 'current_password'});
+    });
+  });
 }

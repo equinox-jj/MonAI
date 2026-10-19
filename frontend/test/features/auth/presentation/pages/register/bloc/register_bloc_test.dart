@@ -4,9 +4,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/error/field_error.dart';
 import 'package:monai/core/model/ui_status.dart';
+import 'package:monai/features/auth/domain/entity/auth_session.dart';
 import 'package:monai/features/auth/domain/usecase/register_usecase.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 import 'package:monai/features/auth/presentation/pages/register/bloc/register_bloc.dart';
+
+import '../../../../../../helpers/entity_fixtures.dart';
 
 class _MockRegisterUseCase extends Mock implements RegisterUseCase {}
 
@@ -41,7 +44,7 @@ void main() {
   tearDown(() => bloc.close());
 
   /// Types a form, submits it and returns the settled state.
-  Future<RegisterState> submit(Either<Failure, Unit> result) async {
+  Future<RegisterState> submit(Either<Failure, AuthSession> result) async {
     when(() => register(any())).thenAnswer((_) async => result);
     bloc.add(
       const RegisterEvent.submitted(
@@ -72,7 +75,7 @@ void main() {
 
   test('sends the submitted form and stays busy on success', () async {
     // Arrange
-    const result = Right<Failure, Unit>(unit);
+    final result = Right<Failure, AuthSession>(authSession());
 
     // Act
     final state = await submit(result);
@@ -94,7 +97,7 @@ void main() {
 
   test('field errors focus the first field in layout order', () async {
     // Arrange
-    const result = Left<Failure, Unit>(
+    const result = Left<Failure, AuthSession>(
       Failure.validation([_passwordTooShort, _nameRequired]),
     );
 
@@ -109,7 +112,9 @@ void main() {
 
   test('a taken email marks the email field, not the banner', () async {
     // Arrange
-    const result = Left<Failure, Unit>(Failure.conflict(code: 'conflict'));
+    const result = Left<Failure, AuthSession>(
+      Failure.conflict(code: 'conflict'),
+    );
 
     // Act
     final state = await submit(result);
@@ -135,7 +140,7 @@ void main() {
 
   test('a server error shows the generic banner', () async {
     // Arrange
-    const result = Left<Failure, Unit>(Failure.server(500));
+    const result = Left<Failure, AuthSession>(Failure.server(500));
 
     // Act
     final state = await submit(result);

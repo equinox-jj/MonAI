@@ -1,0 +1,16 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/features/shared/domain/entity/user.dart';
+import 'package:monai/features/shared/domain/repository/user_repository.dart';
+
+/// Re-fetches the signed-in user.
+class RefreshUserUseCase implements UseCase<User, NoParams> {
+  RefreshUserUseCase(this._repository);
+
+  final UserRepository _repository;
+
+  @override
+  Future<Either<Failure, User>> call(NoParams params) =>
+      _repository.refreshUser();
+}

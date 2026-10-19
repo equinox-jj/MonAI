@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:monai/core/error/exceptions.dart';
 
 /// Mixed into local data sources to centralize cache-error translation.
@@ -14,4 +16,25 @@ mixin BaseLocalDataSource {
       throw CacheException(message: e.toString());
     }
   }
+
+  /// The stream [watch] opens, with every error turned into a
+  /// [CacheException].
+  Stream<T> safeCacheStream<T>(Stream<T> Function() watch) {
+    final Stream<T> source;
+    try {
+      source = watch();
+    } catch (e) {
+      return Stream.error(_toCacheException(e));
+    }
+    return source.transform(
+      StreamTransformer.fromHandlers(
+        handleError: (error, stackTrace, sink) =>
+            sink.addError(_toCacheException(error), stackTrace),
+      ),
+    );
+  }
+
+  CacheException _toCacheException(Object error) => error is CacheException
+      ? error
+      : CacheException(message: error.toString());
 }

@@ -133,7 +133,11 @@ GoRouter createAppRouter({
 );
 
 /// Where the session sends a user at [location], or null to stay.
+///
+/// [AppRoutes.launch] is left alone: go_router runs this before the route's
+/// own [launchRedirect], which picks the first screen.
 String? sessionRedirect(SessionStatus status, String location) {
+  if (location == AppRoutes.launch) return null;
   final onSignedOutRoute = AppRoutes.signedOutRoutes.contains(location);
   return switch (status) {
     .signedIn when onSignedOutRoute => AppRoutes.home,

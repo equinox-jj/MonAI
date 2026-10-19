@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:fpdart/fpdart.dart';
 
 import 'package:monai/core/error/error_mapper.dart';
@@ -14,5 +16,24 @@ mixin BaseRepository {
     } catch (e) {
       return Left(mapExceptionToFailure(e));
     }
+  }
+
+  /// Wraps each value of the stream [watch] opens in `Right`, and turns each
+  /// error, including one thrown while opening it, into a `Left(Failure)`
+  /// event. The stream keeps going after an error.
+  Stream<Either<Failure, T>> safeStream<T>(Stream<T> Function() watch) {
+    final Stream<T> source;
+    try {
+      source = watch();
+    } catch (e) {
+      return Stream.value(Left(mapExceptionToFailure(e)));
+    }
+    return source.transform(
+      StreamTransformer.fromHandlers(
+        handleData: (value, sink) => sink.add(Right(value)),
+        handleError: (error, _, sink) =>
+            sink.add(Left(mapExceptionToFailure(error))),
+      ),
+    );
   }
 }

@@ -34,7 +34,9 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
   ) async {
     if (state.status != .initial) return;
     emit(state.copyWith(status: .loading));
+    
     await _completeOnboarding(const NoParams());
+
     emit(state.copyWith(status: .success, exit: event.exit));
   }
 }

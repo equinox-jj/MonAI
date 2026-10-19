@@ -2,31 +2,42 @@ import 'package:fpdart/fpdart.dart';
 import 'package:monai/core/data/base_repository.dart';
 import 'package:monai/core/error/exceptions.dart';
 import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:monai/features/auth/data/datasources/auth_remote_datasource.dart';
+import 'package:monai/features/auth/data/mapper/auth_mapper.dart';
 import 'package:monai/features/auth/data/model/auth_response.dart';
+import 'package:monai/features/auth/data/model/change_password_request.dart';
 import 'package:monai/features/auth/data/model/login_request.dart';
 import 'package:monai/features/auth/data/model/register_request.dart';
+import 'package:monai/features/auth/domain/entity/auth_session.dart';
 import 'package:monai/features/auth/domain/repository/auth_repository.dart';
+import 'package:monai/features/shared/data/datasources/user_local_datasource.dart';
+import 'package:monai/features/shared/data/mapper/user_mapper.dart';
 
 class AuthRepositoryImpl extends AuthRepository with BaseRepository {
-  AuthRepositoryImpl({required this._remote, required this._local});
+  AuthRepositoryImpl({
+    required this._remote,
+    required this._local,
+    required this._users,
+  });
 
   final AuthRemoteDataSource _remote;
   final AuthLocalDataSource _local;
+  final UserLocalDataSource _users;
 
   @override
   Future<Either<Failure, bool>> isOnboardingCompleted() =>
       safeCall(_local.isOnboardingCompleted);
 
   @override
-  Future<Either<Failure, Unit>> completeOnboarding() => safeCall(() async {
+  Future<Either<Failure, bool>> completeOnboarding() => safeCall(() async {
     await _local.markOnboardingCompleted();
-    return unit;
+    return true;
   });
 
   @override
-  Future<Either<Failure, Unit>> login({
+  Future<Either<Failure, AuthSession>> login({
     required String email,
     required String password,
   }) => _signIn(
@@ -34,7 +45,7 @@ class AuthRepositoryImpl extends AuthRepository with BaseRepository {
   );
 
   @override
-  Future<Either<Failure, Unit>> register({
+  Future<Either<Failure, AuthSession>> register({
     required String name,
     required String email,
     required String password,
@@ -45,29 +56,55 @@ class AuthRepositoryImpl extends AuthRepository with BaseRepository {
   );
 
   @override
-  Future<Either<Failure, Unit>> logout() => safeCall(() async {
+  Future<Either<Failure, SessionStatus>> logout() => safeCall(() async {
     await _local.endSession();
-    return unit;
+    return SessionStatus.signedOut;
+  });
+
+  @override
+  Future<Either<Failure, SessionStatus>> logoutAllDevices() =>
+      safeCall(() async {
+        await _remote.logoutAll();
+        await _local.endSession();
+        return SessionStatus.signedOut;
+      });
+
+  // The response carries a fresh token for this device. It is dropped on
+  // purpose, as on Android: the user signs in again with the new password.
+  @override
+  Future<Either<Failure, SessionStatus>> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) => safeCall(() async {
+    await _remote.changePassword(
+      ChangePasswordRequest(
+        currentPassword: currentPassword,
+        newPassword: newPassword,
+      ),
+    );
+    await _local.endSession();
+    return SessionStatus.signedOut;
   });
 
   @override
   Future<Either<Failure, bool>> restoreSession() =>
       safeCall(_local.restoreSession);
 
-  Future<Either<Failure, Unit>> _signIn(
+  Future<Either<Failure, AuthSession>> _signIn(
     Future<AuthResponse> Function() request,
   ) => safeCall(() async {
-    final response = await request();
-    // Checked first: a payload without a token must not leave a half-started
+    // Mapped first: a malformed payload must not leave a half-started
     // session.
-    final token = response.data?.accessToken;
-    if (token == null || token.isEmpty) {
-      throw const UnknownException(message: 'Malformed response');
-    }
+    final session = (await request()).toEntity();
     // Drop anything cached for a previous account before the new session
     // starts.
     await _local.clearCache();
-    await _local.startSession(token);
-    return unit;
+    // Cached before the session starts, so Home has the user at once. Best
+    // effort: the next user refresh fills a cache that failed to save.
+    try {
+      await _users.replace(session.user.toRow());
+    } on CacheException catch (_) {}
+    await _local.startSession(session.accessToken);
+    return session;
   });
 }

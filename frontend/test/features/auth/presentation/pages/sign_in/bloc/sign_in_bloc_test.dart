@@ -6,9 +6,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/error/field_error.dart';
 import 'package:monai/core/model/ui_status.dart';
+import 'package:monai/features/auth/domain/entity/auth_session.dart';
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
+
+import '../../../../../../helpers/entity_fixtures.dart';
 
 class _MockLoginUseCase extends Mock implements LoginUseCase {}
 
@@ -42,7 +45,7 @@ void main() {
   tearDown(() => bloc.close());
 
   /// Types a form, submits it and returns the settled state.
-  Future<SignInState> submit(Either<Failure, Unit> result) async {
+  Future<SignInState> submit(Either<Failure, AuthSession> result) async {
     when(() => login(any())).thenAnswer((_) async => result);
     bloc.add(_submitted);
     await pumpEventQueue();
@@ -51,7 +54,7 @@ void main() {
 
   test('sends the submitted form and stays busy on success', () async {
     // Arrange
-    const result = Right<Failure, Unit>(unit);
+    final result = Right<Failure, AuthSession>(authSession());
 
     // Act
     final state = await submit(result);
@@ -73,7 +76,7 @@ void main() {
   test('field errors land on their fields and focus the first one', () async {
     // Arrange
     // Listed out of layout order, as the server may.
-    const result = Left<Failure, Unit>(
+    const result = Left<Failure, AuthSession>(
       Failure.validation([_passwordRequired, _emailInvalid]),
     );
 
@@ -90,7 +93,7 @@ void main() {
 
   test('a 422 for an unknown field shows the generic banner', () async {
     // Arrange
-    const result = Left<Failure, Unit>(
+    const result = Left<Failure, AuthSession>(
       Failure.validation([
         FieldError(field: 'other', code: 'required', message: 'x'),
       ]),
@@ -106,7 +109,7 @@ void main() {
 
   test('wrong credentials show the banner', () async {
     // Arrange
-    const result = Left<Failure, Unit>(
+    const result = Left<Failure, AuthSession>(
       Failure.unauthorized(code: 'invalid_credentials'),
     );
 
@@ -121,7 +124,7 @@ void main() {
 
   test('rate limiting rounds the wait up to whole minutes', () async {
     // Arrange
-    const result = Left<Failure, Unit>(
+    const result = Left<Failure, AuthSession>(
       Failure.tooManyRequests(retryAfter: Duration(seconds: 61)),
     );
 
@@ -135,8 +138,8 @@ void main() {
   test('offline and timeouts show the network banner', () async {
     // Arrange
     const results = [
-      Left<Failure, Unit>(Failure.network()),
-      Left<Failure, Unit>(Failure.timeout()),
+      Left<Failure, AuthSession>(Failure.network()),
+      Left<Failure, AuthSession>(Failure.timeout()),
     ];
 
     // Act
@@ -170,7 +173,7 @@ void main() {
 
   test('a second submit while signing in is ignored', () async {
     // Arrange
-    final pending = Completer<Either<Failure, Unit>>();
+    final pending = Completer<Either<Failure, AuthSession>>();
     when(() => login(any())).thenAnswer((_) => pending.future);
 
     // Act
@@ -178,7 +181,7 @@ void main() {
       ..add(_submitted)
       ..add(_submitted);
     await pumpEventQueue();
-    pending.complete(const Right(unit));
+    pending.complete(Right(authSession()));
     await pumpEventQueue();
 
     // Assert

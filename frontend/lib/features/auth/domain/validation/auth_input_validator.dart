@@ -30,6 +30,8 @@ abstract final class AuthInputValidator {
   static const nameField = 'name';
   static const emailField = 'email';
   static const passwordField = 'password';
+  static const currentPasswordField = 'current_password';
+  static const newPasswordField = 'new_password';
 
   /// Whether [password] meets the minimum length; drives the register
   /// screen's live hint.
@@ -54,6 +56,24 @@ abstract final class AuthInputValidator {
     required String password,
   }) => [?_emailError(email), ?_passwordError(password)];
 
+  /// The problems with a change-password form; empty when valid. The new
+  /// password follows the register rules and must differ from the current
+  /// one.
+  static List<FieldError> changePassword({
+    required String currentPassword,
+    required String newPassword,
+  }) => [
+    if (currentPassword.isEmpty) _required(currentPasswordField),
+    ?_passwordError(newPassword, min: passwordMin, field: newPasswordField),
+    if (newPassword.isNotEmpty && newPassword == currentPassword)
+      const FieldError(
+        field: newPasswordField,
+        code: 'not_equal',
+        message: 'must differ from current_password',
+        params: {'other': currentPasswordField},
+      ),
+  ];
+
   static FieldError? _nameError(String name) {
     if (name.isEmpty) return _required(nameField);
     if (name.runes.length > _nameMax) return _tooLong(nameField, _nameMax);
@@ -75,18 +95,22 @@ abstract final class AuthInputValidator {
     return null;
   }
 
-  static FieldError? _passwordError(String password, {int? min}) {
-    if (password.isEmpty) return _required(passwordField);
+  static FieldError? _passwordError(
+    String password, {
+    int? min,
+    String field = passwordField,
+  }) {
+    if (password.isEmpty) return _required(field);
     if (min != null && password.runes.length < min) {
       return FieldError(
-        field: passwordField,
+        field: field,
         code: 'min_length',
         message: 'must be at least $min characters',
         params: {'min': min},
       );
     }
     if (utf8.encode(password).length > _passwordMaxBytes) {
-      return _tooLong(passwordField, _passwordMaxBytes);
+      return _tooLong(field, _passwordMaxBytes);
     }
     return null;
   }

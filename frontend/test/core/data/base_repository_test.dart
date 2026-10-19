@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:monai/core/data/base_repository.dart';
@@ -32,5 +34,49 @@ void main() {
     );
 
     expect(result.getLeft().toNullable(), isA<UnknownFailure>());
+  });
+
+  group('safeStream', () {
+    test('wraps each value in Right', () async {
+      // Arrange
+      final source = Stream.fromIterable([1, 2]);
+
+      // Act
+      final events = await repository.safeStream(() => source).toList();
+
+      // Assert
+      expect(events, const [Right<Failure, int>(1), Right<Failure, int>(2)]);
+    });
+
+    test('turns an error into a Left and keeps going', () async {
+      // Arrange
+      final controller = StreamController<int>();
+
+      // Act
+      final events = repository.safeStream(() => controller.stream).toList();
+      controller
+        ..add(1)
+        ..addError(const CacheException(message: 'boom'))
+        ..add(2);
+      await controller.close();
+
+      // Assert
+      expect(await events, [
+        const Right<Failure, int>(1),
+        const Left<Failure, int>(Failure.cache(message: 'boom')),
+        const Right<Failure, int>(2),
+      ]);
+    });
+
+    test('turns a throw while opening the stream into a Left', () async {
+      // Arrange
+      Stream<int> open() => throw StateError('boom');
+
+      // Act
+      final events = await repository.safeStream(open).toList();
+
+      // Assert
+      expect(events.single.getLeft().toNullable(), isA<UnknownFailure>());
+    });
   });
 }

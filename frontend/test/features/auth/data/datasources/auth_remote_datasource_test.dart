@@ -5,6 +5,7 @@ import 'package:monai/core/error/exceptions.dart';
 import 'package:monai/core/network/api_endpoints.dart';
 import 'package:monai/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:monai/features/auth/data/datasources/endpoint/auth_endpoint.dart';
+import 'package:monai/features/auth/data/model/change_password_request.dart';
 import 'package:monai/features/auth/data/model/login_request.dart';
 import 'package:monai/features/auth/data/model/register_request.dart';
 
@@ -144,5 +145,38 @@ void main() {
         ),
       ),
     );
+  });
+
+  test('logoutAll posts with the session token', () async {
+    // Arrange
+    when(() => dio.post<Map<String, dynamic>>(any()))
+        .thenAnswer((_) async => _ok(AuthEndpoint.logoutAll));
+
+    // Act
+    await dataSource.logoutAll();
+
+    // Assert
+    verify(() => dio.post<Map<String, dynamic>>(AuthEndpoint.logoutAll))
+        .called(1);
+  });
+
+  test('changePassword puts both passwords', () async {
+    // Arrange
+    when(() => dio.put<Map<String, dynamic>>(any(), data: any(named: 'data')))
+        .thenAnswer((_) async => _ok(AuthEndpoint.password));
+
+    // Act
+    await dataSource.changePassword(
+      const ChangePasswordRequest(currentPassword: 'old', newPassword: 'new'),
+    );
+
+    // Assert
+    final body = verify(
+      () => dio.put<Map<String, dynamic>>(
+        AuthEndpoint.password,
+        data: captureAny(named: 'data'),
+      ),
+    ).captured.single;
+    expect(body, {'current_password': 'old', 'new_password': 'new'});
   });
 }

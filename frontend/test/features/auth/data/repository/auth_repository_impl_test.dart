@@ -1,31 +1,59 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:monai/core/database/monai_database.dart';
 import 'package:monai/core/error/exceptions.dart';
 import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:monai/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:monai/features/auth/data/model/auth_response.dart';
+import 'package:monai/features/auth/data/model/change_password_request.dart';
 import 'package:monai/features/auth/data/model/login_request.dart';
 import 'package:monai/features/auth/data/model/register_request.dart';
 import 'package:monai/features/auth/data/repository/auth_repository_impl.dart';
+import 'package:monai/features/auth/domain/entity/auth_session.dart';
+import 'package:monai/features/shared/data/datasources/user_local_datasource.dart';
+import 'package:monai/features/shared/data/mapper/user_mapper.dart';
+
+import '../../../../helpers/database_fixtures.dart';
+import '../../../../helpers/entity_fixtures.dart';
 
 class _MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
 
 class _MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
-const _response = AuthResponse(
-  success: true,
-  data: Data(accessToken: 'token', tokenType: 'Bearer', expiresIn: 3600),
+class _MockUserLocalDataSource extends Mock implements UserLocalDataSource {}
+
+final _data = Data(
+  accessToken: 'token',
+  tokenType: 'Bearer',
+  expiresIn: 3600,
+  user: User(
+    id: 'u1',
+    name: 'Ana',
+    email: 'ana@monai.id',
+    timezone: 'Asia/Jakarta',
+    role: const Role(slug: 'user', name: 'User'),
+    permissions: const [],
+    createdAt: DateTime.utc(2026, 10, 1, 8),
+  ),
 );
+
+final _response = AuthResponse(success: true, data: _data);
 
 void main() {
   late _MockAuthLocalDataSource local;
   late _MockAuthRemoteDataSource remote;
+  late _MockUserLocalDataSource users;
   late AuthRepositoryImpl repository;
 
   setUpAll(() {
+    registerFallbackValue(
+      const ChangePasswordRequest(currentPassword: '', newPassword: ''),
+    );
     registerFallbackValue(const LoginRequest(email: '', password: ''));
+    registerFallbackValue(userRow());
     registerFallbackValue(
       const RegisterRequest(name: '', email: '', password: ''),
     );
@@ -34,7 +62,9 @@ void main() {
   setUp(() {
     local = _MockAuthLocalDataSource();
     remote = _MockAuthRemoteDataSource();
-    repository = AuthRepositoryImpl(remote: remote, local: local);
+    users = _MockUserLocalDataSource();
+    repository = AuthRepositoryImpl(remote: remote, local: local, users: users);
+    when(() => users.replace(any())).thenAnswer((_) async {});
     when(() => local.clearCache()).thenAnswer((_) async {});
     when(() => local.startSession(any())).thenAnswer((_) async {});
     when(() => local.endSession()).thenAnswer((_) async {});
@@ -66,7 +96,7 @@ void main() {
   });
 
   group('completeOnboarding', () {
-    test('saves the flag and returns unit', () async {
+    test('saves the flag and returns it', () async {
       // Arrange
       when(() => local.markOnboardingCompleted()).thenAnswer((_) async {});
 
@@ -74,7 +104,7 @@ void main() {
       final result = await repository.completeOnboarding();
 
       // Assert
-      expect(result, const Right<Failure, Unit>(unit));
+      expect(result, const Right<Failure, bool>(true));
       verify(() => local.markOnboardingCompleted()).called(1);
     });
 
@@ -92,8 +122,8 @@ void main() {
   });
 
   group('login', () {
-    test('sends the credentials, clears the cache, then starts the '
-        'session', () async {
+    test('sends the credentials, clears the cache, caches the user, then '
+        'starts the session', () async {
       // Arrange
       when(() => remote.login(any())).thenAnswer((_) async => _response);
 
@@ -101,14 +131,31 @@ void main() {
       final result = await repository.login(email: 'a@b.co', password: 'pw');
 
       // Assert
-      expect(result, const Right<Failure, Unit>(unit));
+      expect(result, Right<Failure, AuthSession>(authSession()));
       verify(
         () => remote.login(const LoginRequest(email: 'a@b.co', password: 'pw')),
       ).called(1);
-      verifyInOrder([
+      final calls = verifyInOrder([
         () => local.clearCache(),
+        () => users.replace(captureAny()),
         () => local.startSession('token'),
       ]);
+      final cached = calls[1].captured.single as UserRow;
+      expect(cached.toEntity(), user());
+    });
+
+    test('a user that fails to cache still signs in', () async {
+      // Arrange
+      when(() => remote.login(any())).thenAnswer((_) async => _response);
+      when(() => users.replace(any()))
+          .thenThrow(const CacheException(message: 'disk full'));
+
+      // Act
+      final result = await repository.login(email: 'a@b.co', password: 'pw');
+
+      // Assert
+      expect(result, Right<Failure, AuthSession>(authSession()));
+      verify(() => local.startSession('token')).called(1);
     });
 
     test('a response without a token starts no session', () async {
@@ -122,6 +169,24 @@ void main() {
       // Assert
       expect(result.getLeft().toNullable(), isA<UnknownFailure>());
       verifyNever(() => local.clearCache());
+      verifyNever(() => users.replace(any()));
+      verifyNever(() => local.startSession(any()));
+    });
+
+    test('a response without the user starts no session', () async {
+      // Arrange
+      when(() => remote.login(any())).thenAnswer(
+        (_) async =>
+            AuthResponse(success: true, data: _data.copyWith(user: null)),
+      );
+
+      // Act
+      final result = await repository.login(email: 'a@b.co', password: 'pw');
+
+      // Assert
+      expect(result.getLeft().toNullable(), isA<UnknownFailure>());
+      verifyNever(() => local.clearCache());
+      verifyNever(() => users.replace(any()));
       verifyNever(() => local.startSession(any()));
     });
 
@@ -159,7 +224,7 @@ void main() {
       );
 
       // Assert
-      expect(result, const Right<Failure, Unit>(unit));
+      expect(result, Right<Failure, AuthSession>(authSession()));
       verify(
         () => remote.register(
           const RegisterRequest(
@@ -199,7 +264,10 @@ void main() {
       final result = await repository.logout();
 
       // Assert
-      expect(result, const Right<Failure, Unit>(unit));
+      expect(
+        result,
+        const Right<Failure, SessionStatus>(SessionStatus.signedOut),
+      );
       verify(() => local.endSession()).called(1);
     });
 
@@ -226,6 +294,81 @@ void main() {
 
       // Assert
       expect(result, const Right<Failure, bool>(true));
+    });
+  });
+
+  group('logoutAllDevices', () {
+    test('revokes the tokens on the server, then ends the session', () async {
+      // Arrange
+      when(() => remote.logoutAll()).thenAnswer((_) async {});
+
+      // Act
+      final result = await repository.logoutAllDevices();
+
+      // Assert
+      expect(
+        result,
+        const Right<Failure, SessionStatus>(SessionStatus.signedOut),
+      );
+      verifyInOrder([() => remote.logoutAll(), () => local.endSession()]);
+    });
+
+    test('a failed request keeps the session', () async {
+      // Arrange
+      when(() => remote.logoutAll()).thenThrow(const NetworkException());
+
+      // Act
+      final result = await repository.logoutAllDevices();
+
+      // Assert
+      expect(result.getLeft().toNullable(), isA<NetworkFailure>());
+      verifyNever(() => local.endSession());
+    });
+  });
+
+  group('changePassword', () {
+    test('changes the password, then ends the session', () async {
+      // Arrange
+      when(() => remote.changePassword(any()))
+          .thenAnswer((_) async => _response);
+
+      // Act
+      final result = await repository.changePassword(
+        currentPassword: 'old',
+        newPassword: 'new-secret',
+      );
+
+      // Assert
+      expect(
+        result,
+        const Right<Failure, SessionStatus>(SessionStatus.signedOut),
+      );
+      verify(
+        () => remote.changePassword(
+          const ChangePasswordRequest(
+            currentPassword: 'old',
+            newPassword: 'new-secret',
+          ),
+        ),
+      ).called(1);
+      verify(() => local.endSession()).called(1);
+      verifyNever(() => local.startSession(any()));
+    });
+
+    test('a wrong current password keeps its code and the session', () async {
+      // Arrange
+      when(() => remote.changePassword(any()))
+          .thenThrow(const ValidationException([], code: 'invalid_password'));
+
+      // Act
+      final result = await repository.changePassword(
+        currentPassword: 'wrong',
+        newPassword: 'new-secret',
+      );
+
+      // Assert
+      expect(result.getLeft().toNullable()?.code, 'invalid_password');
+      verifyNever(() => local.endSession());
     });
   });
 }

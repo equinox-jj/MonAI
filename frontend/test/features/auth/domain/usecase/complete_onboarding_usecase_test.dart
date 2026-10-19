@@ -20,13 +20,13 @@ void main() {
   test('marks onboarding as completed', () async {
     // Arrange
     when(() => repository.completeOnboarding())
-        .thenAnswer((_) async => const Right(unit));
+        .thenAnswer((_) async => const Right(true));
 
     // Act
     final result = await useCase(const NoParams());
 
     // Assert
-    expect(result, const Right<Failure, Unit>(unit));
+    expect(result, const Right<Failure, bool>(true));
     verify(() => repository.completeOnboarding()).called(1);
   });
 
@@ -40,6 +40,6 @@ void main() {
     final result = await useCase(const NoParams());
 
     // Assert
-    expect(result, const Left<Failure, Unit>(failure));
+    expect(result, const Left<Failure, bool>(failure));
   });
 }
