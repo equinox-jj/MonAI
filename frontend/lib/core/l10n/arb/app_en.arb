@@ -97,5 +97,10 @@
   "authFieldInvalid": "Check this field",
   "sessionExpiredTitle": "Session expired",
   "sessionExpiredBody": "For your security, please sign in again. Your wallets and transactions are saved to your account.",
-  "sessionExpiredSignIn": "Sign in again"
+  "sessionExpiredSignIn": "Sign in again",
+  "navHome": "Home",
+  "navTransactions": "Transactions",
+  "navWallets": "Wallets",
+  "navSettings": "Settings",
+  "navAddTransaction": "Add transaction"
 }

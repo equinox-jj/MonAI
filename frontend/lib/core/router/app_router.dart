@@ -1,10 +1,13 @@
 import 'package:go_router/go_router.dart';
-
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/onboarding_page.dart';
 import 'package:monai/features/auth/presentation/pages/register/register_page.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
+import 'package:monai/features/dashboard/presentation/pages/dashboard/dashboard_page.dart';
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
+import 'package:monai/features/settings/presentation/pages/settings/settings_page.dart';
+import 'package:monai/features/transactions/presentation/pages/transactions/transactions_page.dart';
+import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
 
 /// The app's route paths.
 abstract final class AppRoutes {
@@ -20,8 +23,17 @@ abstract final class AppRoutes {
   /// Create an account.
   static const register = '/register';
 
-  /// The signed-in start screen.
+  /// The signed-in start screen, the first tab.
   static const home = '/home';
+
+  /// The transactions tab.
+  static const transactions = '/transactions';
+
+  /// The wallets tab.
+  static const wallets = '/wallets';
+
+  /// The settings tab.
+  static const settings = '/settings';
 
   /// The query parameter Sign in and Register hand the typed email over in.
   static const emailParam = 'email';
@@ -81,7 +93,42 @@ GoRouter createAppRouter({
         initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
       ),
     ),
-    GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
+    StatefulShellRoute.indexedStack(
+      builder: (_, _, navigationShell) =>
+          DashboardPage(navigationShell: navigationShell),
+      // In bar order: MonAINavItem.main.
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.transactions,
+              builder: (_, _) => const TransactionsPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.wallets,
+              builder: (_, _) => const WalletsPage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: AppRoutes.settings,
+              builder: (_, _) => const SettingsPage(),
+            ),
+          ],
+        ),
+      ],
+    ),
   ],
 );
 

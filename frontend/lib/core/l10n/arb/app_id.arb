@@ -67,5 +67,10 @@
   "authFieldInvalid": "Periksa kolom ini",
   "sessionExpiredTitle": "Sesi berakhir",
   "sessionExpiredBody": "Demi keamananmu, silakan masuk lagi. Dompet dan transaksimu tersimpan di akunmu.",
-  "sessionExpiredSignIn": "Masuk lagi"
+  "sessionExpiredSignIn": "Masuk lagi",
+  "navHome": "Beranda",
+  "navTransactions": "Transaksi",
+  "navWallets": "Dompet",
+  "navSettings": "Pengaturan",
+  "navAddTransaction": "Tambah transaksi"
 }
