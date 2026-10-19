@@ -1,0 +1,56 @@
+/// Fixed component sizes from the design.
+abstract final class MonAISizes {
+  /// Minimum touch target and icon-button size.
+  static const double touchTarget = 44;
+  static const double buttonLarge = 56;
+  static const double buttonMedium = 48;
+  static const double buttonSmall = 36;
+  static const double input = 56;
+  static const double inputCompact = 48;
+  static const double searchField = 48;
+  static const double quickAddField = 52;
+  static const double segmentedControl = 44;
+  static const double filterChip = 32;
+  static const double choiceChip = 40;
+  static const double listRowMin = 64;
+  static const double settingsRow = 56;
+  static const double pickerOption = 64;
+  static const double topBar = 56;
+  static const double statusStrip = 40;
+  static const double navBar = 80;
+  static const double navIndicatorWidth = 64;
+  static const double navIndicatorHeight = 32;
+
+  /// Medium-width (tablet portrait) navigation rail.
+  static const double navRail = 80;
+  static const double navRailIndicatorWidth = 56;
+
+  /// Expanded-width (tablet landscape) permanent drawer.
+  static const double navDrawer = 240;
+  static const double navDrawerItem = 48;
+  static const double navDrawerLogo = 32;
+  static const double fab = 56;
+  static const double avatarSmall = 32;
+  static const double avatarMedium = 40;
+  static const double avatarLarge = 44;
+  static const double avatarXLarge = 64;
+  static const double stateIcon = 64;
+  static const double dialogIcon = 48;
+  static const double iconXs = 14;
+  static const double iconSm = 16;
+  static const double iconMd = 18;
+  static const double iconLg = 20;
+  static const double icon = 24;
+  static const double iconXl = 28;
+  static const double iconXxl = 32;
+  static const double progressTrack = 8;
+  static const double pageIndicatorDot = 6;
+  static const double pageIndicatorActive = 24;
+  static const double sheetHandleWidth = 32;
+  static const double sheetHandleHeight = 4;
+  static const double dialogWidth = 312;
+  static const double walletCardWidth = 300;
+  static const double walletCardHeight = 160;
+  static const double border = 1;
+  static const double borderFocused = 2;
+}
