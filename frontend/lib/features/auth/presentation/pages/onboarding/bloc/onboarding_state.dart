@@ -1,14 +1,16 @@
-import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
-
-part 'onboarding_state.freezed.dart';
+part of 'onboarding_bloc.dart';
 
 @freezed
 abstract class OnboardingState with _$OnboardingState {
   const factory OnboardingState({
+    /// The current page, from 0.
     @Default(0) int page,
 
-    /// Set once the user has left onboarding; the screen navigates on it.
+    /// [UiStatus.loading] while saving the onboarding flag, then
+    /// [UiStatus.success] once the user may leave.
+    @Default(UiStatus.initial) UiStatus status,
+
+    /// Where to go once [status] is success; the screen navigates on it.
     OnboardingExit? exit,
   }) = _OnboardingState;
 

@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/router/app_router.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_event.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_state.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/widgets/onboarding_footer.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/widgets/onboarding_step_content.dart';
@@ -77,7 +74,7 @@ class _OnboardingUIState extends State<OnboardingUI> {
       builder: (context, state) => PopScope(
         canPop: state.page == 0,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) bloc.add(const OnboardingBackPressed());
+          if (!didPop) bloc.add(const OnboardingEvent.backPressed());
         },
         child: Scaffold(
           backgroundColor: context.colors.background,
@@ -93,7 +90,7 @@ class _OnboardingUIState extends State<OnboardingUI> {
                         controller: _controller,
                         itemCount: OnboardingStep.values.length,
                         onPageChanged: (page) =>
-                            bloc.add(OnboardingPageChanged(page)),
+                            bloc.add(OnboardingEvent.pageChanged(page)),
                         itemBuilder: (_, index) => OnboardingStepContent(
                           step: OnboardingStep.values[index],
                         ),

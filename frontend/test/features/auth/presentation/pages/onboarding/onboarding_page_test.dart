@@ -68,8 +68,7 @@ void main() {
     // Assert
     expect(find.text('All your wallets, one total.'), findsOneWidget);
     expect(find.text('Back'), findsOneWidget);
-    // The hero's Skip on the wallets page.
-    expect(find.text('Skip'), findsOneWidget);
+    expect(find.text('Skip'), findsNothing);
   });
 
   testWidgets('swiping to the last page shows the account buttons', (

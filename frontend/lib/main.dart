@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
 import 'package:monai/core/designsystem/theme/monai_theme.dart';
 import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/l10n/l10n.dart';
@@ -17,6 +16,7 @@ Future<void> main() async {
   final router = createAppRouter(
     initialLocation: onboarded ? AppRoutes.signIn : AppRoutes.onboarding,
   );
+
   runApp(MyApp(router: router));
 }
 

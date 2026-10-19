@@ -4,8 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_event.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_state.dart';
 
 const _transition = Duration(milliseconds: 250);
 
@@ -77,7 +75,7 @@ class _NextLink extends StatelessWidget {
             label: context.l10n.onboardingNext,
             trailingIcon: MonAIIcons.arrowForward,
             onPressed: () => context.read<OnboardingBloc>().add(
-              const OnboardingNextPressed(),
+              const OnboardingEvent.nextPressed(),
             ),
           ),
         ),
@@ -96,7 +94,7 @@ class _CaptureActions extends StatelessWidget {
       variant: .outlined,
       expand: true,
       onPressed: () => context.read<OnboardingBloc>().add(
-        const OnboardingExitPressed(.register),
+        const OnboardingEvent.exitPressed(.register),
       ),
     );
   }
@@ -116,7 +114,7 @@ class _WalletsActions extends StatelessWidget {
             label: context.l10n.onboardingBack,
             variant: .outlined,
             expand: true,
-            onPressed: () => bloc.add(const OnboardingBackPressed()),
+            onPressed: () => bloc.add(const OnboardingEvent.backPressed()),
           ),
         ),
         Expanded(
@@ -124,7 +122,7 @@ class _WalletsActions extends StatelessWidget {
             label: context.l10n.onboardingNext,
             trailingIcon: MonAIIcons.arrowForward,
             expand: true,
-            onPressed: () => bloc.add(const OnboardingNextPressed()),
+            onPressed: () => bloc.add(const OnboardingEvent.nextPressed()),
           ),
         ),
       ],
@@ -145,14 +143,15 @@ class _InsightsActions extends StatelessWidget {
         MonAIButton(
           label: context.l10n.onboardingCreateAccount,
           expand: true,
-          onPressed: () => bloc.add(const OnboardingExitPressed(.register)),
+          onPressed: () =>
+              bloc.add(const OnboardingEvent.exitPressed(.register)),
         ),
         MonAIButton(
           label: context.l10n.onboardingSignIn,
           variant: .text,
           size: .medium,
           expand: true,
-          onPressed: () => bloc.add(const OnboardingExitPressed(.signIn)),
+          onPressed: () => bloc.add(const OnboardingEvent.exitPressed(.signIn)),
         ),
       ],
     );

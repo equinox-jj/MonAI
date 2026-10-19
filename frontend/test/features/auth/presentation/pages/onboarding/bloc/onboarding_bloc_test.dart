@@ -3,10 +3,9 @@ import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/utils/ui_status.dart';
 import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_event.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_state.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
 
 class _MockCompleteOnboardingUseCase extends Mock
@@ -49,9 +48,9 @@ void main() {
 
     // Act
     bloc
-      ..add(const OnboardingNextPressed())
-      ..add(const OnboardingNextPressed())
-      ..add(const OnboardingNextPressed());
+      ..add(const OnboardingEvent.nextPressed())
+      ..add(const OnboardingEvent.nextPressed())
+      ..add(const OnboardingEvent.nextPressed());
     await pumpEventQueue();
     await bloc.close();
 
@@ -61,7 +60,7 @@ void main() {
 
   test('Back moves backward and stays on the first page', () async {
     // Arrange
-    bloc.add(const OnboardingPageChanged(1));
+    bloc.add(const OnboardingEvent.pageChanged(1));
     final expectation = expectLater(
       bloc.stream.map((s) => s.page),
       emitsInOrder([1, 0, emitsDone]),
@@ -69,8 +68,8 @@ void main() {
 
     // Act
     bloc
-      ..add(const OnboardingBackPressed())
-      ..add(const OnboardingBackPressed());
+      ..add(const OnboardingEvent.backPressed())
+      ..add(const OnboardingEvent.backPressed());
     await pumpEventQueue();
     await bloc.close();
 
@@ -87,37 +86,46 @@ void main() {
 
     // Act
     bloc
-      ..add(const OnboardingPageChanged(5))
-      ..add(const OnboardingPageChanged(-1));
+      ..add(const OnboardingEvent.pageChanged(5))
+      ..add(const OnboardingEvent.pageChanged(-1));
 
     // Assert
     await expectation;
   });
 
-  test('exiting saves the flag, then sets the exit', () async {
-    // Arrange
-    final expectation = expectLater(
-      bloc.stream,
-      emits(const OnboardingState(exit: OnboardingExit.register)),
-    );
+  test(
+    'exiting shows loading while saving the flag, then sets the exit',
+    () async {
+      // Arrange
+      final expectation = expectLater(
+        bloc.stream,
+        emitsInOrder(const [
+          OnboardingState(status: UiStatus.loading),
+          OnboardingState(
+            status: UiStatus.success,
+            exit: OnboardingExit.register,
+          ),
+        ]),
+      );
 
-    // Act
-    bloc.add(const OnboardingExitPressed(OnboardingExit.register));
+      // Act
+      bloc.add(const OnboardingEvent.exitPressed(OnboardingExit.register));
 
-    // Assert
-    await expectation;
-    verify(() => completeOnboarding(const NoParams())).called(1);
-  });
+      // Assert
+      await expectation;
+      verify(() => completeOnboarding(const NoParams())).called(1);
+    },
+  );
 
   test('Sign in exits to sign in', () async {
     // Arrange
     final expectation = expectLater(
       bloc.stream.map((s) => s.exit),
-      emits(OnboardingExit.signIn),
+      emitsThrough(OnboardingExit.signIn),
     );
 
     // Act
-    bloc.add(const OnboardingExitPressed(OnboardingExit.signIn));
+    bloc.add(const OnboardingEvent.exitPressed(OnboardingExit.signIn));
 
     // Assert
     await expectation;
@@ -130,12 +138,15 @@ void main() {
 
     // Act
     bloc
-      ..add(const OnboardingExitPressed(OnboardingExit.register))
-      ..add(const OnboardingExitPressed(OnboardingExit.signIn));
+      ..add(const OnboardingEvent.exitPressed(OnboardingExit.register))
+      ..add(const OnboardingEvent.exitPressed(OnboardingExit.signIn));
     await pumpEventQueue();
 
     // Assert
-    expect(states, const [OnboardingState(exit: OnboardingExit.register)]);
+    expect(states, const [
+      OnboardingState(status: UiStatus.loading),
+      OnboardingState(status: UiStatus.success, exit: OnboardingExit.register),
+    ]);
     verify(() => completeOnboarding(any())).called(1);
     await subscription.cancel();
   });
@@ -146,11 +157,11 @@ void main() {
         .thenAnswer((_) async => const Left(Failure.cache()));
     final expectation = expectLater(
       bloc.stream.map((s) => s.exit),
-      emits(OnboardingExit.register),
+      emitsThrough(OnboardingExit.register),
     );
 
     // Act
-    bloc.add(const OnboardingExitPressed(OnboardingExit.register));
+    bloc.add(const OnboardingEvent.exitPressed(OnboardingExit.register));
 
     // Assert
     await expectation;

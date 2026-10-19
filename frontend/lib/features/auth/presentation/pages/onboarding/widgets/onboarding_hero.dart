@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
-import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_event.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
 import 'package:monai/features/auth/presentation/widgets/auth_sample_cards.dart';
 
@@ -52,12 +49,6 @@ class OnboardingHero extends StatelessWidget {
               ],
             },
             _Illustration(step: step),
-            if (step == .wallets)
-              const Positioned(
-                top: MonAISpacing.x2_5,
-                right: MonAISpacing.x4,
-                child: _HeroSkipButton(),
-              ),
           ],
         ),
       ),
@@ -124,41 +115,6 @@ class _Illustration extends StatelessWidget {
                   .wallets => const _WalletsIllustration(),
                   .insights => const _InsightsIllustration(),
                 },
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _HeroSkipButton extends StatelessWidget {
-  const _HeroSkipButton();
-
-  @override
-  Widget build(BuildContext context) {
-    return Semantics(
-      button: true,
-      child: InkWell(
-        onTap: () => context.read<OnboardingBloc>().add(
-          const OnboardingExitPressed(.register),
-        ),
-        borderRadius: MonAIRadius.smAll,
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: MonAISizes.touchTarget,
-            minHeight: MonAISizes.touchTarget,
-          ),
-          child: Padding(
-            padding: const .symmetric(horizontal: MonAISpacing.x1_5),
-            child: Center(
-              widthFactor: 1,
-              child: Text(
-                context.l10n.onboardingSkip,
-                style: context.textTheme.labelLarge?.copyWith(
-                  color: context.colors.onGradientMuted,
-                ),
               ),
             ),
           ),
