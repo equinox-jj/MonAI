@@ -17,6 +17,7 @@ import 'package:monai/features/quickadd/di/quickadd_di.dart';
 import 'package:monai/features/receipt/di/receipt_di.dart';
 import 'package:monai/features/reports/di/reports_di.dart';
 import 'package:monai/features/settings/di/settings_di.dart';
+import 'package:monai/features/shared/di/shared_di.dart';
 import 'package:monai/features/transactions/di/transactions_di.dart';
 import 'package:monai/features/wallets/di/wallets_di.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,6 +64,7 @@ Future<void> configureDependencies() async {
   );
 
   // ---- Features ----
+  await SharedDI.init();
   await AuthDI.init();
   await ProfileDI.init();
   await SettingsDI.init();
