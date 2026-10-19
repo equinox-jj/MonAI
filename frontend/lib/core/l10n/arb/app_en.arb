@@ -1,0 +1,7 @@
+{
+  "@@locale": "en",
+  "appTitle": "MonAI",
+  "@appTitle": {
+    "description": "Application name"
+  }
+}
