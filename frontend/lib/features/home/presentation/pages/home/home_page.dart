@@ -9,14 +9,9 @@ class HomePage extends StatelessWidget {
   }
 }
 
-class HomeUI extends StatefulWidget {
+class HomeUI extends StatelessWidget {
   const HomeUI({super.key});
 
-  @override
-  State<HomeUI> createState() => _HomeUIState();
-}
-
-class _HomeUIState extends State<HomeUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Home Page")));

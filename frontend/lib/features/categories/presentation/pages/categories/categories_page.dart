@@ -9,14 +9,9 @@ class CategoriesPage extends StatelessWidget {
   }
 }
 
-class CategoriesUI extends StatefulWidget {
+class CategoriesUI extends StatelessWidget {
   const CategoriesUI({super.key});
 
-  @override
-  State<CategoriesUI> createState() => _CategoriesUIState();
-}
-
-class _CategoriesUIState extends State<CategoriesUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Categories Page")));

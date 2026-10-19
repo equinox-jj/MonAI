@@ -9,14 +9,9 @@ class QuickaddPage extends StatelessWidget {
   }
 }
 
-class QuickaddUI extends StatefulWidget {
+class QuickaddUI extends StatelessWidget {
   const QuickaddUI({super.key});
 
-  @override
-  State<QuickaddUI> createState() => _QuickaddUIState();
-}
-
-class _QuickaddUIState extends State<QuickaddUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Quickadd Page")));

@@ -9,14 +9,9 @@ class ExportPage extends StatelessWidget {
   }
 }
 
-class ExportUI extends StatefulWidget {
+class ExportUI extends StatelessWidget {
   const ExportUI({super.key});
 
-  @override
-  State<ExportUI> createState() => _ExportUIState();
-}
-
-class _ExportUIState extends State<ExportUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Export Page")));

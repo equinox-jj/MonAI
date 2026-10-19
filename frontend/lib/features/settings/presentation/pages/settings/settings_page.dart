@@ -9,14 +9,9 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class SettingsUI extends StatefulWidget {
+class SettingsUI extends StatelessWidget {
   const SettingsUI({super.key});
 
-  @override
-  State<SettingsUI> createState() => _SettingsUIState();
-}
-
-class _SettingsUIState extends State<SettingsUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Settings Page")));

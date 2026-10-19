@@ -9,14 +9,9 @@ class BudgetsPage extends StatelessWidget {
   }
 }
 
-class BudgetsUI extends StatefulWidget {
+class BudgetsUI extends StatelessWidget {
   const BudgetsUI({super.key});
 
-  @override
-  State<BudgetsUI> createState() => _BudgetsUIState();
-}
-
-class _BudgetsUIState extends State<BudgetsUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Budgets Page")));

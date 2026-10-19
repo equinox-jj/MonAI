@@ -9,14 +9,9 @@ class ReportsPage extends StatelessWidget {
   }
 }
 
-class ReportsUI extends StatefulWidget {
+class ReportsUI extends StatelessWidget {
   const ReportsUI({super.key});
 
-  @override
-  State<ReportsUI> createState() => _ReportsUIState();
-}
-
-class _ReportsUIState extends State<ReportsUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Reports Page")));

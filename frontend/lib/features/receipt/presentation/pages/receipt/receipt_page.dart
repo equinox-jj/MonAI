@@ -9,14 +9,9 @@ class ReceiptPage extends StatelessWidget {
   }
 }
 
-class ReceiptUI extends StatefulWidget {
+class ReceiptUI extends StatelessWidget {
   const ReceiptUI({super.key});
 
-  @override
-  State<ReceiptUI> createState() => _ReceiptUIState();
-}
-
-class _ReceiptUIState extends State<ReceiptUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Receipt Page")));

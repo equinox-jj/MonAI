@@ -143,39 +143,16 @@ class _MonAITextFieldState extends State<MonAITextField> {
       widget.focusNode ?? (_ownFocusNode ??= FocusNode());
 
   @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(_onFocusChange);
-  }
-
-  @override
-  void didUpdateWidget(MonAITextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (oldWidget.focusNode != widget.focusNode) {
-      (oldWidget.focusNode ?? _ownFocusNode)?.removeListener(_onFocusChange);
-      _focusNode.addListener(_onFocusChange);
-    }
-  }
-
-  @override
   void dispose() {
-    _focusNode.removeListener(_onFocusChange);
     _ownFocusNode?.dispose();
     super.dispose();
   }
-
-  void _onFocusChange() => setState(() {});
 
   @override
   Widget build(BuildContext context) {
     final c = context.colors;
     final t = context.textTheme;
     final isError = widget.tone == .error;
-    final (borderWidth, borderColor) = isError
-        ? (MonAISizes.borderFocused, c.error)
-        : _focusNode.hasFocus
-        ? (MonAISizes.borderFocused, c.focus)
-        : (MonAISizes.border, c.border);
     final compact = widget.compact;
     final trailing =
         widget.trailing ??
@@ -194,7 +171,9 @@ class _MonAITextFieldState extends State<MonAITextField> {
       children: [
         if (widget.label case final label?)
           Text(label, style: t.labelMedium?.copyWith(color: c.textSecondary)),
-        Container(
+        _FieldFrame(
+          focusNode: _focusNode,
+          isError: isError,
           height: compact ? MonAISizes.inputCompact : MonAISizes.input,
           padding: .only(
             left: compact ? MonAISpacing.x3 : MonAISpacing.x3_5,
@@ -203,11 +182,6 @@ class _MonAITextFieldState extends State<MonAITextField> {
                 : compact
                 ? MonAISpacing.x3
                 : MonAISpacing.x3_5,
-          ),
-          decoration: BoxDecoration(
-            color: c.surfaceSunken,
-            borderRadius: MonAIRadius.mdAll,
-            border: Border.all(color: borderColor, width: borderWidth),
           ),
           child: Row(
             spacing: compact ? MonAISpacing.x2 : MonAISpacing.x2_5,
@@ -252,6 +226,50 @@ class _MonAITextFieldState extends State<MonAITextField> {
             onLinkTap: widget.onSupportingLinkTap,
           ),
       ],
+    );
+  }
+}
+
+/// The filled, rounded box around the input. Only this rebuilds when focus
+/// changes, to swap the border.
+class _FieldFrame extends StatelessWidget {
+  const _FieldFrame({
+    required this.focusNode,
+    required this.isError,
+    required this.height,
+    required this.padding,
+    required this.child,
+  });
+
+  final FocusNode focusNode;
+  final bool isError;
+  final double height;
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    return ListenableBuilder(
+      listenable: focusNode,
+      builder: (context, child) {
+        final (borderWidth, borderColor) = isError
+            ? (MonAISizes.borderFocused, c.error)
+            : focusNode.hasFocus
+            ? (MonAISizes.borderFocused, c.focus)
+            : (MonAISizes.border, c.border);
+        return Container(
+          height: height,
+          padding: padding,
+          decoration: BoxDecoration(
+            color: c.surfaceSunken,
+            borderRadius: MonAIRadius.mdAll,
+            border: Border.all(color: borderColor, width: borderWidth),
+          ),
+          child: child,
+        );
+      },
+      child: child,
     );
   }
 }
@@ -392,31 +410,42 @@ class MonAIPasswordField extends StatefulWidget {
 }
 
 class _MonAIPasswordFieldState extends State<MonAIPasswordField> {
-  bool _visible = false;
+  final _visible = ValueNotifier(false);
+
+  @override
+  void dispose() {
+    _visible.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return MonAITextField(
-      controller: widget.controller,
-      focusNode: widget.focusNode,
-      onChanged: widget.onChanged,
-      onSubmitted: widget.onSubmitted,
-      label: widget.label,
-      placeholder: widget.placeholder,
-      leadingIcon: MonAIIcons.lock,
-      trailing: MonAIIconButton(
-        icon: _visible ? MonAIIcons.visibilityOff : MonAIIcons.visibility,
-        tooltip: _visible ? widget.hidePasswordLabel : widget.showPasswordLabel,
-        onPressed: () => setState(() => _visible = !_visible),
-        color: context.colors.textSecondary,
+    return ValueListenableBuilder(
+      valueListenable: _visible,
+      builder: (context, visible, _) => MonAITextField(
+        controller: widget.controller,
+        focusNode: widget.focusNode,
+        onChanged: widget.onChanged,
+        onSubmitted: widget.onSubmitted,
+        label: widget.label,
+        placeholder: widget.placeholder,
+        leadingIcon: MonAIIcons.lock,
+        trailing: MonAIIconButton(
+          icon: visible ? MonAIIcons.visibilityOff : MonAIIcons.visibility,
+          tooltip: visible
+              ? widget.hidePasswordLabel
+              : widget.showPasswordLabel,
+          onPressed: () => _visible.value = !visible,
+          color: context.colors.textSecondary,
+        ),
+        supportingText: widget.supportingText,
+        tone: widget.tone,
+        enabled: widget.enabled,
+        obscureText: !visible,
+        keyboardType: TextInputType.visiblePassword,
+        textInputAction: widget.textInputAction,
+        autofillHints: widget.autofillHints,
       ),
-      supportingText: widget.supportingText,
-      tone: widget.tone,
-      enabled: widget.enabled,
-      obscureText: !_visible,
-      keyboardType: TextInputType.visiblePassword,
-      textInputAction: widget.textInputAction,
-      autofillHints: widget.autofillHints,
     );
   }
 }

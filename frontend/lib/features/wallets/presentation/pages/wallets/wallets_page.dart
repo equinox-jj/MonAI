@@ -9,14 +9,9 @@ class WalletsPage extends StatelessWidget {
   }
 }
 
-class WalletsUI extends StatefulWidget {
+class WalletsUI extends StatelessWidget {
   const WalletsUI({super.key});
 
-  @override
-  State<WalletsUI> createState() => _WalletsUIState();
-}
-
-class _WalletsUIState extends State<WalletsUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Wallets Page")));

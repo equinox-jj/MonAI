@@ -9,14 +9,9 @@ class TransactionsPage extends StatelessWidget {
   }
 }
 
-class TransactionsUI extends StatefulWidget {
+class TransactionsUI extends StatelessWidget {
   const TransactionsUI({super.key});
 
-  @override
-  State<TransactionsUI> createState() => _TransactionsUIState();
-}
-
-class _TransactionsUIState extends State<TransactionsUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Transactions Page")));

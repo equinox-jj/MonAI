@@ -14,74 +14,132 @@ class DesignSystemGalleryPage extends StatefulWidget {
 }
 
 class _DesignSystemGalleryPageState extends State<DesignSystemGalleryPage> {
-  bool? _dark;
-  int _tab = 0;
+  /// Null follows the platform brightness until the user toggles.
+  final _dark = ValueNotifier<bool?>(null);
+  final _tab = ValueNotifier(0);
+  final _loading = ValueNotifier(false);
+  final _type = ValueNotifier('expense');
+  final _filter = ValueNotifier(true);
+  final _theme = ValueNotifier('system');
+
+  @override
+  void dispose() {
+    _dark.dispose();
+    _tab.dispose();
+    _loading.dispose();
+    _type.dispose();
+    _filter.dispose();
+    _theme.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final dark =
-        _dark ?? MediaQuery.platformBrightnessOf(context) == Brightness.dark;
-    return Theme(
-      data: dark ? MonAITheme.dark() : MonAITheme.light(),
-      child: Builder(
-        builder: (context) => Scaffold(
-          appBar: MonAITopBar(
-            title: 'Design system',
-            navigation: .none,
-            actions: [
-              MonAIIconButton(
-                icon: dark ? MonAIIcons.lightMode : MonAIIcons.darkMode,
-                tooltip: dark ? 'Light theme' : 'Dark theme',
-                onPressed: () => setState(() => _dark = !dark),
-              ),
-            ],
-          ),
-          body: const _GalleryBody(),
-          bottomNavigationBar: MonAIBottomBar(
-            items: MonAINavItem.main(
-              home: 'Home',
-              transactions: 'Transactions',
-              wallets: 'Wallets',
-              settings: 'Settings',
+    return ValueListenableBuilder(
+      valueListenable: _dark,
+      builder: (context, darkOverride, _) {
+        final dark =
+            darkOverride ??
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+        return Theme(
+          data: dark ? MonAITheme.dark() : MonAITheme.light(),
+          child: Scaffold(
+            appBar: MonAITopBar(
+              title: 'Design system',
+              navigation: .none,
+              actions: [
+                MonAIIconButton(
+                  icon: dark ? MonAIIcons.lightMode : MonAIIcons.darkMode,
+                  tooltip: dark ? 'Light theme' : 'Dark theme',
+                  onPressed: () => _dark.value = !dark,
+                ),
+              ],
             ),
-            selectedIndex: _tab,
-            onSelect: (i) => setState(() => _tab = i),
-            onAdd: () => showMonAISnackBar(
-              context,
-              message: 'Add tapped',
-              icon: MonAIIcons.checkCircle,
-              iconColor: context.colors.success,
+            body: _GalleryBody(
+              loading: _loading,
+              type: _type,
+              filter: _filter,
+              theme: _theme,
             ),
-            addLabel: 'Add transaction',
+            bottomNavigationBar: _GalleryBottomBar(tab: _tab),
           ),
+        );
+      },
+    );
+  }
+}
+
+class _GalleryBottomBar extends StatelessWidget {
+  const _GalleryBottomBar({required this.tab});
+
+  final ValueNotifier<int> tab;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: tab,
+      builder: (context, selected, _) => MonAIBottomBar(
+        items: MonAINavItem.main(
+          home: 'Home',
+          transactions: 'Transactions',
+          wallets: 'Wallets',
+          settings: 'Settings',
         ),
+        selectedIndex: selected,
+        onSelect: (i) => tab.value = i,
+        onAdd: () => showMonAISnackBar(
+          context,
+          message: 'Add tapped',
+          icon: MonAIIcons.checkCircle,
+          iconColor: context.colors.success,
+        ),
+        addLabel: 'Add transaction',
       ),
     );
   }
 }
 
 class _GalleryBody extends StatelessWidget {
-  const _GalleryBody();
+  const _GalleryBody({
+    required this.loading,
+    required this.type,
+    required this.filter,
+    required this.theme,
+  });
+
+  final ValueNotifier<bool> loading;
+  final ValueNotifier<String> type;
+  final ValueNotifier<bool> filter;
+  final ValueNotifier<String> theme;
 
   @override
   Widget build(BuildContext context) {
     return CustomScrollView(
       slivers: [
-        const SliverPadding(
-          padding: .all(MonAISpacing.screenHorizontal),
+        SliverPadding(
+          padding: const .all(MonAISpacing.screenHorizontal),
           sliver: SliverList(
             delegate: SliverChildListDelegate.fixed([
-              _Section(title: 'Colors', child: _ColorSwatches()),
-              _Section(title: 'Typography', child: _TypeScale()),
-              _Section(title: 'Buttons', child: _Buttons()),
-              _Section(title: 'Fields', child: _Fields()),
-              _Section(title: 'Surfaces', child: _Surfaces()),
-              _Section(title: 'Badges', child: _Badges()),
-              _Section(title: 'Selection', child: _Selection()),
-              _Section(title: 'Lists', child: _Lists()),
-              _Section(title: 'Feedback', child: _Feedback()),
-              _Section(title: 'States', child: _States()),
-              _Section(title: 'Icons', child: SizedBox.shrink()),
+              const _Section(title: 'Colors', child: _ColorSwatches()),
+              const _Section(title: 'Typography', child: _TypeScale()),
+              _Section(
+                title: 'Buttons',
+                child: _Buttons(loading: loading),
+              ),
+              const _Section(title: 'Fields', child: _Fields()),
+              const _Section(title: 'Surfaces', child: _Surfaces()),
+              const _Section(title: 'Badges', child: _Badges()),
+              _Section(
+                title: 'Selection',
+                child: _Selection(type: type, filter: filter),
+              ),
+              _Section(
+                title: 'Lists',
+                child: _Lists(theme: theme),
+              ),
+              const _Section(title: 'Feedback', child: _Feedback()),
+              const _Section(title: 'States', child: _States()),
+              const _Section(title: 'Icons', child: SizedBox.shrink()),
             ]),
           ),
         ),
@@ -239,15 +297,10 @@ class _TypeScale extends StatelessWidget {
   }
 }
 
-class _Buttons extends StatefulWidget {
-  const _Buttons();
+class _Buttons extends StatelessWidget {
+  const _Buttons({required this.loading});
 
-  @override
-  State<_Buttons> createState() => _ButtonsState();
-}
-
-class _ButtonsState extends State<_Buttons> {
-  bool _loading = false;
+  final ValueNotifier<bool> loading;
 
   @override
   Widget build(BuildContext context) {
@@ -268,11 +321,14 @@ class _ButtonsState extends State<_Buttons> {
           runSpacing: MonAISpacing.x2,
           crossAxisAlignment: .center,
           children: [
-            MonAIButton(
-              label: _loading ? 'Trying…' : 'Try again',
-              onPressed: () => setState(() => _loading = !_loading),
-              size: .medium,
-              loading: _loading,
+            ValueListenableBuilder(
+              valueListenable: loading,
+              builder: (context, isLoading, _) => MonAIButton(
+                label: isLoading ? 'Trying…' : 'Try again',
+                onPressed: () => loading.value = !isLoading,
+                size: .medium,
+                loading: isLoading,
+              ),
             ),
             MonAIButton(
               label: 'New wallet',
@@ -529,16 +585,11 @@ class _Badges extends StatelessWidget {
   }
 }
 
-class _Selection extends StatefulWidget {
-  const _Selection();
+class _Selection extends StatelessWidget {
+  const _Selection({required this.type, required this.filter});
 
-  @override
-  State<_Selection> createState() => _SelectionState();
-}
-
-class _SelectionState extends State<_Selection> {
-  String _type = 'expense';
-  bool _filter = true;
+  final ValueNotifier<String> type;
+  final ValueNotifier<bool> filter;
 
   @override
   Widget build(BuildContext context) {
@@ -547,32 +598,38 @@ class _SelectionState extends State<_Selection> {
       crossAxisAlignment: .stretch,
       spacing: MonAISpacing.x3,
       children: [
-        MonAISegmentedControl<String>(
-          segments: [
-            MonAISegment(
-              value: 'expense',
-              label: 'Expense',
-              selectedContainer: c.expenseContainer,
-              selectedContent: c.expense,
-            ),
-            MonAISegment(
-              value: 'income',
-              label: 'Income',
-              selectedContainer: c.incomeContainer,
-              selectedContent: c.income,
-            ),
-            const MonAISegment(value: 'transfer', label: 'Transfer'),
-          ],
-          selected: _type,
-          onChanged: (v) => setState(() => _type = v),
+        ValueListenableBuilder(
+          valueListenable: type,
+          builder: (context, selected, _) => MonAISegmentedControl<String>(
+            segments: [
+              MonAISegment(
+                value: 'expense',
+                label: 'Expense',
+                selectedContainer: c.expenseContainer,
+                selectedContent: c.expense,
+              ),
+              MonAISegment(
+                value: 'income',
+                label: 'Income',
+                selectedContainer: c.incomeContainer,
+                selectedContent: c.income,
+              ),
+              const MonAISegment(value: 'transfer', label: 'Transfer'),
+            ],
+            selected: selected,
+            onChanged: (v) => type.value = v,
+          ),
         ),
         Wrap(
           spacing: MonAISpacing.x2,
           children: [
-            MonAIFilterChip(
-              label: 'This month',
-              selected: _filter,
-              onTap: () => setState(() => _filter = !_filter),
+            ValueListenableBuilder(
+              valueListenable: filter,
+              builder: (context, selected, _) => MonAIFilterChip(
+                label: 'This month',
+                selected: selected,
+                onTap: () => filter.value = !selected,
+              ),
             ),
             MonAIFilterChip(
               label: 'Category',
@@ -588,15 +645,10 @@ class _SelectionState extends State<_Selection> {
   }
 }
 
-class _Lists extends StatefulWidget {
-  const _Lists();
+class _Lists extends StatelessWidget {
+  const _Lists({required this.theme});
 
-  @override
-  State<_Lists> createState() => _ListsState();
-}
-
-class _ListsState extends State<_Lists> {
-  String _theme = 'system';
+  final ValueNotifier<String> theme;
 
   @override
   Widget build(BuildContext context) {
@@ -651,19 +703,39 @@ class _ListsState extends State<_Lists> {
             ),
           ],
         ),
-        MonAIRadioOption(
-          title: 'System',
-          subtitle: 'Follow the device setting',
-          tag: 'Default',
-          selected: _theme == 'system',
-          onTap: () => setState(() => _theme = 'system'),
-        ),
-        MonAIRadioOption(
-          title: 'Dark',
-          selected: _theme == 'dark',
-          onTap: () => setState(() => _theme = 'dark'),
-        ),
+        _ThemeOptions(theme: theme),
       ],
+    );
+  }
+}
+
+class _ThemeOptions extends StatelessWidget {
+  const _ThemeOptions({required this.theme});
+
+  final ValueNotifier<String> theme;
+
+  @override
+  Widget build(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: theme,
+      builder: (context, selected, _) => Column(
+        crossAxisAlignment: .stretch,
+        spacing: MonAISpacing.x4,
+        children: [
+          MonAIRadioOption(
+            title: 'System',
+            subtitle: 'Follow the device setting',
+            tag: 'Default',
+            selected: selected == 'system',
+            onTap: () => theme.value = 'system',
+          ),
+          MonAIRadioOption(
+            title: 'Dark',
+            selected: selected == 'dark',
+            onTap: () => theme.value = 'dark',
+          ),
+        ],
+      ),
     );
   }
 }

@@ -9,14 +9,9 @@ class ProfilePage extends StatelessWidget {
   }
 }
 
-class ProfileUI extends StatefulWidget {
+class ProfileUI extends StatelessWidget {
   const ProfileUI({super.key});
 
-  @override
-  State<ProfileUI> createState() => _ProfileUIState();
-}
-
-class _ProfileUIState extends State<ProfileUI> {
   @override
   Widget build(BuildContext context) {
     return const Scaffold(body: Center(child: Text("Profile Page")));
