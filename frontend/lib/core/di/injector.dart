@@ -5,6 +5,7 @@ import 'package:monai/core/network/dio_client.dart';
 import 'package:monai/core/network/interceptors/auth_interceptor.dart';
 import 'package:monai/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/services/receipt_scanner_service.dart';
 import 'package:monai/core/storage/token_storage.dart';
 import 'package:monai/features/auth/di/auth_di.dart';
 import 'package:monai/features/budgets/di/budgets_di.dart';
@@ -50,6 +51,9 @@ Future<void> configureDependencies() async {
       tokenStorage: sl<TokenStorage>(),
       sessionManager: sl<SessionManager>(),
     ),
+  );
+  sl.registerLazySingleton<ReceiptScannerService>(
+    ReceiptScannerServiceImpl.new,
   );
   sl.registerLazySingleton<Dio>(
     () => DioClient(

@@ -47,3 +47,8 @@ kotlin {
 flutter {
     source = "../.."
 }
+
+dependencies {
+    // Bundled Latin model for on-device receipt OCR (ReceiptScannerPlugin).
+    implementation("com.google.mlkit:text-recognition:16.0.1")
+}
