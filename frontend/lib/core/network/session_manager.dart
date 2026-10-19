@@ -1,18 +1,39 @@
-import 'dart:async';
+import 'package:flutter/foundation.dart';
 
-/// Broadcasts a "session expired" signal from the network layer to the router
-/// without coupling networking to navigation.
+/// Whether a user is signed in on this device.
+enum SessionStatus {
+  /// No token: the auth screens are shown.
+  signedOut,
+
+  /// A token is stored and the app is usable.
+  signedIn,
+
+  /// The server rejected the token. It is already cleared; the app stays on
+  /// the current screen behind the session-expired dialog until the user
+  /// chooses to sign in again.
+  expired,
+}
+
+/// Holds the session's [SessionStatus], so the router can follow sign-in,
+/// sign-out and expiry without coupling networking to navigation.
 class SessionManager {
-  final _controller = StreamController<void>.broadcast();
+  final _status = ValueNotifier(SessionStatus.signedOut);
 
-  /// Emits when the token is rejected and the user must re-authenticate.
-  Stream<void> get onSessionExpired => _controller.stream;
+  /// The current status; the router refreshes on every change.
+  ValueListenable<SessionStatus> get status => _status;
 
-  /// Signals that the session has expired.
+  /// A token was stored.
+  void signedIn() => _status.value = .signedIn;
+
+  /// The token was removed, or the user acknowledged an expired session.
+  void signedOut() => _status.value = .signedOut;
+
+  /// The server rejected the token. Only a signed-in session can expire, so
+  /// several requests failing at once show one dialog.
   void notifyExpired() {
-    if (!_controller.isClosed) _controller.add(null);
+    if (_status.value == .signedIn) _status.value = .expired;
   }
 
-  /// Closes the underlying stream.
-  void dispose() => _controller.close();
+  /// Releases the listenable.
+  void dispose() => _status.dispose();
 }

@@ -13,9 +13,9 @@ abstract class OnboardingState with _$OnboardingState {
     /// Where to go once [status] is success; the screen navigates on it.
     OnboardingExit? exit,
   }) = _OnboardingState;
+}
 
-  const OnboardingState._();
-
+extension OnboardingStateX on OnboardingState {
   int get pageCount => OnboardingStep.values.length;
 
   OnboardingStep get step => OnboardingStep.values[page];

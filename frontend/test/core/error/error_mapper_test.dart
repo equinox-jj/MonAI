@@ -3,7 +3,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:monai/core/error/error_mapper.dart';
 import 'package:monai/core/error/exceptions.dart';
 
-DioException _badResponse(int status, [Object? body]) {
+DioException _badResponse(
+  int status, [
+  Object? body,
+  Map<String, List<String>> headers = const {},
+]) {
   final options = RequestOptions(path: '/x');
   return DioException(
     requestOptions: options,
@@ -12,6 +16,7 @@ DioException _badResponse(int status, [Object? body]) {
       requestOptions: options,
       statusCode: status,
       data: body,
+      headers: Headers.fromMap(headers),
     ),
   );
 }
@@ -105,6 +110,44 @@ void main() {
       expect(fields.firstForField('password')?.params, {'min': 8});
       expect(fields.forField('email').single.params, isEmpty);
       expect(fields.firstForField('name'), isNull);
+    });
+  });
+
+  group('Retry-After', () {
+    test('429 carries Retry-After seconds through to the failure', () {
+      // Arrange
+      final error = _badResponse(429, _errorBody('rate_limited', 'slow'), {
+        'retry-after': ['90'],
+      });
+
+      // Act
+      final failure = mapExceptionToFailure(mapDioException(error));
+
+      // Assert
+      expect(
+        failure,
+        isA<TooManyRequestsFailure>().having(
+          (f) => f.retryAfter,
+          'retryAfter',
+          const Duration(seconds: 90),
+        ),
+      );
+    });
+
+    test('429 without a usable Retry-After has no wait', () {
+      // Arrange
+      final missing = _badResponse(429);
+      final invalid = _badResponse(429, null, {
+        'retry-after': ['Wed, 21 Oct 2026 07:28:00 GMT'],
+      });
+
+      // Act
+      final fromMissing = mapDioException(missing);
+      final fromInvalid = mapDioException(invalid);
+
+      // Assert
+      expect((fromMissing as TooManyRequestsException).retryAfter, isNull);
+      expect((fromInvalid as TooManyRequestsException).retryAfter, isNull);
     });
   });
 

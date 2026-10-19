@@ -190,7 +190,7 @@ return unknown(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String message,  String? code)?  network,TResult Function( String message,  String? code)?  timeout,TResult Function( String message,  String? code)?  badRequest,TResult Function( String message,  String? code)?  unauthorized,TResult Function( String message,  String? code)?  forbidden,TResult Function( String message,  String? code)?  notFound,TResult Function( String message,  String? code)?  conflict,TResult Function( List<FieldError> fieldErrors,  String message,  String? code)?  validation,TResult Function( String message,  String? code)?  tooManyRequests,TResult Function( String message,  String? code)?  serviceUnavailable,TResult Function( int statusCode,  String message,  String? code)?  server,TResult Function( String message,  String? code)?  cache,TResult Function( String message,  String? code)?  unknown,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String message,  String? code)?  network,TResult Function( String message,  String? code)?  timeout,TResult Function( String message,  String? code)?  badRequest,TResult Function( String message,  String? code)?  unauthorized,TResult Function( String message,  String? code)?  forbidden,TResult Function( String message,  String? code)?  notFound,TResult Function( String message,  String? code)?  conflict,TResult Function( List<FieldError> fieldErrors,  String message,  String? code)?  validation,TResult Function( String message,  String? code,  Duration? retryAfter)?  tooManyRequests,TResult Function( String message,  String? code)?  serviceUnavailable,TResult Function( int statusCode,  String message,  String? code)?  server,TResult Function( String message,  String? code)?  cache,TResult Function( String message,  String? code)?  unknown,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case NetworkFailure() when network != null:
 return network(_that.message,_that.code);case TimeoutFailure() when timeout != null:
@@ -201,7 +201,7 @@ return forbidden(_that.message,_that.code);case NotFoundFailure() when notFound 
 return notFound(_that.message,_that.code);case ConflictFailure() when conflict != null:
 return conflict(_that.message,_that.code);case ValidationFailure() when validation != null:
 return validation(_that.fieldErrors,_that.message,_that.code);case TooManyRequestsFailure() when tooManyRequests != null:
-return tooManyRequests(_that.message,_that.code);case ServiceUnavailableFailure() when serviceUnavailable != null:
+return tooManyRequests(_that.message,_that.code,_that.retryAfter);case ServiceUnavailableFailure() when serviceUnavailable != null:
 return serviceUnavailable(_that.message,_that.code);case ServerFailure() when server != null:
 return server(_that.statusCode,_that.message,_that.code);case CacheFailure() when cache != null:
 return cache(_that.message,_that.code);case UnknownFailure() when unknown != null:
@@ -223,7 +223,7 @@ return unknown(_that.message,_that.code);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String message,  String? code)  network,required TResult Function( String message,  String? code)  timeout,required TResult Function( String message,  String? code)  badRequest,required TResult Function( String message,  String? code)  unauthorized,required TResult Function( String message,  String? code)  forbidden,required TResult Function( String message,  String? code)  notFound,required TResult Function( String message,  String? code)  conflict,required TResult Function( List<FieldError> fieldErrors,  String message,  String? code)  validation,required TResult Function( String message,  String? code)  tooManyRequests,required TResult Function( String message,  String? code)  serviceUnavailable,required TResult Function( int statusCode,  String message,  String? code)  server,required TResult Function( String message,  String? code)  cache,required TResult Function( String message,  String? code)  unknown,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String message,  String? code)  network,required TResult Function( String message,  String? code)  timeout,required TResult Function( String message,  String? code)  badRequest,required TResult Function( String message,  String? code)  unauthorized,required TResult Function( String message,  String? code)  forbidden,required TResult Function( String message,  String? code)  notFound,required TResult Function( String message,  String? code)  conflict,required TResult Function( List<FieldError> fieldErrors,  String message,  String? code)  validation,required TResult Function( String message,  String? code,  Duration? retryAfter)  tooManyRequests,required TResult Function( String message,  String? code)  serviceUnavailable,required TResult Function( int statusCode,  String message,  String? code)  server,required TResult Function( String message,  String? code)  cache,required TResult Function( String message,  String? code)  unknown,}) {final _that = this;
 switch (_that) {
 case NetworkFailure():
 return network(_that.message,_that.code);case TimeoutFailure():
@@ -234,7 +234,7 @@ return forbidden(_that.message,_that.code);case NotFoundFailure():
 return notFound(_that.message,_that.code);case ConflictFailure():
 return conflict(_that.message,_that.code);case ValidationFailure():
 return validation(_that.fieldErrors,_that.message,_that.code);case TooManyRequestsFailure():
-return tooManyRequests(_that.message,_that.code);case ServiceUnavailableFailure():
+return tooManyRequests(_that.message,_that.code,_that.retryAfter);case ServiceUnavailableFailure():
 return serviceUnavailable(_that.message,_that.code);case ServerFailure():
 return server(_that.statusCode,_that.message,_that.code);case CacheFailure():
 return cache(_that.message,_that.code);case UnknownFailure():
@@ -252,7 +252,7 @@ return unknown(_that.message,_that.code);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String message,  String? code)?  network,TResult? Function( String message,  String? code)?  timeout,TResult? Function( String message,  String? code)?  badRequest,TResult? Function( String message,  String? code)?  unauthorized,TResult? Function( String message,  String? code)?  forbidden,TResult? Function( String message,  String? code)?  notFound,TResult? Function( String message,  String? code)?  conflict,TResult? Function( List<FieldError> fieldErrors,  String message,  String? code)?  validation,TResult? Function( String message,  String? code)?  tooManyRequests,TResult? Function( String message,  String? code)?  serviceUnavailable,TResult? Function( int statusCode,  String message,  String? code)?  server,TResult? Function( String message,  String? code)?  cache,TResult? Function( String message,  String? code)?  unknown,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String message,  String? code)?  network,TResult? Function( String message,  String? code)?  timeout,TResult? Function( String message,  String? code)?  badRequest,TResult? Function( String message,  String? code)?  unauthorized,TResult? Function( String message,  String? code)?  forbidden,TResult? Function( String message,  String? code)?  notFound,TResult? Function( String message,  String? code)?  conflict,TResult? Function( List<FieldError> fieldErrors,  String message,  String? code)?  validation,TResult? Function( String message,  String? code,  Duration? retryAfter)?  tooManyRequests,TResult? Function( String message,  String? code)?  serviceUnavailable,TResult? Function( int statusCode,  String message,  String? code)?  server,TResult? Function( String message,  String? code)?  cache,TResult? Function( String message,  String? code)?  unknown,}) {final _that = this;
 switch (_that) {
 case NetworkFailure() when network != null:
 return network(_that.message,_that.code);case TimeoutFailure() when timeout != null:
@@ -263,7 +263,7 @@ return forbidden(_that.message,_that.code);case NotFoundFailure() when notFound 
 return notFound(_that.message,_that.code);case ConflictFailure() when conflict != null:
 return conflict(_that.message,_that.code);case ValidationFailure() when validation != null:
 return validation(_that.fieldErrors,_that.message,_that.code);case TooManyRequestsFailure() when tooManyRequests != null:
-return tooManyRequests(_that.message,_that.code);case ServiceUnavailableFailure() when serviceUnavailable != null:
+return tooManyRequests(_that.message,_that.code,_that.retryAfter);case ServiceUnavailableFailure() when serviceUnavailable != null:
 return serviceUnavailable(_that.message,_that.code);case ServerFailure() when server != null:
 return server(_that.statusCode,_that.message,_that.code);case CacheFailure() when cache != null:
 return cache(_that.message,_that.code);case UnknownFailure() when unknown != null:
@@ -847,11 +847,12 @@ as String?,
 
 
 class TooManyRequestsFailure implements Failure {
-  const TooManyRequestsFailure({this.message = 'Too many requests', this.code});
+  const TooManyRequestsFailure({this.message = 'Too many requests', this.code, this.retryAfter});
   
 
 @override@JsonKey() final  String message;
 @override final  String? code;
+ final  Duration? retryAfter;
 
 /// Create a copy of Failure
 /// with the given fields replaced by the non-null parameter values.
@@ -863,18 +864,18 @@ $TooManyRequestsFailureCopyWith<TooManyRequestsFailure> get copyWith => _$TooMan
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is TooManyRequestsFailure&&(identical(other.message, message) || other.message == message)&&(identical(other.code, code) || other.code == code));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is TooManyRequestsFailure&&(identical(other.message, message) || other.message == message)&&(identical(other.code, code) || other.code == code)&&(identical(other.retryAfter, retryAfter) || other.retryAfter == retryAfter));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,message,code);
+    return Object.hash(runtimeType,message,code,retryAfter);
 }
 
 @override
 String toString() {
-    return 'Failure.tooManyRequests(message: $message, code: $code)';
+    return 'Failure.tooManyRequests(message: $message, code: $code, retryAfter: $retryAfter)';
 }
 
 
@@ -885,7 +886,7 @@ abstract mixin class $TooManyRequestsFailureCopyWith<$Res> implements $FailureCo
   factory $TooManyRequestsFailureCopyWith(TooManyRequestsFailure value, $Res Function(TooManyRequestsFailure) _then) = _$TooManyRequestsFailureCopyWithImpl;
 @override @useResult
 $Res call({
- String message, String? code
+ String message, String? code, Duration? retryAfter
 });
 
 
@@ -902,11 +903,12 @@ class _$TooManyRequestsFailureCopyWithImpl<$Res>
 
 /// Create a copy of Failure
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? code = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? message = null,Object? code = freezed,Object? retryAfter = freezed,}) {
   return _then(TooManyRequestsFailure(
 message: null == message ? _self.message : message // ignore: cast_nullable_to_non_nullable
 as String,code: freezed == code ? _self.code : code // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,retryAfter: freezed == retryAfter ? _self.retryAfter : retryAfter // ignore: cast_nullable_to_non_nullable
+as Duration?,
   ));
 }
 

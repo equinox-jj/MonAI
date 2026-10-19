@@ -5,13 +5,22 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/designsystem/theme/monai_theme.dart';
 import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/router/app_router.dart';
 import 'package:monai/core/usecase/usecase.dart';
 import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
+import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
+import 'package:monai/features/auth/domain/usecase/register_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
+import 'package:monai/features/auth/presentation/pages/register/bloc/register_bloc.dart';
+import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
 
 class _MockCompleteOnboardingUseCase extends Mock
     implements CompleteOnboardingUseCase {}
+
+class _MockLoginUseCase extends Mock implements LoginUseCase {}
+
+class _MockRegisterUseCase extends Mock implements RegisterUseCase {}
 
 void main() {
   late _MockCompleteOnboardingUseCase completeOnboarding;
@@ -22,7 +31,10 @@ void main() {
     completeOnboarding = _MockCompleteOnboardingUseCase();
     when(() => completeOnboarding(any()))
         .thenAnswer((_) async => const Right(unit));
-    sl.registerFactory(() => OnboardingBloc(completeOnboarding));
+    sl
+      ..registerFactory(() => OnboardingBloc(completeOnboarding))
+      ..registerFactory(() => SignInBloc(_MockLoginUseCase()))
+      ..registerFactory(() => RegisterBloc(_MockRegisterUseCase()));
   });
 
   tearDown(sl.reset);
@@ -38,7 +50,10 @@ void main() {
         locale: const Locale('en'),
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
-        routerConfig: createAppRouter(initialLocation: AppRoutes.onboarding),
+        routerConfig: createAppRouter(
+          initialLocation: AppRoutes.onboarding,
+          sessionManager: SessionManager(),
+        ),
       ),
     );
     await tester.pumpAndSettle();
@@ -99,7 +114,7 @@ void main() {
 
     // Assert
     verify(() => completeOnboarding(any())).called(1);
-    expect(find.text('Register Page'), findsOneWidget);
+    expect(find.text('Create your account'), findsOneWidget);
   });
 
   testWidgets('I already have an account opens Sign in', (tester) async {
@@ -115,6 +130,6 @@ void main() {
     await tester.pumpAndSettle();
 
     // Assert
-    expect(find.text('Sign In Page'), findsOneWidget);
+    expect(find.text('Welcome back'), findsOneWidget);
   });
 }

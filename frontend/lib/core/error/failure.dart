@@ -59,10 +59,11 @@ sealed class Failure with _$Failure {
     String? code,
   }) = ValidationFailure;
 
-  /// HTTP 429.
+  /// HTTP 429. [retryAfter] is the server's `Retry-After`, when it sent one.
   const factory Failure.tooManyRequests({
     @Default('Too many requests') String message,
     String? code,
+    Duration? retryAfter,
   }) = TooManyRequestsFailure;
 
   /// HTTP 503.

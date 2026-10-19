@@ -80,7 +80,11 @@ class TooManyRequestsException extends AppException {
   const TooManyRequestsException({
     String message = 'Too many requests',
     String? code,
+    this.retryAfter,
   }) : super(message, code);
+
+  /// How long the server asks to wait (`Retry-After`), when it says.
+  final Duration? retryAfter;
 }
 
 /// HTTP 503 — a dependency (e.g. the AI provider) is unavailable.

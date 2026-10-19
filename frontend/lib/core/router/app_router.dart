@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
 
+import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/onboarding_page.dart';
 import 'package:monai/features/auth/presentation/pages/register/register_page.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
+import 'package:monai/features/home/presentation/pages/home/home_page.dart';
 
 /// The app's route paths.
 abstract final class AppRoutes {
@@ -14,17 +16,69 @@ abstract final class AppRoutes {
 
   /// Create an account.
   static const register = '/register';
+
+  /// The signed-in start screen.
+  static const home = '/home';
+
+  /// The query parameter Sign in and Register hand the typed email over in.
+  static const emailParam = 'email';
+
+  /// The screens a signed-out user may see.
+  static const signedOutRoutes = {onboarding, signIn, register};
+
+  /// Sign in, starting with [email] when given.
+  static String signInWith({String email = ''}) => _withEmail(signIn, email);
+
+  /// Register, starting with [email] when given.
+  static String registerWith({String email = ''}) =>
+      _withEmail(register, email);
+
+  static String _withEmail(String path, String email) => Uri(
+    path: path,
+    queryParameters: email.isEmpty ? null : {emailParam: email},
+  ).toString();
 }
 
 /// Builds the app's router, starting at [initialLocation].
-GoRouter createAppRouter({required String initialLocation}) => GoRouter(
+///
+/// Navigation follows [sessionManager]: a sign-in leaves the auth screens for
+/// Home, and a sign-out returns to Sign in. An expired session stays put
+/// under the session-expired dialog until the user signs in again.
+GoRouter createAppRouter({
+  required String initialLocation,
+  required SessionManager sessionManager,
+}) => GoRouter(
   initialLocation: initialLocation,
+  refreshListenable: sessionManager.status,
+  redirect: (_, state) =>
+      sessionRedirect(sessionManager.status.value, state.matchedLocation),
   routes: [
     GoRoute(
       path: AppRoutes.onboarding,
       builder: (_, _) => const OnboardingPage(),
     ),
-    GoRoute(path: AppRoutes.signIn, builder: (_, _) => const SignInPage()),
-    GoRoute(path: AppRoutes.register, builder: (_, _) => const RegisterPage()),
+    GoRoute(
+      path: AppRoutes.signIn,
+      builder: (_, state) => SignInPage(
+        initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+      ),
+    ),
+    GoRoute(
+      path: AppRoutes.register,
+      builder: (_, state) => RegisterPage(
+        initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+      ),
+    ),
+    GoRoute(path: AppRoutes.home, builder: (_, _) => const HomePage()),
   ],
 );
+
+/// Where the session sends a user at [location], or null to stay.
+String? sessionRedirect(SessionStatus status, String location) {
+  final onSignedOutRoute = AppRoutes.signedOutRoutes.contains(location);
+  return switch (status) {
+    .signedIn when onSignedOutRoute => AppRoutes.home,
+    .signedOut when !onSignedOutRoute => AppRoutes.signIn,
+    .signedIn || .signedOut || .expired => null,
+  };
+}

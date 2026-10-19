@@ -64,6 +64,7 @@ AppException _mapResponse(Response<dynamic>? response) {
       return TooManyRequestsException(
         message: message ?? 'Too many requests',
         code: code,
+        retryAfter: _retryAfter(response),
       );
     case 503:
       return ServiceUnavailableException(
@@ -83,6 +84,16 @@ AppException _mapResponse(Response<dynamic>? response) {
         code: code,
       );
   }
+}
+
+/// The `Retry-After` header in whole seconds; null when absent, negative or
+/// an HTTP date (the backend only sends seconds).
+Duration? _retryAfter(Response<dynamic>? response) {
+  final seconds = int.tryParse(
+    response?.headers.value('retry-after')?.trim() ?? '',
+  );
+  if (seconds == null || seconds < 0) return null;
+  return Duration(seconds: seconds);
 }
 
 String? _extractMessage(Object? data) {
@@ -137,9 +148,10 @@ Failure mapExceptionToFailure(Object error) {
         message: message,
         code: code,
       ),
-      TooManyRequestsException() => Failure.tooManyRequests(
+      TooManyRequestsException(:final retryAfter) => Failure.tooManyRequests(
         message: message,
         code: code,
+        retryAfter: retryAfter,
       ),
       ServiceUnavailableException() => Failure.serviceUnavailable(
         message: message,

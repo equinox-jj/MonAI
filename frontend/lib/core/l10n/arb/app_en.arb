@@ -44,5 +44,58 @@
   "onboardingSampleFood": "Food",
   "onboardingSampleBills": "Bills",
   "onboardingSampleTransport": "Transport",
-  "onboardingSampleComparison": "10% less than September"
+  "onboardingSampleComparison": "10% less than September",
+  "authBrandName": "Expense Tracker",
+  "authHeroTitle": "Every rupiah, every wallet, in seconds.",
+  "authEmailLabel": "Email",
+  "authPasswordLabel": "Password",
+  "authNameLabel": "Name",
+  "authEmailPlaceholder": "you@example.com",
+  "authPasswordPlaceholder": "Enter your password",
+  "authNamePlaceholder": "Your full name",
+  "authShowPassword": "Show password",
+  "authHidePassword": "Hide password",
+  "signInTitle": "Welcome back",
+  "signInSubtitle": "Sign in to see your wallets on this phone.",
+  "signInSubtitleTablet": "Sign in to see your wallets on this tablet.",
+  "signInSubmit": "Sign in",
+  "signInNewHere": "New here?",
+  "signInCreateAccount": "Create an account",
+  "registerTitle": "Create your account",
+  "registerSubtitle": "Your data is saved to your account, so it follows you to a new phone.",
+  "registerPasswordPlaceholder": "Create a password",
+  "registerPasswordHint": "At least {min} characters",
+  "@registerPasswordHint": {
+    "placeholders": {"min": {"type": "int"}}
+  },
+  "registerSetupNote": "We'll set up a Cash wallet and starter categories for you, so you can log your first expense right away.",
+  "registerSubmit": "Create account",
+  "registerHaveAccount": "Have an account?",
+  "registerSignIn": "Sign in",
+  "registerEmailTaken": "This email already has an account.",
+  "registerSignInInstead": "Sign in instead",
+  "authErrorInvalidCredentials": "Email or password is incorrect. Check them and try again.",
+  "authErrorRateLimited": "Too many attempts. Wait a minute, then try again.",
+  "authErrorRateLimitedWait": "{minutes, plural, =1{Too many attempts. Try again in {minutes} minute.} other{Too many attempts. Try again in {minutes} minutes.}}",
+  "@authErrorRateLimitedWait": {
+    "placeholders": {"minutes": {"type": "int"}}
+  },
+  "authErrorNetwork": "Can't reach MonAI. Check your connection and try again.",
+  "authErrorUnexpected": "Something went wrong on our side. Try again.",
+  "authFieldNameRequired": "Enter your name",
+  "authFieldEmailRequired": "Enter your email",
+  "authFieldPasswordRequired": "Enter your password",
+  "authFieldEmailInvalid": "Enter a valid email address",
+  "authFieldTooShort": "Use at least {min} characters",
+  "@authFieldTooShort": {
+    "placeholders": {"min": {"type": "int"}}
+  },
+  "authFieldTooLong": "Use {max} characters or fewer",
+  "@authFieldTooLong": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "authFieldInvalid": "Check this field",
+  "sessionExpiredTitle": "Session expired",
+  "sessionExpiredBody": "For your security, please sign in again. Your wallets and transactions are saved to your account.",
+  "sessionExpiredSignIn": "Sign in again"
 }

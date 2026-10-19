@@ -396,10 +396,13 @@ class MonAITextLink extends StatelessWidget {
               mainAxisSize: .min,
               spacing: MonAISpacing.x1,
               children: [
-                Text(
-                  label,
-                  style: (style ?? context.textTheme.labelLarge)?.copyWith(
-                    color: accent,
+                // Wraps instead of overflowing when given less than its width.
+                Flexible(
+                  child: Text(
+                    label,
+                    style: (style ?? context.textTheme.labelLarge)?.copyWith(
+                      color: accent,
+                    ),
                   ),
                 ),
                 if (trailingIcon case final icon?)

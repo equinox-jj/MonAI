@@ -63,6 +63,7 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<UnauthorizedInterceptor>(
     () => UnauthorizedInterceptor(
       tokenStorage: sl<TokenStorage>(),
+      localCache: sl<LocalCache>(),
       sessionManager: sl<SessionManager>(),
     ),
   );

@@ -589,8 +589,8 @@ return $default(_that.page,_that.status,_that.exit);case _:
 /// @nodoc
 
 
-class _OnboardingState extends OnboardingState {
-  const _OnboardingState({this.page = 0, this.status = UiStatus.initial, this.exit}): super._();
+class _OnboardingState implements OnboardingState {
+  const _OnboardingState({this.page = 0, this.status = UiStatus.initial, this.exit});
   
 
 /// The current page, from 0.
