@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:monai/core/designsystem/icons/monai_icon.dart';
 import 'package:monai/core/designsystem/icons/monai_icons.dart';
+import 'package:monai/core/designsystem/theme/monai_category_colors.dart';
 import 'package:monai/core/designsystem/theme/monai_radius.dart';
 import 'package:monai/core/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/designsystem/theme/monai_spacing.dart';
@@ -99,9 +100,12 @@ class MonAIPill extends StatelessWidget {
           children: [
             if (icon case final icon?)
               MonAIIcon(icon, size: MonAISizes.iconXs, color: content),
-            Text(
-              text,
-              style: context.textTheme.labelMedium?.copyWith(color: content),
+            Flexible(
+              child: Text(
+                text,
+                textAlign: .center,
+                style: context.textTheme.labelMedium?.copyWith(color: content),
+              ),
             ),
           ],
         ),
@@ -214,6 +218,48 @@ class MonAIMonogram extends StatelessWidget {
               height: 1.2,
               color: contentColor ?? context.colors.heroGradientStart,
             ),
+      ),
+    );
+  }
+}
+
+/// A category's icon on a tinted circle, 40 by default.
+///
+/// [color] is the category's light color (the server hex); the icon and
+/// tint switch to the dark-mode shade on their own.
+class MonAICategoryIcon extends StatelessWidget {
+  /// Creates a category icon.
+  const MonAICategoryIcon({
+    required this.icon,
+    required this.color,
+    super.key,
+    this.size = MonAISizes.avatarMedium,
+  });
+
+  /// The category's icon.
+  final MonAIIconData icon;
+
+  /// The category's color.
+  final Color color;
+
+  /// The diameter.
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = context.colors.isDark;
+    return Container(
+      width: size,
+      height: size,
+      alignment: .center,
+      decoration: BoxDecoration(
+        color: CategoryColors.tint(color, dark: dark),
+        shape: .circle,
+      ),
+      child: MonAIIcon(
+        icon,
+        size: MonAISizes.iconLg,
+        color: CategoryColors.content(color, dark: dark),
       ),
     );
   }

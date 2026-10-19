@@ -3,5 +3,46 @@
   "appTitle": "MonAI",
   "@appTitle": {
     "description": "Application name"
-  }
+  },
+  "onboardingCaptureTitle": "Every rupiah, every wallet, in seconds.",
+  "onboardingCaptureBody": "Type it the way you'd say it or snap the receipt. We'll sort cash, bank and e-wallets for you.",
+  "onboardingWalletsTitle": "All your wallets, one total.",
+  "onboardingWalletsBody": "Add BCA, GoPay, OVO, cash and more. Move money between them and every balance stays right.",
+  "onboardingInsightsTitle": "See where it went. Stay on budget.",
+  "onboardingInsightsBody": "Set one monthly limit and get a clear report that compares each month with the last.",
+  "onboardingStep": "Step {current} of {total}",
+  "@onboardingStep": {
+    "description": "Screen-reader label of the onboarding step dots",
+    "placeholders": {
+      "current": {"type": "int"},
+      "total": {"type": "int"}
+    }
+  },
+  "onboardingNext": "Next",
+  "onboardingBack": "Back",
+  "onboardingSkip": "Skip",
+  "onboardingCreateAccount": "Create free account",
+  "onboardingSignIn": "I already have an account",
+  "onboardingSamplePrompt": "makan siang 35rb pakai gopay",
+  "@onboardingSamplePrompt": {
+    "description": "Sample quick-add sentence; stays Indonesian in every locale"
+  },
+  "onboardingSampleTitle": "Makan siang",
+  "onboardingSampleMeta": "Food · GoPay · Today",
+  "onboardingSampleBca": "BCA Tabungan",
+  "onboardingSampleGopay": "GoPay",
+  "onboardingSampleCash": "Cash",
+  "onboardingSampleTotal": "Total",
+  "onboardingSampleBudget": "October budget",
+  "onboardingSampleBudgetLeft": "{amount} left · 21 days to go",
+  "@onboardingSampleBudgetLeft": {
+    "placeholders": {
+      "amount": {"type": "String", "example": "Rp 585.000"}
+    }
+  },
+  "onboardingSampleBreakdown": "Where it went",
+  "onboardingSampleFood": "Food",
+  "onboardingSampleBills": "Bills",
+  "onboardingSampleTransport": "Transport",
+  "onboardingSampleComparison": "10% less than September"
 }

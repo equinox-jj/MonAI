@@ -1,1 +1,1 @@
-class SharedEndpoint{}
+class SharedEndpoint {}

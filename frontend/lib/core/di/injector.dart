@@ -6,6 +6,7 @@ import 'package:monai/core/network/interceptors/auth_interceptor.dart';
 import 'package:monai/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/services/receipt_scanner_service.dart';
+import 'package:monai/core/storage/app_preferences.dart';
 import 'package:monai/core/storage/token_storage.dart';
 import 'package:monai/features/auth/di/auth_di.dart';
 import 'package:monai/features/budgets/di/budgets_di.dart';
@@ -41,6 +42,9 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<SessionManager>(SessionManager.new);
 
   // ---- Core ----
+  sl.registerLazySingleton<AppPreferences>(
+    () => SharedAppPreferences(sl<SharedPreferences>()),
+  );
   sl.registerLazySingleton<TokenStorage>(
     () => SecureTokenStorage(sl<FlutterSecureStorage>()),
   );
