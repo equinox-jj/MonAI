@@ -117,12 +117,14 @@ Category category({
   String? color = '#F97316',
   CategoryType type = CategoryType.expense,
   bool isHidden = false,
+  bool isDefault = true,
+  bool isSystem = false,
 }) => Category(
   id: id,
   name: name,
   type: type,
-  isDefault: true,
-  isSystem: false,
+  isDefault: isDefault,
+  isSystem: isSystem,
   isHidden: isHidden,
   icon: icon,
   color: color,
@@ -135,6 +137,7 @@ CategoryBreakdown categoryBreakdown({
   String name = 'Food',
   int amount = 100000,
   double sharePercent = 40,
+  double? changePercent,
 }) => CategoryBreakdown(
   categoryId: id,
   name: name,
@@ -142,4 +145,5 @@ CategoryBreakdown categoryBreakdown({
   sharePercent: sharePercent,
   previousAmount: 0,
   color: '#F97316',
+  changePercent: changePercent,
 );

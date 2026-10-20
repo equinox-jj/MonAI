@@ -56,11 +56,9 @@ class HomeUI extends StatelessWidget {
 
   void _addWallet(BuildContext context) => context.push(AppRoutes.walletNew);
 
-  // TODO(home): open the month's budget once it exists.
-  void _openBudget() {}
+  void _openBudget(BuildContext context) => context.push(AppRoutes.budgetFor());
 
-  // TODO(home): open the month's report once it exists.
-  void _openReport() {}
+  void _openReport(BuildContext context) => context.push(AppRoutes.reportFor());
 
   void _openTransaction(BuildContext context, String transactionId) =>
       context.push(AppRoutes.transactionDetail(transactionId));
@@ -102,8 +100,8 @@ class HomeUI extends StatelessWidget {
       onSeeAllWallets: () => _openWallets(context),
       onOpenWallet: (id) => _openWallet(context, id),
       onAddWallet: () => _addWallet(context),
-      onOpenBudget: _openBudget,
-      onOpenReport: _openReport,
+      onOpenBudget: () => _openBudget(context),
+      onOpenReport: () => _openReport(context),
       onSeeAllTransactions: () => _openTransactions(context),
       onOpenTransaction: (id) => _openTransaction(context, id),
       onAddTransaction: () => _addTransaction(context),

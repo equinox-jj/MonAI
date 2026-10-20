@@ -89,7 +89,7 @@ class SharedDI {
         () => CategoryRemoteDataSourceImpl(dio: sl()),
       )
       ..registerLazySingleton<CategoryLocalDataSource>(
-        () => CategoryLocalDataSourceImpl(dao: sl()),
+        () => CategoryLocalDataSourceImpl(dao: sl(), transactionDao: sl()),
       )
       ..registerLazySingleton<TransactionRemoteDataSource>(
         () => TransactionRemoteDataSourceImpl(dio: sl()),

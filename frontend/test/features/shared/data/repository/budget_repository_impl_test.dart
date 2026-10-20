@@ -9,6 +9,7 @@ import 'package:monai/features/shared/data/datasources/budget_local_datasource.d
 import 'package:monai/features/shared/data/datasources/budget_remote_datasource.dart';
 import 'package:monai/features/shared/data/mapper/budget_mapper.dart';
 import 'package:monai/features/shared/data/model/budget_response.dart';
+import 'package:monai/features/shared/data/model/set_budget_request.dart';
 import 'package:monai/features/shared/data/repository/budget_repository_impl.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 
@@ -25,7 +26,10 @@ void main() {
   late BudgetRepositoryImpl repository;
   final october = DateTime(2026, 10);
 
-  setUpAll(() => registerFallbackValue(budgetRow()));
+  setUpAll(() {
+    registerFallbackValue(budgetRow());
+    registerFallbackValue(const SetBudgetRequest(limitAmount: 0));
+  });
 
   setUp(() {
     remote = _MockRemote();
@@ -91,5 +95,75 @@ void main() {
 
     // Assert
     expect(result.getRight().toNullable()?.limitAmount, 500);
+  });
+
+  test('setBudget sends the limit and caches the result', () async {
+    // Arrange
+    when(
+      () => remote.setBudget(
+        '2026-10',
+        const SetBudgetRequest(limitAmount: 1000000),
+      ),
+    ).thenAnswer((_) async => BudgetResponse.fromJson(envelope(budgetJson())));
+
+    // Act
+    final result = await repository.setBudget(october, 1000000);
+
+    // Assert
+    final row =
+        verify(() => local.upsert(captureAny())).captured.single as BudgetRow;
+    expect(result, Right<Failure, Budget>(row.toEntity()));
+    expect(row.limitAmount, 1000000);
+  });
+
+  test('setBudget failing leaves the cache alone', () async {
+    // Arrange
+    when(() => remote.setBudget(any(), any()))
+        .thenThrow(const NetworkException());
+
+    // Act
+    final result = await repository.setBudget(october, 1000000);
+
+    // Assert
+    expect(result.getLeft().toNullable(), isA<NetworkFailure>());
+    verifyNever(() => local.upsert(any()));
+  });
+
+  test('deleteBudget removes it on the server and in the cache', () async {
+    // Arrange
+    when(() => remote.deleteBudget('2026-10')).thenAnswer((_) async {});
+
+    // Act
+    final result = await repository.deleteBudget(october);
+
+    // Assert
+    expect(result, const Right<Failure, Unit>(unit));
+    verify(() => local.deleteByMonth(october)).called(1);
+  });
+
+  test('deleteBudget treats an already removed budget as done', () async {
+    // Arrange
+    when(() => remote.deleteBudget('2026-10'))
+        .thenThrow(const NotFoundException(code: 'not_found'));
+
+    // Act
+    final result = await repository.deleteBudget(october);
+
+    // Assert
+    expect(result, const Right<Failure, Unit>(unit));
+    verify(() => local.deleteByMonth(october)).called(1);
+  });
+
+  test('deleteBudget failing keeps the cached budget', () async {
+    // Arrange
+    when(() => remote.deleteBudget('2026-10'))
+        .thenThrow(const NetworkException());
+
+    // Act
+    final result = await repository.deleteBudget(october);
+
+    // Assert
+    expect(result.getLeft().toNullable(), isA<NetworkFailure>());
+    verifyNever(() => local.deleteByMonth(any()));
   });
 }

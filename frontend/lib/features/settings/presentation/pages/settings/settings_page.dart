@@ -38,11 +38,10 @@ class SettingsUI extends StatelessWidget {
   // TODO(settings): open Edit profile once it exists.
   void _openProfile() {}
 
-  // TODO(settings): open the month's budget once it exists.
-  void _openBudget() {}
+  void _openBudget(BuildContext context) => context.push(AppRoutes.budgetFor());
 
-  // TODO(settings): open Categories once it exists.
-  void _openCategories() {}
+  void _openCategories(BuildContext context) =>
+      context.push(AppRoutes.categories);
 
   void _openWallets(BuildContext context) => context.go(AppRoutes.wallets);
 
@@ -134,8 +133,8 @@ class SettingsUI extends StatelessWidget {
   Widget build(BuildContext context) {
     final actions = SettingsActions(
       onOpenProfile: _openProfile,
-      onOpenBudget: _openBudget,
-      onOpenCategories: _openCategories,
+      onOpenBudget: () => _openBudget(context),
+      onOpenCategories: () => _openCategories(context),
       onOpenWallets: () => _openWallets(context),
       onExport: _export,
       onPickTheme: () => _pickTheme(context),

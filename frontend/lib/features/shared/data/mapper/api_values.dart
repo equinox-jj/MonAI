@@ -98,3 +98,8 @@ extension TransactionTypeApi on TransactionType {
 extension TransactionSourceApi on TransactionSource {
   String get apiValue => _format(_transactionSources, this);
 }
+
+/// The API value of a [CategoryType], e.g. `EXPENSE`.
+extension CategoryTypeApi on CategoryType {
+  String get apiValue => _format(_categoryTypes, this);
+}

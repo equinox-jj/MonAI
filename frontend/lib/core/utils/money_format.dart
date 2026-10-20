@@ -26,16 +26,19 @@ const _compactUnits = [
 /// Formats whole rupiah in short form: `Rp 35 rb`, `Rp 2,4 jt`, `Rp 2 M`.
 ///
 /// Keeps one decimal, truncated, so 999.999 reads `Rp 999,9 rb` rather than
-/// rounding up. Amounts under a thousand use [formatRupiah].
-String formatRupiahCompact(int amount) {
+/// rounding up. Amounts under a thousand use [formatRupiah]. Without
+/// [symbol], the `Rp` is left out: `2,5 jt`.
+String formatRupiahCompact(int amount, {bool symbol = true}) {
   final abs = amount.abs();
   final unit = _compactUnits.where((u) => abs >= u.$1).firstOrNull;
-  if (unit == null) return formatRupiah(amount);
+  final sign = amount < 0 ? '−' : '';
+  final rp = symbol ? 'Rp ' : '';
+  if (unit == null) return '$sign$rp${_rupiahDigits.format(abs)}';
   final (size, suffix) = unit;
   final whole = abs ~/ size;
   final tenth = (abs % size) ~/ (size ~/ 10);
   final number = '${_rupiahDigits.format(whole)}${tenth > 0 ? ',$tenth' : ''}';
-  return '${amount < 0 ? '−' : ''}Rp $number $suffix';
+  return '$sign$rp$number $suffix';
 }
 
 final _nonDigits = RegExp(r'\D');

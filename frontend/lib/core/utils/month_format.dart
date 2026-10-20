@@ -10,6 +10,10 @@ abstract final class MonthFormat {
   static String monthName(DateTime month, String locale) =>
       DateFormat.LLLL(locale).format(month);
 
+  /// `October 2026`.
+  static String monthYear(DateTime month, String locale) =>
+      DateFormat.yMMMM(locale).format(month);
+
   /// `Oct`.
   static String shortMonthName(DateTime month, String locale) =>
       DateFormat.LLL(locale).format(month);

@@ -1,13 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monai/core/designsystem/designsystem.dart';
+import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/onboarding_page.dart';
 import 'package:monai/features/auth/presentation/pages/register/register_page.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
+import 'package:monai/features/budgets/presentation/pages/budget/budget_page.dart';
+import 'package:monai/features/categories/presentation/pages/categories/categories_page.dart';
+import 'package:monai/features/categories/presentation/pages/category_form/category_form_page.dart';
+import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';
 import 'package:monai/features/dashboard/presentation/pages/dashboard/dashboard_page.dart';
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
+import 'package:monai/features/reports/presentation/pages/report/report_page.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/receipt_review_page.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/scan_receipt_page.dart';
@@ -50,6 +57,18 @@ abstract final class AppRoutes {
   /// The settings tab.
   static const settings = '/settings';
 
+  /// The categories; reached from Settings.
+  static const categories = '/settings/categories';
+
+  /// The add-category form, for a category of [type].
+  static String categoryNew(CategoryType type) => Uri(
+    path: '$categories/new',
+    queryParameters: {typeParam: type.name},
+  ).toString();
+
+  /// The edit form of category [id].
+  static String categoryEdit(String id) => '$categories/$id/edit';
+
   /// The add-wallet form.
   static const walletNew = '/wallets/new';
 
@@ -76,15 +95,8 @@ abstract final class AppRoutes {
   static const walletParam = 'wallet';
 
   /// Search, starting in [month] when given.
-  static String transactionSearchIn([DateTime? month]) => Uri(
-    path: transactionSearch,
-    queryParameters: month == null
-        ? null
-        : {
-            monthParam:
-                '${month.year}-${month.month.toString().padLeft(2, '0')}',
-          },
-  ).toString();
+  static String transactionSearchIn([DateTime? month]) =>
+      _inMonth(transactionSearch, month);
 
   /// The add form, starting as a [type] (`expense`, `income`, `transfer`)
   /// out of [walletId] when given.
@@ -106,6 +118,18 @@ abstract final class AppRoutes {
   /// `extra`.
   static const receiptReview = '/receipt/review';
 
+  /// A month's budget; see [budgetFor].
+  static const budget = '/budget';
+
+  /// The budget of [month], or of the current month when null.
+  static String budgetFor([DateTime? month]) => _inMonth(budget, month);
+
+  /// A month's report; see [reportFor].
+  static const report = '/report';
+
+  /// The report of [month], or of the current month when null.
+  static String reportFor([DateTime? month]) => _inMonth(report, month);
+
   /// The query parameter Sign in and Register hand the typed email over in.
   static const emailParam = 'email';
 
@@ -118,6 +142,16 @@ abstract final class AppRoutes {
   /// Register, starting with [email] when given.
   static String registerWith({String email = ''}) =>
       _withEmail(register, email);
+
+  static String _inMonth(String path, DateTime? month) => Uri(
+    path: path,
+    queryParameters: month == null
+        ? null
+        : {
+            monthParam:
+                '${month.year}-${month.month.toString().padLeft(2, '0')}',
+          },
+  ).toString();
 
   static String _withEmail(String path, String email) => Uri(
     path: path,
@@ -183,6 +217,26 @@ GoRouter createAppRouter({
             state.extra is ReceiptReviewArgs ? null : AppRoutes.receiptScan,
         builder: (_, state) =>
             ReceiptReviewPage(args: state.extra! as ReceiptReviewArgs),
+      ),
+      GoRoute(
+        path: AppRoutes.budget,
+        builder: (_, state) => BudgetPage(
+          month:
+              parseMonthParam(
+                state.uri.queryParameters[AppRoutes.monthParam],
+              ) ??
+              monthOf(DateTime.now()),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.report,
+        builder: (_, state) => ReportPage(
+          month:
+              parseMonthParam(
+                state.uri.queryParameters[AppRoutes.monthParam],
+              ) ??
+              monthOf(DateTime.now()),
+        ),
       ),
       StatefulShellRoute.indexedStack(
         builder: (_, _, navigationShell) => UndoDeleteHost(
@@ -313,6 +367,46 @@ GoRouter createAppRouter({
               GoRoute(
                 path: AppRoutes.settings,
                 builder: (_, _) => const SettingsPage(),
+                routes: [
+                  GoRoute(
+                    path: 'categories',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, _) => const CategoriesPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (context, state) => _formPage(
+                          context,
+                          state,
+                          (placement) => CategoryFormPage(
+                            placement: placement,
+                            mode: CategoryFormMode.create(
+                              CategoryType.values.asNameMap()[state
+                                      .uri
+                                      .queryParameters[AppRoutes.typeParam]] ??
+                                  CategoryType.expense,
+                            ),
+                          ),
+                        ),
+                      ),
+                      GoRoute(
+                        path: ':id/edit',
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (context, state) => _formPage(
+                          context,
+                          state,
+                          (placement) => CategoryFormPage(
+                            placement: placement,
+                            mode: CategoryFormMode.edit(
+                              state.pathParameters['id']!,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),

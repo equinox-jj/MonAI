@@ -11,4 +11,11 @@ abstract class BudgetRepository {
   /// Re-fetches the budget for [month] and gives the cached copy. A month
   /// without a budget succeeds with null and clears the cached one.
   Future<Either<Failure, Budget?>> refreshBudget(DateTime month);
+
+  /// Sets the spending limit of [month] to [limitAmount] rupiah and caches
+  /// the result.
+  Future<Either<Failure, Budget>> setBudget(DateTime month, int limitAmount);
+
+  /// Removes the budget of [month]. A month that has none already succeeds.
+  Future<Either<Failure, Unit>> deleteBudget(DateTime month);
 }

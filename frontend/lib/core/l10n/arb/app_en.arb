@@ -642,5 +642,241 @@
   "receiptReviewAiBusy": "The AI is busy right now, so the fields are empty. Try again in a moment, or fill them in yourself.",
   "receiptReviewAiOffline": "You're offline, so the receipt couldn't be read. Try again once you're connected, or fill the fields in yourself.",
   "receiptReviewTryAgain": "Try again",
-  "receiptReviewStillBusy": "The AI is still busy. Try again in a moment."
+  "receiptReviewStillBusy": "The AI is still busy. Try again in a moment.",
+  "budgetTitle": "{month} budget",
+  "@budgetTitle": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "budgetBack": "Back",
+  "budgetIntro": "One spending limit for the whole month. Transfers and income don't count toward it.",
+  "budgetLimitLabel": "Monthly limit",
+  "budgetCurrency": "Rp",
+  "budgetLimitDescription": "Monthly limit in rupiah",
+  "budgetPreviewTitle": "Preview with this month's spending",
+  "budgetPreviewSpent": "{amount} spent",
+  "@budgetPreviewSpent": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "budgetPreviewLeft": "{amount} left",
+  "@budgetPreviewLeft": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "budgetPreviewOver": "Over by {amount}",
+  "@budgetPreviewOver": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "budgetPercent": "{percent}%",
+  "@budgetPercent": {
+    "placeholders": {"percent": {"type": "int"}}
+  },
+  "budgetLegendOk": "Under 80% — on track",
+  "budgetLegendWarning": "80% and up — warning",
+  "budgetLegendExceeded": "Over 100% — over budget",
+  "budgetSave": "Save budget",
+  "budgetRemove": "Remove budget for {month}",
+  "@budgetRemove": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "budgetRemoveTitle": "Remove the {month} budget?",
+  "@budgetRemoveTitle": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "budgetRemoveMessage": "Home and the monthly report will stop comparing spending with a limit for this month.",
+  "budgetRemoveConfirm": "Remove",
+  "budgetCancel": "Cancel",
+  "budgetErrorInvalidLimit": "Enter a limit between {min} and {max}.",
+  "@budgetErrorInvalidLimit": {
+    "placeholders": {"min": {"type": "String"}, "max": {"type": "String"}}
+  },
+  "budgetErrorNetwork": "You're offline. Connect to the internet and try again.",
+  "budgetErrorUnexpected": "Something went wrong. Try again in a moment.",
+  "reportTitle": "Monthly report",
+  "reportBack": "Back",
+  "reportPreviousMonth": "Previous month, {month}",
+  "@reportPreviousMonth": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportNextMonth": "Next month, {month}",
+  "@reportNextMonth": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportIncome": "Income",
+  "reportExpense": "Expense",
+  "reportNet": "Net this month",
+  "reportSpentLess": "Spent {percent}% less than {month}",
+  "@reportSpentLess": {
+    "placeholders": {"percent": {"type": "int"}, "month": {"type": "String"}}
+  },
+  "reportSpentMore": "Spent {percent}% more than {month}",
+  "@reportSpentMore": {
+    "placeholders": {"percent": {"type": "int"}, "month": {"type": "String"}}
+  },
+  "reportSpentSame": "Spent the same as {month}",
+  "@reportSpentSame": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportBreakdownTitle": "Spending by category",
+  "reportBreakdownSpentIn": "spent in {month}",
+  "@reportBreakdownSpentIn": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportBreakdownDescription": "Spending by category, {month}: {shares}",
+  "@reportBreakdownDescription": {
+    "placeholders": {"month": {"type": "String"}, "shares": {"type": "String"}}
+  },
+  "reportBreakdownShareDescription": "{name} {percent} percent",
+  "@reportBreakdownShareDescription": {
+    "placeholders": {"name": {"type": "String"}, "percent": {"type": "int"}}
+  },
+  "reportBreakdownShare": "{percent}% of spending",
+  "@reportBreakdownShare": {
+    "placeholders": {"percent": {"type": "int"}}
+  },
+  "reportChangeLess": "↓ {percent}% vs {month}",
+  "@reportChangeLess": {
+    "placeholders": {"percent": {"type": "int"}, "month": {"type": "String"}}
+  },
+  "reportChangeMore": "↑ {percent}% vs {month}",
+  "@reportChangeMore": {
+    "placeholders": {"percent": {"type": "int"}, "month": {"type": "String"}}
+  },
+  "reportChangeSame": "Same as {month}",
+  "@reportChangeSame": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportNoSpendingTitle": "No spending in {month}",
+  "@reportNoSpendingTitle": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportNoSpendingBody": "Expenses you add this month will show up here by category.",
+  "reportBudgetTitle": "Budget",
+  "reportBudgetChange": "Change",
+  "reportBudgetProgress": "{percent}% of {limit}",
+  "@reportBudgetProgress": {
+    "placeholders": {"percent": {"type": "int"}, "limit": {"type": "String"}}
+  },
+  "reportBudgetLeft": "{amount} left",
+  "@reportBudgetLeft": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "reportBudgetOver": "{amount} over",
+  "@reportBudgetOver": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "reportBudgetEmptyTitle": "No budget for {month}",
+  "@reportBudgetEmptyTitle": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "reportBudgetEmptyBody": "Set a monthly limit to see how you're tracking.",
+  "reportBudgetSet": "Set",
+  "reportErrorTitle": "Couldn't load the report",
+  "reportTryAgain": "Try again",
+  "reportLoadFailedNetwork": "You're offline. Connect to the internet to load this month.",
+  "reportLoadFailedUnexpected": "Something went wrong on our side. Your data is safe — try again in a moment.",
+  "reportRefreshFailedNetwork": "You're offline. Showing saved data.",
+  "reportRefreshFailedUnexpected": "Couldn't refresh the report. Showing saved data.",
+  "categoriesTitle": "Categories",
+  "categoriesBack": "Back",
+  "categoriesNew": "New",
+  "categoriesExpense": "Expense",
+  "categoriesIncome": "Income",
+  "categoriesTagCustom": "Custom",
+  "categoriesTagHidden": "Hidden",
+  "categoriesMetaDefault": "Default category",
+  "categoriesMetaCustom": "Your category",
+  "categoriesMetaHidden": "Hidden from pickers",
+  "categoriesMetaSystem": "Always kept",
+  "categoriesLocked": "Can't be hidden or deleted",
+  "categoriesHide": "Hide {name}",
+  "@categoriesHide": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "categoriesShow": "Show {name}",
+  "@categoriesShow": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "categoriesDelete": "Delete {name}",
+  "@categoriesDelete": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "categoriesFootnote": "Default categories can be hidden but not deleted. “Other” always stays so every transaction has a home.",
+  "categoriesEmpty": "No categories yet.",
+  "categoriesLoadErrorTitle": "Couldn't load categories",
+  "categoriesRetry": "Try again",
+  "categoriesDeleteTitle": "Delete “{name}”?",
+  "@categoriesDeleteTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "categoriesDeleteMessage": "It disappears from the pickers. Categories with transactions ask where to move them first.",
+  "categoriesDeleteConfirm": "Delete",
+  "categoriesCancel": "Cancel",
+  "categoriesMoveMessage": "Transactions use this category. Choose where to move them — then “{name}” will be removed.",
+  "@categoriesMoveMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "categoriesMoveTo": "Move transactions to",
+  "categoriesMoveConfirm": "Move & delete",
+  "categoriesDeleted": "“{name}” deleted.",
+  "@categoriesDeleted": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "categoriesErrorLocked": "This category can't be changed that way.",
+  "categoriesErrorNotFound": "This category was already deleted.",
+  "categoriesErrorNetwork": "You're offline. Connect to the internet and try again.",
+  "categoriesErrorUnexpected": "Something went wrong. Try again in a moment.",
+  "categoryFormNewTitle": "New category",
+  "categoryFormEditTitle": "Edit category",
+  "categoryFormSave": "Save",
+  "categoryFormClose": "Close",
+  "categoryFormName": "Name",
+  "categoryFormNamePlaceholder": "e.g. Kopi",
+  "categoryFormExpenseCaption": "Expense category · {count}/{max}",
+  "@categoryFormExpenseCaption": {
+    "placeholders": {"count": {"type": "int"}, "max": {"type": "int"}}
+  },
+  "categoryFormIncomeCaption": "Income category · {count}/{max}",
+  "@categoryFormIncomeCaption": {
+    "placeholders": {"count": {"type": "int"}, "max": {"type": "int"}}
+  },
+  "categoryFormIcon": "Icon",
+  "categoryFormColor": "Color",
+  "categoryFormDelete": "Delete category",
+  "categoryFormNameRequired": "Enter a name.",
+  "categoryFormNameTooLong": "Use {max} characters or fewer.",
+  "@categoryFormNameTooLong": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "categoryFormNameTaken": "You already have a category with this name.",
+  "categoryFormNameInvalid": "This name can't be used. Try another.",
+  "categoryFormErrorNetwork": "You're offline. Connect to the internet and try again.",
+  "categoryFormErrorUnexpected": "Something went wrong. Try again in a moment.",
+  "categoryFormErrorNotFound": "This category was deleted.",
+  "categoryIconLocalCafe": "Coffee",
+  "categoryIconRestaurant": "Restaurant",
+  "categoryIconLunchDining": "Meal",
+  "categoryIconLocalGroceryStore": "Groceries",
+  "categoryIconDirectionsCar": "Car",
+  "categoryIconTwoWheeler": "Motorbike",
+  "categoryIconReceiptLong": "Bills",
+  "categoryIconBolt": "Electricity",
+  "categoryIconShoppingBag": "Shopping",
+  "categoryIconCheckroom": "Clothes",
+  "categoryIconFavorite": "Health",
+  "categoryIconFitnessCenter": "Fitness",
+  "categoryIconMovie": "Entertainment",
+  "categoryIconSportsEsports": "Games",
+  "categoryIconSchool": "Education",
+  "categoryIconPets": "Pets",
+  "categoryIconHome": "Home",
+  "categoryIconCategory": "Other",
+  "categoryColorOrange": "Orange",
+  "categoryColorSky": "Sky blue",
+  "categoryColorPink": "Pink",
+  "categoryColorViolet": "Violet",
+  "categoryColorEmerald": "Emerald",
+  "categoryColorAmber": "Amber",
+  "categoryColorIndigo": "Indigo",
+  "categoryColorLime": "Lime",
+  "categoryColorTeal": "Teal",
+  "categoryColorSlate": "Slate"
 }

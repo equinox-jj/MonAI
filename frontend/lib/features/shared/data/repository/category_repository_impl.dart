@@ -5,7 +5,11 @@ import 'package:monai/core/model/category_type.dart';
 import 'package:monai/features/shared/data/datasources/category_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/category_remote_datasource.dart';
 import 'package:monai/features/shared/data/mapper/category_mapper.dart';
+import 'package:monai/features/shared/data/mapper/api_values.dart';
+import 'package:monai/features/shared/data/model/category_response.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
+import 'package:monai/features/shared/domain/entity/category_changes.dart';
+import 'package:monai/features/shared/domain/entity/category_input.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';
 
 class CategoryRepositoryImpl extends CategoryRepository with BaseRepository {
@@ -45,4 +49,34 @@ class CategoryRepositoryImpl extends CategoryRepository with BaseRepository {
         await _local.replaceAll(rows);
         return rows.map((row) => row.toEntity()).toList();
       });
+
+  @override
+  Future<Either<Failure, Category?>> findCategory(String id) =>
+      safeCall(() async => (await _local.find(id))?.toEntity());
+
+  @override
+  Future<Either<Failure, Category>> createCategory(CategoryInput input) =>
+      _write(() => _remote.createCategory(input.toRequest()));
+
+  @override
+  Future<Either<Failure, Category>> updateCategory(
+    String id,
+    CategoryChanges changes,
+  ) => _write(() => _remote.updateCategory(id, changes.toRequest()));
+
+  @override
+  Future<Either<Failure, Unit>> deleteCategory(String id, {String? moveTo}) =>
+      safeCall(() async {
+        await _remote.deleteCategory(id, moveTo: moveTo);
+        await _local.delete(id, moveTo: moveTo);
+        return unit;
+      });
+
+  Future<Either<Failure, Category>> _write(
+    Future<CategoryResponse> Function() request,
+  ) => safeCall(() async {
+    final row = requireField((await request()).data).toRow();
+    await _local.save(row);
+    return row.toEntity();
+  });
 }

@@ -27,6 +27,10 @@ class CategoryDao extends DatabaseAccessor<MonAIDatabase>
             ]))
           .watch();
 
+  /// Category [id], or null.
+  Future<CategoryRow?> find(String id) =>
+      (select(categories)..where((t) => t.id.equals(id))).getSingleOrNull();
+
   Future<void> upsertAll(List<CategoryRow> rows) => batch(
     (b) => b.insertAllOnConflictUpdate(
       categories,
