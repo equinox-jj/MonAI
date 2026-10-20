@@ -13,6 +13,8 @@ import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart'
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
 
+import '../../../../../helpers/transaction_fakes.dart';
+
 class _MockWatchDashboard extends Mock implements WatchHomeDashboardUseCase {}
 
 class _MockRefreshHome extends Mock implements RefreshHomeUseCase {}
@@ -22,6 +24,7 @@ void main() {
 
   // Home, the first tab, settles on its load error with nothing cached.
   setUp(() {
+    registerQuietTransactionScreens();
     final watch = _MockWatchDashboard();
     final refresh = _MockRefreshHome();
     when(() => watch(any())).thenAnswer((_) => const Stream.empty());

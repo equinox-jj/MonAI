@@ -28,6 +28,9 @@ enum MonAIFieldTone {
 InputDecoration _bareDecoration(String? hint, TextStyle? hintStyle) {
   return InputDecoration(
     isCollapsed: true,
+    // The theme's padding is for boxed fields; here it would push the text
+    // off the frame's center.
+    contentPadding: EdgeInsets.zero,
     filled: false,
     hintText: hint,
     hintStyle: hintStyle,

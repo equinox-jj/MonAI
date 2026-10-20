@@ -257,5 +257,185 @@
   "settingsSignOutAllMessage": "Every phone and tablet signed in to your account, this one included, will need to sign in again.",
   "settingsCancel": "Cancel",
   "settingsErrorNetwork": "You're offline. Connect to the internet and try again.",
-  "settingsErrorSignOut": "Couldn't sign out. Try again in a moment."
+  "settingsErrorSignOut": "Couldn't sign out. Try again in a moment.",
+  "transactionTypeExpense": "Expense",
+  "transactionTypeIncome": "Income",
+  "transactionTypeTransfer": "Transfer",
+  "transactionUntitled": "Transaction",
+  "transactionsDayToday": "Today · {date}",
+  "@transactionsDayToday": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "transactionsDayYesterday": "Yesterday · {date}",
+  "@transactionsDayYesterday": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "transactionsTitle": "Transactions",
+  "transactionsSearchHint": "Search note or merchant",
+  "transactionsPreviousMonth": "Previous month",
+  "transactionsNextMonth": "Next month",
+  "transactionsChooseMonth": "Choose month",
+  "transactionsDelete": "Delete",
+  "transactionsAdd": "Add transaction",
+  "transactionsEmptyTitle": "No transactions yet",
+  "transactionsEmptyBody": "Transactions you add for {month} show up here.",
+  "@transactionsEmptyBody": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "transactionsFilteredEmptyTitle": "Nothing matches these filters",
+  "transactionsFilteredEmptyBody": "Try another wallet, category or type.",
+  "transactionsClearFilters": "Clear filters",
+  "transactionsLoadErrorTitle": "Couldn't load transactions",
+  "transactionsRetry": "Try again",
+  "transactionsErrorNetwork": "You're offline. Connect to the internet and try again.",
+  "transactionsErrorNotFound": "This transaction no longer exists.",
+  "transactionsErrorWalletArchived": "Its wallet is archived. Unarchive the wallet first.",
+  "transactionsErrorUnexpected": "Something went wrong. Try again in a moment.",
+  "transactionsRefreshFailedNetwork": "You're offline. Showing saved transactions.",
+  "transactionsSelectPrompt": "Select a transaction to see its details",
+  "filterAllTypes": "All types",
+  "filterWallet": "Wallet",
+  "filterCategory": "Category",
+  "filterType": "Type",
+  "filterWalletsTitle": "Wallets",
+  "filterCategoriesTitle": "Categories",
+  "filterTypeTitle": "Transaction type",
+  "filterAllWallets": "All wallets",
+  "filterAllCategories": "All categories",
+  "filterTransferNote": "Transfers move money between your wallets. They never count as income or spending.",
+  "filterArchived": "Archived · still in history",
+  "filterClear": "Clear",
+  "filterReset": "Reset",
+  "filterApply": "Apply",
+  "filterShowAll": "Show all",
+  "monthPickerPreviousYear": "Previous year",
+  "monthPickerNextYear": "Next year",
+  "monthPickerShow": "Show {month}",
+  "@monthPickerShow": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "monthPickerNoData": "No data",
+  "undoDeleted": "{title} deleted",
+  "@undoDeleted": {
+    "placeholders": {"title": {"type": "String"}}
+  },
+  "undoAction": "Undo",
+  "undoRestoreFailed": "Couldn't restore the transaction.",
+  "transactionsLoading": "Loading transactions",
+  "transactionDetailTitle": "Transaction",
+  "transactionDetailEdit": "Edit",
+  "transactionDetailEditTooltip": "Edit transaction",
+  "transactionDetailDeleteTooltip": "Delete transaction",
+  "transactionDetailCategory": "Category",
+  "transactionDetailWallet": "Wallet",
+  "transactionDetailFrom": "From",
+  "transactionDetailTo": "To",
+  "transactionDetailDate": "Date",
+  "transactionDetailMerchant": "Merchant",
+  "transactionDetailNote": "Note",
+  "transactionDetailAddedBy": "Added by",
+  "transactionSourceManual": "Manual entry",
+  "transactionSourceQuickAdd": "AI quick add",
+  "transactionSourceReceipt": "Receipt scan",
+  "transactionDetailReceipt": "Receipt photo",
+  "transactionDetailReceiptNote": "Location data removed",
+  "transactionDetailViewReceipt": "View",
+  "transactionDetailReceiptError": "Couldn't load the photo",
+  "transactionDetailLoadErrorTitle": "Couldn't open the transaction",
+  "transactionDetailLoading": "Loading the transaction",
+  "transactionFormNewTitle": "New transaction",
+  "transactionFormEditTitle": "Edit transaction",
+  "transactionFormCategory": "Category",
+  "transactionFormAllCategories": "All categories",
+  "transactionFormChooseCategory": "Choose category",
+  "transactionFormUseCategory": "Use {name}",
+  "@transactionFormUseCategory": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "transactionFormNoCategories": "No categories of this type yet.",
+  "transactionFormWallet": "Wallet",
+  "transactionFormPayFrom": "Pay from",
+  "transactionFormReceiveTo": "Receive to",
+  "transactionFormFrom": "From",
+  "transactionFormTo": "To",
+  "transactionFormChooseWallet": "Choose wallet",
+  "transactionFormArchivedNote": "Archived wallets don't appear here.",
+  "transactionFormDefault": "Default",
+  "transactionFormDone": "Done",
+  "transactionFormDate": "Date",
+  "transactionFormDateTitle": "Transaction date",
+  "transactionFormToday": "Today",
+  "transactionFormYesterday": "Yesterday",
+  "transactionFormTodayDate": "Today, {date}",
+  "@transactionFormTodayDate": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "transactionFormYesterdayDate": "Yesterday, {date}",
+  "@transactionFormYesterdayDate": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "transactionFormFutureNote": "Future dates can't be picked.",
+  "transactionFormDayUnavailable": "{date}, unavailable",
+  "@transactionFormDayUnavailable": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "transactionFormCancel": "Cancel",
+  "transactionFormSetDate": "Set date",
+  "transactionFormNoteHint": "Add a note (optional)",
+  "transactionFormWas": "Was {amount}",
+  "@transactionFormWas": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "transactionFormSaveExpense": "Save expense",
+  "transactionFormSaveIncome": "Save income",
+  "transactionFormSaveTransfer": "Save transfer",
+  "transactionFormSaveChanges": "Save changes",
+  "transactionFormUpdateNote": "Wallet balance, budget and report update when you save.",
+  "transactionFormDeleteDigit": "Delete digit",
+  "transactionFormDiscardTitle": "Discard changes?",
+  "transactionFormDiscardBody": "What you've entered won't be saved.",
+  "transactionFormDiscard": "Discard",
+  "transactionFormKeepEditing": "Keep editing",
+  "transactionFormNoWallets": "Add a wallet first.",
+  "transactionErrorAmountRequired": "Enter an amount",
+  "transactionErrorAmountMax": "That's more than {max}",
+  "@transactionErrorAmountMax": {
+    "placeholders": {"max": {"type": "String"}}
+  },
+  "transactionErrorWalletRequired": "Pick a wallet",
+  "transactionErrorToWalletRequired": "Pick where the money goes",
+  "transactionErrorSameWallet": "Pick two different wallets",
+  "transactionErrorCategoryRequired": "Pick a category",
+  "transactionErrorFutureDate": "The date can't be in the future",
+  "transactionErrorTooLong": "Keep it under {max} characters",
+  "@transactionErrorTooLong": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "searchClear": "Clear search",
+  "searchRecentTitle": "Recent searches",
+  "searchPromptTitle": "Search your transactions",
+  "searchPromptBody": "Find notes and merchants, like “kopi” or “parkir”.",
+  "searchResultCount": "{count, plural, =1{1 result} other{{count} results}}",
+  "@searchResultCount": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "searchAllMonths": "Search all months",
+  "searchMonthOnly": "Search {month} only",
+  "@searchMonthOnly": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "searchAllMonthsChip": "All months",
+  "searchEmptyTitle": "No results for “{query}”",
+  "@searchEmptyTitle": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "searchEmptyBody": "Nothing in {month} matches “{query}”.",
+  "@searchEmptyBody": {
+    "placeholders": {"month": {"type": "String"}, "query": {"type": "String"}}
+  },
+  "searchEmptyBodyAllMonths": "Nothing saved on this device matches “{query}”.",
+  "@searchEmptyBodyAllMonths": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "searchErrorTitle": "Couldn't search"
 }

@@ -10,4 +10,8 @@ abstract class ReportRepository {
 
   /// Re-fetches the report for [month] and gives the cached copy.
   Future<Either<Failure, MonthlyReport>> refreshMonthlyReport(DateTime month);
+
+  /// The expense total of each cached month of [year], keyed by the first of
+  /// the month; months without a cached report are missing.
+  Stream<Either<Failure, Map<DateTime, int>>> watchExpenseTotals(int year);
 }

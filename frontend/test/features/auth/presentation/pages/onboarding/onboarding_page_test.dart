@@ -15,6 +15,8 @@ import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboardin
 import 'package:monai/features/auth/presentation/pages/register/bloc/register_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
 
+import '../../../../../helpers/transaction_fakes.dart';
+
 class _MockCompleteOnboardingUseCase extends Mock
     implements CompleteOnboardingUseCase {}
 
@@ -28,6 +30,7 @@ void main() {
   setUpAll(() => registerFallbackValue(const NoParams()));
 
   setUp(() {
+    registerQuietTransactionScreens();
     completeOnboarding = _MockCompleteOnboardingUseCase();
     when(() => completeOnboarding(any()))
         .thenAnswer((_) async => const Right(true));

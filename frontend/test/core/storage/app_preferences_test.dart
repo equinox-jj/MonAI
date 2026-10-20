@@ -120,4 +120,41 @@ void main() {
       expect(result, AppLanguage.system);
     });
   });
+
+  group('recent searches', () {
+    test('are empty on a fresh install', () async {
+      // Arrange
+      // (empty preferences from setUp)
+
+      // Act
+      final result = await preferences.recentSearches();
+
+      // Assert
+      expect(result, isEmpty);
+    });
+
+    test('keep the newest first, without repeats, at most five', () async {
+      // Arrange
+      for (final query in ['kopi', 'gojek', 'Kopi', 'a', 'b', 'c', 'd']) {
+        await preferences.addRecentSearch(query);
+      }
+
+      // Act
+      final result = await preferences.recentSearches();
+
+      // Assert
+      expect(result, ['d', 'c', 'b', 'a', 'Kopi']);
+    });
+
+    test('ignore blank text', () async {
+      // Arrange
+      // (empty preferences from setUp)
+
+      // Act
+      await preferences.addRecentSearch('   ');
+
+      // Assert
+      expect(await preferences.recentSearches(), isEmpty);
+    });
+  });
 }

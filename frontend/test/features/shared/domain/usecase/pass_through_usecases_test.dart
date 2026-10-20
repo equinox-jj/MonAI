@@ -36,6 +36,7 @@ import 'package:monai/features/shared/domain/usecase/upload_receipt_usecase.dart
 import 'package:monai/features/shared/domain/usecase/watch_all_wallets_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_budget_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.dart';
+import 'package:monai/features/shared/domain/usecase/watch_cached_expense_totals_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_monthly_report_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_payment_providers_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_recent_transactions_usecase.dart';
@@ -270,6 +271,19 @@ void main() {
       verify(() => budgets.watchBudget(october)).called(1);
       verify(() => reports.watchMonthlyReport(october)).called(1);
       verify(() => users.watchUser()).called(1);
+    });
+
+    test('expense totals forward the year', () async {
+      // Arrange
+      final reports = _MockReports();
+      when(() => reports.watchExpenseTotals(2026))
+          .thenAnswer((_) => Stream.value(const Right({})));
+
+      // Act
+      await WatchCachedExpenseTotalsUseCase(reports)(2026).first;
+
+      // Assert
+      verify(() => reports.watchExpenseTotals(2026)).called(1);
     });
   });
 }

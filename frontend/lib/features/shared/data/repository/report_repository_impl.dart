@@ -26,4 +26,14 @@ class ReportRepositoryImpl extends ReportRepository with BaseRepository {
         await _local.replace(rows);
         return rows.toEntity();
       });
+
+  @override
+  Stream<Either<Failure, Map<DateTime, int>>> watchExpenseTotals(int year) =>
+      safeStream(
+        () => _local
+            .watchBetween(DateTime(year), DateTime(year, 12))
+            .map(
+              (rows) => {for (final row in rows) row.month: row.expenseTotal},
+            ),
+      );
 }

@@ -50,6 +50,7 @@ import 'package:monai/features/shared/domain/usecase/upload_receipt_usecase.dart
 import 'package:monai/features/shared/domain/usecase/watch_all_wallets_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_budget_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.dart';
+import 'package:monai/features/shared/domain/usecase/watch_cached_expense_totals_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_monthly_report_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_payment_providers_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_recent_transactions_usecase.dart';
@@ -189,6 +190,7 @@ class SharedDI {
       ..registerFactory(() => RefreshBudgetUseCase(sl()))
       ..registerFactory(() => WatchMonthlyReportUseCase(sl()))
       ..registerFactory(() => RefreshMonthlyReportUseCase(sl()))
+      ..registerFactory(() => WatchCachedExpenseTotalsUseCase(sl()))
       ..registerFactory(() => WatchUserUseCase(sl()))
       ..registerFactory(() => RefreshUserUseCase(sl()))
       ..registerFactory(() => LogoutUseCase(sl()))

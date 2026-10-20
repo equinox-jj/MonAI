@@ -42,8 +42,8 @@ class HomeUI extends StatelessWidget {
 
   void _openSettings(BuildContext context) => context.go(AppRoutes.settings);
 
-  // TODO(home): open search once it exists.
-  void _openSearch() {}
+  void _openSearch(BuildContext context) =>
+      context.push(AppRoutes.transactionSearchIn());
 
   // TODO(home): open quick add once it exists.
   void _openQuickAdd() {}
@@ -63,11 +63,11 @@ class HomeUI extends StatelessWidget {
   // TODO(home): open the month's report once it exists.
   void _openReport() {}
 
-  // TODO(home): open the transaction's detail once it exists.
-  void _openTransaction(String transactionId) {}
+  void _openTransaction(BuildContext context, String transactionId) =>
+      context.push(AppRoutes.transactionDetail(transactionId));
 
-  // TODO(home): open the transaction form once it exists.
-  void _addTransaction() {}
+  void _addTransaction(BuildContext context) =>
+      context.push(AppRoutes.transactionNew);
 
   void _refresh(BuildContext context) =>
       context.read<HomeBloc>().add(const HomeEvent.refreshed());
@@ -96,7 +96,7 @@ class HomeUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = HomeActions(
-      onSearch: _openSearch,
+      onSearch: () => _openSearch(context),
       onProfile: () => _openSettings(context),
       onQuickAdd: _openQuickAdd,
       onScanReceipt: _openScanReceipt,
@@ -106,8 +106,8 @@ class HomeUI extends StatelessWidget {
       onOpenBudget: _openBudget,
       onOpenReport: _openReport,
       onSeeAllTransactions: () => _openTransactions(context),
-      onOpenTransaction: _openTransaction,
-      onAddTransaction: _addTransaction,
+      onOpenTransaction: (id) => _openTransaction(context, id),
+      onAddTransaction: () => _addTransaction(context),
       onToggleBalance: () => context.read<HomeBloc>().add(
         const HomeEvent.balanceVisibilityToggled(),
       ),

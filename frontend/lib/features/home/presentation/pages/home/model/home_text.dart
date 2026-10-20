@@ -1,6 +1,5 @@
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/l10n/l10n.dart';
-import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/home/domain/entity/home_dashboard.dart';
@@ -14,16 +13,6 @@ extension HomeGreetingText on HomeGreeting {
     .morning => l10n.homeGreetingMorning,
     .afternoon => l10n.homeGreetingAfternoon,
     .evening => l10n.homeGreetingEvening,
-  };
-}
-
-extension WalletTypeText on WalletType {
-  /// "Cash", "Bank", "E-wallet", "Other".
-  String label(AppLocalizations l10n) => switch (this) {
-    .cash => l10n.walletTypeCash,
-    .bank => l10n.walletTypeBank,
-    .eWallet => l10n.walletTypeEWallet,
-    .other => l10n.walletTypeOther,
   };
 }
 

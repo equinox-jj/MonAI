@@ -78,4 +78,27 @@ void main() {
     expect(report?.previous.expenseTotal, 100000);
     expect(report?.categories.single.name, 'Food');
   });
+
+  test(
+    'watchExpenseTotals gives the expense of each cached month of the year',
+    () async {
+      // Arrange
+      when(() => local.watchBetween(DateTime(2026), DateTime(2026, 12)))
+          .thenAnswer(
+            (_) => Stream.value([
+              monthlyReportRow(month: DateTime(2026, 9)),
+              monthlyReportRow(),
+            ]),
+          );
+
+      // Act
+      final result = await repository.watchExpenseTotals(2026).first;
+
+      // Assert
+      expect(result.getRight().toNullable(), {
+        DateTime(2026, 9): 200000,
+        DateTime(2026, 10): 200000,
+      });
+    },
+  );
 }

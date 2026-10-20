@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
-import 'package:monai/features/home/presentation/pages/home/model/home_text.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_actions.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 

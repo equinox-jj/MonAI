@@ -19,6 +19,7 @@ class MonAIFilterChip extends StatelessWidget {
     required this.onTap,
     super.key,
     this.hasDropdown = false,
+    this.leadingIcon,
   });
 
   /// The text.
@@ -32,6 +33,10 @@ class MonAIFilterChip extends StatelessWidget {
 
   /// Shows a chevron.
   final bool hasDropdown;
+
+  /// Shown before the text instead of the check, e.g. the calendar of a
+  /// month chip.
+  final MonAIIconData? leadingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -59,12 +64,9 @@ class MonAIFilterChip extends StatelessWidget {
                 mainAxisSize: .min,
                 spacing: MonAISpacing.x1,
                 children: [
-                  if (selected)
-                    MonAIIcon(
-                      MonAIIcons.check,
-                      size: MonAISizes.iconSm,
-                      color: content,
-                    ),
+                  if (leadingIcon ?? (selected ? MonAIIcons.check : null)
+                      case final icon?)
+                    MonAIIcon(icon, size: MonAISizes.iconSm, color: content),
                   Text(
                     label,
                     style: context.textTheme.labelMedium?.copyWith(

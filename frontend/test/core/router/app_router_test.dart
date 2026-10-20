@@ -12,6 +12,8 @@ import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
 
+import '../../helpers/transaction_fakes.dart';
+
 class _MockCompleteOnboardingUseCase extends Mock
     implements CompleteOnboardingUseCase {}
 
@@ -123,6 +125,7 @@ void main() {
 
   group('launch', () {
     setUp(() {
+      registerQuietTransactionScreens();
       sl
         ..registerFactory(
           () => OnboardingBloc(_MockCompleteOnboardingUseCase()),
@@ -214,6 +217,57 @@ void main() {
 
       // Assert
       expect(location, AppRoutes.signIn);
+    });
+  });
+
+  group('transaction routes', () {
+    test('search carries its month as yyyy-MM', () {
+      // Arrange
+      final month = DateTime(2026, 9);
+
+      // Act
+      final location = AppRoutes.transactionSearchIn(month);
+
+      // Assert
+      expect(location, '/transactions/search?month=2026-09');
+      expect(parseMonthParam('2026-09'), month);
+    });
+
+    test('a missing or malformed month parses as none', () {
+      // Arrange
+      const values = [null, '', '2026-13', 'sept', '2026-9'];
+
+      // Act
+      final parsed = values.map(parseMonthParam);
+
+      // Assert
+      expect(parsed, everyElement(isNull));
+    });
+
+    test('the add form takes an optional type and wallet', () {
+      // Arrange
+      // (no arguments, then both)
+
+      // Act
+      final plain = AppRoutes.newTransaction();
+      final preset = AppRoutes.newTransaction(type: 'transfer', walletId: 'w1');
+
+      // Assert
+      expect(plain, AppRoutes.transactionNew);
+      expect(preset, '/transactions/new?type=transfer&wallet=w1');
+    });
+
+    test('detail and edit sit under the transactions tab', () {
+      // Arrange
+      const id = 't1';
+
+      // Act
+      final detail = AppRoutes.transactionDetail(id);
+      final edit = AppRoutes.transactionEdit(id);
+
+      // Assert
+      expect(detail, '/transactions/t1');
+      expect(edit, '/transactions/t1/edit');
     });
   });
 }

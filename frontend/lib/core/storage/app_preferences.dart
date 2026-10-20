@@ -23,6 +23,13 @@ abstract interface class AppPreferences {
 
   /// Remembers the picked language.
   Future<void> setLanguage(AppLanguage language);
+
+  /// The last transaction searches, newest first.
+  Future<List<String>> recentSearches();
+
+  /// Puts [query] first in [recentSearches], dropping an older copy of it and
+  /// the oldest past the limit. Blank text is ignored.
+  Future<void> addRecentSearch(String query);
 }
 
 /// [AppPreferences] backed by [SharedPreferences].
@@ -34,6 +41,10 @@ class SharedAppPreferences implements AppPreferences {
   static const _kOnboardingCompleted = 'onboarding_completed';
   static const _kThemeMode = 'theme_mode';
   static const _kLanguage = 'language';
+  static const _kRecentSearches = 'recent_searches';
+
+  /// How many searches [recentSearches] keeps.
+  static const recentSearchLimit = 5;
 
   @override
   Future<bool> isOnboardingCompleted() async =>
@@ -64,5 +75,22 @@ class SharedAppPreferences implements AppPreferences {
   @override
   Future<void> setLanguage(AppLanguage language) async {
     await _prefs.setString(_kLanguage, language.name);
+  }
+
+  @override
+  Future<List<String>> recentSearches() async =>
+      _prefs.getStringList(_kRecentSearches) ?? const [];
+
+  // A repeat is matched ignoring case, and keeps the casing typed last.
+  @override
+  Future<void> addRecentSearch(String query) async {
+    final trimmed = query.trim();
+    if (trimmed.isEmpty) return;
+    final key = trimmed.toLowerCase();
+    final searches = [
+      trimmed,
+      ...(await recentSearches()).where((s) => s.toLowerCase() != key),
+    ].take(recentSearchLimit).toList();
+    await _prefs.setStringList(_kRecentSearches, searches);
   }
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/router/app_router.dart';
 
 /// The signed-in app: the main tabs around the current one. Phones get a
 /// bottom bar, tablet portrait a rail and tablet landscape a drawer.
@@ -19,8 +20,8 @@ class DashboardPage extends StatelessWidget {
     initialLocation: index == navigationShell.currentIndex,
   );
 
-  // TODO(dashboard): open the transaction form once it exists.
-  void _addTransaction() {}
+  void _addTransaction(BuildContext context) =>
+      context.push(AppRoutes.transactionNew);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,7 @@ class DashboardPage extends StatelessWidget {
           items: items,
           selectedIndex: selectedIndex,
           onSelect: _selectTab,
-          onAdd: _addTransaction,
+          onAdd: () => _addTransaction(context),
           addLabel: l10n.navAddTransaction,
         ),
       ),
@@ -49,7 +50,7 @@ class DashboardPage extends StatelessWidget {
           items: items,
           selectedIndex: selectedIndex,
           onSelect: _selectTab,
-          onAdd: _addTransaction,
+          onAdd: () => _addTransaction(context),
           addLabel: l10n.navAddTransaction,
         ),
         child: navigationShell,
@@ -60,7 +61,7 @@ class DashboardPage extends StatelessWidget {
           items: items,
           selectedIndex: selectedIndex,
           onSelect: _selectTab,
-          onAdd: _addTransaction,
+          onAdd: () => _addTransaction(context),
           addLabel: l10n.navAddTransaction,
         ),
         child: navigationShell,
