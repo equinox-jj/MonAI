@@ -16,7 +16,9 @@ T _$identity<T>(T value) => value;
 mixin _$PaymentProvider {
 
  String get id; String get slug; String get name; WalletType get type;/// Other names the provider is known by, for quick add.
- List<String> get aliases; int get sortOrder; String? get logoUrl;
+ List<String> get aliases; int get sortOrder; String? get logoUrl;/// From the catalog bundled with the app, not yet replaced by the
+/// server's: its [id] isn't one the server knows.
+ bool get isBundled;
 /// Create a copy of PaymentProvider
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -28,20 +30,20 @@ $PaymentProviderCopyWith<PaymentProvider> get copyWith => _$PaymentProviderCopyW
 @override
 bool operator ==(Object other) {
   final _this = this as PaymentProvider;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentProvider&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.slug, _this.slug) || other.slug == _this.slug)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.type, _this.type) || other.type == _this.type)&&const DeepCollectionEquality().equals(other.aliases, _this.aliases)&&(identical(other.sortOrder, _this.sortOrder) || other.sortOrder == _this.sortOrder)&&(identical(other.logoUrl, _this.logoUrl) || other.logoUrl == _this.logoUrl));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is PaymentProvider&&(identical(other.id, _this.id) || other.id == _this.id)&&(identical(other.slug, _this.slug) || other.slug == _this.slug)&&(identical(other.name, _this.name) || other.name == _this.name)&&(identical(other.type, _this.type) || other.type == _this.type)&&const DeepCollectionEquality().equals(other.aliases, _this.aliases)&&(identical(other.sortOrder, _this.sortOrder) || other.sortOrder == _this.sortOrder)&&(identical(other.logoUrl, _this.logoUrl) || other.logoUrl == _this.logoUrl)&&(identical(other.isBundled, _this.isBundled) || other.isBundled == _this.isBundled));
 }
 
 
 @override
 int get hashCode {
   final _this = this as PaymentProvider;
-  return Object.hash(runtimeType,_this.id,_this.slug,_this.name,_this.type,const DeepCollectionEquality().hash(_this.aliases),_this.sortOrder,_this.logoUrl);
+  return Object.hash(runtimeType,_this.id,_this.slug,_this.name,_this.type,const DeepCollectionEquality().hash(_this.aliases),_this.sortOrder,_this.logoUrl,_this.isBundled);
 }
 
 @override
 String toString() {
   final _this = this as PaymentProvider;
-  return 'PaymentProvider(id: ${_this.id}, slug: ${_this.slug}, name: ${_this.name}, type: ${_this.type}, aliases: ${_this.aliases}, sortOrder: ${_this.sortOrder}, logoUrl: ${_this.logoUrl})';
+  return 'PaymentProvider(id: ${_this.id}, slug: ${_this.slug}, name: ${_this.name}, type: ${_this.type}, aliases: ${_this.aliases}, sortOrder: ${_this.sortOrder}, logoUrl: ${_this.logoUrl}, isBundled: ${_this.isBundled})';
 }
 
 
@@ -52,7 +54,7 @@ abstract mixin class $PaymentProviderCopyWith<$Res>  {
   factory $PaymentProviderCopyWith(PaymentProvider value, $Res Function(PaymentProvider) _then) = _$PaymentProviderCopyWithImpl;
 @useResult
 $Res call({
- String id, String slug, String name, WalletType type, List<String> aliases, int sortOrder, String? logoUrl
+ String id, String slug, String name, WalletType type, List<String> aliases, int sortOrder, String? logoUrl, bool isBundled
 });
 
 
@@ -69,7 +71,7 @@ class _$PaymentProviderCopyWithImpl<$Res>
 
 /// Create a copy of PaymentProvider
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? slug = null,Object? name = null,Object? type = null,Object? aliases = null,Object? sortOrder = null,Object? logoUrl = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? slug = null,Object? name = null,Object? type = null,Object? aliases = null,Object? sortOrder = null,Object? logoUrl = freezed,Object? isBundled = null,}) {
   return _then(PaymentProvider(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
@@ -78,7 +80,8 @@ as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non
 as WalletType,aliases: null == aliases ? _self.aliases : aliases // ignore: cast_nullable_to_non_nullable
 as List<String>,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
 as int,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,isBundled: null == isBundled ? _self.isBundled : isBundled // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 
@@ -163,10 +166,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String slug,  String name,  WalletType type,  List<String> aliases,  int sortOrder,  String? logoUrl)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String slug,  String name,  WalletType type,  List<String> aliases,  int sortOrder,  String? logoUrl,  bool isBundled)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _PaymentProvider() when $default != null:
-return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.sortOrder,_that.logoUrl);case _:
+return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.sortOrder,_that.logoUrl,_that.isBundled);case _:
   return orElse();
 
 }
@@ -184,10 +187,10 @@ return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.so
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String slug,  String name,  WalletType type,  List<String> aliases,  int sortOrder,  String? logoUrl)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String slug,  String name,  WalletType type,  List<String> aliases,  int sortOrder,  String? logoUrl,  bool isBundled)  $default,) {final _that = this;
 switch (_that) {
 case _PaymentProvider():
-return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.sortOrder,_that.logoUrl);case _:
+return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.sortOrder,_that.logoUrl,_that.isBundled);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -204,10 +207,10 @@ return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.so
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String slug,  String name,  WalletType type,  List<String> aliases,  int sortOrder,  String? logoUrl)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String slug,  String name,  WalletType type,  List<String> aliases,  int sortOrder,  String? logoUrl,  bool isBundled)?  $default,) {final _that = this;
 switch (_that) {
 case _PaymentProvider() when $default != null:
-return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.sortOrder,_that.logoUrl);case _:
+return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.sortOrder,_that.logoUrl,_that.isBundled);case _:
   return null;
 
 }
@@ -219,7 +222,7 @@ return $default(_that.id,_that.slug,_that.name,_that.type,_that.aliases,_that.so
 
 
 class _PaymentProvider implements PaymentProvider {
-  const _PaymentProvider({required this.id, required this.slug, required this.name, required this.type, required  List<String> aliases, required this.sortOrder, this.logoUrl}): _aliases = aliases;
+  const _PaymentProvider({required this.id, required this.slug, required this.name, required this.type, required  List<String> aliases, required this.sortOrder, this.logoUrl, this.isBundled = false}): _aliases = aliases;
   
 
 @override final  String id;
@@ -237,6 +240,9 @@ class _PaymentProvider implements PaymentProvider {
 
 @override final  int sortOrder;
 @override final  String? logoUrl;
+/// From the catalog bundled with the app, not yet replaced by the
+/// server's: its [id] isn't one the server knows.
+@override@JsonKey() final  bool isBundled;
 
 /// Create a copy of PaymentProvider
 /// with the given fields replaced by the non-null parameter values.
@@ -248,18 +254,18 @@ _$PaymentProviderCopyWith<_PaymentProvider> get copyWith => __$PaymentProviderCo
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentProvider&&(identical(other.id, id) || other.id == id)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.aliases, _aliases)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _PaymentProvider&&(identical(other.id, id) || other.id == id)&&(identical(other.slug, slug) || other.slug == slug)&&(identical(other.name, name) || other.name == name)&&(identical(other.type, type) || other.type == type)&&const DeepCollectionEquality().equals(other.aliases, _aliases)&&(identical(other.sortOrder, sortOrder) || other.sortOrder == sortOrder)&&(identical(other.logoUrl, logoUrl) || other.logoUrl == logoUrl)&&(identical(other.isBundled, isBundled) || other.isBundled == isBundled));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,id,slug,name,type,const DeepCollectionEquality().hash(_aliases),sortOrder,logoUrl);
+    return Object.hash(runtimeType,id,slug,name,type,const DeepCollectionEquality().hash(_aliases),sortOrder,logoUrl,isBundled);
 }
 
 @override
 String toString() {
-    return 'PaymentProvider(id: $id, slug: $slug, name: $name, type: $type, aliases: $aliases, sortOrder: $sortOrder, logoUrl: $logoUrl)';
+    return 'PaymentProvider(id: $id, slug: $slug, name: $name, type: $type, aliases: $aliases, sortOrder: $sortOrder, logoUrl: $logoUrl, isBundled: $isBundled)';
 }
 
 
@@ -270,7 +276,7 @@ abstract mixin class _$PaymentProviderCopyWith<$Res> implements $PaymentProvider
   factory _$PaymentProviderCopyWith(_PaymentProvider value, $Res Function(_PaymentProvider) _then) = __$PaymentProviderCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String slug, String name, WalletType type, List<String> aliases, int sortOrder, String? logoUrl
+ String id, String slug, String name, WalletType type, List<String> aliases, int sortOrder, String? logoUrl, bool isBundled
 });
 
 
@@ -287,7 +293,7 @@ class __$PaymentProviderCopyWithImpl<$Res>
 
 /// Create a copy of PaymentProvider
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? slug = null,Object? name = null,Object? type = null,Object? aliases = null,Object? sortOrder = null,Object? logoUrl = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? slug = null,Object? name = null,Object? type = null,Object? aliases = null,Object? sortOrder = null,Object? logoUrl = freezed,Object? isBundled = null,}) {
   return _then(_PaymentProvider(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,slug: null == slug ? _self.slug : slug // ignore: cast_nullable_to_non_nullable
@@ -296,7 +302,8 @@ as String,type: null == type ? _self.type : type // ignore: cast_nullable_to_non
 as WalletType,aliases: null == aliases ? _self._aliases : aliases // ignore: cast_nullable_to_non_nullable
 as List<String>,sortOrder: null == sortOrder ? _self.sortOrder : sortOrder // ignore: cast_nullable_to_non_nullable
 as int,logoUrl: freezed == logoUrl ? _self.logoUrl : logoUrl // ignore: cast_nullable_to_non_nullable
-as String?,
+as String?,isBundled: null == isBundled ? _self.isBundled : isBundled // ignore: cast_nullable_to_non_nullable
+as bool,
   ));
 }
 

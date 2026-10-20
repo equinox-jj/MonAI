@@ -3,6 +3,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/database/monai_database.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_remote_datasource.dart';
+import 'package:monai/features/shared/data/datasources/payment_provider_seed_datasource.dart';
 import 'package:monai/features/shared/data/mapper/payment_provider_mapper.dart';
 import 'package:monai/features/shared/data/model/payment_provider_catalog_response.dart';
 import 'package:monai/features/shared/data/repository/payment_provider_repository_impl.dart';
@@ -14,15 +15,24 @@ class _MockRemote extends Mock implements PaymentProviderRemoteDataSource {}
 
 class _MockLocal extends Mock implements PaymentProviderLocalDataSource {}
 
+class _MockSeed extends Mock implements PaymentProviderSeedDataSource {}
+
 void main() {
   late _MockRemote remote;
   late _MockLocal local;
+  late _MockSeed seed;
   late PaymentProviderRepositoryImpl repository;
 
   setUp(() {
     remote = _MockRemote();
     local = _MockLocal();
-    repository = PaymentProviderRepositoryImpl(remote: remote, local: local);
+    seed = _MockSeed();
+    repository = PaymentProviderRepositoryImpl(
+      remote: remote,
+      local: local,
+      seed: seed,
+    );
+    when(() => local.seedIfEmpty(any())).thenAnswer((_) async {});
     when(() => local.etag()).thenAnswer((_) async => '"v2"');
     when(
       () => local.replaceCatalog(
@@ -102,4 +112,38 @@ void main() {
       'bank central asia',
     ]);
   });
+
+  test('watchProviders leaves a cached catalog unseeded', () async {
+    // Arrange
+    when(() => local.watchAll())
+        .thenAnswer((_) => Stream.value([paymentProviderRow()]));
+
+    // Act
+    await repository.watchProviders().first;
+
+    // Assert
+    verifyNever(() => seed.load());
+    verifyNever(() => local.seedIfEmpty(any()));
+  });
+
+  test(
+    'watchProviders seeds an empty cache with the bundled catalog',
+    () async {
+      // Arrange
+      final seeded = paymentProviderRow(id: 'seed:bca');
+      var cached = <PaymentProviderRow>[];
+      when(() => local.watchAll()).thenAnswer((_) => Stream.value(cached));
+      when(() => seed.load()).thenAnswer((_) async => [seeded]);
+      when(() => local.seedIfEmpty(any())).thenAnswer((_) async {
+        cached = [seeded];
+      });
+
+      // Act
+      final result = await repository.watchProviders().first;
+
+      // Assert
+      verify(() => local.seedIfEmpty([seeded])).called(1);
+      expect(result.getRight().toNullable(), [seeded.toEntity()]);
+    },
+  );
 }

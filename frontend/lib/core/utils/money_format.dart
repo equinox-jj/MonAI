@@ -37,3 +37,13 @@ String formatRupiahCompact(int amount) {
   final number = '${_rupiahDigits.format(whole)}${tenth > 0 ? ',$tenth' : ''}';
   return '${amount < 0 ? '−' : ''}Rp $number $suffix';
 }
+
+final _nonDigits = RegExp(r'\D');
+
+/// The whole rupiah typed in a money field, ignoring separators: 1250000
+/// for `1.250.000`, 0 when nothing is typed.
+int parseRupiahInput(String text) =>
+    int.tryParse(text.replaceAll(_nonDigits, '')) ?? 0;
+
+/// [amount] as a money field shows it: `1.250.000`.
+String formatRupiahInput(int amount) => _rupiahDigits.format(amount);

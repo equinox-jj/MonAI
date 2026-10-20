@@ -1,3 +1,4 @@
+import 'package:flutter/services.dart';
 import 'package:monai/core/di/injector.dart';
 import 'package:monai/features/shared/data/datasources/budget_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/budget_remote_datasource.dart';
@@ -5,6 +6,7 @@ import 'package:monai/features/shared/data/datasources/category_local_datasource
 import 'package:monai/features/shared/data/datasources/category_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_remote_datasource.dart';
+import 'package:monai/features/shared/data/datasources/payment_provider_seed_datasource.dart';
 import 'package:monai/features/shared/data/datasources/report_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/report_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/session_local_datasource.dart';
@@ -80,6 +82,9 @@ class SharedDI {
       ..registerLazySingleton<PaymentProviderLocalDataSource>(
         () => PaymentProviderLocalDataSourceImpl(dao: sl()),
       )
+      ..registerLazySingleton<PaymentProviderSeedDataSource>(
+        () => PaymentProviderSeedDataSourceImpl(bundle: rootBundle),
+      )
       ..registerLazySingleton<CategoryRemoteDataSource>(
         () => CategoryRemoteDataSourceImpl(dio: sl()),
       )
@@ -125,7 +130,11 @@ class SharedDI {
         () => WalletRepositoryImpl(remote: sl(), local: sl()),
       )
       ..registerLazySingleton<PaymentProviderRepository>(
-        () => PaymentProviderRepositoryImpl(remote: sl(), local: sl()),
+        () => PaymentProviderRepositoryImpl(
+          remote: sl(),
+          local: sl(),
+          seed: sl(),
+        ),
       )
       ..registerLazySingleton<CategoryRepository>(
         () => CategoryRepositoryImpl(remote: sl(), local: sl()),

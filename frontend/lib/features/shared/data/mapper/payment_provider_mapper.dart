@@ -1,4 +1,5 @@
 import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/features/shared/data/datasources/payment_provider_seed_datasource.dart';
 import 'package:monai/features/shared/data/mapper/api_values.dart';
 import 'package:monai/features/shared/data/model/payment_provider_catalog_response.dart';
 import 'package:monai/features/shared/domain/entity/payment_provider.dart';
@@ -24,5 +25,6 @@ extension PaymentProviderRowMapper on PaymentProviderRow {
     logoUrl: logoUrl,
     aliases: aliases,
     sortOrder: sortOrder,
+    isBundled: id.startsWith(seedIdPrefix),
   );
 }

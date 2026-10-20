@@ -16,6 +16,7 @@ import 'package:monai/features/auth/presentation/pages/register/bloc/register_bl
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
 
 import '../../../../../helpers/transaction_fakes.dart';
+import '../../../../../helpers/wallet_fakes.dart';
 
 class _MockCompleteOnboardingUseCase extends Mock
     implements CompleteOnboardingUseCase {}
@@ -31,6 +32,7 @@ void main() {
 
   setUp(() {
     registerQuietTransactionScreens();
+    registerQuietWalletScreens();
     completeOnboarding = _MockCompleteOnboardingUseCase();
     when(() => completeOnboarding(any()))
         .thenAnswer((_) async => const Right(true));

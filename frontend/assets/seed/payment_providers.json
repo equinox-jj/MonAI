@@ -1,0 +1,140 @@
+{
+  "data": {
+    "version": 0,
+    "providers": [
+      {
+        "id": "seed:cash",
+        "slug": "cash",
+        "name": "Cash",
+        "type": "CASH",
+        "logo_url": null,
+        "aliases": [
+          "tunai"
+        ],
+        "sort_order": 0
+      },
+      {
+        "id": "seed:bca",
+        "slug": "bca",
+        "name": "BCA",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [
+          "bank central asia"
+        ],
+        "sort_order": 10
+      },
+      {
+        "id": "seed:mandiri",
+        "slug": "mandiri",
+        "name": "Bank Mandiri",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [
+          "livin"
+        ],
+        "sort_order": 20
+      },
+      {
+        "id": "seed:bri",
+        "slug": "bri",
+        "name": "BRI",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [
+          "brimo"
+        ],
+        "sort_order": 30
+      },
+      {
+        "id": "seed:bni",
+        "slug": "bni",
+        "name": "BNI",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [],
+        "sort_order": 40
+      },
+      {
+        "id": "seed:bsi",
+        "slug": "bsi",
+        "name": "BSI",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [
+          "bank syariah indonesia"
+        ],
+        "sort_order": 50
+      },
+      {
+        "id": "seed:jago",
+        "slug": "jago",
+        "name": "Bank Jago",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [],
+        "sort_order": 60
+      },
+      {
+        "id": "seed:seabank",
+        "slug": "seabank",
+        "name": "SeaBank",
+        "type": "BANK",
+        "logo_url": null,
+        "aliases": [],
+        "sort_order": 70
+      },
+      {
+        "id": "seed:gopay",
+        "slug": "gopay",
+        "name": "GoPay",
+        "type": "E_WALLET",
+        "logo_url": null,
+        "aliases": [
+          "gpay",
+          "go-pay"
+        ],
+        "sort_order": 100
+      },
+      {
+        "id": "seed:ovo",
+        "slug": "ovo",
+        "name": "OVO",
+        "type": "E_WALLET",
+        "logo_url": null,
+        "aliases": [],
+        "sort_order": 110
+      },
+      {
+        "id": "seed:dana",
+        "slug": "dana",
+        "name": "DANA",
+        "type": "E_WALLET",
+        "logo_url": null,
+        "aliases": [],
+        "sort_order": 120
+      },
+      {
+        "id": "seed:shopeepay",
+        "slug": "shopeepay",
+        "name": "ShopeePay",
+        "type": "E_WALLET",
+        "logo_url": null,
+        "aliases": [
+          "spay",
+          "shopee pay"
+        ],
+        "sort_order": 130
+      },
+      {
+        "id": "seed:linkaja",
+        "slug": "linkaja",
+        "name": "LinkAja",
+        "type": "E_WALLET",
+        "logo_url": null,
+        "aliases": [],
+        "sort_order": 140
+      }
+    ]
+  }
+}

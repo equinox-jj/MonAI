@@ -4,6 +4,7 @@ import 'package:monai/core/database/monai_database.dart';
 import 'package:monai/core/error/failure.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_remote_datasource.dart';
+import 'package:monai/features/shared/data/datasources/payment_provider_seed_datasource.dart';
 import 'package:monai/features/shared/data/mapper/api_values.dart';
 import 'package:monai/features/shared/data/mapper/payment_provider_mapper.dart';
 import 'package:monai/features/shared/domain/entity/payment_provider.dart';
@@ -11,14 +12,26 @@ import 'package:monai/features/shared/domain/repository/payment_provider_reposit
 
 class PaymentProviderRepositoryImpl extends PaymentProviderRepository
     with BaseRepository {
-  PaymentProviderRepositoryImpl({required this._remote, required this._local});
+  PaymentProviderRepositoryImpl({
+    required this._remote,
+    required this._local,
+    required this._seed,
+  });
 
   final PaymentProviderRemoteDataSource _remote;
   final PaymentProviderLocalDataSource _local;
+  final PaymentProviderSeedDataSource _seed;
 
+  /// Seeds an empty cache with the bundled catalog first, so a first launch
+  /// without network still has providers to pick.
   @override
   Stream<Either<Failure, List<PaymentProvider>>> watchProviders() =>
-      safeStream(() => _local.watchAll().map(_entities));
+      safeStream(() async* {
+        if ((await _local.watchAll().first).isEmpty) {
+          await _local.seedIfEmpty(await _seed.load());
+        }
+        yield* _local.watchAll().map(_entities);
+      });
 
   @override
   Future<Either<Failure, List<PaymentProvider>>> refreshProviders() =>

@@ -437,5 +437,157 @@
   "@searchEmptyBodyAllMonths": {
     "placeholders": {"query": {"type": "String"}}
   },
-  "searchErrorTitle": "Couldn't search"
+  "searchErrorTitle": "Couldn't search",
+  "walletsTitle": "Wallets",
+  "walletsAdd": "Add wallet",
+  "walletsTotalAcross": "{count, plural, =1{Total across 1 wallet} other{Total across {count} wallets}}",
+  "@walletsTotalAcross": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "walletsShare": "{type} {percent}%",
+  "@walletsShare": {
+    "placeholders": {"type": {"type": "String"}, "percent": {"type": "int"}}
+  },
+  "walletsShowArchived": "{count, plural, =1{Show 1 archived wallet} other{Show {count} archived wallets}}",
+  "@walletsShowArchived": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "walletsDefault": "Default",
+  "walletsLoading": "Loading wallets",
+  "walletsLoadErrorTitle": "Couldn't load your wallets",
+  "walletsEmptyTitle": "No wallets yet",
+  "walletsEmptyBody": "Add where you keep your money: cash, a bank or an e-wallet.",
+  "walletsRetry": "Try again",
+  "walletsSelectPrompt": "Pick a wallet to see it here",
+  "walletsRefreshFailedNetwork": "Couldn't refresh · showing saved wallets",
+  "walletsViewArchived": "View",
+  "walletsErrorNetwork": "You're offline. Connect to the internet and try again.",
+  "walletsErrorNotFound": "This wallet no longer exists.",
+  "walletsErrorDefaultRequired": "Make another wallet the default first.",
+  "walletsErrorHasTransactions": "This wallet has transactions. Archive it instead.",
+  "walletsErrorArchived": "An archived wallet can't be the default. Unarchive it first.",
+  "walletsErrorUnexpected": "Something went wrong. Try again.",
+  "walletArchivedSnack": "{name} archived",
+  "@walletArchivedSnack": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletDeletedSnack": "{name} deleted",
+  "@walletDeletedSnack": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletDetailTitle": "Wallet",
+  "walletDetailMore": "More options",
+  "walletDetailMakeDefault": "Make default",
+  "walletDetailLoading": "Loading wallet",
+  "walletDetailLoadErrorTitle": "Couldn't load this wallet",
+  "walletDetailCurrentBalance": "Current balance",
+  "walletDetailEdit": "Edit",
+  "walletDetailTransferAction": "Transfer",
+  "walletDetailArchive": "Archive",
+  "walletDetailDefaultNote": "Your default wallet can't be archived or deleted. Make another wallet the default first.",
+  "walletDetailMoneyOut": "Money out · {month}",
+  "@walletDetailMoneyOut": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "walletDetailChartLabel": "Daily money out in {month}",
+  "@walletDetailChartLabel": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "walletDetailThisMonth": "This month",
+  "walletDetailNoTransactions": "No transactions this month",
+  "walletDetailTransfer": "Transfer",
+  "walletDetailUntitled": "Transaction",
+  "walletDetailTransferTo": "Transfer to {name}",
+  "@walletDetailTransferTo": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletDetailTransferFrom": "Transfer from {name}",
+  "@walletDetailTransferFrom": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletFormAddTitle": "Add wallet",
+  "walletFormEditTitle": "Edit wallet",
+  "walletFormLoadErrorTitle": "Couldn't open this wallet",
+  "walletFormPickProvider": "Pick where your money is",
+  "walletFormCustom": "Custom",
+  "walletFormName": "Wallet name",
+  "walletFormNameHintCustom": "Give it a name you recognise, e.g. “Tabungan rumah”.",
+  "walletFormNameHintProvider": "You can rename it — e.g. “{name} Bisnis”.",
+  "@walletFormNameHintProvider": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletFormType": "Type",
+  "walletFormTypeFromProvider": "Set by the provider.",
+  "walletFormTypeLine": "Type: {type}",
+  "@walletFormTypeLine": {
+    "placeholders": {"type": {"type": "String"}}
+  },
+  "walletFormTypeLineProvider": "Type: {type} · set by the provider",
+  "@walletFormTypeLineProvider": {
+    "placeholders": {"type": {"type": "String"}}
+  },
+  "walletFormCurrency": "Rp",
+  "walletFormCurrentBalance": "Current balance",
+  "walletFormCurrentBalanceHint": "What's in it right now. Your transactions adjust it from here.",
+  "walletFormStartingBalance": "Starting balance",
+  "walletFormBalanceShift": "Changing the starting balance shifts the current balance by the same amount: {from} → {to} ({diff}). Your transactions don't change.",
+  "@walletFormBalanceShift": {
+    "placeholders": {"from": {"type": "String"}, "to": {"type": "String"}, "diff": {"type": "String"}}
+  },
+  "walletFormMakeDefault": "Make this my default wallet",
+  "walletFormMakeDefaultHint": "Pre-selected when you add a transaction",
+  "walletFormDefault": "Default wallet",
+  "walletFormDefaultIsThis": "This is your default wallet",
+  "walletFormDefaultIsOther": "{name} is your default now",
+  "@walletFormDefaultIsOther": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletFormCardColor": "Card color",
+  "walletColorIndigo": "Indigo",
+  "walletColorTeal": "Teal",
+  "walletColorGreen": "Green",
+  "walletColorViolet": "Violet",
+  "walletColorRose": "Rose",
+  "walletColorSlate": "Slate",
+  "walletFormSave": "Save",
+  "walletFormArchive": "Archive",
+  "walletFormDelete": "Delete",
+  "walletFormCancel": "Cancel",
+  "walletFormDeleteTitle": "Delete {name}?",
+  "@walletFormDeleteTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletFormDeleteBody": "This can't be undone.",
+  "walletFormErrorNameRequired": "Give the wallet a name",
+  "walletFormErrorNameTooLong": "Use at most {max} characters",
+  "@walletFormErrorNameTooLong": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "walletFormErrorNameTaken": "You already have a wallet with this name",
+  "walletFormErrorTypeRequired": "Pick a type",
+  "walletFormErrorBalanceMin": "Can't be below zero",
+  "walletFormErrorBalanceMax": "Must be at most {max}",
+  "@walletFormErrorBalanceMax": {
+    "placeholders": {"max": {"type": "String"}}
+  },
+  "walletArchiveInsteadTitle": "Archive {name} instead?",
+  "@walletArchiveInsteadTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletArchiveInsteadBody": "{name} has transactions, so it can't be deleted. Archiving hides it from pickers — its history, balance and reports stay as they are.",
+  "@walletArchiveInsteadBody": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "walletArchiveInsteadKeeps": "Transactions stay in your list",
+  "walletArchiveInsteadUndo": "You can unarchive any time",
+  "archivedWalletsTitle": "Archived wallets",
+  "archivedWalletsIntro": "Hidden from wallet pickers. Their transactions still show in your history and reports.",
+  "archivedWalletsUnarchive": "Unarchive",
+  "archivedWalletsEmptyTitle": "No archived wallets",
+  "archivedWalletsEmptyBody": "Wallets you archive will show up here.",
+  "archivedWalletsRestored": "{name} is back in your wallets",
+  "@archivedWalletsRestored": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "archivedWalletsView": "View"
 }

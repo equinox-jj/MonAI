@@ -16,6 +16,10 @@ abstract class PaymentProviderLocalDataSource {
     required String? etag,
     required List<PaymentProviderRow> rows,
   });
+
+  /// Stores the bundled seed [rows] when nothing is cached yet. It has no
+  /// ETag, so the next fetch downloads the whole catalog over it.
+  Future<void> seedIfEmpty(List<PaymentProviderRow> rows);
 }
 
 class PaymentProviderLocalDataSourceImpl extends PaymentProviderLocalDataSource
@@ -45,6 +49,17 @@ class PaymentProviderLocalDataSourceImpl extends PaymentProviderLocalDataSource
         id: PaymentProviderDao.catalogRowId,
         version: version,
         etag: etag,
+      ),
+      rows,
+    ),
+  );
+
+  @override
+  Future<void> seedIfEmpty(List<PaymentProviderRow> rows) => safeCacheCall(
+    () => _dao.seedIfEmpty(
+      const PaymentProviderCatalogRow(
+        id: PaymentProviderDao.catalogRowId,
+        version: 0,
       ),
       rows,
     ),

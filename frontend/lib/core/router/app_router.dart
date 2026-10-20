@@ -15,6 +15,10 @@ import 'package:monai/features/transactions/presentation/pages/transaction_form/
 import 'package:monai/features/transactions/presentation/pages/transaction_form/transaction_form_page.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/transactions_page.dart';
 import 'package:monai/features/transactions/presentation/pages/undo_delete/undo_delete_host.dart';
+import 'package:monai/features/wallets/presentation/pages/archived_wallets/archived_wallets_page.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_detail/wallet_detail_page.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_mode.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/wallet_form_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
 
 /// The app's route paths.
@@ -42,6 +46,18 @@ abstract final class AppRoutes {
 
   /// The settings tab.
   static const settings = '/settings';
+
+  /// The add-wallet form.
+  static const walletNew = '/wallets/new';
+
+  /// The archived wallets.
+  static const walletsArchived = '/wallets/archived';
+
+  /// The detail of wallet [id].
+  static String walletDetail(String id) => '$wallets/$id';
+
+  /// The edit form of wallet [id].
+  static String walletEdit(String id) => '$wallets/$id/edit';
 
   /// Search over notes and merchants; see [transactionSearchIn].
   static const transactionSearch = '/transactions/search';
@@ -177,14 +193,17 @@ GoRouter createAppRouter({
                     pageBuilder: (context, state) => _formPage(
                       context,
                       state,
-                      TransactionFormMode.add(
-                        type:
-                            TransactionType.values.asNameMap()[state
-                                .uri
-                                .queryParameters[AppRoutes.typeParam]] ??
-                            TransactionType.expense,
-                        walletId:
-                            state.uri.queryParameters[AppRoutes.walletParam],
+                      (placement) => TransactionFormPage(
+                        placement: placement,
+                        mode: TransactionFormMode.add(
+                          type:
+                              TransactionType.values.asNameMap()[state
+                                  .uri
+                                  .queryParameters[AppRoutes.typeParam]] ??
+                              TransactionType.expense,
+                          walletId:
+                              state.uri.queryParameters[AppRoutes.walletParam],
+                        ),
                       ),
                     ),
                   ),
@@ -200,7 +219,12 @@ GoRouter createAppRouter({
                         pageBuilder: (context, state) => _formPage(
                           context,
                           state,
-                          TransactionFormMode.edit(state.pathParameters['id']!),
+                          (placement) => TransactionFormPage(
+                            placement: placement,
+                            mode: TransactionFormMode.edit(
+                              state.pathParameters['id']!,
+                            ),
+                          ),
                         ),
                       ),
                     ],
@@ -214,6 +238,47 @@ GoRouter createAppRouter({
               GoRoute(
                 path: AppRoutes.wallets,
                 builder: (_, _) => const WalletsPage(),
+                routes: [
+                  GoRoute(
+                    path: 'new',
+                    parentNavigatorKey: rootKey,
+                    pageBuilder: (context, state) => _formPage(
+                      context,
+                      state,
+                      (placement) => WalletFormPage(
+                        mode: const WalletFormMode.add(),
+                        placement: placement,
+                      ),
+                    ),
+                  ),
+                  GoRoute(
+                    path: 'archived',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, _) => const ArchivedWalletsPage(),
+                  ),
+                  GoRoute(
+                    path: ':id',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, state) =>
+                        WalletDetailPage(id: state.pathParameters['id']!),
+                    routes: [
+                      GoRoute(
+                        path: 'edit',
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (context, state) => _formPage(
+                          context,
+                          state,
+                          (placement) => WalletFormPage(
+                            mode: WalletFormMode.edit(
+                              state.pathParameters['id']!,
+                            ),
+                            placement: placement,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ),
             ],
           ),
@@ -231,18 +296,18 @@ GoRouter createAppRouter({
   );
 }
 
-/// The add or edit form: a side sheet over the screen on tablet landscape,
-/// otherwise a full-screen dialog.
+/// An add or edit form, built for where it shows: a side sheet over the
+/// screen on tablet landscape, otherwise a full-screen dialog.
 Page<void> _formPage(
   BuildContext context,
   GoRouterState state,
-  TransactionFormMode mode,
+  Widget Function(ScreenPlacement placement) form,
 ) {
   if (context.widthClass != .expanded) {
     return MaterialPage(
       key: state.pageKey,
       fullscreenDialog: true,
-      child: TransactionFormPage(mode: mode),
+      child: form(.fullScreen),
     );
   }
   return CustomTransitionPage(
@@ -258,7 +323,7 @@ Page<void> _formPage(
           borderRadius: const BorderRadius.horizontal(
             left: Radius.circular(MonAIRadius.xl),
           ),
-          child: TransactionFormPage(mode: mode, placement: .sideSheet),
+          child: form(.sideSheet),
         ),
       ),
     ),

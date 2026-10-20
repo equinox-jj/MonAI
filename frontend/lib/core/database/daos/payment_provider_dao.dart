@@ -50,4 +50,19 @@ class PaymentProviderDao extends DatabaseAccessor<MonAIDatabase>
     await upsertAll(rows);
     await upsertMeta(meta);
   });
+
+  /// Stores [rows] as the catalog only while none is cached, so a catalog
+  /// fetched meanwhile is never overwritten. True when it stored them.
+  Future<bool> seedIfEmpty(
+    PaymentProviderCatalogRow meta,
+    List<PaymentProviderRow> rows,
+  ) => transaction(() async {
+    final cached = await (selectOnly(
+      paymentProviders,
+    )..addColumns([paymentProviders.id.count()])).getSingle();
+    if ((cached.read(paymentProviders.id.count()) ?? 0) > 0) return false;
+    await upsertAll(rows);
+    await upsertMeta(meta);
+    return true;
+  });
 }

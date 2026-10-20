@@ -16,5 +16,9 @@ abstract class PaymentProvider with _$PaymentProvider {
     required List<String> aliases,
     required int sortOrder,
     String? logoUrl,
+
+    /// From the catalog bundled with the app, not yet replaced by the
+    /// server's: its [id] isn't one the server knows.
+    @Default(false) bool isBundled,
   }) = _PaymentProvider;
 }

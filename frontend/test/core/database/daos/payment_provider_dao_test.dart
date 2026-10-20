@@ -62,4 +62,42 @@ void main() {
     expect(providers.map((p) => p.id), ['p2']);
     expect(await database.paymentProviderDao.catalogMeta(), newMeta);
   });
+
+  test('seedIfEmpty stores the seed and its meta in an empty cache', () async {
+    // Arrange
+    final dao = database.paymentProviderDao;
+    const meta = PaymentProviderCatalogRow(
+      id: PaymentProviderDao.catalogRowId,
+      version: 0,
+    );
+
+    // Act
+    final stored = await dao.seedIfEmpty(meta, [
+      paymentProviderRow(id: 'seed:bca'),
+    ]);
+
+    // Assert
+    expect(stored, isTrue);
+    expect((await dao.watchAll().first).map((p) => p.id), ['seed:bca']);
+    expect(await dao.catalogMeta(), meta);
+  });
+
+  test('seedIfEmpty keeps a catalog already cached', () async {
+    // Arrange
+    final dao = database.paymentProviderDao;
+    await dao.upsertAll([paymentProviderRow(id: 'p1')]);
+
+    // Act
+    final stored = await dao.seedIfEmpty(
+      const PaymentProviderCatalogRow(
+        id: PaymentProviderDao.catalogRowId,
+        version: 0,
+      ),
+      [paymentProviderRow(id: 'seed:bca')],
+    );
+
+    // Assert
+    expect(stored, isFalse);
+    expect((await dao.watchAll().first).map((p) => p.id), ['p1']);
+  });
 }

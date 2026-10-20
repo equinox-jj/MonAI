@@ -27,6 +27,7 @@ import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.d
 import '../../../../../helpers/entity_fixtures.dart';
 import '../../../../../helpers/settings_fakes.dart';
 import '../../../../../helpers/transaction_fakes.dart';
+import '../../../../../helpers/wallet_fakes.dart';
 
 class _MockWatchDashboard extends Mock implements WatchHomeDashboardUseCase {}
 
@@ -93,6 +94,7 @@ void main() {
 
   setUp(() {
     registerQuietTransactionScreens();
+    registerQuietWalletScreens();
     watch = _MockWatchDashboard();
     refresh = _MockRefreshHome();
     when(() => refresh(any())).thenAnswer((_) async => Right(_result()));

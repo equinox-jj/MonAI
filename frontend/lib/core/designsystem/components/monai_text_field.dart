@@ -60,6 +60,7 @@ class MonAITextField extends StatefulWidget {
     this.label,
     this.placeholder,
     this.leadingIcon,
+    this.prefix,
     this.trailing,
     this.supportingText,
     this.supportingLinkLabel,
@@ -95,6 +96,9 @@ class MonAITextField extends StatefulWidget {
 
   /// An icon at the start of the field.
   final MonAIIconData? leadingIcon;
+
+  /// Fixed text before the input, e.g. the "Rp" of a money field.
+  final String? prefix;
 
   /// A widget at the end of the field, e.g. a visibility toggle.
   final Widget? trailing;
@@ -191,6 +195,11 @@ class _MonAITextFieldState extends State<MonAITextField> {
             children: [
               if (widget.leadingIcon case final icon?)
                 MonAIIcon(icon, size: MonAISizes.iconLg, color: c.textTertiary),
+              if (widget.prefix case final prefix?)
+                Text(
+                  prefix,
+                  style: t.titleMedium?.copyWith(color: c.textTertiary),
+                ),
               Expanded(
                 child: TextField(
                   controller: widget.controller,
