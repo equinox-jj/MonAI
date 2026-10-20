@@ -1,13 +1,44 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:fpdart/fpdart.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/router/app_router.dart';
+import 'package:monai/features/home/domain/usecase/refresh_home_usecase.dart';
+import 'package:monai/features/home/domain/usecase/watch_home_dashboard_usecase.dart';
+import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
 
+class _MockWatchDashboard extends Mock implements WatchHomeDashboardUseCase {}
+
+class _MockRefreshHome extends Mock implements RefreshHomeUseCase {}
+
 void main() {
+  setUpAll(() => registerFallbackValue(DateTime(2026)));
+
+  // Home, the first tab, settles on its load error with nothing cached.
+  setUp(() {
+    final watch = _MockWatchDashboard();
+    final refresh = _MockRefreshHome();
+    when(() => watch(any())).thenAnswer((_) => const Stream.empty());
+    when(() => refresh(any())).thenAnswer(
+      (_) async => const Right(
+        HomeRefreshResult(
+          budgetLoaded: false,
+          recentLoaded: false,
+          failure: .unexpected,
+        ),
+      ),
+    );
+    sl.registerFactory(() => HomeBloc(watchDashboard: watch, refresh: refresh));
+  });
+
+  tearDown(sl.reset);
+
   Future<void> pumpDashboard(WidgetTester tester) async {
     final sessionManager = SessionManager()..signedIn();
     addTearDown(sessionManager.dispose);

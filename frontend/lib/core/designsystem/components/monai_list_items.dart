@@ -4,6 +4,7 @@ import 'package:monai/core/designsystem/components/monai_badges.dart';
 import 'package:monai/core/designsystem/components/monai_surfaces.dart';
 import 'package:monai/core/designsystem/icons/monai_icon.dart';
 import 'package:monai/core/designsystem/icons/monai_icons.dart';
+import 'package:monai/core/designsystem/theme/monai_colors.dart';
 import 'package:monai/core/designsystem/theme/monai_radius.dart';
 import 'package:monai/core/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/designsystem/theme/monai_spacing.dart';
@@ -89,6 +90,98 @@ class MonAIListItem extends StatelessWidget {
         ),
         if (showDivider) const MonAIDivider(),
       ],
+    );
+  }
+}
+
+/// Which way money moves, which colors an amount and picks its arrow.
+enum MoneyDirection {
+  /// Money out: red with a north-east arrow.
+  expense,
+
+  /// Money in: green with a south-west arrow.
+  income,
+
+  /// Between the user's wallets: neutral with a two-way arrow.
+  transfer;
+
+  /// The amount and arrow color.
+  Color color(MonAIColors c) => switch (this) {
+    expense => c.expense,
+    income => c.income,
+    transfer => c.transfer,
+  };
+
+  /// The arrow under the amount.
+  MonAIIconData get arrow => switch (this) {
+    expense => MonAIIcons.northEast,
+    income => MonAIIcons.southWest,
+    transfer => MonAIIcons.syncAlt,
+  };
+}
+
+/// A transaction in a list: category icon, title, meta line, and the signed
+/// amount with its direction arrow.
+///
+/// [amount] is already formatted with its sign (`−Rp 35.000`).
+class MonAITransactionRow extends StatelessWidget {
+  /// Creates a transaction row.
+  const MonAITransactionRow({
+    required this.title,
+    required this.meta,
+    required this.amount,
+    required this.direction,
+    required this.categoryIcon,
+    required this.categoryColor,
+    super.key,
+    this.onTap,
+    this.showDivider = false,
+  });
+
+  /// The note, merchant or category.
+  final String title;
+
+  /// `Food · GoPay · 12:40`.
+  final String meta;
+
+  /// The signed, formatted amount.
+  final String amount;
+
+  /// Colors the amount and picks the arrow.
+  final MoneyDirection direction;
+
+  /// The category's icon, or the transfer icon.
+  final MonAIIconData categoryIcon;
+
+  /// The category's light color.
+  final Color categoryColor;
+
+  /// Opens the transaction.
+  final VoidCallback? onTap;
+
+  /// Draws a divider under the row.
+  final bool showDivider;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = direction.color(context.colors);
+    return MonAIListItem(
+      title: title,
+      supporting: meta,
+      onTap: onTap,
+      showDivider: showDivider,
+      leading: MonAICategoryIcon(icon: categoryIcon, color: categoryColor),
+      trailing: Column(
+        crossAxisAlignment: .end,
+        children: [
+          Text(
+            amount,
+            maxLines: 1,
+            style: context.textStyles.amount.copyWith(color: color),
+          ),
+          MonAIIcon(direction.arrow, size: MonAISizes.iconSm, color: color),
+        ],
+      ),
     );
   }
 }

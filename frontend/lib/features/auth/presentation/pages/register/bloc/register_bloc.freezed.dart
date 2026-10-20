@@ -126,11 +126,11 @@ return submitted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  nameEdited,TResult Function()?  emailEdited,TResult Function( String password)?  passwordEdited,TResult Function( String name,  String email,  String password)?  submitted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( String name)?  nameEdited,TResult Function( String email)?  emailEdited,TResult Function( String password)?  passwordEdited,TResult Function( String name,  String email,  String password)?  submitted,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _NameEdited() when nameEdited != null:
-return nameEdited();case _EmailEdited() when emailEdited != null:
-return emailEdited();case _PasswordEdited() when passwordEdited != null:
+return nameEdited(_that.name);case _EmailEdited() when emailEdited != null:
+return emailEdited(_that.email);case _PasswordEdited() when passwordEdited != null:
 return passwordEdited(_that.password);case _Submitted() when submitted != null:
 return submitted(_that.name,_that.email,_that.password);case _:
   return orElse();
@@ -150,11 +150,11 @@ return submitted(_that.name,_that.email,_that.password);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  nameEdited,required TResult Function()  emailEdited,required TResult Function( String password)  passwordEdited,required TResult Function( String name,  String email,  String password)  submitted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( String name)  nameEdited,required TResult Function( String email)  emailEdited,required TResult Function( String password)  passwordEdited,required TResult Function( String name,  String email,  String password)  submitted,}) {final _that = this;
 switch (_that) {
 case _NameEdited():
-return nameEdited();case _EmailEdited():
-return emailEdited();case _PasswordEdited():
+return nameEdited(_that.name);case _EmailEdited():
+return emailEdited(_that.email);case _PasswordEdited():
 return passwordEdited(_that.password);case _Submitted():
 return submitted(_that.name,_that.email,_that.password);}
 }
@@ -170,11 +170,11 @@ return submitted(_that.name,_that.email,_that.password);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  nameEdited,TResult? Function()?  emailEdited,TResult? Function( String password)?  passwordEdited,TResult? Function( String name,  String email,  String password)?  submitted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( String name)?  nameEdited,TResult? Function( String email)?  emailEdited,TResult? Function( String password)?  passwordEdited,TResult? Function( String name,  String email,  String password)?  submitted,}) {final _that = this;
 switch (_that) {
 case _NameEdited() when nameEdited != null:
-return nameEdited();case _EmailEdited() when emailEdited != null:
-return emailEdited();case _PasswordEdited() when passwordEdited != null:
+return nameEdited(_that.name);case _EmailEdited() when emailEdited != null:
+return emailEdited(_that.email);case _PasswordEdited() when passwordEdited != null:
 return passwordEdited(_that.password);case _Submitted() when submitted != null:
 return submitted(_that.name,_that.email,_that.password);case _:
   return null;
@@ -188,65 +188,137 @@ return submitted(_that.name,_that.email,_that.password);case _:
 
 
 class _NameEdited implements RegisterEvent {
-  const _NameEdited();
+  const _NameEdited(this.name);
   
 
+ final  String name;
 
-
+/// Create a copy of RegisterEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$NameEditedCopyWith<_NameEdited> get copyWith => __$NameEditedCopyWithImpl<_NameEdited>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _NameEdited);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _NameEdited&&(identical(other.name, name) || other.name == name));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode {
+    return Object.hash(runtimeType,name);
+}
 
 @override
 String toString() {
-    return 'RegisterEvent.nameEdited()';
+    return 'RegisterEvent.nameEdited(name: $name)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class _$NameEditedCopyWith<$Res> implements $RegisterEventCopyWith<$Res> {
+  factory _$NameEditedCopyWith(_NameEdited value, $Res Function(_NameEdited) _then) = __$NameEditedCopyWithImpl;
+@useResult
+$Res call({
+ String name
+});
 
 
+
+
+}
+/// @nodoc
+class __$NameEditedCopyWithImpl<$Res>
+    implements _$NameEditedCopyWith<$Res> {
+  __$NameEditedCopyWithImpl(this._self, this._then);
+
+  final _NameEdited _self;
+  final $Res Function(_NameEdited) _then;
+
+/// Create a copy of RegisterEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? name = null,}) {
+  return _then(_NameEdited(
+null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
 
 class _EmailEdited implements RegisterEvent {
-  const _EmailEdited();
+  const _EmailEdited(this.email);
   
 
+ final  String email;
 
-
+/// Create a copy of RegisterEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$EmailEditedCopyWith<_EmailEdited> get copyWith => __$EmailEditedCopyWithImpl<_EmailEdited>(this, _$identity);
 
 
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmailEdited);
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _EmailEdited&&(identical(other.email, email) || other.email == email));
 }
 
 
 @override
-int get hashCode => runtimeType.hashCode;
+int get hashCode {
+    return Object.hash(runtimeType,email);
+}
 
 @override
 String toString() {
-    return 'RegisterEvent.emailEdited()';
+    return 'RegisterEvent.emailEdited(email: $email)';
 }
 
 
 }
 
+/// @nodoc
+abstract mixin class _$EmailEditedCopyWith<$Res> implements $RegisterEventCopyWith<$Res> {
+  factory _$EmailEditedCopyWith(_EmailEdited value, $Res Function(_EmailEdited) _then) = __$EmailEditedCopyWithImpl;
+@useResult
+$Res call({
+ String email
+});
 
 
+
+
+}
+/// @nodoc
+class __$EmailEditedCopyWithImpl<$Res>
+    implements _$EmailEditedCopyWith<$Res> {
+  __$EmailEditedCopyWithImpl(this._self, this._then);
+
+  final _EmailEdited _self;
+  final $Res Function(_EmailEdited) _then;
+
+/// Create a copy of RegisterEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? email = null,}) {
+  return _then(_EmailEdited(
+null == email ? _self.email : email // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
 
 /// @nodoc
 
@@ -396,7 +468,8 @@ mixin _$RegisterState {
  UiStatus get status; FieldError? get nameError; FieldError? get emailError;/// The email already has an account; the field offers "Sign in instead".
  bool get emailTaken; FieldError? get passwordError;/// Drives the live "At least 8 characters" hint.
  bool get passwordLongEnough;/// A problem with the whole attempt, shown as a banner.
- AuthFormError? get formError;/// The first field with an error after a failed submit; the screen
+ AuthFormError? get formError;/// A submit failed on the input, so each edit re-checks its field.
+ bool get autovalidate;/// The first field with an error after a failed submit; the screen
 /// focuses it so the keyboard and screen reader land on the error.
  AuthField? get focusField;
 /// Create a copy of RegisterState
@@ -410,20 +483,20 @@ $RegisterStateCopyWith<RegisterState> get copyWith => _$RegisterStateCopyWithImp
 @override
 bool operator ==(Object other) {
   final _this = this as RegisterState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterState&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.nameError, _this.nameError) || other.nameError == _this.nameError)&&(identical(other.emailError, _this.emailError) || other.emailError == _this.emailError)&&(identical(other.emailTaken, _this.emailTaken) || other.emailTaken == _this.emailTaken)&&(identical(other.passwordError, _this.passwordError) || other.passwordError == _this.passwordError)&&(identical(other.passwordLongEnough, _this.passwordLongEnough) || other.passwordLongEnough == _this.passwordLongEnough)&&(identical(other.formError, _this.formError) || other.formError == _this.formError)&&(identical(other.focusField, _this.focusField) || other.focusField == _this.focusField));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is RegisterState&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.nameError, _this.nameError) || other.nameError == _this.nameError)&&(identical(other.emailError, _this.emailError) || other.emailError == _this.emailError)&&(identical(other.emailTaken, _this.emailTaken) || other.emailTaken == _this.emailTaken)&&(identical(other.passwordError, _this.passwordError) || other.passwordError == _this.passwordError)&&(identical(other.passwordLongEnough, _this.passwordLongEnough) || other.passwordLongEnough == _this.passwordLongEnough)&&(identical(other.formError, _this.formError) || other.formError == _this.formError)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.focusField, _this.focusField) || other.focusField == _this.focusField));
 }
 
 
 @override
 int get hashCode {
   final _this = this as RegisterState;
-  return Object.hash(runtimeType,_this.status,_this.nameError,_this.emailError,_this.emailTaken,_this.passwordError,_this.passwordLongEnough,_this.formError,_this.focusField);
+  return Object.hash(runtimeType,_this.status,_this.nameError,_this.emailError,_this.emailTaken,_this.passwordError,_this.passwordLongEnough,_this.formError,_this.autovalidate,_this.focusField);
 }
 
 @override
 String toString() {
   final _this = this as RegisterState;
-  return 'RegisterState(status: ${_this.status}, nameError: ${_this.nameError}, emailError: ${_this.emailError}, emailTaken: ${_this.emailTaken}, passwordError: ${_this.passwordError}, passwordLongEnough: ${_this.passwordLongEnough}, formError: ${_this.formError}, focusField: ${_this.focusField})';
+  return 'RegisterState(status: ${_this.status}, nameError: ${_this.nameError}, emailError: ${_this.emailError}, emailTaken: ${_this.emailTaken}, passwordError: ${_this.passwordError}, passwordLongEnough: ${_this.passwordLongEnough}, formError: ${_this.formError}, autovalidate: ${_this.autovalidate}, focusField: ${_this.focusField})';
 }
 
 
@@ -434,7 +507,7 @@ abstract mixin class $RegisterStateCopyWith<$Res>  {
   factory $RegisterStateCopyWith(RegisterState value, $Res Function(RegisterState) _then) = _$RegisterStateCopyWithImpl;
 @useResult
 $Res call({
- UiStatus status, FieldError? nameError, FieldError? emailError, bool emailTaken, FieldError? passwordError, bool passwordLongEnough, AuthFormError? formError, AuthField? focusField
+ UiStatus status, FieldError? nameError, FieldError? emailError, bool emailTaken, FieldError? passwordError, bool passwordLongEnough, AuthFormError? formError, bool autovalidate, AuthField? focusField
 });
 
 
@@ -451,7 +524,7 @@ class _$RegisterStateCopyWithImpl<$Res>
 
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? nameError = freezed,Object? emailError = freezed,Object? emailTaken = null,Object? passwordError = freezed,Object? passwordLongEnough = null,Object? formError = freezed,Object? focusField = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? nameError = freezed,Object? emailError = freezed,Object? emailTaken = null,Object? passwordError = freezed,Object? passwordLongEnough = null,Object? formError = freezed,Object? autovalidate = null,Object? focusField = freezed,}) {
   return _then(RegisterState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as UiStatus,nameError: freezed == nameError ? _self.nameError : nameError // ignore: cast_nullable_to_non_nullable
@@ -460,7 +533,8 @@ as FieldError?,emailTaken: null == emailTaken ? _self.emailTaken : emailTaken //
 as bool,passwordError: freezed == passwordError ? _self.passwordError : passwordError // ignore: cast_nullable_to_non_nullable
 as FieldError?,passwordLongEnough: null == passwordLongEnough ? _self.passwordLongEnough : passwordLongEnough // ignore: cast_nullable_to_non_nullable
 as bool,formError: freezed == formError ? _self.formError : formError // ignore: cast_nullable_to_non_nullable
-as AuthFormError?,focusField: freezed == focusField ? _self.focusField : focusField // ignore: cast_nullable_to_non_nullable
+as AuthFormError?,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
+as bool,focusField: freezed == focusField ? _self.focusField : focusField // ignore: cast_nullable_to_non_nullable
 as AuthField?,
   ));
 }
@@ -558,10 +632,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? nameError,  FieldError? emailError,  bool emailTaken,  FieldError? passwordError,  bool passwordLongEnough,  AuthFormError? formError,  AuthField? focusField)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? nameError,  FieldError? emailError,  bool emailTaken,  FieldError? passwordError,  bool passwordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _RegisterState() when $default != null:
-return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_that.passwordError,_that.passwordLongEnough,_that.formError,_that.focusField);case _:
+return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_that.passwordError,_that.passwordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
   return orElse();
 
 }
@@ -579,10 +653,10 @@ return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? nameError,  FieldError? emailError,  bool emailTaken,  FieldError? passwordError,  bool passwordLongEnough,  AuthFormError? formError,  AuthField? focusField)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? nameError,  FieldError? emailError,  bool emailTaken,  FieldError? passwordError,  bool passwordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)  $default,) {final _that = this;
 switch (_that) {
 case _RegisterState():
-return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_that.passwordError,_that.passwordLongEnough,_that.formError,_that.focusField);case _:
+return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_that.passwordError,_that.passwordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -599,10 +673,10 @@ return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UiStatus status,  FieldError? nameError,  FieldError? emailError,  bool emailTaken,  FieldError? passwordError,  bool passwordLongEnough,  AuthFormError? formError,  AuthField? focusField)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UiStatus status,  FieldError? nameError,  FieldError? emailError,  bool emailTaken,  FieldError? passwordError,  bool passwordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)?  $default,) {final _that = this;
 switch (_that) {
 case _RegisterState() when $default != null:
-return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_that.passwordError,_that.passwordLongEnough,_that.formError,_that.focusField);case _:
+return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_that.passwordError,_that.passwordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
   return null;
 
 }
@@ -614,7 +688,7 @@ return $default(_that.status,_that.nameError,_that.emailError,_that.emailTaken,_
 
 
 class _RegisterState implements RegisterState {
-  const _RegisterState({this.status = UiStatus.initial, this.nameError, this.emailError, this.emailTaken = false, this.passwordError, this.passwordLongEnough = false, this.formError, this.focusField});
+  const _RegisterState({this.status = UiStatus.initial, this.nameError, this.emailError, this.emailTaken = false, this.passwordError, this.passwordLongEnough = false, this.formError, this.autovalidate = false, this.focusField});
   
 
 /// [UiStatus.loading] while registering. [UiStatus.success] stays until
@@ -629,6 +703,8 @@ class _RegisterState implements RegisterState {
 @override@JsonKey() final  bool passwordLongEnough;
 /// A problem with the whole attempt, shown as a banner.
 @override final  AuthFormError? formError;
+/// A submit failed on the input, so each edit re-checks its field.
+@override@JsonKey() final  bool autovalidate;
 /// The first field with an error after a failed submit; the screen
 /// focuses it so the keyboard and screen reader land on the error.
 @override final  AuthField? focusField;
@@ -643,18 +719,18 @@ _$RegisterStateCopyWith<_RegisterState> get copyWith => __$RegisterStateCopyWith
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterState&&(identical(other.status, status) || other.status == status)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.emailTaken, emailTaken) || other.emailTaken == emailTaken)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.passwordLongEnough, passwordLongEnough) || other.passwordLongEnough == passwordLongEnough)&&(identical(other.formError, formError) || other.formError == formError)&&(identical(other.focusField, focusField) || other.focusField == focusField));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _RegisterState&&(identical(other.status, status) || other.status == status)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.emailError, emailError) || other.emailError == emailError)&&(identical(other.emailTaken, emailTaken) || other.emailTaken == emailTaken)&&(identical(other.passwordError, passwordError) || other.passwordError == passwordError)&&(identical(other.passwordLongEnough, passwordLongEnough) || other.passwordLongEnough == passwordLongEnough)&&(identical(other.formError, formError) || other.formError == formError)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.focusField, focusField) || other.focusField == focusField));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,status,nameError,emailError,emailTaken,passwordError,passwordLongEnough,formError,focusField);
+    return Object.hash(runtimeType,status,nameError,emailError,emailTaken,passwordError,passwordLongEnough,formError,autovalidate,focusField);
 }
 
 @override
 String toString() {
-    return 'RegisterState(status: $status, nameError: $nameError, emailError: $emailError, emailTaken: $emailTaken, passwordError: $passwordError, passwordLongEnough: $passwordLongEnough, formError: $formError, focusField: $focusField)';
+    return 'RegisterState(status: $status, nameError: $nameError, emailError: $emailError, emailTaken: $emailTaken, passwordError: $passwordError, passwordLongEnough: $passwordLongEnough, formError: $formError, autovalidate: $autovalidate, focusField: $focusField)';
 }
 
 
@@ -665,7 +741,7 @@ abstract mixin class _$RegisterStateCopyWith<$Res> implements $RegisterStateCopy
   factory _$RegisterStateCopyWith(_RegisterState value, $Res Function(_RegisterState) _then) = __$RegisterStateCopyWithImpl;
 @override @useResult
 $Res call({
- UiStatus status, FieldError? nameError, FieldError? emailError, bool emailTaken, FieldError? passwordError, bool passwordLongEnough, AuthFormError? formError, AuthField? focusField
+ UiStatus status, FieldError? nameError, FieldError? emailError, bool emailTaken, FieldError? passwordError, bool passwordLongEnough, AuthFormError? formError, bool autovalidate, AuthField? focusField
 });
 
 
@@ -682,7 +758,7 @@ class __$RegisterStateCopyWithImpl<$Res>
 
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? nameError = freezed,Object? emailError = freezed,Object? emailTaken = null,Object? passwordError = freezed,Object? passwordLongEnough = null,Object? formError = freezed,Object? focusField = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? nameError = freezed,Object? emailError = freezed,Object? emailTaken = null,Object? passwordError = freezed,Object? passwordLongEnough = null,Object? formError = freezed,Object? autovalidate = null,Object? focusField = freezed,}) {
   return _then(_RegisterState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as UiStatus,nameError: freezed == nameError ? _self.nameError : nameError // ignore: cast_nullable_to_non_nullable
@@ -691,7 +767,8 @@ as FieldError?,emailTaken: null == emailTaken ? _self.emailTaken : emailTaken //
 as bool,passwordError: freezed == passwordError ? _self.passwordError : passwordError // ignore: cast_nullable_to_non_nullable
 as FieldError?,passwordLongEnough: null == passwordLongEnough ? _self.passwordLongEnough : passwordLongEnough // ignore: cast_nullable_to_non_nullable
 as bool,formError: freezed == formError ? _self.formError : formError // ignore: cast_nullable_to_non_nullable
-as AuthFormError?,focusField: freezed == focusField ? _self.focusField : focusField // ignore: cast_nullable_to_non_nullable
+as AuthFormError?,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
+as bool,focusField: freezed == focusField ? _self.focusField : focusField // ignore: cast_nullable_to_non_nullable
 as AuthField?,
   ));
 }

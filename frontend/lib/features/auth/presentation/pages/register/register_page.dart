@@ -208,9 +208,8 @@ class _NameField extends StatelessWidget {
         return MonAITextField(
           controller: controller,
           focusNode: focusNode,
-          onChanged: (_) => context.read<RegisterBloc>().add(
-            const RegisterEvent.nameEdited(),
-          ),
+          onChanged: (value) =>
+              context.read<RegisterBloc>().add(RegisterEvent.nameEdited(value)),
           onSubmitted: (_) => nextFocus.requestFocus(),
           enabled: !submitting,
           label: l10n.authNameLabel,
@@ -254,8 +253,8 @@ class _EmailField extends StatelessWidget {
         return MonAITextField(
           controller: controller,
           focusNode: focusNode,
-          onChanged: (_) => context.read<RegisterBloc>().add(
-            const RegisterEvent.emailEdited(),
+          onChanged: (value) => context.read<RegisterBloc>().add(
+            RegisterEvent.emailEdited(value),
           ),
           onSubmitted: (_) => nextFocus.requestFocus(),
           enabled: !submitting,

@@ -457,10 +457,14 @@ class MonAINavigationDrawer extends StatelessWidget {
                         spacing: MonAISpacing.x2_5,
                         children: [
                           const MonAIIcon(MonAIIcons.add),
-                          Text(
-                            addLabel,
-                            style: context.textTheme.titleSmall?.withWeight(
-                              .w600,
+                          Flexible(
+                            child: Text(
+                              addLabel,
+                              maxLines: 1,
+                              overflow: .ellipsis,
+                              style: context.textTheme.titleSmall?.withWeight(
+                                .w600,
+                              ),
                             ),
                           ),
                         ],

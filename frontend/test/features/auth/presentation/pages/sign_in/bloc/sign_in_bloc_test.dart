@@ -155,19 +155,49 @@ void main() {
     );
   });
 
-  test('editing a field clears its error and the banner', () async {
+  test('editing before a failed submit shows no field errors', () async {
+    // Arrange
+    // (a fresh form)
+
+    // Act
+    bloc.add(const SignInEvent.emailEdited('not-an-email'));
+    await pumpEventQueue();
+
+    // Assert
+    expect(bloc.state.emailError, isNull);
+    expect(bloc.state.autovalidate, isFalse);
+  });
+
+  test('after a failed submit, an edit re-checks only its field', () async {
     // Arrange
     await submit(
       const Left(Failure.validation([_emailInvalid, _passwordRequired])),
     );
 
     // Act
-    bloc.add(const SignInEvent.emailEdited());
+    bloc.add(const SignInEvent.emailEdited(' A@B.co '));
+    await pumpEventQueue();
+    final fixed = bloc.state;
+    bloc.add(const SignInEvent.emailEdited('a@b'));
     await pumpEventQueue();
 
     // Assert
-    expect(bloc.state.emailError, isNull);
-    expect(bloc.state.passwordError, _passwordRequired);
+    expect(fixed.emailError, isNull);
+    expect(fixed.passwordError, _passwordRequired);
+    expect(bloc.state.emailError?.code, 'invalid_format');
+  });
+
+  test('a failure not caused by the input does not re-check edits', () async {
+    // Arrange
+    await submit(const Left(Failure.network()));
+
+    // Act
+    bloc.add(const SignInEvent.passwordEdited(''));
+    await pumpEventQueue();
+
+    // Assert
+    expect(bloc.state.autovalidate, isFalse);
+    expect(bloc.state.passwordError, isNull);
     expect(bloc.state.formError, isNull);
   });
 

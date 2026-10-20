@@ -141,6 +141,28 @@ void main() {
       expect(_codes(errors), [('name', 'max_length'), ('email', 'max_length')]);
     });
 
+    test('the per-field checks match the form check', () {
+      // Arrange
+      const name = '';
+      const email = 'not-an-email';
+      const password = 'short';
+
+      // Act
+      final fields = [
+        AuthInputValidator.registerName(name),
+        AuthInputValidator.registerEmail(email),
+        AuthInputValidator.registerPassword(password),
+      ];
+      final form = AuthInputValidator.register(
+        name: name,
+        email: email,
+        password: password,
+      );
+
+      // Assert
+      expect(fields, form);
+    });
+
     test('isPasswordLongEnough follows the minimum', () {
       // Arrange
       const short = '1234567';

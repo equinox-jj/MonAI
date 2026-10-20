@@ -60,4 +60,27 @@ void main() {
       expect(result, '+Rp 35.000');
     });
   });
+
+  group('formatRupiahCompact', () {
+    final cases = {
+      999: 'Rp 999',
+      35000: 'Rp 35 rb',
+      2415000: 'Rp 2,4 jt',
+      999999: 'Rp 999,9 rb',
+      2000000000: 'Rp 2 M',
+      -1500000: '−Rp 1,5 jt',
+    };
+    for (final MapEntry(key: amount, value: expected) in cases.entries) {
+      test('formats $amount as $expected', () {
+        // Arrange
+        final input = amount;
+
+        // Act
+        final result = formatRupiahCompact(input);
+
+        // Assert
+        expect(result, expected);
+      });
+    }
+  });
 }

@@ -4,6 +4,7 @@ import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/error/field_error.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/auth/domain/usecase/register_usecase.dart';
+import 'package:monai/features/auth/domain/validation/auth_input.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 
@@ -21,14 +22,31 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
 
   final RegisterUseCase _register;
 
-  // The typed values stay in the screen's text controllers; editing a field
-  // only clears the errors it may have fixed.
+  // Field errors stay hidden until a submit fails on the input; after that,
+  // each edit re-checks its field. An edit always clears the banner, and an
+  // email edit the taken mark, since only the next submit can tell whether
+  // the problem is still there.
   void _onNameEdited(_NameEdited event, Emitter<RegisterState> emit) {
-    emit(state.copyWith(nameError: null, formError: null));
+    emit(
+      state.copyWith(
+        nameError: state.autovalidate
+            ? AuthInputValidator.registerName(event.name.normalizedName)
+            : state.nameError,
+        formError: null,
+      ),
+    );
   }
 
   void _onEmailEdited(_EmailEdited event, Emitter<RegisterState> emit) {
-    emit(state.copyWith(emailError: null, emailTaken: false, formError: null));
+    emit(
+      state.copyWith(
+        emailError: state.autovalidate
+            ? AuthInputValidator.registerEmail(event.email.normalizedEmail)
+            : state.emailError,
+        emailTaken: false,
+        formError: null,
+      ),
+    );
   }
 
   void _onPasswordEdited(_PasswordEdited event, Emitter<RegisterState> emit) {
@@ -37,7 +55,9 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         passwordLongEnough: AuthInputValidator.isPasswordLongEnough(
           event.password,
         ),
-        passwordError: null,
+        passwordError: state.autovalidate
+            ? AuthInputValidator.registerPassword(event.password)
+            : state.passwordError,
         formError: null,
       ),
     );
@@ -89,6 +109,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
             emailTaken: false,
             passwordError: passwordError,
             focusField: focusField,
+            autovalidate: true,
           );
         }
       case ConflictFailure():

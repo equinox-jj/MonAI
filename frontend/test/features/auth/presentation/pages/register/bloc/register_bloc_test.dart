@@ -131,11 +131,46 @@ void main() {
     await submit(const Left(Failure.conflict()));
 
     // Act
-    bloc.add(const RegisterEvent.emailEdited());
+    bloc.add(const RegisterEvent.emailEdited('b@c.co'));
     await pumpEventQueue();
 
     // Assert
     expect(bloc.state.emailTaken, isFalse);
+    expect(bloc.state.emailError, isNull);
+  });
+
+  test('editing before a failed submit shows no field errors', () async {
+    // Arrange
+    // (a fresh form)
+
+    // Act
+    bloc
+      ..add(const RegisterEvent.nameEdited(' '))
+      ..add(const RegisterEvent.passwordEdited('short'));
+    await pumpEventQueue();
+
+    // Assert
+    expect(bloc.state.nameError, isNull);
+    expect(bloc.state.passwordError, isNull);
+  });
+
+  test('after a failed submit, an edit re-checks only its field', () async {
+    // Arrange
+    await submit(
+      const Left(Failure.validation([_nameRequired, _passwordTooShort])),
+    );
+
+    // Act
+    bloc.add(const RegisterEvent.passwordEdited('password1'));
+    await pumpEventQueue();
+    final fixed = bloc.state;
+    bloc.add(const RegisterEvent.nameEdited('  '));
+    await pumpEventQueue();
+
+    // Assert
+    expect(fixed.passwordError, isNull);
+    expect(fixed.nameError, _nameRequired);
+    expect(bloc.state.nameError?.code, 'required');
   });
 
   test('a server error shows the generic banner', () async {

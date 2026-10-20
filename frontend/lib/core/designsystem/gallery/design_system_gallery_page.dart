@@ -128,6 +128,7 @@ class _GalleryBody extends StatelessWidget {
               ),
               const _Section(title: 'Fields', child: _Fields()),
               const _Section(title: 'Surfaces', child: _Surfaces()),
+              const _Section(title: 'Money', child: _Money()),
               const _Section(title: 'Badges', child: _Badges()),
               _Section(
                 title: 'Selection',
@@ -495,39 +496,14 @@ class _Surfaces extends StatelessWidget {
         ),
         SizedBox(
           height: MonAISizes.walletCardHeight,
-          child: MonAIGradientCard(
-            gradient: WalletGradients.eWallet(dark: c.isDark).gradient,
-            borderRadius: MonAIRadius.lgAll,
-            padding: const .all(MonAISpacing.x4),
-            elevated: false,
-            decorated: false,
+          child: MonAIWalletCard(
+            name: 'GoPay',
+            monogram: 'GP',
+            gradient: WalletGradients.eWallet(dark: c.isDark),
+            balance: 'Rp 1.185.000',
+            balanceLabel: 'E-wallet · balance',
+            defaultLabel: 'Default',
             onTap: () {},
-            child: Column(
-              crossAxisAlignment: .start,
-              mainAxisAlignment: .spaceBetween,
-              children: [
-                Row(
-                  spacing: MonAISpacing.x2_5,
-                  children: [
-                    MonAIMonogram(
-                      text: 'GP',
-                      contentColor: WalletGradients.eWallet(dark: c.isDark)
-                          .start,
-                    ),
-                    Text(
-                      'GoPay',
-                      style: t.titleMedium?.copyWith(color: Colors.white),
-                    ),
-                  ],
-                ),
-                Text(
-                  'Rp 1.185.000',
-                  style: context.textStyles.amountLarge.copyWith(
-                    color: Colors.white,
-                  ),
-                ),
-              ],
-            ),
           ),
         ),
         MonAICard(
@@ -808,6 +784,67 @@ class _Feedback extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ],
+    );
+  }
+}
+
+class _Money extends StatelessWidget {
+  const _Money();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: .stretch,
+      spacing: MonAISpacing.x4,
+      children: [
+        MonAICard(
+          padding: .zero,
+          child: Column(
+            children: [
+              MonAITransactionRow(
+                title: 'Makan siang',
+                meta: 'Food · GoPay · 12:40',
+                amount: '−Rp 35.000',
+                direction: .expense,
+                categoryIcon: MonAIIcons.restaurant,
+                categoryColor: CategoryColors.parse('#F97316'),
+                onTap: () {},
+                showDivider: true,
+              ),
+              MonAITransactionRow(
+                title: 'Top up GoPay',
+                meta: 'Transfer · BCA → GoPay · Yesterday',
+                amount: 'Rp 500.000',
+                direction: .transfer,
+                categoryIcon: MonAIIcons.swapHoriz,
+                categoryColor: context.colors.accent,
+                onTap: () {},
+              ),
+            ],
+          ),
+        ),
+        const SizedBox.square(
+          dimension: 140,
+          child: MonAIDonut(
+            shares: [36, 25, 17, 13, 9],
+            colors: [
+              Color(0xFFF97316),
+              Color(0xFF8B5CF6),
+              Color(0xFF0EA5E9),
+              Color(0xFFEC4899),
+              Color(0xFF94A3B8),
+            ],
+            stroke: 17,
+          ),
+        ),
+        const MonAIBudgetRemaining(text: 'Rp 585.000 left', status: .warning),
+        MonAIBudgetPromptCard(
+          title: 'No budget for October',
+          body: "Set a monthly limit to see how you're tracking.",
+          actionLabel: 'Set',
+          onTap: () {},
         ),
       ],
     );

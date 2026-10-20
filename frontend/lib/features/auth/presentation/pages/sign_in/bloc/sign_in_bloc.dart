@@ -4,6 +4,7 @@ import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/error/field_error.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
+import 'package:monai/features/auth/domain/validation/auth_input.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 
@@ -20,14 +21,29 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
 
   final LoginUseCase _login;
 
-  // The typed values stay in the screen's text controllers; editing a field
-  // only clears the errors it may have fixed.
+  // Field errors stay hidden until a submit fails on the input; after that,
+  // each edit re-checks its field. An edit always clears the banner, since
+  // only the next submit can tell whether the problem is still there.
   void _onEmailEdited(_EmailEdited event, Emitter<SignInState> emit) {
-    emit(state.copyWith(emailError: null, formError: null));
+    emit(
+      state.copyWith(
+        emailError: state.autovalidate
+            ? AuthInputValidator.loginEmail(event.email.normalizedEmail)
+            : state.emailError,
+        formError: null,
+      ),
+    );
   }
 
   void _onPasswordEdited(_PasswordEdited event, Emitter<SignInState> emit) {
-    emit(state.copyWith(passwordError: null, formError: null));
+    emit(
+      state.copyWith(
+        passwordError: state.autovalidate
+            ? AuthInputValidator.loginPassword(event.password)
+            : state.passwordError,
+        formError: null,
+      ),
+    );
   }
 
   /// On success the saved session moves the app to Home, so the form stays
@@ -63,6 +79,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
           emailError: emailError,
           passwordError: passwordError,
           focusField: focusField,
+          autovalidate: true,
         );
       }
     }

@@ -15,3 +15,25 @@ String formatRupiah(int amount) {
 /// [amount] itself is ignored.
 String formatRupiahSigned(int amount, {required bool negative}) =>
     '${negative ? '−' : '+'}${formatRupiah(amount.abs())}';
+
+const _compactUnits = [
+  (1000000000000, 'T'),
+  (1000000000, 'M'),
+  (1000000, 'jt'),
+  (1000, 'rb'),
+];
+
+/// Formats whole rupiah in short form: `Rp 35 rb`, `Rp 2,4 jt`, `Rp 2 M`.
+///
+/// Keeps one decimal, truncated, so 999.999 reads `Rp 999,9 rb` rather than
+/// rounding up. Amounts under a thousand use [formatRupiah].
+String formatRupiahCompact(int amount) {
+  final abs = amount.abs();
+  final unit = _compactUnits.where((u) => abs >= u.$1).firstOrNull;
+  if (unit == null) return formatRupiah(amount);
+  final (size, suffix) = unit;
+  final whole = abs ~/ size;
+  final tenth = (abs % size) ~/ (size ~/ 10);
+  final number = '${_rupiahDigits.format(whole)}${tenth > 0 ? ',$tenth' : ''}';
+  return '${amount < 0 ? '−' : ''}Rp $number $suffix';
+}

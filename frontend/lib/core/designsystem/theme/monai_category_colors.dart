@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 
 import 'package:monai/core/designsystem/theme/monai_palette.dart';
+import 'package:monai/core/model/wallet_type.dart';
 
 /// Category colors.
 ///
@@ -68,6 +69,24 @@ class WalletGradient {
 
 /// Wallet card gradients by wallet type, light and dark.
 abstract final class WalletGradients {
+  /// The card of a wallet with the stored [colorHex], else its [type]'s.
+  static WalletGradient of(
+    WalletType type, {
+    required bool dark,
+    String? colorHex,
+  }) =>
+      WalletColor.fromHex(colorHex)?.gradient(dark: dark) ??
+      forType(type, dark: dark);
+
+  /// The [type]'s own card, for a wallet without a color of its own.
+  static WalletGradient forType(WalletType type, {required bool dark}) =>
+      switch (type) {
+        .bank => bank(dark: dark),
+        .eWallet => eWallet(dark: dark),
+        .cash => cash(dark: dark),
+        .other => bankAlt(dark: dark),
+      };
+
   /// Bank wallets (indigo).
   static WalletGradient bank({required bool dark}) => dark
       ? const WalletGradient(

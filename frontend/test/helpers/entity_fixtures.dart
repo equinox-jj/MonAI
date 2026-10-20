@@ -1,9 +1,11 @@
 import 'package:monai/core/model/budget_status.dart';
+import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/features/auth/domain/entity/auth_session.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
+import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
@@ -16,6 +18,7 @@ Wallet wallet({
   String name = 'Cash',
   WalletType type = WalletType.cash,
   int initialBalance = 0,
+  int currentBalance = 100000,
   String? providerId,
   String? color,
   bool isDefault = false,
@@ -26,7 +29,7 @@ Wallet wallet({
   name: name,
   type: type,
   initialBalance: initialBalance,
-  currentBalance: 100000,
+  currentBalance: currentBalance,
   color: color,
   isDefault: isDefault,
   isArchived: isArchived,
@@ -40,22 +43,29 @@ Transaction transaction({
   int amount = 10000,
   String walletId = 'w1',
   String? categoryId = 'c1',
+  String? toWalletId,
+  String? note,
+  String? merchant,
   DateTime? date,
+  DateTime? createdAt,
 }) => Transaction(
   id: id,
   type: type,
   amount: amount,
   walletId: walletId,
+  toWalletId: toWalletId,
   categoryId: categoryId,
+  note: note,
+  merchant: merchant,
   date: date ?? DateTime(2026, 10, 1),
   source: TransactionSource.manual,
-  createdAt: _timestamp,
+  createdAt: createdAt ?? _timestamp,
   updatedAt: _timestamp,
 );
 
-User user({String id = 'u1'}) => User(
+User user({String id = 'u1', String name = 'Ana'}) => User(
   id: id,
-  name: 'Ana',
+  name: name,
   email: 'ana@monai.id',
   timezone: 'Asia/Jakarta',
   role: const UserRole(slug: 'user', name: 'User'),
@@ -79,7 +89,11 @@ Budget budget({DateTime? month}) => Budget(
   status: BudgetStatus.ok,
 );
 
-MonthlyReport monthlyReport({DateTime? month}) => MonthlyReport(
+MonthlyReport monthlyReport({
+  DateTime? month,
+  List<CategoryBreakdown> categories = const [],
+  double? expenseChangePercent,
+}) => MonthlyReport(
   month: month ?? DateTime(2026, 10),
   incomeTotal: 5000000,
   expenseTotal: 250000,
@@ -89,5 +103,38 @@ MonthlyReport monthlyReport({DateTime? month}) => MonthlyReport(
     incomeTotal: 0,
     expenseTotal: 0,
   ),
-  categories: const [],
+  categories: categories,
+  expenseChangePercent: expenseChangePercent,
+);
+
+Category category({
+  String id = 'c1',
+  String name = 'Food',
+  String? icon = 'restaurant',
+  String? color = '#F97316',
+}) => Category(
+  id: id,
+  name: name,
+  type: CategoryType.expense,
+  isDefault: true,
+  isSystem: false,
+  isHidden: false,
+  icon: icon,
+  color: color,
+  createdAt: _timestamp,
+  updatedAt: _timestamp,
+);
+
+CategoryBreakdown categoryBreakdown({
+  String id = 'c1',
+  String name = 'Food',
+  int amount = 100000,
+  double sharePercent = 40,
+}) => CategoryBreakdown(
+  categoryId: id,
+  name: name,
+  amount: amount,
+  sharePercent: sharePercent,
+  previousAmount: 0,
+  color: '#F97316',
 );

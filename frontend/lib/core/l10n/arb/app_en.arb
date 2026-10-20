@@ -102,5 +102,117 @@
   "navTransactions": "Transactions",
   "navWallets": "Wallets",
   "navSettings": "Settings",
-  "navAddTransaction": "Add transaction"
+  "navAddTransaction": "Add transaction",
+  "homeGreetingMorning": "Good morning,",
+  "homeGreetingAfternoon": "Good afternoon,",
+  "homeGreetingEvening": "Good evening,",
+  "homeGreetingWelcome": "Welcome,",
+  "homeSearch": "Search transactions",
+  "homeProfile": "Profile and settings",
+  "homeTotalBalance": "{count, plural, =1{Total balance · 1 wallet} other{Total balance · {count} wallets}}",
+  "@homeTotalBalance": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "homeHideBalance": "Hide balance",
+  "homeShowBalance": "Balance hidden, show balance",
+  "homeHiddenAmount": "Rp ••••••",
+  "homeHiddenAmountShort": "••••",
+  "homeIncomeMonth": "Income · {month}",
+  "@homeIncomeMonth": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "homeExpenseMonth": "Expense · {month}",
+  "@homeExpenseMonth": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "homeSpentLess": "{percent}% less spent than {month}",
+  "@homeSpentLess": {
+    "placeholders": {"percent": {"type": "int"}, "month": {"type": "String"}}
+  },
+  "homeSpentMore": "{percent}% more spent than {month}",
+  "@homeSpentMore": {
+    "placeholders": {"percent": {"type": "int"}, "month": {"type": "String"}}
+  },
+  "homeSpentSame": "Same spending as {month}",
+  "@homeSpentSame": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "homeAddWallets": "Add BCA, GoPay and more",
+  "homeQuickAddExample": "makan siang 35rb pakai gopay",
+  "homeQuickAddHelper": "Type it like you'd say it — we'll fill the form for you.",
+  "homeScanReceipt": "Scan receipt",
+  "homeWallets": "Wallets",
+  "homeSeeAll": "See all",
+  "homeWalletDefault": "Default",
+  "homeWalletBalance": "{type} · balance",
+  "@homeWalletBalance": {
+    "placeholders": {"type": {"type": "String"}}
+  },
+  "walletTypeCash": "Cash",
+  "walletTypeBank": "Bank",
+  "walletTypeEWallet": "E-wallet",
+  "walletTypeOther": "Other",
+  "homeBudgetTitle": "{month} budget",
+  "@homeBudgetTitle": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "homeBudgetDaysLeft": "{count, plural, =1{1 day left} other{{count} days left}}",
+  "@homeBudgetDaysLeft": {
+    "placeholders": {"count": {"type": "int"}}
+  },
+  "homeBudgetLastDay": "Last day",
+  "homePercent": "{percent}%",
+  "@homePercent": {
+    "placeholders": {"percent": {"type": "int"}}
+  },
+  "homeBudgetProgress": "{spent} of {limit}",
+  "@homeBudgetProgress": {
+    "placeholders": {"spent": {"type": "String"}, "limit": {"type": "String"}}
+  },
+  "homeBudgetLeft": "{amount} left",
+  "@homeBudgetLeft": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "homeBudgetOver": "{amount} over",
+  "@homeBudgetOver": {
+    "placeholders": {"amount": {"type": "String"}}
+  },
+  "homeBudgetChange": "Change budget",
+  "homeBudgetEmptyTitle": "No budget for {month}",
+  "@homeBudgetEmptyTitle": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "homeBudgetEmptyBody": "Set a monthly limit to see how you're tracking.",
+  "homeBudgetSet": "Set",
+  "homeSpendingTitle": "Where it went",
+  "homeSpendingTitleMonth": "Spending by category · {month}",
+  "@homeSpendingTitleMonth": {
+    "placeholders": {"month": {"type": "String"}}
+  },
+  "homeFullReport": "Full report",
+  "homeSpendingOthers": "Others",
+  "homeSpendingSpent": "spent",
+  "homeSpendingDescription": "{month} spending: {shares}",
+  "@homeSpendingDescription": {
+    "placeholders": {"month": {"type": "String"}, "shares": {"type": "String"}}
+  },
+  "homeSpendingShareDescription": "{name} {percent} percent",
+  "@homeSpendingShareDescription": {
+    "placeholders": {"name": {"type": "String"}, "percent": {"type": "int"}}
+  },
+  "homeRecent": "Recent",
+  "homeTransactionTransfer": "Transfer",
+  "homeTransactionUntitled": "Transaction",
+  "homeYesterday": "Yesterday",
+  "homeEmptyTitle": "No transactions yet",
+  "homeEmptyBody": "Add your first expense to see where your money goes.",
+  "homeEmptyAdd": "Add transaction",
+  "homeEmptyQuickAdd": "or try “kopi 25rb pakai cash”",
+  "homeLoading": "Loading your dashboard",
+  "homeErrorTitle": "Couldn't load your dashboard",
+  "homeTryAgain": "Try again",
+  "homeLoadFailedNetwork": "You're offline. Connect to the internet to load your dashboard.",
+  "homeLoadFailedUnexpected": "Something went wrong on our side. Your data is safe — try again in a moment.",
+  "homeRefreshFailedNetwork": "You're offline. Showing saved data.",
+  "homeRefreshFailedUnexpected": "Couldn't refresh. Showing saved data."
 }

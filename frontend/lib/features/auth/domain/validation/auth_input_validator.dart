@@ -44,17 +44,36 @@ abstract final class AuthInputValidator {
     required String email,
     required String password,
   }) => [
-    ?_nameError(name),
-    ?_emailError(email, max: _emailMax),
-    ?_passwordError(password, min: passwordMin),
+    ?registerName(name),
+    ?registerEmail(email),
+    ?registerPassword(password),
   ];
+
+  /// The problem with a register form's name; null when valid. Lets the
+  /// screen re-check one field as it is edited.
+  static FieldError? registerName(String name) => _nameError(name);
+
+  /// The problem with a register form's email; null when valid.
+  static FieldError? registerEmail(String email) =>
+      _emailError(email, max: _emailMax);
+
+  /// The problem with a register form's password; null when valid.
+  static FieldError? registerPassword(String password) =>
+      _passwordError(password, min: passwordMin);
 
   /// The problems with a login form; empty when valid. The server has no
   /// password minimum on login, so a short one fails as wrong credentials.
   static List<FieldError> login({
     required String email,
     required String password,
-  }) => [?_emailError(email), ?_passwordError(password)];
+  }) => [?loginEmail(email), ?loginPassword(password)];
+
+  /// The problem with a login form's email; null when valid. Lets the screen
+  /// re-check one field as it is edited.
+  static FieldError? loginEmail(String email) => _emailError(email);
+
+  /// The problem with a login form's password; null when valid.
+  static FieldError? loginPassword(String password) => _passwordError(password);
 
   /// The problems with a change-password form; empty when valid. The new
   /// password follows the register rules and must differ from the current

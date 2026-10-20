@@ -186,8 +186,8 @@ class _EmailField extends StatelessWidget {
         return MonAITextField(
           controller: controller,
           focusNode: focusNode,
-          onChanged: (_) =>
-              context.read<SignInBloc>().add(const SignInEvent.emailEdited()),
+          onChanged: (value) =>
+              context.read<SignInBloc>().add(SignInEvent.emailEdited(value)),
           onSubmitted: (_) => nextFocus.requestFocus(),
           enabled: !submitting,
           label: l10n.authEmailLabel,
@@ -228,9 +228,8 @@ class _PasswordField extends StatelessWidget {
         return MonAIPasswordField(
           controller: controller,
           focusNode: focusNode,
-          onChanged: (_) => context.read<SignInBloc>().add(
-            const SignInEvent.passwordEdited(),
-          ),
+          onChanged: (value) =>
+              context.read<SignInBloc>().add(SignInEvent.passwordEdited(value)),
           onSubmitted: (_) => onSubmit(),
           enabled: !submitting,
           label: l10n.authPasswordLabel,

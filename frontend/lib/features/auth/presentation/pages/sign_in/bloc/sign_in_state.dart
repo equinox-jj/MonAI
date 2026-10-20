@@ -12,6 +12,9 @@ abstract class SignInState with _$SignInState {
     /// A problem with the whole attempt, shown as a banner.
     AuthFormError? formError,
 
+    /// A submit failed on the input, so each edit re-checks its field.
+    @Default(false) bool autovalidate,
+
     /// The first field with an error after a failed submit; the screen
     /// focuses it so the keyboard and screen reader land on the error.
     AuthField? focusField,
