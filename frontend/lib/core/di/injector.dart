@@ -15,6 +15,8 @@ import 'package:monai/core/network/interceptors/auth_interceptor.dart';
 import 'package:monai/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/services/app_info_service.dart';
+import 'package:monai/core/services/avatar_photo_service.dart';
+import 'package:monai/core/services/file_share_service.dart';
 import 'package:monai/core/services/image_compressor_service.dart';
 import 'package:monai/core/services/receipt_scanner_service.dart';
 import 'package:monai/core/storage/app_preferences.dart';
@@ -76,6 +78,8 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<ImageCompressorService>(
     ImageCompressorServiceImpl.new,
   );
+  sl.registerLazySingleton<AvatarPhotoService>(AvatarPhotoServiceImpl.new);
+  sl.registerLazySingleton<FileShareService>(FileShareServiceImpl.new);
   sl.registerLazySingleton<Dio>(
     () => DioClient(
       authInterceptor: sl<AuthInterceptor>(),

@@ -41,11 +41,15 @@ class TransactionFormCategory extends StatelessWidget {
     return BlocSelector<
       TransactionFormBloc,
       TransactionFormState,
-      (List<Category>, String?)
+      (List<Category>, String?, bool)
     >(
-      selector: (state) => (state.categories, state.draft.categoryId),
+      selector: (state) => (
+        state.categories,
+        state.draft.categoryId,
+        state.isUnsure(TransactionInputValidator.categoryField),
+      ),
       builder: (context, selected) {
-        final (categories, selectedId) = selected;
+        final (categories, selectedId, check) = selected;
         return Column(
           crossAxisAlignment: .stretch,
           spacing: MonAISpacing.x1_5,
@@ -54,9 +58,11 @@ class TransactionFormCategory extends StatelessWidget {
               mainAxisAlignment: .spaceBetween,
               children: [
                 Text(
-                  l10n.transactionFormCategory,
+                  check
+                      ? l10n.transactionFormCategoryCheck
+                      : l10n.transactionFormCategory,
                   style: context.textTheme.labelMedium?.copyWith(
-                    color: c.textSecondary,
+                    color: check ? c.warning : c.textSecondary,
                   ),
                 ),
                 MonAITextLink(

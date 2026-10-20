@@ -94,4 +94,68 @@ void main() {
       ),
     );
   });
+
+  group('compressAvatar', () {
+    ImageCompressorServiceImpl avatarService(int? size) =>
+        ImageCompressorServiceImpl(
+          compressAvatar: (path, {required quality, required side}) async {
+            calls.add(side);
+            return size == null ? null : Uint8List(size);
+          },
+        );
+
+    test('gives a 512 px photo under the avatar limit', () async {
+      // Arrange
+      final compressor = avatarService(40000);
+
+      // Act
+      final bytes = await compressor.compressAvatar('/tmp/me.jpg');
+
+      // Assert
+      expect(bytes.length, 40000);
+      expect(calls, [ImageCompressorServiceImpl.avatarSide]);
+    });
+
+    test('a photo over the avatar limit is too large', () async {
+      // Arrange
+      final compressor = avatarService(
+        ImageCompressorServiceImpl.avatarMaxBytes + 1,
+      );
+
+      // Act
+      final result = compressor.compressAvatar('/tmp/me.jpg');
+
+      // Assert
+      await expectLater(
+        result,
+        throwsA(
+          isA<UnknownException>().having(
+            (e) => e.code,
+            'code',
+            'photo_too_large',
+          ),
+        ),
+      );
+    });
+
+    test('an unreadable photo says so', () async {
+      // Arrange
+      final compressor = avatarService(null);
+
+      // Act
+      final result = compressor.compressAvatar('/tmp/me.jpg');
+
+      // Assert
+      await expectLater(
+        result,
+        throwsA(
+          isA<UnknownException>().having(
+            (e) => e.code,
+            'code',
+            'unreadable_image',
+          ),
+        ),
+      );
+    });
+  });
 }

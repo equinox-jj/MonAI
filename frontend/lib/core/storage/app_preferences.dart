@@ -30,6 +30,13 @@ abstract interface class AppPreferences {
   /// Puts [query] first in [recentSearches], dropping an older copy of it and
   /// the oldest past the limit. Blank text is ignored.
   Future<void> addRecentSearch(String query);
+
+  /// The name of the CSV separator last exported with, or null before the
+  /// first export.
+  Future<String?> csvDelimiter();
+
+  /// Remembers the CSV separator by [name].
+  Future<void> setCsvDelimiter(String name);
 }
 
 /// [AppPreferences] backed by [SharedPreferences].
@@ -42,6 +49,7 @@ class SharedAppPreferences implements AppPreferences {
   static const _kThemeMode = 'theme_mode';
   static const _kLanguage = 'language';
   static const _kRecentSearches = 'recent_searches';
+  static const _kCsvDelimiter = 'csv_delimiter';
 
   /// How many searches [recentSearches] keeps.
   static const recentSearchLimit = 5;
@@ -92,5 +100,13 @@ class SharedAppPreferences implements AppPreferences {
       ...(await recentSearches()).where((s) => s.toLowerCase() != key),
     ].take(recentSearchLimit).toList();
     await _prefs.setStringList(_kRecentSearches, searches);
+  }
+
+  @override
+  Future<String?> csvDelimiter() async => _prefs.getString(_kCsvDelimiter);
+
+  @override
+  Future<void> setCsvDelimiter(String name) async {
+    await _prefs.setString(_kCsvDelimiter, name);
   }
 }

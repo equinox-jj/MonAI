@@ -23,12 +23,16 @@ class TransactionFormAmount extends StatelessWidget {
     return BlocSelector<
       TransactionFormBloc,
       TransactionFormState,
-      (int, TransactionType, int?)
+      (int, TransactionType, int?, bool)
     >(
-      selector: (state) =>
-          (state.draft.amount, state.draft.type, state.changedFromAmount),
+      selector: (state) => (
+        state.draft.amount,
+        state.draft.type,
+        state.changedFromAmount,
+        state.isUnsure(TransactionInputValidator.amountField),
+      ),
       builder: (context, selected) {
-        final (amount, type, was) = selected;
+        final (amount, type, was, check) = selected;
         final (sign, color) = switch (type) {
           .expense => ('−', c.expense),
           .income => ('+', c.income),
@@ -59,6 +63,11 @@ class TransactionFormAmount extends StatelessWidget {
                   ),
                 ],
               ),
+              if (check)
+                Text(
+                  context.l10n.transactionFormCheckAmount,
+                  style: t.bodySmall?.copyWith(color: c.warning),
+                ),
               if (was case final was?)
                 Text(
                   context.l10n.transactionFormWas(formatRupiah(was)),

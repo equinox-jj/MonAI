@@ -10,6 +10,7 @@ import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/core/usecase/usecase.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
+import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/transaction_input.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
@@ -42,7 +43,11 @@ class TransactionFormBloc
     required this._delete,
     required this._watchLookups,
     DateTime Function()? now,
-  }) : super(_initialState(mode, (now ?? DateTime.now)())) {
+  }) : _baselineNote = switch (mode) {
+         PrefillTransactionMode(:final draft) => draft.note ?? '',
+         _ => '',
+       },
+       super(_initialState(mode, (now ?? DateTime.now)())) {
     on<_Started>(_onStarted);
     on<_Retried>(_onRetried);
     on<_TypeSelected>(_onTypeSelected);
@@ -69,8 +74,9 @@ class TransactionFormBloc
 
   StreamSubscription<void>? _lookups;
 
-  /// The note the form started with; the edited transaction's own.
-  String _baselineNote = '';
+  /// The note the form started with: the edited transaction's own, or the
+  /// quick-add draft's.
+  String _baselineNote;
 
   /// Where the form goes once it is left: closed, or to the scanner.
   TransactionFormOutcome _leaveTo = const TransactionFormOutcome.closed();
@@ -95,6 +101,15 @@ class TransactionFormBloc
         date: today,
         walletId: walletId,
       ),
+      PrefillTransactionMode(draft: final quick) => TransactionDraft(
+        type: quick.type,
+        // A draft read wrong as a later day starts at today.
+        date: quick.date.isAfter(today) ? today : quick.date,
+        amount: quick.amount ?? 0,
+        walletId: quick.walletId,
+        toWalletId: quick.toWalletId,
+        categoryId: quick.categoryId,
+      ),
       EditTransactionMode() => TransactionDraft(
         type: TransactionType.expense,
         date: today,
@@ -105,8 +120,47 @@ class TransactionFormBloc
       today: today,
       draft: draft,
       baseline: draft,
-      status: mode is AddTransactionMode ? UiStatus.success : UiStatus.initial,
+      unsure: switch (mode) {
+        PrefillTransactionMode(draft: final quick) => _unsureOf(quick),
+        _ => const {},
+      },
+      status: mode is EditTransactionMode ? UiStatus.initial : UiStatus.success,
     );
+  }
+
+  /// The fields of [draft] the user should check: missing or read unsurely.
+  static Set<String> _unsureOf(QuickAddDraft draft) => {
+    if (draft.amount == null || draft.isAmountUnsure)
+      TransactionInputValidator.amountField,
+    if (draft.walletId == null || draft.isWalletUnsure)
+      TransactionInputValidator.walletField,
+    if (draft.isCategoryUnsure ||
+        (draft.type != .transfer && draft.categoryId == null))
+      TransactionInputValidator.categoryField,
+    if (draft.isDateUnsure) TransactionInputValidator.dateField,
+  };
+
+  /// [unsure] without the fields [next] changed from [previous].
+  static Set<String> _stillUnsure(
+    Set<String> unsure,
+    TransactionDraft previous,
+    TransactionDraft next,
+  ) {
+    if (unsure.isEmpty) return unsure;
+    return {
+      for (final field in unsure)
+        if (!switch (field) {
+          TransactionInputValidator.amountField =>
+            previous.amount != next.amount,
+          TransactionInputValidator.walletField =>
+            previous.walletId != next.walletId,
+          TransactionInputValidator.categoryField =>
+            previous.categoryId != next.categoryId,
+          TransactionInputValidator.dateField => previous.date != next.date,
+          _ => false,
+        })
+          field,
+    };
   }
 
   Future<void> _onStarted(
@@ -164,7 +218,7 @@ class TransactionFormBloc
     Emitter<TransactionFormState> emit,
   ) {
     emit(state.copyWith(lookups: event.lookups));
-    if (state.mode is! AddTransactionMode) return;
+    if (state.mode is EditTransactionMode) return;
     // Defaults aren't changes: the baseline takes them too.
     final draft = _withDefaultWallets(state.draft);
     final baseline = _withDefaultWallets(state.baseline);
@@ -273,8 +327,9 @@ class TransactionFormBloc
 
   /// Applies an edit, re-checking the fields once a save failed on them.
   void _edit(Emitter<TransactionFormState> emit, TransactionDraft draft) {
+    final unsure = _stillUnsure(state.unsure, state.draft, draft);
     if (!state.autovalidate) {
-      emit(state.copyWith(draft: draft));
+      emit(state.copyWith(draft: draft, unsure: unsure));
       return;
     }
     final live = TransactionInputValidator.validate(
@@ -284,6 +339,7 @@ class TransactionFormBloc
     emit(
       state.copyWith(
         draft: draft,
+        unsure: unsure,
         errors: {
           // The note is only checked on save.
           for (final MapEntry(:key, :value) in state.errors.entries)
@@ -294,19 +350,24 @@ class TransactionFormBloc
     );
   }
 
-  TransactionInput _input(TransactionDraft draft, {required String note}) =>
-      TransactionInput(
-        type: draft.type,
-        amount: draft.amount,
-        date: draft.date,
-        walletId: draft.walletId,
-        toWalletId: draft.toWalletId,
-        categoryId: draft.categoryId,
-        note: note,
-        // The form doesn't edit these; an update keeps them.
-        merchant: state.original?.merchant,
-        source: state.original?.source ?? .manual,
-      );
+  TransactionInput _input(TransactionDraft draft, {required String note}) {
+    final quick = switch (state.mode) {
+      PrefillTransactionMode(:final draft) => draft,
+      _ => null,
+    };
+    return TransactionInput(
+      type: draft.type,
+      amount: draft.amount,
+      date: draft.date,
+      walletId: draft.walletId,
+      toWalletId: draft.toWalletId,
+      categoryId: draft.categoryId,
+      note: note,
+      // The form doesn't edit these; an update keeps them.
+      merchant: state.original?.merchant ?? quick?.merchant,
+      source: state.original?.source ?? (quick != null ? .quickAdd : .manual),
+    );
+  }
 
   Future<void> _onSaveRequested(
     _SaveRequested event,

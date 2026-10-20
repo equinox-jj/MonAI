@@ -7,6 +7,7 @@ import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:monai/core/router/app_router.dart';
+import 'package:monai/features/export/presentation/pages/export_csv/export_csv_sheet.dart';
 import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
 import 'package:monai/features/settings/presentation/pages/settings/bloc/settings_bloc.dart';
 import 'package:monai/features/settings/presentation/pages/settings/widgets/settings_actions.dart';
@@ -35,8 +36,7 @@ class SettingsUI extends StatelessWidget {
   /// Wide windows keep the list at a readable width.
   static const _maxContentWidth = 720.0;
 
-  // TODO(settings): open Edit profile once it exists.
-  void _openProfile() {}
+  void _openProfile(BuildContext context) => context.push(AppRoutes.profile);
 
   void _openBudget(BuildContext context) => context.push(AppRoutes.budgetFor());
 
@@ -45,8 +45,7 @@ class SettingsUI extends StatelessWidget {
 
   void _openWallets(BuildContext context) => context.go(AppRoutes.wallets);
 
-  // TODO(settings): open the CSV export once it exists.
-  void _export() {}
+  void _export(BuildContext context) => showExportCsvSheet(context);
 
   // TODO(settings): open Manage payment providers once it exists.
   void _manageProviders() {}
@@ -54,9 +53,8 @@ class SettingsUI extends StatelessWidget {
   // TODO(settings): open Change password once it exists.
   void _changePassword() {}
 
-  // TODO(settings): open Edit profile at its delete-account card once it
-  // exists.
-  void _deleteAccount() {}
+  void _deleteAccount(BuildContext context) =>
+      context.push(AppRoutes.profileDeleteAccount);
 
   void _pickTheme(BuildContext context) {
     final appSettings = context.read<AppSettingsCubit>();
@@ -132,18 +130,18 @@ class SettingsUI extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final actions = SettingsActions(
-      onOpenProfile: _openProfile,
+      onOpenProfile: () => _openProfile(context),
       onOpenBudget: () => _openBudget(context),
       onOpenCategories: () => _openCategories(context),
       onOpenWallets: () => _openWallets(context),
-      onExport: _export,
+      onExport: () => _export(context),
       onPickTheme: () => _pickTheme(context),
       onPickLanguage: () => _pickLanguage(context),
       onManageProviders: _manageProviders,
       onChangePassword: _changePassword,
       onSignOut: () => _signOut(context, allDevices: false),
       onSignOutAllDevices: () => _signOut(context, allDevices: true),
-      onDeleteAccount: _deleteAccount,
+      onDeleteAccount: () => _deleteAccount(context),
     );
 
     return ColoredBox(

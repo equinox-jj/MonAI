@@ -1,4 +1,7 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
+import 'package:monai/features/shared/data/model/draft_confidence_data.dart';
+
+export 'package:monai/features/shared/data/model/draft_confidence_data.dart';
 
 part 'parse_receipt_response.freezed.dart';
 part 'parse_receipt_response.g.dart';
@@ -45,20 +48,6 @@ abstract class ReceiptDraftData with _$ReceiptDraftData {
 
   factory ReceiptDraftData.fromJson(Map<String, dynamic> json) =>
       _$ReceiptDraftDataFromJson(json);
-}
-
-@freezed
-abstract class DraftConfidenceData with _$DraftConfidenceData {
-  const factory DraftConfidenceData({
-    @JsonKey(name: 'type') double? type,
-    @JsonKey(name: 'amount') double? amount,
-    @JsonKey(name: 'wallet') double? wallet,
-    @JsonKey(name: 'category') double? category,
-    @JsonKey(name: 'date') double? date,
-  }) = _DraftConfidenceData;
-
-  factory DraftConfidenceData.fromJson(Map<String, dynamic> json) =>
-      _$DraftConfidenceDataFromJson(json);
 }
 
 @freezed

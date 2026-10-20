@@ -22,4 +22,8 @@ class UserDao extends DatabaseAccessor<MonAIDatabase> with _$UserDaoMixin {
     await deleteAll();
     await upsert(row);
   });
+
+  /// Drops the cached user's profile photo, after it was removed.
+  Future<void> clearAvatar() =>
+      update(users).write(const UsersCompanion(avatarUrl: Value(null)));
 }

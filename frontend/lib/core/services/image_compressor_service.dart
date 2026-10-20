@@ -12,6 +12,14 @@ abstract class ImageCompressorService {
   /// file can't be decoded, or `photo_too_large` when it stays over the
   /// limit.
   Future<Uint8List> compressForUpload(String path);
+
+  /// The square image file at [path] as a 512×512 WebP profile photo under
+  /// the avatar limit, without EXIF data (location, camera).
+  ///
+  /// Throws an [UnknownException] with `code` `unreadable_image` when the
+  /// file can't be decoded, or `photo_too_large` when it stays over the
+  /// limit.
+  Future<Uint8List> compressAvatar(String path);
 }
 
 /// Compresses [path] to a JPEG at [quality] (0 to 100), scaled down so its
@@ -22,11 +30,23 @@ typedef CompressImage = Future<Uint8List?> Function(
   required int minSide,
 });
 
+/// Compresses [path] to a WebP at [quality] (0 to 100), scaled down to
+/// [side] pixels square; null when the image can't be read.
+typedef CompressAvatar = Future<Uint8List?> Function(
+  String path, {
+  required int quality,
+  required int side,
+});
+
 /// [ImageCompressorService] backed by `flutter_image_compress`.
 class ImageCompressorServiceImpl implements ImageCompressorService {
-  /// [compress] replaces the platform compressor in tests.
-  ImageCompressorServiceImpl({CompressImage? compress})
-    : _compress = compress ?? _flutterImageCompress;
+  /// [compress] and [compressAvatar] replace the platform compressor in
+  /// tests.
+  ImageCompressorServiceImpl({
+    CompressImage? compress,
+    CompressAvatar? compressAvatar,
+  }) : _compress = compress ?? _flutterImageCompress,
+       _compressAvatar = compressAvatar ?? _flutterAvatarCompress;
 
   /// The upload limit of `POST /transactions/receipt`.
   static const maxBytes = 5 * 1024 * 1024;
@@ -40,7 +60,29 @@ class ImageCompressorServiceImpl implements ImageCompressorService {
   /// The shorter side, in pixels, the photo is scaled down to.
   static const minSide = 1600;
 
+  /// The upload limit of `PUT /me/avatar`.
+  static const avatarMaxBytes = 2 * 1024 * 1024;
+
+  /// A profile photo's side, in pixels.
+  static const avatarSide = 512;
+
+  /// The WebP quality of a profile photo.
+  static const avatarQuality = 85;
+
   final CompressImage _compress;
+  final CompressAvatar _compressAvatar;
+
+  static Future<Uint8List?> _flutterAvatarCompress(
+    String path, {
+    required int quality,
+    required int side,
+  }) => FlutterImageCompress.compressWithFile(
+    path,
+    minWidth: side,
+    minHeight: side,
+    quality: quality,
+    format: CompressFormat.webp,
+  );
 
   static Future<Uint8List?> _flutterImageCompress(
     String path, {
@@ -69,5 +111,27 @@ class ImageCompressorServiceImpl implements ImageCompressorService {
       message: 'The photo is too large',
       code: 'photo_too_large',
     );
+  }
+
+  @override
+  Future<Uint8List> compressAvatar(String path) async {
+    final bytes = await _compressAvatar(
+      path,
+      quality: avatarQuality,
+      side: avatarSide,
+    );
+    if (bytes == null) {
+      throw const UnknownException(
+        message: "The photo couldn't be read",
+        code: 'unreadable_image',
+      );
+    }
+    if (bytes.length > avatarMaxBytes) {
+      throw const UnknownException(
+        message: 'The photo is too large',
+        code: 'photo_too_large',
+      );
+    }
+    return bytes;
   }
 }

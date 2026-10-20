@@ -1148,7 +1148,9 @@ mixin _$TransactionFormState {
 /// [UiStatus.success].
  UiStatus get status;/// The transaction being edited.
  Transaction? get original; TransactionLookups get lookups;/// One error per invalid field, keyed by the API's field name.
- Map<String, FieldError> get errors;/// A save failed on the input, so errors update as the user edits.
+ Map<String, FieldError> get errors;/// Fields a quick-add draft filled unsurely, keyed by the API's field
+/// name; each is marked until the user changes it.
+ Set<String> get unsure;/// A save failed on the input, so errors update as the user edits.
  bool get autovalidate; bool get isSaving; bool get isDeleting;/// Close was asked with unsaved changes: the discard dialog shows once.
  bool get askDiscard;/// Set once the form is done; the screen closes.
  TransactionFormOutcome? get outcome;/// Why the edited transaction couldn't be loaded.
@@ -1165,20 +1167,20 @@ $TransactionFormStateCopyWith<TransactionFormState> get copyWith => _$Transactio
 @override
 bool operator ==(Object other) {
   final _this = this as TransactionFormState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionFormState&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.today, _this.today) || other.today == _this.today)&&(identical(other.draft, _this.draft) || other.draft == _this.draft)&&(identical(other.baseline, _this.baseline) || other.baseline == _this.baseline)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.original, _this.original) || other.original == _this.original)&&(identical(other.lookups, _this.lookups) || other.lookups == _this.lookups)&&const DeepCollectionEquality().equals(other.errors, _this.errors)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.isDeleting, _this.isDeleting) || other.isDeleting == _this.isDeleting)&&(identical(other.askDiscard, _this.askDiscard) || other.askDiscard == _this.askDiscard)&&(identical(other.outcome, _this.outcome) || other.outcome == _this.outcome)&&(identical(other.loadFailure, _this.loadFailure) || other.loadFailure == _this.loadFailure)&&(identical(other.actionFailure, _this.actionFailure) || other.actionFailure == _this.actionFailure));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is TransactionFormState&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.today, _this.today) || other.today == _this.today)&&(identical(other.draft, _this.draft) || other.draft == _this.draft)&&(identical(other.baseline, _this.baseline) || other.baseline == _this.baseline)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.original, _this.original) || other.original == _this.original)&&(identical(other.lookups, _this.lookups) || other.lookups == _this.lookups)&&const DeepCollectionEquality().equals(other.errors, _this.errors)&&const DeepCollectionEquality().equals(other.unsure, _this.unsure)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.isDeleting, _this.isDeleting) || other.isDeleting == _this.isDeleting)&&(identical(other.askDiscard, _this.askDiscard) || other.askDiscard == _this.askDiscard)&&(identical(other.outcome, _this.outcome) || other.outcome == _this.outcome)&&(identical(other.loadFailure, _this.loadFailure) || other.loadFailure == _this.loadFailure)&&(identical(other.actionFailure, _this.actionFailure) || other.actionFailure == _this.actionFailure));
 }
 
 
 @override
 int get hashCode {
   final _this = this as TransactionFormState;
-  return Object.hash(runtimeType,_this.mode,_this.today,_this.draft,_this.baseline,_this.status,_this.original,_this.lookups,const DeepCollectionEquality().hash(_this.errors),_this.autovalidate,_this.isSaving,_this.isDeleting,_this.askDiscard,_this.outcome,_this.loadFailure,_this.actionFailure);
+  return Object.hash(runtimeType,_this.mode,_this.today,_this.draft,_this.baseline,_this.status,_this.original,_this.lookups,const DeepCollectionEquality().hash(_this.errors),const DeepCollectionEquality().hash(_this.unsure),_this.autovalidate,_this.isSaving,_this.isDeleting,_this.askDiscard,_this.outcome,_this.loadFailure,_this.actionFailure);
 }
 
 @override
 String toString() {
   final _this = this as TransactionFormState;
-  return 'TransactionFormState(mode: ${_this.mode}, today: ${_this.today}, draft: ${_this.draft}, baseline: ${_this.baseline}, status: ${_this.status}, original: ${_this.original}, lookups: ${_this.lookups}, errors: ${_this.errors}, autovalidate: ${_this.autovalidate}, isSaving: ${_this.isSaving}, isDeleting: ${_this.isDeleting}, askDiscard: ${_this.askDiscard}, outcome: ${_this.outcome}, loadFailure: ${_this.loadFailure}, actionFailure: ${_this.actionFailure})';
+  return 'TransactionFormState(mode: ${_this.mode}, today: ${_this.today}, draft: ${_this.draft}, baseline: ${_this.baseline}, status: ${_this.status}, original: ${_this.original}, lookups: ${_this.lookups}, errors: ${_this.errors}, unsure: ${_this.unsure}, autovalidate: ${_this.autovalidate}, isSaving: ${_this.isSaving}, isDeleting: ${_this.isDeleting}, askDiscard: ${_this.askDiscard}, outcome: ${_this.outcome}, loadFailure: ${_this.loadFailure}, actionFailure: ${_this.actionFailure})';
 }
 
 
@@ -1189,7 +1191,7 @@ abstract mixin class $TransactionFormStateCopyWith<$Res>  {
   factory $TransactionFormStateCopyWith(TransactionFormState value, $Res Function(TransactionFormState) _then) = _$TransactionFormStateCopyWithImpl;
 @useResult
 $Res call({
- TransactionFormMode mode, DateTime today, TransactionDraft draft, TransactionDraft baseline, UiStatus status, Transaction? original, TransactionLookups lookups, Map<String, FieldError> errors, bool autovalidate, bool isSaving, bool isDeleting, bool askDiscard, TransactionFormOutcome? outcome, TransactionFailure? loadFailure, TransactionFailure? actionFailure
+ TransactionFormMode mode, DateTime today, TransactionDraft draft, TransactionDraft baseline, UiStatus status, Transaction? original, TransactionLookups lookups, Map<String, FieldError> errors, Set<String> unsure, bool autovalidate, bool isSaving, bool isDeleting, bool askDiscard, TransactionFormOutcome? outcome, TransactionFailure? loadFailure, TransactionFailure? actionFailure
 });
 
 
@@ -1206,7 +1208,7 @@ class _$TransactionFormStateCopyWithImpl<$Res>
 
 /// Create a copy of TransactionFormState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? today = null,Object? draft = null,Object? baseline = null,Object? status = null,Object? original = freezed,Object? lookups = null,Object? errors = null,Object? autovalidate = null,Object? isSaving = null,Object? isDeleting = null,Object? askDiscard = null,Object? outcome = freezed,Object? loadFailure = freezed,Object? actionFailure = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? today = null,Object? draft = null,Object? baseline = null,Object? status = null,Object? original = freezed,Object? lookups = null,Object? errors = null,Object? unsure = null,Object? autovalidate = null,Object? isSaving = null,Object? isDeleting = null,Object? askDiscard = null,Object? outcome = freezed,Object? loadFailure = freezed,Object? actionFailure = freezed,}) {
   return _then(TransactionFormState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as TransactionFormMode,today: null == today ? _self.today : today // ignore: cast_nullable_to_non_nullable
@@ -1216,7 +1218,8 @@ as TransactionDraft,status: null == status ? _self.status : status // ignore: ca
 as UiStatus,original: freezed == original ? _self.original : original // ignore: cast_nullable_to_non_nullable
 as Transaction?,lookups: null == lookups ? _self.lookups : lookups // ignore: cast_nullable_to_non_nullable
 as TransactionLookups,errors: null == errors ? _self.errors : errors // ignore: cast_nullable_to_non_nullable
-as Map<String, FieldError>,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
+as Map<String, FieldError>,unsure: null == unsure ? _self.unsure : unsure // ignore: cast_nullable_to_non_nullable
+as Set<String>,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,isDeleting: null == isDeleting ? _self.isDeleting : isDeleting // ignore: cast_nullable_to_non_nullable
 as bool,askDiscard: null == askDiscard ? _self.askDiscard : askDiscard // ignore: cast_nullable_to_non_nullable
@@ -1368,10 +1371,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TransactionFormMode mode,  DateTime today,  TransactionDraft draft,  TransactionDraft baseline,  UiStatus status,  Transaction? original,  TransactionLookups lookups,  Map<String, FieldError> errors,  bool autovalidate,  bool isSaving,  bool isDeleting,  bool askDiscard,  TransactionFormOutcome? outcome,  TransactionFailure? loadFailure,  TransactionFailure? actionFailure)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( TransactionFormMode mode,  DateTime today,  TransactionDraft draft,  TransactionDraft baseline,  UiStatus status,  Transaction? original,  TransactionLookups lookups,  Map<String, FieldError> errors,  Set<String> unsure,  bool autovalidate,  bool isSaving,  bool isDeleting,  bool askDiscard,  TransactionFormOutcome? outcome,  TransactionFailure? loadFailure,  TransactionFailure? actionFailure)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _TransactionFormState() when $default != null:
-return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_that.original,_that.lookups,_that.errors,_that.autovalidate,_that.isSaving,_that.isDeleting,_that.askDiscard,_that.outcome,_that.loadFailure,_that.actionFailure);case _:
+return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_that.original,_that.lookups,_that.errors,_that.unsure,_that.autovalidate,_that.isSaving,_that.isDeleting,_that.askDiscard,_that.outcome,_that.loadFailure,_that.actionFailure);case _:
   return orElse();
 
 }
@@ -1389,10 +1392,10 @@ return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TransactionFormMode mode,  DateTime today,  TransactionDraft draft,  TransactionDraft baseline,  UiStatus status,  Transaction? original,  TransactionLookups lookups,  Map<String, FieldError> errors,  bool autovalidate,  bool isSaving,  bool isDeleting,  bool askDiscard,  TransactionFormOutcome? outcome,  TransactionFailure? loadFailure,  TransactionFailure? actionFailure)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( TransactionFormMode mode,  DateTime today,  TransactionDraft draft,  TransactionDraft baseline,  UiStatus status,  Transaction? original,  TransactionLookups lookups,  Map<String, FieldError> errors,  Set<String> unsure,  bool autovalidate,  bool isSaving,  bool isDeleting,  bool askDiscard,  TransactionFormOutcome? outcome,  TransactionFailure? loadFailure,  TransactionFailure? actionFailure)  $default,) {final _that = this;
 switch (_that) {
 case _TransactionFormState():
-return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_that.original,_that.lookups,_that.errors,_that.autovalidate,_that.isSaving,_that.isDeleting,_that.askDiscard,_that.outcome,_that.loadFailure,_that.actionFailure);case _:
+return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_that.original,_that.lookups,_that.errors,_that.unsure,_that.autovalidate,_that.isSaving,_that.isDeleting,_that.askDiscard,_that.outcome,_that.loadFailure,_that.actionFailure);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -1409,10 +1412,10 @@ return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TransactionFormMode mode,  DateTime today,  TransactionDraft draft,  TransactionDraft baseline,  UiStatus status,  Transaction? original,  TransactionLookups lookups,  Map<String, FieldError> errors,  bool autovalidate,  bool isSaving,  bool isDeleting,  bool askDiscard,  TransactionFormOutcome? outcome,  TransactionFailure? loadFailure,  TransactionFailure? actionFailure)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( TransactionFormMode mode,  DateTime today,  TransactionDraft draft,  TransactionDraft baseline,  UiStatus status,  Transaction? original,  TransactionLookups lookups,  Map<String, FieldError> errors,  Set<String> unsure,  bool autovalidate,  bool isSaving,  bool isDeleting,  bool askDiscard,  TransactionFormOutcome? outcome,  TransactionFailure? loadFailure,  TransactionFailure? actionFailure)?  $default,) {final _that = this;
 switch (_that) {
 case _TransactionFormState() when $default != null:
-return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_that.original,_that.lookups,_that.errors,_that.autovalidate,_that.isSaving,_that.isDeleting,_that.askDiscard,_that.outcome,_that.loadFailure,_that.actionFailure);case _:
+return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_that.original,_that.lookups,_that.errors,_that.unsure,_that.autovalidate,_that.isSaving,_that.isDeleting,_that.askDiscard,_that.outcome,_that.loadFailure,_that.actionFailure);case _:
   return null;
 
 }
@@ -1424,7 +1427,7 @@ return $default(_that.mode,_that.today,_that.draft,_that.baseline,_that.status,_
 
 
 class _TransactionFormState implements TransactionFormState {
-  const _TransactionFormState({required this.mode, required this.today, required this.draft, required this.baseline, this.status = UiStatus.initial, this.original, this.lookups = const TransactionLookups(),  Map<String, FieldError> errors = const {}, this.autovalidate = false, this.isSaving = false, this.isDeleting = false, this.askDiscard = false, this.outcome, this.loadFailure, this.actionFailure}): _errors = errors;
+  const _TransactionFormState({required this.mode, required this.today, required this.draft, required this.baseline, this.status = UiStatus.initial, this.original, this.lookups = const TransactionLookups(),  Map<String, FieldError> errors = const {},  Set<String> unsure = const {}, this.autovalidate = false, this.isSaving = false, this.isDeleting = false, this.askDiscard = false, this.outcome, this.loadFailure, this.actionFailure}): _errors = errors,_unsure = unsure;
   
 
 @override final  TransactionFormMode mode;
@@ -1450,6 +1453,17 @@ class _TransactionFormState implements TransactionFormState {
   return EqualUnmodifiableMapView(_errors);
 }
 
+/// Fields a quick-add draft filled unsurely, keyed by the API's field
+/// name; each is marked until the user changes it.
+ final  Set<String> _unsure;
+/// Fields a quick-add draft filled unsurely, keyed by the API's field
+/// name; each is marked until the user changes it.
+@override@JsonKey() Set<String> get unsure {
+  if (_unsure is EqualUnmodifiableSetView) return _unsure;
+  // ignore: implicit_dynamic_type
+  return EqualUnmodifiableSetView(_unsure);
+}
+
 /// A save failed on the input, so errors update as the user edits.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
@@ -1473,18 +1487,18 @@ _$TransactionFormStateCopyWith<_TransactionFormState> get copyWith => __$Transac
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionFormState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.today, today) || other.today == today)&&(identical(other.draft, draft) || other.draft == draft)&&(identical(other.baseline, baseline) || other.baseline == baseline)&&(identical(other.status, status) || other.status == status)&&(identical(other.original, original) || other.original == original)&&(identical(other.lookups, lookups) || other.lookups == lookups)&&const DeepCollectionEquality().equals(other.errors, _errors)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.isDeleting, isDeleting) || other.isDeleting == isDeleting)&&(identical(other.askDiscard, askDiscard) || other.askDiscard == askDiscard)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.loadFailure, loadFailure) || other.loadFailure == loadFailure)&&(identical(other.actionFailure, actionFailure) || other.actionFailure == actionFailure));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _TransactionFormState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.today, today) || other.today == today)&&(identical(other.draft, draft) || other.draft == draft)&&(identical(other.baseline, baseline) || other.baseline == baseline)&&(identical(other.status, status) || other.status == status)&&(identical(other.original, original) || other.original == original)&&(identical(other.lookups, lookups) || other.lookups == lookups)&&const DeepCollectionEquality().equals(other.errors, _errors)&&const DeepCollectionEquality().equals(other.unsure, _unsure)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.isDeleting, isDeleting) || other.isDeleting == isDeleting)&&(identical(other.askDiscard, askDiscard) || other.askDiscard == askDiscard)&&(identical(other.outcome, outcome) || other.outcome == outcome)&&(identical(other.loadFailure, loadFailure) || other.loadFailure == loadFailure)&&(identical(other.actionFailure, actionFailure) || other.actionFailure == actionFailure));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,mode,today,draft,baseline,status,original,lookups,const DeepCollectionEquality().hash(_errors),autovalidate,isSaving,isDeleting,askDiscard,outcome,loadFailure,actionFailure);
+    return Object.hash(runtimeType,mode,today,draft,baseline,status,original,lookups,const DeepCollectionEquality().hash(_errors),const DeepCollectionEquality().hash(_unsure),autovalidate,isSaving,isDeleting,askDiscard,outcome,loadFailure,actionFailure);
 }
 
 @override
 String toString() {
-    return 'TransactionFormState(mode: $mode, today: $today, draft: $draft, baseline: $baseline, status: $status, original: $original, lookups: $lookups, errors: $errors, autovalidate: $autovalidate, isSaving: $isSaving, isDeleting: $isDeleting, askDiscard: $askDiscard, outcome: $outcome, loadFailure: $loadFailure, actionFailure: $actionFailure)';
+    return 'TransactionFormState(mode: $mode, today: $today, draft: $draft, baseline: $baseline, status: $status, original: $original, lookups: $lookups, errors: $errors, unsure: $unsure, autovalidate: $autovalidate, isSaving: $isSaving, isDeleting: $isDeleting, askDiscard: $askDiscard, outcome: $outcome, loadFailure: $loadFailure, actionFailure: $actionFailure)';
 }
 
 
@@ -1495,7 +1509,7 @@ abstract mixin class _$TransactionFormStateCopyWith<$Res> implements $Transactio
   factory _$TransactionFormStateCopyWith(_TransactionFormState value, $Res Function(_TransactionFormState) _then) = __$TransactionFormStateCopyWithImpl;
 @override @useResult
 $Res call({
- TransactionFormMode mode, DateTime today, TransactionDraft draft, TransactionDraft baseline, UiStatus status, Transaction? original, TransactionLookups lookups, Map<String, FieldError> errors, bool autovalidate, bool isSaving, bool isDeleting, bool askDiscard, TransactionFormOutcome? outcome, TransactionFailure? loadFailure, TransactionFailure? actionFailure
+ TransactionFormMode mode, DateTime today, TransactionDraft draft, TransactionDraft baseline, UiStatus status, Transaction? original, TransactionLookups lookups, Map<String, FieldError> errors, Set<String> unsure, bool autovalidate, bool isSaving, bool isDeleting, bool askDiscard, TransactionFormOutcome? outcome, TransactionFailure? loadFailure, TransactionFailure? actionFailure
 });
 
 
@@ -1512,7 +1526,7 @@ class __$TransactionFormStateCopyWithImpl<$Res>
 
 /// Create a copy of TransactionFormState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? today = null,Object? draft = null,Object? baseline = null,Object? status = null,Object? original = freezed,Object? lookups = null,Object? errors = null,Object? autovalidate = null,Object? isSaving = null,Object? isDeleting = null,Object? askDiscard = null,Object? outcome = freezed,Object? loadFailure = freezed,Object? actionFailure = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? today = null,Object? draft = null,Object? baseline = null,Object? status = null,Object? original = freezed,Object? lookups = null,Object? errors = null,Object? unsure = null,Object? autovalidate = null,Object? isSaving = null,Object? isDeleting = null,Object? askDiscard = null,Object? outcome = freezed,Object? loadFailure = freezed,Object? actionFailure = freezed,}) {
   return _then(_TransactionFormState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as TransactionFormMode,today: null == today ? _self.today : today // ignore: cast_nullable_to_non_nullable
@@ -1522,7 +1536,8 @@ as TransactionDraft,status: null == status ? _self.status : status // ignore: ca
 as UiStatus,original: freezed == original ? _self.original : original // ignore: cast_nullable_to_non_nullable
 as Transaction?,lookups: null == lookups ? _self.lookups : lookups // ignore: cast_nullable_to_non_nullable
 as TransactionLookups,errors: null == errors ? _self._errors : errors // ignore: cast_nullable_to_non_nullable
-as Map<String, FieldError>,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
+as Map<String, FieldError>,unsure: null == unsure ? _self._unsure : unsure // ignore: cast_nullable_to_non_nullable
+as Set<String>,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,isDeleting: null == isDeleting ? _self.isDeleting : isDeleting // ignore: cast_nullable_to_non_nullable
 as bool,askDiscard: null == askDiscard ? _self.askDiscard : askDiscard // ignore: cast_nullable_to_non_nullable

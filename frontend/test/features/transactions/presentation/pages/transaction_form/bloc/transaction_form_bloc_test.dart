@@ -4,9 +4,12 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/error/field_error.dart';
 import 'package:monai/core/model/category_type.dart';
+import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/features/shared/domain/entity/draft_confidence.dart';
+import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/transaction_input.dart';
 import 'package:monai/features/shared/domain/usecase/create_transaction_usecase.dart';
@@ -402,6 +405,112 @@ void main() {
       expect(bloc.state.status, UiStatus.failure);
       expect(bloc.state.loadFailure, TransactionFailure.network);
       verify(() => get('t1')).called(2);
+    });
+  });
+
+  group('a quick-add draft', () {
+    final draft = QuickAddDraft(
+      type: TransactionType.expense,
+      date: DateTime(2026, 10, 9),
+      amount: 35000,
+      walletId: 'w1',
+      categoryId: 'c1',
+      note: 'Makan siang',
+      merchant: 'Warteg',
+      confidence: const DraftConfidence(
+        type: 0.9,
+        amount: 0.95,
+        wallet: 0.5,
+        category: 0.3,
+        date: 0.95,
+      ),
+    );
+
+    test('fills the form and marks the unsure fields', () async {
+      // Act
+      final bloc = await started(TransactionFormMode.prefill(draft));
+
+      // Assert
+      expect(bloc.state.status, UiStatus.success);
+      expect(bloc.state.draft.amount, 35000);
+      expect(bloc.state.draft.walletId, 'w1');
+      expect(bloc.state.draft.categoryId, 'c1');
+      expect(bloc.state.draft.date, DateTime(2026, 10, 9));
+      expect(bloc.state.initialNote, 'Makan siang');
+      expect(bloc.state.unsure, {
+        TransactionInputValidator.walletField,
+        TransactionInputValidator.categoryField,
+      });
+    });
+
+    test('a missing amount is marked too', () async {
+      // Act
+      final bloc = await started(
+        TransactionFormMode.prefill(draft.copyWith(amount: null)),
+      );
+
+      // Assert
+      expect(bloc.state.draft.amount, 0);
+      expect(
+        bloc.state.isUnsure(TransactionInputValidator.amountField),
+        isTrue,
+      );
+    });
+
+    test('changing a field clears its mark', () async {
+      // Arrange
+      final bloc = await started(TransactionFormMode.prefill(draft));
+
+      // Act
+      await send(bloc, const TransactionFormEvent.categoryPicked('c1'));
+      await send(bloc, const TransactionFormEvent.walletPicked('w2'));
+
+      // Assert
+      expect(
+        bloc.state.isUnsure(TransactionInputValidator.walletField),
+        isFalse,
+      );
+      // The same category again isn't a change.
+      expect(
+        bloc.state.isUnsure(TransactionInputValidator.categoryField),
+        isTrue,
+      );
+    });
+
+    test('saves as an AI quick add with its merchant', () async {
+      // Arrange
+      when(() => create(any()))
+          .thenAnswer((_) async => Right(transaction(id: 'new')));
+      final bloc = await started(TransactionFormMode.prefill(draft));
+
+      // Act
+      await send(
+        bloc,
+        const TransactionFormEvent.saveRequested(note: 'Makan siang'),
+      );
+
+      // Assert
+      final input =
+          verify(() => create(captureAny())).captured.single
+              as TransactionInput;
+      expect(input.source, TransactionSource.quickAdd);
+      expect(input.merchant, 'Warteg');
+      expect(input.amount, 35000);
+      expect(bloc.state.outcome, const TransactionFormOutcome.saved('new'));
+    });
+
+    test('closing it unchanged closes at once', () async {
+      // Arrange
+      final bloc = await started(TransactionFormMode.prefill(draft));
+
+      // Act
+      await send(
+        bloc,
+        const TransactionFormEvent.closeRequested(note: 'Makan siang'),
+      );
+
+      // Assert
+      expect(bloc.state.outcome, const TransactionFormOutcome.closed());
     });
   });
 }

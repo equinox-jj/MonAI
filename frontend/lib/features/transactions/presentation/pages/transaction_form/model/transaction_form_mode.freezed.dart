@@ -56,11 +56,12 @@ extension TransactionFormModePatterns on TransactionFormMode {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AddTransactionMode value)?  add,TResult Function( EditTransactionMode value)?  edit,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( AddTransactionMode value)?  add,TResult Function( PrefillTransactionMode value)?  prefill,TResult Function( EditTransactionMode value)?  edit,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case AddTransactionMode() when add != null:
-return add(_that);case EditTransactionMode() when edit != null:
+return add(_that);case PrefillTransactionMode() when prefill != null:
+return prefill(_that);case EditTransactionMode() when edit != null:
 return edit(_that);case _:
   return orElse();
 
@@ -79,11 +80,12 @@ return edit(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AddTransactionMode value)  add,required TResult Function( EditTransactionMode value)  edit,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( AddTransactionMode value)  add,required TResult Function( PrefillTransactionMode value)  prefill,required TResult Function( EditTransactionMode value)  edit,}){
 final _that = this;
 switch (_that) {
 case AddTransactionMode():
-return add(_that);case EditTransactionMode():
+return add(_that);case PrefillTransactionMode():
+return prefill(_that);case EditTransactionMode():
 return edit(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
@@ -98,11 +100,12 @@ return edit(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AddTransactionMode value)?  add,TResult? Function( EditTransactionMode value)?  edit,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( AddTransactionMode value)?  add,TResult? Function( PrefillTransactionMode value)?  prefill,TResult? Function( EditTransactionMode value)?  edit,}){
 final _that = this;
 switch (_that) {
 case AddTransactionMode() when add != null:
-return add(_that);case EditTransactionMode() when edit != null:
+return add(_that);case PrefillTransactionMode() when prefill != null:
+return prefill(_that);case EditTransactionMode() when edit != null:
 return edit(_that);case _:
   return null;
 
@@ -120,10 +123,11 @@ return edit(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( TransactionType type,  String? walletId)?  add,TResult Function( String id)?  edit,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function( TransactionType type,  String? walletId)?  add,TResult Function( QuickAddDraft draft)?  prefill,TResult Function( String id)?  edit,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case AddTransactionMode() when add != null:
-return add(_that.type,_that.walletId);case EditTransactionMode() when edit != null:
+return add(_that.type,_that.walletId);case PrefillTransactionMode() when prefill != null:
+return prefill(_that.draft);case EditTransactionMode() when edit != null:
 return edit(_that.id);case _:
   return orElse();
 
@@ -142,10 +146,11 @@ return edit(_that.id);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( TransactionType type,  String? walletId)  add,required TResult Function( String id)  edit,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function( TransactionType type,  String? walletId)  add,required TResult Function( QuickAddDraft draft)  prefill,required TResult Function( String id)  edit,}) {final _that = this;
 switch (_that) {
 case AddTransactionMode():
-return add(_that.type,_that.walletId);case EditTransactionMode():
+return add(_that.type,_that.walletId);case PrefillTransactionMode():
+return prefill(_that.draft);case EditTransactionMode():
 return edit(_that.id);}
 }
 /// A variant of `when` that fallback to returning `null`
@@ -160,10 +165,11 @@ return edit(_that.id);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( TransactionType type,  String? walletId)?  add,TResult? Function( String id)?  edit,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function( TransactionType type,  String? walletId)?  add,TResult? Function( QuickAddDraft draft)?  prefill,TResult? Function( String id)?  edit,}) {final _that = this;
 switch (_that) {
 case AddTransactionMode() when add != null:
-return add(_that.type,_that.walletId);case EditTransactionMode() when edit != null:
+return add(_that.type,_that.walletId);case PrefillTransactionMode() when prefill != null:
+return prefill(_that.draft);case EditTransactionMode() when edit != null:
 return edit(_that.id);case _:
   return null;
 
@@ -240,6 +246,83 @@ as String?,
 }
 
 
+}
+
+/// @nodoc
+
+
+class PrefillTransactionMode implements TransactionFormMode {
+  const PrefillTransactionMode(this.draft);
+  
+
+ final  QuickAddDraft draft;
+
+/// Create a copy of TransactionFormMode
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+$PrefillTransactionModeCopyWith<PrefillTransactionMode> get copyWith => _$PrefillTransactionModeCopyWithImpl<PrefillTransactionMode>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is PrefillTransactionMode&&(identical(other.draft, draft) || other.draft == draft));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,draft);
+}
+
+@override
+String toString() {
+    return 'TransactionFormMode.prefill(draft: $draft)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class $PrefillTransactionModeCopyWith<$Res> implements $TransactionFormModeCopyWith<$Res> {
+  factory $PrefillTransactionModeCopyWith(PrefillTransactionMode value, $Res Function(PrefillTransactionMode) _then) = _$PrefillTransactionModeCopyWithImpl;
+@useResult
+$Res call({
+ QuickAddDraft draft
+});
+
+
+$QuickAddDraftCopyWith<$Res> get draft;
+
+}
+/// @nodoc
+class _$PrefillTransactionModeCopyWithImpl<$Res>
+    implements $PrefillTransactionModeCopyWith<$Res> {
+  _$PrefillTransactionModeCopyWithImpl(this._self, this._then);
+
+  final PrefillTransactionMode _self;
+  final $Res Function(PrefillTransactionMode) _then;
+
+/// Create a copy of TransactionFormMode
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? draft = null,}) {
+  return _then(PrefillTransactionMode(
+null == draft ? _self.draft : draft // ignore: cast_nullable_to_non_nullable
+as QuickAddDraft,
+  ));
+}
+
+/// Create a copy of TransactionFormMode
+/// with the given fields replaced by the non-null parameter values.
+@override
+@pragma('vm:prefer-inline')
+$QuickAddDraftCopyWith<$Res> get draft {
+  
+  return $QuickAddDraftCopyWith<$Res>(_self.draft, (value) {
+    return _then(_self.copyWith(draft: value));
+  });
+}
 }
 
 /// @nodoc

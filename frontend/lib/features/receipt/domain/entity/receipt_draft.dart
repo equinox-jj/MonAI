@@ -1,5 +1,8 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/model/transaction_type.dart';
+import 'package:monai/features/shared/domain/entity/draft_confidence.dart';
+
+export 'package:monai/features/shared/domain/entity/draft_confidence.dart';
 
 part 'receipt_draft.freezed.dart';
 
@@ -25,21 +28,6 @@ abstract class ReceiptDraft with _$ReceiptDraft {
 
   /// Nothing read: the AI failed, so the user fills the fields in.
   static const empty = ReceiptDraft();
-}
-
-/// How sure the AI is of each field, from 0 to 1.
-@freezed
-abstract class DraftConfidence with _$DraftConfidence {
-  const factory DraftConfidence({
-    @Default(0) double type,
-    @Default(0) double amount,
-    @Default(0) double wallet,
-    @Default(0) double category,
-    @Default(0) double date,
-  }) = _DraftConfidence;
-
-  /// Below this a filled field is shown for the user to check.
-  static const sure = 0.7;
 }
 
 /// One line of the receipt.

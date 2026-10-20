@@ -26,6 +26,10 @@ abstract class TransactionFormState with _$TransactionFormState {
     /// One error per invalid field, keyed by the API's field name.
     @Default({}) Map<String, FieldError> errors,
 
+    /// Fields a quick-add draft filled unsurely, keyed by the API's field
+    /// name; each is marked until the user changes it.
+    @Default({}) Set<String> unsure,
+
     /// A save failed on the input, so errors update as the user edits.
     @Default(false) bool autovalidate,
     @Default(false) bool isSaving,
@@ -47,6 +51,14 @@ abstract class TransactionFormState with _$TransactionFormState {
 
 extension TransactionFormStateX on TransactionFormState {
   bool get isEdit => mode is EditTransactionMode;
+
+  /// The note the text field starts with.
+  String get initialNote => switch (mode) {
+    PrefillTransactionMode(:final draft) => draft.note ?? '',
+    _ => original?.note ?? '',
+  };
+
+  bool isUnsure(String field) => unsure.contains(field);
 
   /// The categories of the draft's type to pick from; the edited
   /// transaction's own stays even when hidden.

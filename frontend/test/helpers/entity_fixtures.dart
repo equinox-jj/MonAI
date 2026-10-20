@@ -7,6 +7,7 @@ import 'package:monai/features/auth/domain/entity/auth_session.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
+import 'package:monai/features/shared/domain/entity/payment_provider.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
@@ -146,4 +147,19 @@ CategoryBreakdown categoryBreakdown({
   previousAmount: 0,
   color: '#F97316',
   changePercent: changePercent,
+);
+
+PaymentProvider paymentProvider({
+  String id = 'p1',
+  String? slug,
+  String name = 'GoPay',
+  WalletType type = WalletType.eWallet,
+  List<String> aliases = const [],
+}) => PaymentProvider(
+  id: id,
+  slug: slug ?? id,
+  name: name,
+  type: type,
+  aliases: aliases,
+  sortOrder: 0,
 );

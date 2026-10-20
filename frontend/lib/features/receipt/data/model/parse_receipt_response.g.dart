@@ -66,25 +66,6 @@ Map<String, dynamic> _$ReceiptDraftDataToJson(_ReceiptDraftData instance) =>
       'items': instance.items,
     };
 
-_DraftConfidenceData _$DraftConfidenceDataFromJson(Map<String, dynamic> json) =>
-    _DraftConfidenceData(
-      type: (json['type'] as num?)?.toDouble(),
-      amount: (json['amount'] as num?)?.toDouble(),
-      wallet: (json['wallet'] as num?)?.toDouble(),
-      category: (json['category'] as num?)?.toDouble(),
-      date: (json['date'] as num?)?.toDouble(),
-    );
-
-Map<String, dynamic> _$DraftConfidenceDataToJson(
-  _DraftConfidenceData instance,
-) => <String, dynamic>{
-  'type': instance.type,
-  'amount': instance.amount,
-  'wallet': instance.wallet,
-  'category': instance.category,
-  'date': instance.date,
-};
-
 _ReceiptItemData _$ReceiptItemDataFromJson(Map<String, dynamic> json) =>
     _ReceiptItemData(
       name: json['name'] as String?,

@@ -71,13 +71,18 @@ class TransactionFormFields extends StatelessWidget {
     return BlocBuilder<TransactionFormBloc, TransactionFormState>(
       buildWhen: (previous, current) =>
           previous.draft != current.draft ||
-          previous.lookups != current.lookups,
+          previous.lookups != current.lookups ||
+          previous.unsure != current.unsure,
       builder: (context, state) {
         final draft = state.draft;
         final wallet = state.lookups.wallet(draft.walletId)?.name ?? '–';
+        final walletUnsure = state.isUnsure(
+          TransactionInputValidator.walletField,
+        );
         final date = _SelectBox(
           icon: MonAIIcons.calendarToday,
           label: l10n.transactionFormDate,
+          check: state.isUnsure(TransactionInputValidator.dateField),
           value: TransactionDates.field(
             draft.date,
             state.today,
@@ -104,6 +109,7 @@ class TransactionFormFields extends StatelessWidget {
                     child: _SelectBox(
                       label: l10n.transactionFormFrom,
                       value: wallet,
+                      check: walletUnsure,
                       onTap: () => _openWalletPicker(context, .source),
                     ),
                   ),
@@ -140,6 +146,7 @@ class TransactionFormFields extends StatelessWidget {
                     icon: MonAIIcons.accountBalanceWallet,
                     label: l10n.transactionFormWallet,
                     value: wallet,
+                    check: walletUnsure,
                     onTap: () => _openWalletPicker(context, .source),
                   ),
                 ),
@@ -157,19 +164,24 @@ class TransactionFormFields extends StatelessWidget {
   }
 }
 
-/// A tappable box with a small label over its value.
+/// A tappable box with a small label over its value; amber with a warning
+/// when quick add filled it unsurely.
 class _SelectBox extends StatelessWidget {
   const _SelectBox({
     required this.label,
     required this.value,
     required this.onTap,
     this.icon,
+    this.check = false,
   });
 
   final String label;
   final String value;
   final VoidCallback onTap;
   final MonAIIconData? icon;
+
+  /// Marks the value for the user to check.
+  final bool check;
 
   @override
   Widget build(BuildContext context) {
@@ -180,11 +192,14 @@ class _SelectBox extends StatelessWidget {
       label: label,
       value: value,
       excludeSemantics: true,
+      hint: check ? context.l10n.transactionFormCheckField : null,
       child: Material(
-        color: c.surfaceSunken,
+        color: check ? c.warningContainer : c.surfaceSunken,
         shape: RoundedRectangleBorder(
           borderRadius: MonAIRadius.mdAll,
-          side: BorderSide(color: c.border),
+          side: check
+              ? BorderSide(color: c.warning, width: 2)
+              : BorderSide(color: c.border),
         ),
         clipBehavior: .antiAlias,
         child: InkWell(
@@ -216,6 +231,12 @@ class _SelectBox extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (check)
+                    MonAIIcon(
+                      MonAIIcons.warning,
+                      size: MonAISizes.iconMd,
+                      color: c.warning,
+                    ),
                 ],
               ),
             ),

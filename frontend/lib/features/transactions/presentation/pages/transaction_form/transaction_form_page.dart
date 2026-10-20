@@ -63,7 +63,7 @@ class _TransactionFormUIState extends State<TransactionFormUI> {
   void initState() {
     super.initState();
     // The edited transaction may have loaded before this screen listened.
-    _note.text = _bloc.state.original?.note ?? '';
+    _note.text = _bloc.state.initialNote;
   }
 
   @override
@@ -178,7 +178,7 @@ class _TransactionFormUIState extends State<TransactionFormUI> {
             placement: widget.placement,
             actions: [
               BlocSelector<TransactionFormBloc, TransactionFormState, bool>(
-                selector: (state) => !state.isEdit,
+                selector: (state) => state.mode is AddTransactionMode,
                 builder: (context, canScan) => canScan
                     ? Padding(
                         padding: const .only(right: MonAISpacing.x2),
@@ -290,6 +290,7 @@ class _FormBody extends StatelessWidget {
                   crossAxisAlignment: .stretch,
                   spacing: MonAISpacing.x3,
                   children: [
+                    const _QuickAddNote(),
                     const TransactionFormTypeTabs(),
                     const TransactionFormAmount(),
                     BlocSelector<
@@ -317,6 +318,25 @@ class _FormBody extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Over a quick-add draft with unsure fields: asks the user to check them.
+class _QuickAddNote extends StatelessWidget {
+  const _QuickAddNote();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocSelector<TransactionFormBloc, TransactionFormState, bool>(
+      selector: (state) =>
+          state.mode is PrefillTransactionMode && state.unsure.isNotEmpty,
+      builder: (context, show) => show
+          ? MonAIInlineAlert(
+              message: context.l10n.transactionFormQuickAddCheck,
+              tone: .warning,
+            )
+          : const SizedBox.shrink(),
     );
   }
 }

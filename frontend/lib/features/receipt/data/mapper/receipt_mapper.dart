@@ -24,16 +24,6 @@ extension ReceiptDraftDataMapper on ReceiptDraftData {
   );
 }
 
-extension DraftConfidenceDataMapper on DraftConfidenceData {
-  DraftConfidence toEntity() => DraftConfidence(
-    type: type ?? 0,
-    amount: amount ?? 0,
-    wallet: wallet ?? 0,
-    category: category ?? 0,
-    date: date ?? 0,
-  );
-}
-
 /// Expense or income; a receipt is never a transfer.
 TransactionType? _receiptType(String? value) {
   if (value == null) return null;

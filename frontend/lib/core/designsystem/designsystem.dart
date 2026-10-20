@@ -8,6 +8,7 @@ export 'package:monai/core/designsystem/components/monai_calendar.dart';
 export 'package:monai/core/designsystem/components/monai_donut.dart';
 export 'package:monai/core/designsystem/components/monai_feedback.dart';
 export 'package:monai/core/designsystem/components/monai_list_items.dart';
+export 'package:monai/core/designsystem/components/monai_marked_field.dart';
 export 'package:monai/core/designsystem/components/monai_month_switcher.dart';
 export 'package:monai/core/designsystem/components/monai_navigation.dart';
 export 'package:monai/core/designsystem/components/monai_pickers.dart';

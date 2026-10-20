@@ -14,11 +14,16 @@ import 'package:monai/features/categories/presentation/pages/category_form/categ
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';
 import 'package:monai/features/dashboard/presentation/pages/dashboard/dashboard_page.dart';
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
+import 'package:monai/features/profile/presentation/pages/edit_profile/edit_profile_page.dart';
+import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add/quick_add_page.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add_review/quick_add_review_page.dart';
 import 'package:monai/features/reports/presentation/pages/report/report_page.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/receipt_review_page.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/scan_receipt_page.dart';
 import 'package:monai/features/settings/presentation/pages/settings/settings_page.dart';
+import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/transactions/presentation/pages/search/search_page.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/transaction_detail_page.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_mode.dart';
@@ -60,6 +65,18 @@ abstract final class AppRoutes {
   /// The categories; reached from Settings.
   static const categories = '/settings/categories';
 
+  /// Edit profile; reached from Settings.
+  static const profile = '/settings/profile';
+
+  /// The query parameter Edit profile opens scrolled to a section by.
+  static const focusParam = 'focus';
+
+  /// Edit profile, scrolled to its delete-account card.
+  static final profileDeleteAccount = Uri(
+    path: profile,
+    queryParameters: {focusParam: 'delete'},
+  ).toString();
+
   /// The add-category form, for a category of [type].
   static String categoryNew(CategoryType type) => Uri(
     path: '$categories/new',
@@ -84,7 +101,8 @@ abstract final class AppRoutes {
   /// Search over notes and merchants; see [transactionSearchIn].
   static const transactionSearch = '/transactions/search';
 
-  /// The add-transaction form; see [newTransaction].
+  /// The add-transaction form; see [newTransaction]. Pass a
+  /// `QuickAddDraft` as `extra` to start from it; see [pushQuickAddForm].
   static const transactionNew = '/transactions/new';
 
   /// The query parameter Search starts in, as `yyyy-MM`.
@@ -110,6 +128,13 @@ abstract final class AppRoutes {
 
   /// The edit form of transaction [id].
   static String transactionEdit(String id) => '$transactions/$id/edit';
+
+  /// Quick add: a typed phrase to transaction drafts.
+  static const quickAdd = '/quick-add';
+
+  /// The review of several quick-add drafts; pass its `QuickAddReviewArgs`
+  /// as `extra`. Pops with a `QuickAddReviewExit`.
+  static const quickAddReview = '/quick-add/review';
 
   /// The receipt scanner.
   static const receiptScan = '/receipt/scan';
@@ -203,6 +228,24 @@ GoRouter createAppRouter({
         ),
       ),
       GoRoute(
+        path: AppRoutes.quickAdd,
+        pageBuilder: (_, state) => MaterialPage(
+          key: state.pageKey,
+          fullscreenDialog: true,
+          child: const QuickAddPage(),
+        ),
+        routes: [
+          GoRoute(
+            path: 'review',
+            // The drafts only live in memory: without them, start over.
+            redirect: (_, state) =>
+                state.extra is QuickAddReviewArgs ? null : AppRoutes.quickAdd,
+            builder: (_, state) =>
+                QuickAddReviewPage(args: state.extra! as QuickAddReviewArgs),
+          ),
+        ],
+      ),
+      GoRoute(
         path: AppRoutes.receiptScan,
         pageBuilder: (_, state) => MaterialPage(
           key: state.pageKey,
@@ -275,15 +318,20 @@ GoRouter createAppRouter({
                       state,
                       (placement) => TransactionFormPage(
                         placement: placement,
-                        mode: TransactionFormMode.add(
-                          type:
-                              TransactionType.values.asNameMap()[state
-                                  .uri
-                                  .queryParameters[AppRoutes.typeParam]] ??
-                              TransactionType.expense,
-                          walletId:
-                              state.uri.queryParameters[AppRoutes.walletParam],
-                        ),
+                        mode: switch (state.extra) {
+                          final QuickAddDraft draft =>
+                            TransactionFormMode.prefill(draft),
+                          _ => TransactionFormMode.add(
+                            type:
+                                TransactionType.values.asNameMap()[state
+                                    .uri
+                                    .queryParameters[AppRoutes.typeParam]] ??
+                                TransactionType.expense,
+                            walletId: state
+                                .uri
+                                .queryParameters[AppRoutes.walletParam],
+                          ),
+                        },
                       ),
                     ),
                   ),
@@ -369,6 +417,15 @@ GoRouter createAppRouter({
                 builder: (_, _) => const SettingsPage(),
                 routes: [
                   GoRoute(
+                    path: 'profile',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, state) => EditProfilePage(
+                      focusDelete:
+                          state.uri.queryParameters[AppRoutes.focusParam] ==
+                          'delete',
+                    ),
+                  ),
+                  GoRoute(
                     path: 'categories',
                     parentNavigatorKey: rootKey,
                     builder: (_, _) => const CategoriesPage(),
@@ -415,6 +472,16 @@ GoRouter createAppRouter({
     ],
   );
 }
+
+/// Opens the add form filled from a quick-add [draft]; true once it was
+/// saved, false when the user closed it.
+Future<bool> pushQuickAddForm(
+  BuildContext context,
+  QuickAddDraft draft,
+) async => await context.push<TransactionFormOutcome>(
+  AppRoutes.transactionNew,
+  extra: draft,
+) is SavedFormOutcome;
 
 /// An add or edit form, built for where it shows: a side sheet over the
 /// screen on tablet landscape, otherwise a full-screen dialog.
