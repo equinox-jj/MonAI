@@ -1,3 +1,4 @@
+import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/home/domain/entity/home_dashboard.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
@@ -19,9 +20,6 @@ HomeGreeting greetingFor(DateTime now) => switch (now.hour) {
   >= 12 && < 18 => .afternoon,
   _ => .evening,
 };
-
-/// The first of [now]'s month.
-DateTime monthOf(DateTime now) => DateTime(now.year, now.month);
 
 /// Days after [today] until its month ends; 0 on the last day.
 int daysLeftInMonth(DateTime today) {

@@ -65,4 +65,15 @@ void main() {
     // Assert
     expect(result.getLeft().toNullable(), isA<CacheFailure>());
   });
+
+  test('reads the app version', () async {
+    // Arrange
+    when(() => local.appVersion()).thenAnswer((_) async => '1.0.0');
+
+    // Act
+    final result = await repository.appVersion();
+
+    // Assert
+    expect(result, const Right<Failure, String>('1.0.0'));
+  });
 }

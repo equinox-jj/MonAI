@@ -14,6 +14,7 @@ import 'package:monai/core/network/dio_client.dart';
 import 'package:monai/core/network/interceptors/auth_interceptor.dart';
 import 'package:monai/core/network/interceptors/unauthorized_interceptor.dart';
 import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/services/app_info_service.dart';
 import 'package:monai/core/services/receipt_scanner_service.dart';
 import 'package:monai/core/storage/app_preferences.dart';
 import 'package:monai/core/storage/token_storage.dart';
@@ -70,6 +71,7 @@ Future<void> configureDependencies() async {
   sl.registerLazySingleton<ReceiptScannerService>(
     ReceiptScannerServiceImpl.new,
   );
+  sl.registerLazySingleton<AppInfoService>(AppInfoServiceImpl.new);
   sl.registerLazySingleton<Dio>(
     () => DioClient(
       authInterceptor: sl<AuthInterceptor>(),

@@ -13,6 +13,7 @@ import 'package:monai/features/auth/data/model/login_request.dart';
 import 'package:monai/features/auth/data/model/register_request.dart';
 import 'package:monai/features/auth/data/repository/auth_repository_impl.dart';
 import 'package:monai/features/auth/domain/entity/auth_session.dart';
+import 'package:monai/features/shared/data/datasources/session_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/user_local_datasource.dart';
 import 'package:monai/features/shared/data/mapper/user_mapper.dart';
 
@@ -24,6 +25,9 @@ class _MockAuthLocalDataSource extends Mock implements AuthLocalDataSource {}
 class _MockAuthRemoteDataSource extends Mock implements AuthRemoteDataSource {}
 
 class _MockUserLocalDataSource extends Mock implements UserLocalDataSource {}
+
+class _MockSessionLocalDataSource extends Mock
+    implements SessionLocalDataSource {}
 
 final _data = Data(
   accessToken: 'token',
@@ -46,6 +50,7 @@ void main() {
   late _MockAuthLocalDataSource local;
   late _MockAuthRemoteDataSource remote;
   late _MockUserLocalDataSource users;
+  late _MockSessionLocalDataSource session;
   late AuthRepositoryImpl repository;
 
   setUpAll(() {
@@ -63,11 +68,17 @@ void main() {
     local = _MockAuthLocalDataSource();
     remote = _MockAuthRemoteDataSource();
     users = _MockUserLocalDataSource();
-    repository = AuthRepositoryImpl(remote: remote, local: local, users: users);
+    session = _MockSessionLocalDataSource();
+    repository = AuthRepositoryImpl(
+      remote: remote,
+      local: local,
+      users: users,
+      session: session,
+    );
     when(() => users.replace(any())).thenAnswer((_) async {});
     when(() => local.clearCache()).thenAnswer((_) async {});
     when(() => local.startSession(any())).thenAnswer((_) async {});
-    when(() => local.endSession()).thenAnswer((_) async {});
+    when(() => session.endSession()).thenAnswer((_) async {});
   });
 
   group('isOnboardingCompleted', () {
@@ -255,35 +266,6 @@ void main() {
     });
   });
 
-  group('logout', () {
-    test('ends the session', () async {
-      // Arrange
-      // (mocks from setUp)
-
-      // Act
-      final result = await repository.logout();
-
-      // Assert
-      expect(
-        result,
-        const Right<Failure, SessionStatus>(SessionStatus.signedOut),
-      );
-      verify(() => local.endSession()).called(1);
-    });
-
-    test('returns a CacheFailure when the token cannot be removed', () async {
-      // Arrange
-      when(() => local.endSession())
-          .thenThrow(const CacheException(message: 'keystore'));
-
-      // Act
-      final result = await repository.logout();
-
-      // Assert
-      expect(result.getLeft().toNullable(), isA<CacheFailure>());
-    });
-  });
-
   group('restoreSession', () {
     test('returns whether a session was restored', () async {
       // Arrange
@@ -294,35 +276,6 @@ void main() {
 
       // Assert
       expect(result, const Right<Failure, bool>(true));
-    });
-  });
-
-  group('logoutAllDevices', () {
-    test('revokes the tokens on the server, then ends the session', () async {
-      // Arrange
-      when(() => remote.logoutAll()).thenAnswer((_) async {});
-
-      // Act
-      final result = await repository.logoutAllDevices();
-
-      // Assert
-      expect(
-        result,
-        const Right<Failure, SessionStatus>(SessionStatus.signedOut),
-      );
-      verifyInOrder([() => remote.logoutAll(), () => local.endSession()]);
-    });
-
-    test('a failed request keeps the session', () async {
-      // Arrange
-      when(() => remote.logoutAll()).thenThrow(const NetworkException());
-
-      // Act
-      final result = await repository.logoutAllDevices();
-
-      // Assert
-      expect(result.getLeft().toNullable(), isA<NetworkFailure>());
-      verifyNever(() => local.endSession());
     });
   });
 
@@ -351,7 +304,7 @@ void main() {
           ),
         ),
       ).called(1);
-      verify(() => local.endSession()).called(1);
+      verify(() => session.endSession()).called(1);
       verifyNever(() => local.startSession(any()));
     });
 
@@ -368,7 +321,7 @@ void main() {
 
       // Assert
       expect(result.getLeft().toNullable()?.code, 'invalid_password');
-      verifyNever(() => local.endSession());
+      verifyNever(() => session.endSession());
     });
   });
 }

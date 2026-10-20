@@ -14,9 +14,6 @@ abstract class AuthRemoteDataSource {
   /// `POST /auth/register`.
   Future<AuthResponse> register(RegisterRequest request);
 
-  /// `POST /auth/logout-all`.
-  Future<void> logoutAll();
-
   /// `PUT /auth/password`.
   Future<AuthResponse> changePassword(ChangePasswordRequest request);
 }
@@ -38,11 +35,6 @@ class AuthRemoteDataSourceImpl extends AuthRemoteDataSource
   @override
   Future<AuthResponse> register(RegisterRequest request) =>
       _post(AuthEndpoint.register, request.toJson());
-
-  @override
-  Future<void> logoutAll() => safeApiCall(() async {
-    await _dio.post<Map<String, dynamic>>(AuthEndpoint.logoutAll);
-  });
 
   @override
   Future<AuthResponse> changePassword(ChangePasswordRequest request) =>

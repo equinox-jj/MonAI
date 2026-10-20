@@ -14,11 +14,6 @@ abstract class AuthLocalDataSource {
   /// Stores [accessToken] and marks the session signed in.
   Future<void> startSession(String accessToken);
 
-  /// Removes the token, clears the cache and marks the session signed out.
-  /// Only a token that fails to clear throws: once it is gone the user is
-  /// signed out, and the next sign-in clears a cache left behind.
-  Future<void> endSession();
-
   /// Deletes every cached row, e.g. a previous account's data.
   Future<void> clearCache();
 
@@ -53,15 +48,6 @@ class AuthLocalDataSourceImpl extends AuthLocalDataSource
   Future<void> startSession(String accessToken) => safeCacheCall(() async {
     await _tokenStorage.saveAccessToken(accessToken);
     _sessionManager.signedIn();
-  });
-
-  @override
-  Future<void> endSession() => safeCacheCall(() async {
-    await _tokenStorage.clear();
-    try {
-      await _localCache.clear();
-    } on Object catch (_) {}
-    _sessionManager.signedOut();
   });
 
   @override

@@ -12,6 +12,7 @@ import 'package:monai/features/auth/data/model/login_request.dart';
 import 'package:monai/features/auth/data/model/register_request.dart';
 import 'package:monai/features/auth/domain/entity/auth_session.dart';
 import 'package:monai/features/auth/domain/repository/auth_repository.dart';
+import 'package:monai/features/shared/data/datasources/session_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/user_local_datasource.dart';
 import 'package:monai/features/shared/data/mapper/user_mapper.dart';
 
@@ -20,11 +21,13 @@ class AuthRepositoryImpl extends AuthRepository with BaseRepository {
     required this._remote,
     required this._local,
     required this._users,
+    required this._session,
   });
 
   final AuthRemoteDataSource _remote;
   final AuthLocalDataSource _local;
   final UserLocalDataSource _users;
+  final SessionLocalDataSource _session;
 
   @override
   Future<Either<Failure, bool>> isOnboardingCompleted() =>
@@ -55,20 +58,6 @@ class AuthRepositoryImpl extends AuthRepository with BaseRepository {
     ),
   );
 
-  @override
-  Future<Either<Failure, SessionStatus>> logout() => safeCall(() async {
-    await _local.endSession();
-    return SessionStatus.signedOut;
-  });
-
-  @override
-  Future<Either<Failure, SessionStatus>> logoutAllDevices() =>
-      safeCall(() async {
-        await _remote.logoutAll();
-        await _local.endSession();
-        return SessionStatus.signedOut;
-      });
-
   // The response carries a fresh token for this device. It is dropped on
   // purpose, as on Android: the user signs in again with the new password.
   @override
@@ -82,7 +71,7 @@ class AuthRepositoryImpl extends AuthRepository with BaseRepository {
         newPassword: newPassword,
       ),
     );
-    await _local.endSession();
+    await _session.endSession();
     return SessionStatus.signedOut;
   });
 

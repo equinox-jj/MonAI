@@ -147,19 +147,6 @@ void main() {
     );
   });
 
-  test('logoutAll posts with the session token', () async {
-    // Arrange
-    when(() => dio.post<Map<String, dynamic>>(any()))
-        .thenAnswer((_) async => _ok(AuthEndpoint.logoutAll));
-
-    // Act
-    await dataSource.logoutAll();
-
-    // Assert
-    verify(() => dio.post<Map<String, dynamic>>(AuthEndpoint.logoutAll))
-        .called(1);
-  });
-
   test('changePassword puts both passwords', () async {
     // Arrange
     when(() => dio.put<Map<String, dynamic>>(any(), data: any(named: 'data')))

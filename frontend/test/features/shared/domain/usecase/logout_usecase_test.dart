@@ -4,15 +4,15 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/usecase/usecase.dart';
-import 'package:monai/features/auth/domain/repository/auth_repository.dart';
-import 'package:monai/features/auth/domain/usecase/logout_usecase.dart';
+import 'package:monai/features/shared/domain/repository/session_repository.dart';
+import 'package:monai/features/shared/domain/usecase/logout_usecase.dart';
 
-class _MockAuthRepository extends Mock implements AuthRepository {}
+class _MockSessionRepository extends Mock implements SessionRepository {}
 
 void main() {
-  late _MockAuthRepository repository;
+  late _MockSessionRepository repository;
 
-  setUp(() => repository = _MockAuthRepository());
+  setUp(() => repository = _MockSessionRepository());
 
   test('LogoutUseCase ends the session through the repository', () async {
     // Arrange

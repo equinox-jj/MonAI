@@ -27,15 +27,6 @@ abstract class AuthRepository {
     required String password,
   });
 
-  /// Signs out of this device only; the token stays valid on the server
-  /// until it expires. Fails only when the token could not be removed, and
-  /// the user is then still signed in. Gives [SessionStatus.signedOut].
-  Future<Either<Failure, SessionStatus>> logout();
-
-  /// Revokes the account's tokens on every device, then signs out here.
-  /// Gives [SessionStatus.signedOut].
-  Future<Either<Failure, SessionStatus>> logoutAllDevices();
-
   /// Changes the password, which revokes every token, then signs out here so
   /// the user signs in again with the new one. A wrong [currentPassword]
   /// fails with code `invalid_password`. Gives [SessionStatus.signedOut].

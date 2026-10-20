@@ -7,8 +7,6 @@ import 'package:monai/features/auth/domain/usecase/change_password_usecase.dart'
 import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/is_onboarding_completed_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
-import 'package:monai/features/auth/domain/usecase/logout_all_devices_usecase.dart';
-import 'package:monai/features/auth/domain/usecase/logout_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/register_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/restore_session_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
@@ -33,14 +31,17 @@ class AuthDI {
         () => AuthRemoteDataSourceImpl(dio: sl()),
       )
       ..registerLazySingleton<AuthRepository>(
-        () => AuthRepositoryImpl(remote: sl(), local: sl(), users: sl()),
+        () => AuthRepositoryImpl(
+          remote: sl(),
+          local: sl(),
+          users: sl(),
+          session: sl(),
+        ),
       )
       ..registerFactory(() => IsOnboardingCompletedUseCase(sl()))
       ..registerFactory(() => CompleteOnboardingUseCase(sl()))
       ..registerFactory(() => LoginUseCase(sl()))
       ..registerFactory(() => RegisterUseCase(sl()))
-      ..registerFactory(() => LogoutUseCase(sl()))
-      ..registerFactory(() => LogoutAllDevicesUseCase(sl()))
       ..registerFactory(() => ChangePasswordUseCase(sl()))
       ..registerFactory(() => RestoreSessionUseCase(sl()))
       ..registerFactory(() => OnboardingBloc(sl()))

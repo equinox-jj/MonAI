@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
@@ -24,6 +25,7 @@ import 'package:monai/features/transactions/presentation/pages/transactions/tran
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
 
 import '../../../../../helpers/entity_fixtures.dart';
+import '../../../../../helpers/settings_fakes.dart';
 
 class _MockWatchDashboard extends Mock implements WatchHomeDashboardUseCase {}
 
@@ -84,6 +86,7 @@ HomeRefreshResult _result({HomeLoadFailure? failure, bool loaded = true}) =>
 void main() {
   late _MockWatchDashboard watch;
   late _MockRefreshHome refresh;
+  late SettingsFakes settings;
 
   setUpAll(() => registerFallbackValue(DateTime(2026)));
 
@@ -94,6 +97,9 @@ void main() {
     sl.registerFactory(
       () => HomeBloc(watchDashboard: watch, refresh: refresh, now: () => _now),
     );
+    // The avatar opens the Settings tab.
+    settings = SettingsFakes()..register();
+    addTearDown(settings.appSettings.close);
   });
 
   tearDown(sl.reset);
@@ -120,12 +126,15 @@ void main() {
     );
     addTearDown(router.dispose);
     await tester.pumpWidget(
-      MaterialApp.router(
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('en'),
-        theme: MonAITheme.light(),
-        routerConfig: router,
+      BlocProvider.value(
+        value: settings.appSettings,
+        child: MaterialApp.router(
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('en'),
+          theme: MonAITheme.light(),
+          routerConfig: router,
+        ),
       ),
     );
     if (settle) {

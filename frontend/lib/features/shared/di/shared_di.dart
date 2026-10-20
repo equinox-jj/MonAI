@@ -7,6 +7,8 @@ import 'package:monai/features/shared/data/datasources/payment_provider_local_da
 import 'package:monai/features/shared/data/datasources/payment_provider_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/report_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/report_remote_datasource.dart';
+import 'package:monai/features/shared/data/datasources/session_local_datasource.dart';
+import 'package:monai/features/shared/data/datasources/session_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/transaction_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/transaction_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/user_local_datasource.dart';
@@ -17,6 +19,7 @@ import 'package:monai/features/shared/data/repository/budget_repository_impl.dar
 import 'package:monai/features/shared/data/repository/category_repository_impl.dart';
 import 'package:monai/features/shared/data/repository/payment_provider_repository_impl.dart';
 import 'package:monai/features/shared/data/repository/report_repository_impl.dart';
+import 'package:monai/features/shared/data/repository/session_repository_impl.dart';
 import 'package:monai/features/shared/data/repository/transaction_repository_impl.dart';
 import 'package:monai/features/shared/data/repository/user_repository_impl.dart';
 import 'package:monai/features/shared/data/repository/wallet_repository_impl.dart';
@@ -25,12 +28,15 @@ import 'package:monai/features/shared/domain/repository/budget_repository.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';
 import 'package:monai/features/shared/domain/repository/payment_provider_repository.dart';
 import 'package:monai/features/shared/domain/repository/report_repository.dart';
+import 'package:monai/features/shared/domain/repository/session_repository.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/shared/domain/repository/user_repository.dart';
 import 'package:monai/features/shared/domain/repository/wallet_repository.dart';
 import 'package:monai/features/shared/domain/usecase/create_transaction_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/delete_transaction_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/load_more_transactions_usecase.dart';
+import 'package:monai/features/shared/domain/usecase/logout_all_devices_usecase.dart';
+import 'package:monai/features/shared/domain/usecase/logout_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_budget_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_categories_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_monthly_report_usecase.dart';
@@ -103,6 +109,16 @@ class SharedDI {
       ..registerLazySingleton<UserLocalDataSource>(
         () => UserLocalDataSourceImpl(dao: sl()),
       )
+      ..registerLazySingleton<SessionRemoteDataSource>(
+        () => SessionRemoteDataSourceImpl(dio: sl()),
+      )
+      ..registerLazySingleton<SessionLocalDataSource>(
+        () => SessionLocalDataSourceImpl(
+          tokenStorage: sl(),
+          localCache: sl(),
+          sessionManager: sl(),
+        ),
+      )
       // ---- Repositories ----
       ..registerLazySingleton<WalletRepository>(
         () => WalletRepositoryImpl(remote: sl(), local: sl()),
@@ -124,6 +140,9 @@ class SharedDI {
       )
       ..registerLazySingleton<UserRepository>(
         () => UserRepositoryImpl(remote: sl(), local: sl()),
+      )
+      ..registerLazySingleton<SessionRepository>(
+        () => SessionRepositoryImpl(remote: sl(), local: sl()),
       )
       // ---- Events ----
       ..registerLazySingleton<TransactionDeletionEvents>(
@@ -171,6 +190,8 @@ class SharedDI {
       ..registerFactory(() => WatchMonthlyReportUseCase(sl()))
       ..registerFactory(() => RefreshMonthlyReportUseCase(sl()))
       ..registerFactory(() => WatchUserUseCase(sl()))
-      ..registerFactory(() => RefreshUserUseCase(sl()));
+      ..registerFactory(() => RefreshUserUseCase(sl()))
+      ..registerFactory(() => LogoutUseCase(sl()))
+      ..registerFactory(() => LogoutAllDevicesUseCase(sl()));
   }
 }

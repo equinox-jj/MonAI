@@ -31,4 +31,7 @@ class SettingsRepositoryImpl extends SettingsRepository with BaseRepository {
         await _local.setLanguage(language);
         return language;
       });
+
+  @override
+  Future<Either<Failure, String>> appVersion() => safeCall(_local.appVersion);
 }

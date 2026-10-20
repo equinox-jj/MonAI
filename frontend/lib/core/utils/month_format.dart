@@ -1,6 +1,9 @@
 import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart';
 
+/// The first of [now]'s month.
+DateTime monthOf(DateTime now) => DateTime(now.year, now.month);
+
 /// Month and day names in a locale such as `id` or `en`.
 abstract final class MonthFormat {
   /// `October`.

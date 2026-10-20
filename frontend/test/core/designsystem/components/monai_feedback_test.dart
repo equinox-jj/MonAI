@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:monai/core/designsystem/components/monai_feedback.dart';
 import 'package:monai/core/designsystem/theme/monai_theme.dart';
 
+import '../../../helpers/pump_themed.dart';
+
 void main() {
   testWidgets('alert dialog opens and its confirm button fires', (
     tester,
@@ -42,5 +44,30 @@ void main() {
     expect(find.text('Delete wallet?'), findsOneWidget);
     expect(confirmed, 1);
     semantics.dispose();
+  });
+
+  testWidgets('dialog buttons too long for one row stack instead', (
+    tester,
+  ) async {
+    // Arrange
+    await pumpThemed(
+      tester,
+      MonAIAlertDialog(
+        title: 'Sign out of all devices?',
+        message: 'Every device will need to sign in again.',
+        confirmLabel: 'Sign out of all devices',
+        dismissLabel: 'Cancel',
+        onConfirm: () {},
+      ),
+    );
+
+    // Act
+    await tester.pumpAndSettle();
+
+    // Assert
+    expect(tester.takeException(), isNull);
+    final confirm = tester.getTopLeft(find.text('Sign out of all devices'));
+    final cancel = tester.getTopLeft(find.text('Cancel'));
+    expect(confirm.dy, lessThan(cancel.dy));
   });
 }

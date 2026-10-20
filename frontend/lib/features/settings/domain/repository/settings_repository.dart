@@ -16,4 +16,7 @@ abstract class SettingsRepository {
 
   /// Remembers the picked language and gives it back.
   Future<Either<Failure, AppLanguage>> setLanguage(AppLanguage language);
+
+  /// The installed version name, e.g. `1.0.0`.
+  Future<Either<Failure, String>> appVersion();
 }

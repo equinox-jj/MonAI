@@ -6,6 +6,7 @@ import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:monai/core/usecase/usecase.dart';
 import 'package:monai/features/settings/domain/repository/settings_repository.dart';
+import 'package:monai/features/settings/domain/usecase/get_app_version_usecase.dart';
 import 'package:monai/features/settings/domain/usecase/get_language_usecase.dart';
 import 'package:monai/features/settings/domain/usecase/get_theme_mode_usecase.dart';
 import 'package:monai/features/settings/domain/usecase/set_language_usecase.dart';
@@ -49,5 +50,17 @@ void main() {
     // Assert
     expect(read, const Right<Failure, AppLanguage>(AppLanguage.english));
     expect(saved, const Right<Failure, AppLanguage>(AppLanguage.indonesian));
+  });
+
+  test('the app version is read', () async {
+    // Arrange
+    when(() => repository.appVersion())
+        .thenAnswer((_) async => const Right('1.0.0'));
+
+    // Act
+    final result = await GetAppVersionUseCase(repository)(const NoParams());
+
+    // Assert
+    expect(result, const Right<Failure, String>('1.0.0'));
   });
 }

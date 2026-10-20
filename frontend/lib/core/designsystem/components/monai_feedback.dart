@@ -359,20 +359,27 @@ class MonAIAlertDialog extends StatelessWidget {
                 ?content,
                 Padding(
                   padding: const .only(top: MonAISpacing.x1),
-                  child: Row(
-                    mainAxisAlignment: .end,
-                    spacing: MonAISpacing.x2,
-                    children: [
-                      if (dismissLabel case final label?)
+                  child: switch (dismissLabel) {
+                    null => Row(children: [Expanded(child: confirm)]),
+                    // Long labels stack, confirm on top, rather than
+                    // overflow.
+                    final label => OverflowBar(
+                      alignment: .end,
+                      spacing: MonAISpacing.x2,
+                      overflowAlignment: .end,
+                      overflowDirection: .up,
+                      overflowSpacing: MonAISpacing.x1,
+                      children: [
                         MonAIButton(
                           label: label,
                           onPressed: onDismiss ?? () => Navigator.pop(context),
                           variant: .text,
                           size: .compact,
                         ),
-                      if (single) Expanded(child: confirm) else confirm,
-                    ],
-                  ),
+                        confirm,
+                      ],
+                    ),
+                  },
                 ),
               ],
             ),

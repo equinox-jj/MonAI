@@ -32,7 +32,6 @@ void main() {
       sessionManager: sessionManager,
     );
     when(() => tokenStorage.saveAccessToken(any())).thenAnswer((_) async {});
-    when(() => tokenStorage.clear()).thenAnswer((_) async {});
     when(() => localCache.clear()).thenAnswer((_) async {});
   });
 
@@ -99,46 +98,6 @@ void main() {
       // Assert
       await expectLater(call, throwsA(isA<CacheException>()));
       expect(sessionManager.status.value, SessionStatus.signedOut);
-    });
-  });
-
-  group('endSession', () {
-    test('clears the token and cache and signs out', () async {
-      // Arrange
-      sessionManager.signedIn();
-
-      // Act
-      await dataSource.endSession();
-
-      // Assert
-      verify(() => tokenStorage.clear()).called(1);
-      verify(() => localCache.clear()).called(1);
-      expect(sessionManager.status.value, SessionStatus.signedOut);
-    });
-
-    test('signs out even when the cache fails to clear', () async {
-      // Arrange
-      sessionManager.signedIn();
-      when(() => localCache.clear()).thenThrow(StateError('disk'));
-
-      // Act
-      await dataSource.endSession();
-
-      // Assert
-      expect(sessionManager.status.value, SessionStatus.signedOut);
-    });
-
-    test('stays signed in when the token cannot be removed', () async {
-      // Arrange
-      sessionManager.signedIn();
-      when(() => tokenStorage.clear()).thenThrow(StateError('keystore'));
-
-      // Act
-      final call = dataSource.endSession();
-
-      // Assert
-      await expectLater(call, throwsA(isA<CacheException>()));
-      expect(sessionManager.status.value, SessionStatus.signedIn);
     });
   });
 
