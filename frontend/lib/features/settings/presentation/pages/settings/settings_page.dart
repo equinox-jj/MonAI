@@ -75,8 +75,9 @@ class SettingsUI extends StatelessWidget {
     AppSettingsCubit appSettings,
     AppThemeMode mode,
   ) {
+    final sheetClosed = ModalRoute.of(sheetContext)!.completed;
     Navigator.pop(sheetContext);
-    appSettings.themeModePicked(mode);
+    sheetClosed.then((_) => appSettings.themeModePicked(mode));
   }
 
   void _pickLanguage(BuildContext context) {

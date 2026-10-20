@@ -54,6 +54,7 @@ class MyApp extends StatelessWidget {
           theme: MonAITheme.light(),
           darkTheme: MonAITheme.dark(),
           themeMode: settings.themeMode.material,
+          themeAnimationStyle: AnimationStyle.noAnimation,
           routerConfig: router,
           builder: (_, child) => SessionExpiredGate(child: child!),
         ),
