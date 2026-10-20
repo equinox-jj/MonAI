@@ -42,6 +42,11 @@ sealed class TransactionFormEvent with _$TransactionFormEvent {
   const factory TransactionFormEvent.closeRequested({required String note}) =
       _CloseRequested;
 
+  /// The Scan chip, with the note field's text: like close, then the
+  /// receipt scanner. Adding only.
+  const factory TransactionFormEvent.scanRequested({required String note}) =
+      _ScanRequested;
+
   /// "Discard" in the discard dialog.
   const factory TransactionFormEvent.discardConfirmed() = _DiscardConfirmed;
 

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/error/field_error.dart';
 import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
+import 'package:monai/core/router/app_router.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
@@ -80,6 +82,9 @@ class _TransactionFormUIState extends State<TransactionFormUI> {
 
   void _delete() => _bloc.add(const TransactionFormEvent.deleteRequested());
 
+  void _scan() =>
+      _bloc.add(TransactionFormEvent.scanRequested(note: _note.text));
+
   void _retry() => _bloc.add(const TransactionFormEvent.retried());
 
   void _onPopInvoked(bool didPop, Object? result) {
@@ -90,7 +95,12 @@ class _TransactionFormUIState extends State<TransactionFormUI> {
       _note.text = state.original?.note ?? '';
 
   void _finish(BuildContext context, TransactionFormState state) =>
-      Navigator.pop(context, state.outcome);
+      switch (state.outcome) {
+        ScanReceiptFormOutcome() => context.pushReplacement(
+          AppRoutes.receiptScan,
+        ),
+        final outcome => Navigator.pop(context, outcome),
+      };
 
   Future<void> _askDiscard(
     BuildContext context,
@@ -167,8 +177,21 @@ class _TransactionFormUIState extends State<TransactionFormUI> {
             onNavigationPressed: _close,
             placement: widget.placement,
             actions: [
-              // TODO(transactions): add the Scan chip once receipt scanning
-              // exists.
+              BlocSelector<TransactionFormBloc, TransactionFormState, bool>(
+                selector: (state) => !state.isEdit,
+                builder: (context, canScan) => canScan
+                    ? Padding(
+                        padding: const .only(right: MonAISpacing.x2),
+                        child: MonAIButton(
+                          label: l10n.transactionFormScan,
+                          leadingIcon: MonAIIcons.documentScanner,
+                          onPressed: _scan,
+                          variant: .tonal,
+                          size: .small,
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ),
               BlocSelector<
                 TransactionFormBloc,
                 TransactionFormState,

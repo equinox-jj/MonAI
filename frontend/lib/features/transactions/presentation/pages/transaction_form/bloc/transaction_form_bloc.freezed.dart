@@ -56,7 +56,7 @@ extension TransactionFormEventPatterns on TransactionFormEvent {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _Retried value)?  retried,TResult Function( _TypeSelected value)?  typeSelected,TResult Function( _DigitPressed value)?  digitPressed,TResult Function( _TripleZeroPressed value)?  tripleZeroPressed,TResult Function( _BackspacePressed value)?  backspacePressed,TResult Function( _CategoryPicked value)?  categoryPicked,TResult Function( _WalletPicked value)?  walletPicked,TResult Function( _ToWalletPicked value)?  toWalletPicked,TResult Function( _DatePicked value)?  datePicked,TResult Function( _SaveRequested value)?  saveRequested,TResult Function( _CloseRequested value)?  closeRequested,TResult Function( _DiscardConfirmed value)?  discardConfirmed,TResult Function( _DeleteRequested value)?  deleteRequested,TResult Function( _LookupsChanged value)?  lookupsChanged,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( _Started value)?  started,TResult Function( _Retried value)?  retried,TResult Function( _TypeSelected value)?  typeSelected,TResult Function( _DigitPressed value)?  digitPressed,TResult Function( _TripleZeroPressed value)?  tripleZeroPressed,TResult Function( _BackspacePressed value)?  backspacePressed,TResult Function( _CategoryPicked value)?  categoryPicked,TResult Function( _WalletPicked value)?  walletPicked,TResult Function( _ToWalletPicked value)?  toWalletPicked,TResult Function( _DatePicked value)?  datePicked,TResult Function( _SaveRequested value)?  saveRequested,TResult Function( _CloseRequested value)?  closeRequested,TResult Function( _ScanRequested value)?  scanRequested,TResult Function( _DiscardConfirmed value)?  discardConfirmed,TResult Function( _DeleteRequested value)?  deleteRequested,TResult Function( _LookupsChanged value)?  lookupsChanged,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
@@ -71,7 +71,8 @@ return walletPicked(_that);case _ToWalletPicked() when toWalletPicked != null:
 return toWalletPicked(_that);case _DatePicked() when datePicked != null:
 return datePicked(_that);case _SaveRequested() when saveRequested != null:
 return saveRequested(_that);case _CloseRequested() when closeRequested != null:
-return closeRequested(_that);case _DiscardConfirmed() when discardConfirmed != null:
+return closeRequested(_that);case _ScanRequested() when scanRequested != null:
+return scanRequested(_that);case _DiscardConfirmed() when discardConfirmed != null:
 return discardConfirmed(_that);case _DeleteRequested() when deleteRequested != null:
 return deleteRequested(_that);case _LookupsChanged() when lookupsChanged != null:
 return lookupsChanged(_that);case _:
@@ -92,7 +93,7 @@ return lookupsChanged(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _Retried value)  retried,required TResult Function( _TypeSelected value)  typeSelected,required TResult Function( _DigitPressed value)  digitPressed,required TResult Function( _TripleZeroPressed value)  tripleZeroPressed,required TResult Function( _BackspacePressed value)  backspacePressed,required TResult Function( _CategoryPicked value)  categoryPicked,required TResult Function( _WalletPicked value)  walletPicked,required TResult Function( _ToWalletPicked value)  toWalletPicked,required TResult Function( _DatePicked value)  datePicked,required TResult Function( _SaveRequested value)  saveRequested,required TResult Function( _CloseRequested value)  closeRequested,required TResult Function( _DiscardConfirmed value)  discardConfirmed,required TResult Function( _DeleteRequested value)  deleteRequested,required TResult Function( _LookupsChanged value)  lookupsChanged,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( _Started value)  started,required TResult Function( _Retried value)  retried,required TResult Function( _TypeSelected value)  typeSelected,required TResult Function( _DigitPressed value)  digitPressed,required TResult Function( _TripleZeroPressed value)  tripleZeroPressed,required TResult Function( _BackspacePressed value)  backspacePressed,required TResult Function( _CategoryPicked value)  categoryPicked,required TResult Function( _WalletPicked value)  walletPicked,required TResult Function( _ToWalletPicked value)  toWalletPicked,required TResult Function( _DatePicked value)  datePicked,required TResult Function( _SaveRequested value)  saveRequested,required TResult Function( _CloseRequested value)  closeRequested,required TResult Function( _ScanRequested value)  scanRequested,required TResult Function( _DiscardConfirmed value)  discardConfirmed,required TResult Function( _DeleteRequested value)  deleteRequested,required TResult Function( _LookupsChanged value)  lookupsChanged,}){
 final _that = this;
 switch (_that) {
 case _Started():
@@ -107,7 +108,8 @@ return walletPicked(_that);case _ToWalletPicked():
 return toWalletPicked(_that);case _DatePicked():
 return datePicked(_that);case _SaveRequested():
 return saveRequested(_that);case _CloseRequested():
-return closeRequested(_that);case _DiscardConfirmed():
+return closeRequested(_that);case _ScanRequested():
+return scanRequested(_that);case _DiscardConfirmed():
 return discardConfirmed(_that);case _DeleteRequested():
 return deleteRequested(_that);case _LookupsChanged():
 return lookupsChanged(_that);}
@@ -124,7 +126,7 @@ return lookupsChanged(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _Retried value)?  retried,TResult? Function( _TypeSelected value)?  typeSelected,TResult? Function( _DigitPressed value)?  digitPressed,TResult? Function( _TripleZeroPressed value)?  tripleZeroPressed,TResult? Function( _BackspacePressed value)?  backspacePressed,TResult? Function( _CategoryPicked value)?  categoryPicked,TResult? Function( _WalletPicked value)?  walletPicked,TResult? Function( _ToWalletPicked value)?  toWalletPicked,TResult? Function( _DatePicked value)?  datePicked,TResult? Function( _SaveRequested value)?  saveRequested,TResult? Function( _CloseRequested value)?  closeRequested,TResult? Function( _DiscardConfirmed value)?  discardConfirmed,TResult? Function( _DeleteRequested value)?  deleteRequested,TResult? Function( _LookupsChanged value)?  lookupsChanged,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( _Started value)?  started,TResult? Function( _Retried value)?  retried,TResult? Function( _TypeSelected value)?  typeSelected,TResult? Function( _DigitPressed value)?  digitPressed,TResult? Function( _TripleZeroPressed value)?  tripleZeroPressed,TResult? Function( _BackspacePressed value)?  backspacePressed,TResult? Function( _CategoryPicked value)?  categoryPicked,TResult? Function( _WalletPicked value)?  walletPicked,TResult? Function( _ToWalletPicked value)?  toWalletPicked,TResult? Function( _DatePicked value)?  datePicked,TResult? Function( _SaveRequested value)?  saveRequested,TResult? Function( _CloseRequested value)?  closeRequested,TResult? Function( _ScanRequested value)?  scanRequested,TResult? Function( _DiscardConfirmed value)?  discardConfirmed,TResult? Function( _DeleteRequested value)?  deleteRequested,TResult? Function( _LookupsChanged value)?  lookupsChanged,}){
 final _that = this;
 switch (_that) {
 case _Started() when started != null:
@@ -139,7 +141,8 @@ return walletPicked(_that);case _ToWalletPicked() when toWalletPicked != null:
 return toWalletPicked(_that);case _DatePicked() when datePicked != null:
 return datePicked(_that);case _SaveRequested() when saveRequested != null:
 return saveRequested(_that);case _CloseRequested() when closeRequested != null:
-return closeRequested(_that);case _DiscardConfirmed() when discardConfirmed != null:
+return closeRequested(_that);case _ScanRequested() when scanRequested != null:
+return scanRequested(_that);case _DiscardConfirmed() when discardConfirmed != null:
 return discardConfirmed(_that);case _DeleteRequested() when deleteRequested != null:
 return deleteRequested(_that);case _LookupsChanged() when lookupsChanged != null:
 return lookupsChanged(_that);case _:
@@ -159,7 +162,7 @@ return lookupsChanged(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  retried,TResult Function( TransactionType type)?  typeSelected,TResult Function( int digit)?  digitPressed,TResult Function()?  tripleZeroPressed,TResult Function()?  backspacePressed,TResult Function( String categoryId)?  categoryPicked,TResult Function( String walletId)?  walletPicked,TResult Function( String walletId)?  toWalletPicked,TResult Function( DateTime date)?  datePicked,TResult Function( String note)?  saveRequested,TResult Function( String note)?  closeRequested,TResult Function()?  discardConfirmed,TResult Function()?  deleteRequested,TResult Function( TransactionLookups lookups)?  lookupsChanged,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  started,TResult Function()?  retried,TResult Function( TransactionType type)?  typeSelected,TResult Function( int digit)?  digitPressed,TResult Function()?  tripleZeroPressed,TResult Function()?  backspacePressed,TResult Function( String categoryId)?  categoryPicked,TResult Function( String walletId)?  walletPicked,TResult Function( String walletId)?  toWalletPicked,TResult Function( DateTime date)?  datePicked,TResult Function( String note)?  saveRequested,TResult Function( String note)?  closeRequested,TResult Function( String note)?  scanRequested,TResult Function()?  discardConfirmed,TResult Function()?  deleteRequested,TResult Function( TransactionLookups lookups)?  lookupsChanged,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started();case _Retried() when retried != null:
@@ -173,7 +176,8 @@ return walletPicked(_that.walletId);case _ToWalletPicked() when toWalletPicked !
 return toWalletPicked(_that.walletId);case _DatePicked() when datePicked != null:
 return datePicked(_that.date);case _SaveRequested() when saveRequested != null:
 return saveRequested(_that.note);case _CloseRequested() when closeRequested != null:
-return closeRequested(_that.note);case _DiscardConfirmed() when discardConfirmed != null:
+return closeRequested(_that.note);case _ScanRequested() when scanRequested != null:
+return scanRequested(_that.note);case _DiscardConfirmed() when discardConfirmed != null:
 return discardConfirmed();case _DeleteRequested() when deleteRequested != null:
 return deleteRequested();case _LookupsChanged() when lookupsChanged != null:
 return lookupsChanged(_that.lookups);case _:
@@ -194,7 +198,7 @@ return lookupsChanged(_that.lookups);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  retried,required TResult Function( TransactionType type)  typeSelected,required TResult Function( int digit)  digitPressed,required TResult Function()  tripleZeroPressed,required TResult Function()  backspacePressed,required TResult Function( String categoryId)  categoryPicked,required TResult Function( String walletId)  walletPicked,required TResult Function( String walletId)  toWalletPicked,required TResult Function( DateTime date)  datePicked,required TResult Function( String note)  saveRequested,required TResult Function( String note)  closeRequested,required TResult Function()  discardConfirmed,required TResult Function()  deleteRequested,required TResult Function( TransactionLookups lookups)  lookupsChanged,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  started,required TResult Function()  retried,required TResult Function( TransactionType type)  typeSelected,required TResult Function( int digit)  digitPressed,required TResult Function()  tripleZeroPressed,required TResult Function()  backspacePressed,required TResult Function( String categoryId)  categoryPicked,required TResult Function( String walletId)  walletPicked,required TResult Function( String walletId)  toWalletPicked,required TResult Function( DateTime date)  datePicked,required TResult Function( String note)  saveRequested,required TResult Function( String note)  closeRequested,required TResult Function( String note)  scanRequested,required TResult Function()  discardConfirmed,required TResult Function()  deleteRequested,required TResult Function( TransactionLookups lookups)  lookupsChanged,}) {final _that = this;
 switch (_that) {
 case _Started():
 return started();case _Retried():
@@ -208,7 +212,8 @@ return walletPicked(_that.walletId);case _ToWalletPicked():
 return toWalletPicked(_that.walletId);case _DatePicked():
 return datePicked(_that.date);case _SaveRequested():
 return saveRequested(_that.note);case _CloseRequested():
-return closeRequested(_that.note);case _DiscardConfirmed():
+return closeRequested(_that.note);case _ScanRequested():
+return scanRequested(_that.note);case _DiscardConfirmed():
 return discardConfirmed();case _DeleteRequested():
 return deleteRequested();case _LookupsChanged():
 return lookupsChanged(_that.lookups);}
@@ -225,7 +230,7 @@ return lookupsChanged(_that.lookups);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  retried,TResult? Function( TransactionType type)?  typeSelected,TResult? Function( int digit)?  digitPressed,TResult? Function()?  tripleZeroPressed,TResult? Function()?  backspacePressed,TResult? Function( String categoryId)?  categoryPicked,TResult? Function( String walletId)?  walletPicked,TResult? Function( String walletId)?  toWalletPicked,TResult? Function( DateTime date)?  datePicked,TResult? Function( String note)?  saveRequested,TResult? Function( String note)?  closeRequested,TResult? Function()?  discardConfirmed,TResult? Function()?  deleteRequested,TResult? Function( TransactionLookups lookups)?  lookupsChanged,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  started,TResult? Function()?  retried,TResult? Function( TransactionType type)?  typeSelected,TResult? Function( int digit)?  digitPressed,TResult? Function()?  tripleZeroPressed,TResult? Function()?  backspacePressed,TResult? Function( String categoryId)?  categoryPicked,TResult? Function( String walletId)?  walletPicked,TResult? Function( String walletId)?  toWalletPicked,TResult? Function( DateTime date)?  datePicked,TResult? Function( String note)?  saveRequested,TResult? Function( String note)?  closeRequested,TResult? Function( String note)?  scanRequested,TResult? Function()?  discardConfirmed,TResult? Function()?  deleteRequested,TResult? Function( TransactionLookups lookups)?  lookupsChanged,}) {final _that = this;
 switch (_that) {
 case _Started() when started != null:
 return started();case _Retried() when retried != null:
@@ -239,7 +244,8 @@ return walletPicked(_that.walletId);case _ToWalletPicked() when toWalletPicked !
 return toWalletPicked(_that.walletId);case _DatePicked() when datePicked != null:
 return datePicked(_that.date);case _SaveRequested() when saveRequested != null:
 return saveRequested(_that.note);case _CloseRequested() when closeRequested != null:
-return closeRequested(_that.note);case _DiscardConfirmed() when discardConfirmed != null:
+return closeRequested(_that.note);case _ScanRequested() when scanRequested != null:
+return scanRequested(_that.note);case _DiscardConfirmed() when discardConfirmed != null:
 return discardConfirmed();case _DeleteRequested() when deleteRequested != null:
 return deleteRequested();case _LookupsChanged() when lookupsChanged != null:
 return lookupsChanged(_that.lookups);case _:
@@ -914,6 +920,74 @@ class __$CloseRequestedCopyWithImpl<$Res>
 /// with the given fields replaced by the non-null parameter values.
 @pragma('vm:prefer-inline') $Res call({Object? note = null,}) {
   return _then(_CloseRequested(
+note: null == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
+as String,
+  ));
+}
+
+
+}
+
+/// @nodoc
+
+
+class _ScanRequested implements TransactionFormEvent {
+  const _ScanRequested({required this.note});
+  
+
+ final  String note;
+
+/// Create a copy of TransactionFormEvent
+/// with the given fields replaced by the non-null parameter values.
+@JsonKey(includeFromJson: false, includeToJson: false)
+@pragma('vm:prefer-inline')
+_$ScanRequestedCopyWith<_ScanRequested> get copyWith => __$ScanRequestedCopyWithImpl<_ScanRequested>(this, _$identity);
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ScanRequested&&(identical(other.note, note) || other.note == note));
+}
+
+
+@override
+int get hashCode {
+    return Object.hash(runtimeType,note);
+}
+
+@override
+String toString() {
+    return 'TransactionFormEvent.scanRequested(note: $note)';
+}
+
+
+}
+
+/// @nodoc
+abstract mixin class _$ScanRequestedCopyWith<$Res> implements $TransactionFormEventCopyWith<$Res> {
+  factory _$ScanRequestedCopyWith(_ScanRequested value, $Res Function(_ScanRequested) _then) = __$ScanRequestedCopyWithImpl;
+@useResult
+$Res call({
+ String note
+});
+
+
+
+
+}
+/// @nodoc
+class __$ScanRequestedCopyWithImpl<$Res>
+    implements _$ScanRequestedCopyWith<$Res> {
+  __$ScanRequestedCopyWithImpl(this._self, this._then);
+
+  final _ScanRequested _self;
+  final $Res Function(_ScanRequested) _then;
+
+/// Create a copy of TransactionFormEvent
+/// with the given fields replaced by the non-null parameter values.
+@pragma('vm:prefer-inline') $Res call({Object? note = null,}) {
+  return _then(_ScanRequested(
 note: null == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String,
   ));

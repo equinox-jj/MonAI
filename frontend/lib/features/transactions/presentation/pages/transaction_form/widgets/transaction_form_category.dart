@@ -4,8 +4,8 @@ import 'package:monai/core/designsystem/designsystem.dart';
 import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
+import 'package:monai/features/transactions/presentation/model/transaction_picker_options.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
-import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_category_picker_sheet.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_field_error.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_category_filter_sheet.dart';
 
@@ -23,10 +23,13 @@ class TransactionFormCategory extends StatelessWidget {
     showMonAIBottomSheet<void>(
       context,
       title: context.l10n.transactionFormChooseCategory,
-      builder: (_) => TransactionCategoryPickerSheet(
-        categories: bloc.state.categories,
+      builder: (context) => MonAICategoryPickerSheet(
+        options: bloc.state.categories.map((c) => c.pickerOption).toList(),
         selectedId: bloc.state.draft.categoryId,
         onPick: (id) => bloc.add(TransactionFormEvent.categoryPicked(id)),
+        doneLabel: context.l10n.transactionFormDone,
+        useLabel: context.l10n.transactionFormUseCategory,
+        emptyLabel: context.l10n.transactionFormNoCategories,
       ),
     );
   }

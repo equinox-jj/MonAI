@@ -5,11 +5,10 @@ import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
+import 'package:monai/features/transactions/presentation/model/transaction_picker_options.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
-import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_date_picker_sheet.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_field_error.dart';
-import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_wallet_picker_sheet.dart';
 
 /// Which wallet a picker sets.
 enum _WalletTarget { source, destination }
@@ -31,8 +30,8 @@ class TransactionFormFields extends StatelessWidget {
         (.income, _) => l10n.transactionFormReceiveTo,
         (.expense, _) => l10n.transactionFormPayFrom,
       },
-      builder: (_) => TransactionWalletPickerSheet(
-        wallets: state.wallets,
+      builder: (_) => MonAIRadioPickerSheet(
+        options: state.wallets.map((w) => w.pickerOption(l10n)).toList(),
         selectedId: isDestination
             ? state.draft.toWalletId
             : state.draft.walletId,
@@ -41,6 +40,10 @@ class TransactionFormFields extends StatelessWidget {
               ? TransactionFormEvent.toWalletPicked(id)
               : TransactionFormEvent.walletPicked(id),
         ),
+        doneLabel: l10n.transactionFormDone,
+        note: state.wallets.isEmpty
+            ? l10n.transactionFormNoWallets
+            : l10n.transactionFormArchivedNote,
       ),
     );
   }
@@ -49,10 +52,15 @@ class TransactionFormFields extends StatelessWidget {
     final bloc = context.read<TransactionFormBloc>();
     showMonAIBottomSheet<void>(
       context,
-      builder: (_) => TransactionDatePickerSheet(
+      builder: (_) => MonAIDatePickerSheet(
         selected: bloc.state.draft.date,
         today: bloc.state.today,
         onPick: (date) => bloc.add(TransactionFormEvent.datePicked(date)),
+        labels: transactionDatePickerLabels(
+          context.l10n,
+          today: bloc.state.today,
+          locale: context.localeName,
+        ),
       ),
     );
   }

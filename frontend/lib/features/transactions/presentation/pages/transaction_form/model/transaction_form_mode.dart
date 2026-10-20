@@ -28,4 +28,7 @@ sealed class TransactionFormOutcome with _$TransactionFormOutcome {
 
   /// The edited transaction was deleted.
   const factory TransactionFormOutcome.deleted(String id) = DeletedFormOutcome;
+
+  /// Without saving, to scan a receipt instead.
+  const factory TransactionFormOutcome.scanReceipt() = ScanReceiptFormOutcome;
 }

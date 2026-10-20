@@ -274,6 +274,61 @@ void main() {
     await sub.cancel();
   });
 
+  test('scanning from an untouched form leaves for the scanner', () async {
+    // Arrange
+    final bloc = await started();
+
+    // Act
+    await send(bloc, const TransactionFormEvent.scanRequested(note: ''));
+
+    // Assert
+    expect(bloc.state.outcome, const TransactionFormOutcome.scanReceipt());
+  });
+
+  test(
+    'scanning with changes asks first, then leaves for the scanner',
+    () async {
+      // Arrange
+      final bloc = await started();
+      final asked = <bool>[];
+      final sub = bloc.stream.listen((s) => asked.add(s.askDiscard));
+      addTearDown(sub.cancel);
+
+      // Act
+      await send(bloc, const TransactionFormEvent.scanRequested(note: 'x'));
+      await send(bloc, const TransactionFormEvent.discardConfirmed());
+
+      // Assert
+      expect(asked, contains(true));
+      expect(bloc.state.outcome, const TransactionFormOutcome.scanReceipt());
+    },
+  );
+
+  test('a close after a kept-editing scan just closes', () async {
+    // Arrange
+    final bloc = await started();
+    await send(bloc, const TransactionFormEvent.scanRequested(note: 'x'));
+
+    // Act
+    await send(bloc, const TransactionFormEvent.closeRequested(note: 'x'));
+    await send(bloc, const TransactionFormEvent.discardConfirmed());
+
+    // Assert
+    expect(bloc.state.outcome, const TransactionFormOutcome.closed());
+  });
+
+  test('an edit cannot scan', () async {
+    // Arrange
+    when(() => get('t1')).thenAnswer((_) async => Right(transaction()));
+    final bloc = await started(const TransactionFormMode.edit('t1'));
+
+    // Act
+    await send(bloc, const TransactionFormEvent.scanRequested(note: ''));
+
+    // Assert
+    expect(bloc.state.outcome, isNull);
+  });
+
   group('editing', () {
     final original = transaction(
       id: 't1',

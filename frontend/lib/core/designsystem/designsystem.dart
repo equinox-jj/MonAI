@@ -9,6 +9,7 @@ export 'package:monai/core/designsystem/components/monai_donut.dart';
 export 'package:monai/core/designsystem/components/monai_feedback.dart';
 export 'package:monai/core/designsystem/components/monai_list_items.dart';
 export 'package:monai/core/designsystem/components/monai_navigation.dart';
+export 'package:monai/core/designsystem/components/monai_pickers.dart';
 export 'package:monai/core/designsystem/components/monai_selection.dart';
 export 'package:monai/core/designsystem/components/monai_states.dart';
 export 'package:monai/core/designsystem/components/monai_surfaces.dart';

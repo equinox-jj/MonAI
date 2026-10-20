@@ -178,6 +178,30 @@ void main() {
     expect(find.byType(TransactionFormUI), findsNothing);
   });
 
+  testWidgets('a new transaction offers to scan a receipt', (tester) async {
+    // Arrange
+    // (an empty add form)
+
+    // Act
+    await openForm(tester);
+
+    // Assert
+    expect(find.text('Scan'), findsOneWidget);
+  });
+
+  testWidgets('scanning with changes asks first', (tester) async {
+    // Arrange
+    await openForm(tester);
+    await tester.tap(find.text('7'));
+
+    // Act
+    await tester.tap(find.text('Scan'));
+    await tester.pumpAndSettle();
+
+    // Assert
+    expect(find.text('Discard changes?'), findsOneWidget);
+  });
+
   testWidgets('editing shows the saved amount and note', (tester) async {
     // Arrange
     when(() => get('t1')).thenAnswer(
@@ -191,6 +215,7 @@ void main() {
 
     // Assert
     expect(find.text('Edit transaction'), findsOneWidget);
+    expect(find.text('Scan'), findsNothing);
     expect(find.text('Makan siang'), findsOneWidget);
     expect(find.text('Was Rp 35.000'), findsOneWidget);
     expect(find.text('Save changes'), findsOneWidget);

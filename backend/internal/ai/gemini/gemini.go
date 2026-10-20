@@ -57,27 +57,39 @@ func (p *parser) ParseReceipt(ctx context.Context, in ai.ParseInput) (ai.RawRece
 	return resp.toRaw(), nil
 }
 
-// generate asks for JSON matching schema and decodes it into out. It logs the
-// operation, outcome and latency only, never the user's text or the output.
+// generate asks for JSON matching schema and decodes it into out, retrying
+// once when the model is overloaded or rate-limited. It logs the operation,
+// outcome, latency and the provider's error message, never the user's text or
+// the output.
 func (p *parser) generate(ctx context.Context, op, instruction string, schema *genai.Schema, in ai.ParseInput, out any) error {
 	prompt, err := userPrompt(in)
 	if err != nil {
 		return fmt.Errorf("gemini: build prompt: %w", err)
 	}
 
+	contents := []*genai.Content{genai.NewContentFromText(prompt, genai.RoleUser)}
+	config := &genai.GenerateContentConfig{
+		SystemInstruction: genai.NewContentFromText(instruction, genai.RoleUser),
+		ResponseMIMEType:  "application/json",
+		ResponseSchema:    schema,
+	}
+
 	start := time.Now()
-	resp, err := p.models.GenerateContent(ctx, p.model,
-		[]*genai.Content{genai.NewContentFromText(prompt, genai.RoleUser)},
-		&genai.GenerateContentConfig{
-			SystemInstruction: genai.NewContentFromText(instruction, genai.RoleUser),
-			ResponseMIMEType:  "application/json",
-			ResponseSchema:    schema,
+	resp, err := withRetry(ctx, retryDelay,
+		func() (*genai.GenerateContentResponse, error) {
+			return p.models.GenerateContent(ctx, p.model, contents, config)
+		},
+		func(err error) {
+			p.log.InfoContext(ctx, "gemini: retrying", "op", op, "latency", time.Since(start),
+				"provider_message", providerMessage(err))
 		},
 	)
 	latency := time.Since(start)
 	if err != nil {
+		message := providerMessage(err)
 		err = classify(err)
-		p.log.WarnContext(ctx, "gemini: request failed", "op", op, "latency", latency, "error", err)
+		p.log.WarnContext(ctx, "gemini: request failed", "op", op, "latency", latency, "error", err,
+			"provider_message", message)
 		return err
 	}
 

@@ -354,13 +354,14 @@ extension TransactionFormOutcomePatterns on TransactionFormOutcome {
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ClosedFormOutcome value)?  closed,TResult Function( SavedFormOutcome value)?  saved,TResult Function( DeletedFormOutcome value)?  deleted,required TResult orElse(),}){
+@optionalTypeArgs TResult maybeMap<TResult extends Object?>({TResult Function( ClosedFormOutcome value)?  closed,TResult Function( SavedFormOutcome value)?  saved,TResult Function( DeletedFormOutcome value)?  deleted,TResult Function( ScanReceiptFormOutcome value)?  scanReceipt,required TResult orElse(),}){
 final _that = this;
 switch (_that) {
 case ClosedFormOutcome() when closed != null:
 return closed(_that);case SavedFormOutcome() when saved != null:
 return saved(_that);case DeletedFormOutcome() when deleted != null:
-return deleted(_that);case _:
+return deleted(_that);case ScanReceiptFormOutcome() when scanReceipt != null:
+return scanReceipt(_that);case _:
   return orElse();
 
 }
@@ -378,13 +379,14 @@ return deleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ClosedFormOutcome value)  closed,required TResult Function( SavedFormOutcome value)  saved,required TResult Function( DeletedFormOutcome value)  deleted,}){
+@optionalTypeArgs TResult map<TResult extends Object?>({required TResult Function( ClosedFormOutcome value)  closed,required TResult Function( SavedFormOutcome value)  saved,required TResult Function( DeletedFormOutcome value)  deleted,required TResult Function( ScanReceiptFormOutcome value)  scanReceipt,}){
 final _that = this;
 switch (_that) {
 case ClosedFormOutcome():
 return closed(_that);case SavedFormOutcome():
 return saved(_that);case DeletedFormOutcome():
-return deleted(_that);}
+return deleted(_that);case ScanReceiptFormOutcome():
+return scanReceipt(_that);}
 }
 /// A variant of `map` that fallback to returning `null`.
 ///
@@ -398,13 +400,14 @@ return deleted(_that);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ClosedFormOutcome value)?  closed,TResult? Function( SavedFormOutcome value)?  saved,TResult? Function( DeletedFormOutcome value)?  deleted,}){
+@optionalTypeArgs TResult? mapOrNull<TResult extends Object?>({TResult? Function( ClosedFormOutcome value)?  closed,TResult? Function( SavedFormOutcome value)?  saved,TResult? Function( DeletedFormOutcome value)?  deleted,TResult? Function( ScanReceiptFormOutcome value)?  scanReceipt,}){
 final _that = this;
 switch (_that) {
 case ClosedFormOutcome() when closed != null:
 return closed(_that);case SavedFormOutcome() when saved != null:
 return saved(_that);case DeletedFormOutcome() when deleted != null:
-return deleted(_that);case _:
+return deleted(_that);case ScanReceiptFormOutcome() when scanReceipt != null:
+return scanReceipt(_that);case _:
   return null;
 
 }
@@ -421,12 +424,13 @@ return deleted(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  closed,TResult Function( String id)?  saved,TResult Function( String id)?  deleted,required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>({TResult Function()?  closed,TResult Function( String id)?  saved,TResult Function( String id)?  deleted,TResult Function()?  scanReceipt,required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case ClosedFormOutcome() when closed != null:
 return closed();case SavedFormOutcome() when saved != null:
 return saved(_that.id);case DeletedFormOutcome() when deleted != null:
-return deleted(_that.id);case _:
+return deleted(_that.id);case ScanReceiptFormOutcome() when scanReceipt != null:
+return scanReceipt();case _:
   return orElse();
 
 }
@@ -444,12 +448,13 @@ return deleted(_that.id);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  closed,required TResult Function( String id)  saved,required TResult Function( String id)  deleted,}) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>({required TResult Function()  closed,required TResult Function( String id)  saved,required TResult Function( String id)  deleted,required TResult Function()  scanReceipt,}) {final _that = this;
 switch (_that) {
 case ClosedFormOutcome():
 return closed();case SavedFormOutcome():
 return saved(_that.id);case DeletedFormOutcome():
-return deleted(_that.id);}
+return deleted(_that.id);case ScanReceiptFormOutcome():
+return scanReceipt();}
 }
 /// A variant of `when` that fallback to returning `null`
 ///
@@ -463,12 +468,13 @@ return deleted(_that.id);}
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  closed,TResult? Function( String id)?  saved,TResult? Function( String id)?  deleted,}) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>({TResult? Function()?  closed,TResult? Function( String id)?  saved,TResult? Function( String id)?  deleted,TResult? Function()?  scanReceipt,}) {final _that = this;
 switch (_that) {
 case ClosedFormOutcome() when closed != null:
 return closed();case SavedFormOutcome() when saved != null:
 return saved(_that.id);case DeletedFormOutcome() when deleted != null:
-return deleted(_that.id);case _:
+return deleted(_that.id);case ScanReceiptFormOutcome() when scanReceipt != null:
+return scanReceipt();case _:
   return null;
 
 }
@@ -643,5 +649,37 @@ as String,
 
 
 }
+
+/// @nodoc
+
+
+class ScanReceiptFormOutcome implements TransactionFormOutcome {
+  const ScanReceiptFormOutcome();
+  
+
+
+
+
+
+
+@override
+bool operator ==(Object other) {
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is ScanReceiptFormOutcome);
+}
+
+
+@override
+int get hashCode => runtimeType.hashCode;
+
+@override
+String toString() {
+    return 'TransactionFormOutcome.scanReceipt()';
+}
+
+
+}
+
+
+
 
 // dart format on

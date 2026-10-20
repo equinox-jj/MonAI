@@ -55,6 +55,7 @@ class TransactionFormBloc
     on<_DatePicked>(_onDatePicked);
     on<_SaveRequested>(_onSaveRequested);
     on<_CloseRequested>(_onCloseRequested);
+    on<_ScanRequested>(_onScanRequested);
     on<_DiscardConfirmed>(_onDiscardConfirmed);
     on<_DeleteRequested>(_onDeleteRequested);
     on<_LookupsChanged>(_onLookupsChanged);
@@ -70,6 +71,9 @@ class TransactionFormBloc
 
   /// The note the form started with; the edited transaction's own.
   String _baselineNote = '';
+
+  /// Where the form goes once it is left: closed, or to the scanner.
+  TransactionFormOutcome _leaveTo = const TransactionFormOutcome.closed();
 
   /// The fields only the device checks live; the note is checked on save.
   static const _liveFields = {
@@ -341,15 +345,31 @@ class TransactionFormBloc
   void _onCloseRequested(
     _CloseRequested event,
     Emitter<TransactionFormState> emit,
+  ) => _leave(emit, const TransactionFormOutcome.closed(), note: event.note);
+
+  void _onScanRequested(
+    _ScanRequested event,
+    Emitter<TransactionFormState> emit,
   ) {
+    if (state.mode is! AddTransactionMode) return;
+    _leave(emit, const TransactionFormOutcome.scanReceipt(), note: event.note);
+  }
+
+  /// Leaves for [outcome], asking first when something changed.
+  void _leave(
+    Emitter<TransactionFormState> emit,
+    TransactionFormOutcome outcome, {
+    required String note,
+  }) {
+    _leaveTo = outcome;
     final changed =
         state.status == UiStatus.success &&
-        (state.draft != state.baseline || event.note.trim() != _baselineNote);
+        (state.draft != state.baseline || note.trim() != _baselineNote);
     if (changed) {
       emit(state.copyWith(askDiscard: true));
       emit(state.copyWith(askDiscard: false));
     } else {
-      emit(state.copyWith(outcome: const TransactionFormOutcome.closed()));
+      emit(state.copyWith(outcome: outcome));
     }
   }
 
@@ -357,7 +377,7 @@ class TransactionFormBloc
     _DiscardConfirmed event,
     Emitter<TransactionFormState> emit,
   ) {
-    emit(state.copyWith(outcome: const TransactionFormOutcome.closed()));
+    emit(state.copyWith(outcome: _leaveTo));
   }
 
   Future<void> _onDeleteRequested(

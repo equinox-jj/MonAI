@@ -8,6 +8,9 @@ import 'package:monai/features/auth/presentation/pages/register/register_page.da
 import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
 import 'package:monai/features/dashboard/presentation/pages/dashboard/dashboard_page.dart';
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
+import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
+import 'package:monai/features/receipt/presentation/pages/receipt_review/receipt_review_page.dart';
+import 'package:monai/features/receipt/presentation/pages/scan_receipt/scan_receipt_page.dart';
 import 'package:monai/features/settings/presentation/pages/settings/settings_page.dart';
 import 'package:monai/features/transactions/presentation/pages/search/search_page.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/transaction_detail_page.dart';
@@ -96,6 +99,13 @@ abstract final class AppRoutes {
   /// The edit form of transaction [id].
   static String transactionEdit(String id) => '$transactions/$id/edit';
 
+  /// The receipt scanner.
+  static const receiptScan = '/receipt/scan';
+
+  /// The review of a scanned receipt; pass its `ReceiptReviewArgs` as
+  /// `extra`.
+  static const receiptReview = '/receipt/review';
+
   /// The query parameter Sign in and Register hand the typed email over in.
   static const emailParam = 'email';
 
@@ -157,6 +167,22 @@ GoRouter createAppRouter({
         builder: (_, state) => RegisterPage(
           initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
         ),
+      ),
+      GoRoute(
+        path: AppRoutes.receiptScan,
+        pageBuilder: (_, state) => MaterialPage(
+          key: state.pageKey,
+          fullscreenDialog: true,
+          child: const ScanReceiptPage(),
+        ),
+      ),
+      GoRoute(
+        path: AppRoutes.receiptReview,
+        // The draft only lives in memory: without it, scan again.
+        redirect: (_, state) =>
+            state.extra is ReceiptReviewArgs ? null : AppRoutes.receiptScan,
+        builder: (_, state) =>
+            ReceiptReviewPage(args: state.extra! as ReceiptReviewArgs),
       ),
       StatefulShellRoute.indexedStack(
         builder: (_, _, navigationShell) => UndoDeleteHost(

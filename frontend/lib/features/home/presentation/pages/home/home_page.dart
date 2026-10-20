@@ -48,8 +48,8 @@ class HomeUI extends StatelessWidget {
   // TODO(home): open quick add once it exists.
   void _openQuickAdd() {}
 
-  // TODO(home): open the receipt scanner once it exists.
-  void _openScanReceipt() {}
+  void _openScanReceipt(BuildContext context) =>
+      context.push(AppRoutes.receiptScan);
 
   void _openWallet(BuildContext context, String walletId) =>
       context.push(AppRoutes.walletDetail(walletId));
@@ -98,7 +98,7 @@ class HomeUI extends StatelessWidget {
       onSearch: () => _openSearch(context),
       onProfile: () => _openSettings(context),
       onQuickAdd: _openQuickAdd,
-      onScanReceipt: _openScanReceipt,
+      onScanReceipt: () => _openScanReceipt(context),
       onSeeAllWallets: () => _openWallets(context),
       onOpenWallet: (id) => _openWallet(context, id),
       onAddWallet: () => _addWallet(context),
