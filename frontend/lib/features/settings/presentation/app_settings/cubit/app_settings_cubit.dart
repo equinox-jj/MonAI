@@ -30,6 +30,7 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   Future<void> load() async {
     final themeMode = await _getThemeMode(const NoParams());
     final language = await _getLanguage(const NoParams());
+
     emit(
       AppSettingsState(
         themeMode: themeMode.getOrElse((_) => AppThemeMode.system),
