@@ -7,9 +7,9 @@ import 'package:monai/features/settings/domain/repository/admin_provider_reposit
 import 'package:monai/features/settings/domain/usecase/provider_logo_uploader.dart';
 import 'package:monai/features/settings/domain/validation/provider_input_validator.dart';
 
-/// Saves the form over the original provider, sending only the fields that
-/// changed, then a new status and a new logo when there is one. A logo that
-/// fails after the rest saved is reported in [SavedProvider.logoFailure].
+/// Sends only the fields that changed, then a new status and logo when there
+/// is one. A logo that fails after the rest saved is reported in
+/// [SavedProvider.logoFailure].
 class UpdateProviderUseCase
     implements UseCase<SavedProvider, UpdateProviderParams> {
   UpdateProviderUseCase({
@@ -88,13 +88,8 @@ class UpdateProviderParams {
     this.logoPath,
   });
 
-  /// The provider as last loaded or saved.
   final AdminPaymentProvider original;
-
-  /// The form as filled in.
   final ProviderInput input;
-
-  /// A newly picked logo to upload; null to keep the current one.
   final String? logoPath;
 }
 

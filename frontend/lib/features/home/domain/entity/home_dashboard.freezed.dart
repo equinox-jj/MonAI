@@ -15,20 +15,12 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$HomeDashboard {
 
-/// The first of the month the summary, budget, spending and recent
-/// sections cover.
- DateTime get month; HomeGreeting get greeting;/// Empty until the user is cached.
- String get userName; String get initials;/// Whether a user or any wallet is cached, so there is something to show
+ DateTime get month; HomeGreeting get greeting; String get userName; String get initials;/// Whether a user or any wallet is cached, so there is something to show
 /// while a refresh runs.
- bool get hasCache;/// Rupiah across wallets that are not archived.
- int get totalBalance;/// Not archived, default first.
- List<Wallet> get wallets;/// Days after today until the month ends; 0 on its last day.
+ bool get hasCache; int get totalBalance; List<Wallet> get wallets;/// Days after today until the month ends; 0 on its last day.
  int get daysLeftInMonth;/// At most [kMaxSpendingSlices], largest first; the last may be
 /// "Others".
- List<SpendingSlice> get spending;/// The month's newest transactions, newest first.
- List<RecentTransaction> get recent; String? get avatarUrl;/// Null until the month's report is cached.
- MonthSummary? get summary;/// Null when the month has no budget, or it isn't cached yet.
- Budget? get budget;
+ List<SpendingSlice> get spending; List<RecentTransaction> get recent; String? get avatarUrl; MonthSummary? get summary; Budget? get budget;
 /// Create a copy of HomeDashboard
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -264,21 +256,15 @@ class _HomeDashboard implements HomeDashboard {
   const _HomeDashboard({required this.month, required this.greeting, required this.userName, required this.initials, required this.hasCache, required this.totalBalance, required  List<Wallet> wallets, required this.daysLeftInMonth, required  List<SpendingSlice> spending, required  List<RecentTransaction> recent, this.avatarUrl, this.summary, this.budget}): _wallets = wallets,_spending = spending,_recent = recent;
   
 
-/// The first of the month the summary, budget, spending and recent
-/// sections cover.
 @override final  DateTime month;
 @override final  HomeGreeting greeting;
-/// Empty until the user is cached.
 @override final  String userName;
 @override final  String initials;
 /// Whether a user or any wallet is cached, so there is something to show
 /// while a refresh runs.
 @override final  bool hasCache;
-/// Rupiah across wallets that are not archived.
 @override final  int totalBalance;
-/// Not archived, default first.
  final  List<Wallet> _wallets;
-/// Not archived, default first.
 @override List<Wallet> get wallets {
   if (_wallets is EqualUnmodifiableListView) return _wallets;
   // ignore: implicit_dynamic_type
@@ -298,9 +284,7 @@ class _HomeDashboard implements HomeDashboard {
   return EqualUnmodifiableListView(_spending);
 }
 
-/// The month's newest transactions, newest first.
  final  List<RecentTransaction> _recent;
-/// The month's newest transactions, newest first.
 @override List<RecentTransaction> get recent {
   if (_recent is EqualUnmodifiableListView) return _recent;
   // ignore: implicit_dynamic_type
@@ -308,9 +292,7 @@ class _HomeDashboard implements HomeDashboard {
 }
 
 @override final  String? avatarUrl;
-/// Null until the month's report is cached.
 @override final  MonthSummary? summary;
-/// Null when the month has no budget, or it isn't cached yet.
 @override final  Budget? budget;
 
 /// Create a copy of HomeDashboard
@@ -411,8 +393,7 @@ $BudgetCopyWith<$Res>? get budget {
 /// @nodoc
 mixin _$MonthSummary {
 
- int get incomeTotal; int get expenseTotal;/// The first of the month before.
- DateTime get previousMonth;/// Against [previousMonth]; negative means less was spent. Null when
+ int get incomeTotal; int get expenseTotal; DateTime get previousMonth;/// Against [previousMonth]; negative means less was spent. Null when
 /// that month had no expenses.
  double? get expenseChangePercent;
 /// Create a copy of MonthSummary
@@ -619,7 +600,6 @@ class _MonthSummary implements MonthSummary {
 
 @override final  int incomeTotal;
 @override final  int expenseTotal;
-/// The first of the month before.
 @override final  DateTime previousMonth;
 /// Against [previousMonth]; negative means less was spent. Null when
 /// that month had no expenses.
@@ -691,8 +671,7 @@ as double?,
 mixin _$SpendingSlice {
 
  int get amount; double get sharePercent;/// Null for the "Others" slice.
- String? get categoryId;/// Null for the "Others" slice.
- String? get name;/// `#RRGGBB`; null uses the neutral color.
+ String? get categoryId; String? get name;/// `#RRGGBB`; null uses the neutral color.
  String? get color;
 /// Create a copy of SpendingSlice
 /// with the given fields replaced by the non-null parameter values.
@@ -901,7 +880,6 @@ class _SpendingSlice extends SpendingSlice {
 @override final  double sharePercent;
 /// Null for the "Others" slice.
 @override final  String? categoryId;
-/// Null for the "Others" slice.
 @override final  String? name;
 /// `#RRGGBB`; null uses the neutral color.
 @override final  String? color;
@@ -972,11 +950,9 @@ as String?,
 /// @nodoc
 mixin _$RecentTransaction {
 
- String get id; TransactionType get type;/// Rupiah, positive; [type] gives the sign.
- int get amount; RecentDay get day;/// The note, else the merchant, else the category name; null when there
+ String get id; TransactionType get type; int get amount; RecentDay get day;/// The note, else the merchant, else the category name; null when there
 /// is none, so the screen labels it by its [type].
- String? get title; String? get categoryName; String? get icon;/// `#RRGGBB`.
- String? get color; String? get walletName; String? get toWalletName;
+ String? get title; String? get categoryName; String? get icon; String? get color; String? get walletName; String? get toWalletName;
 /// Create a copy of RecentTransaction
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1196,7 +1172,6 @@ class _RecentTransaction implements RecentTransaction {
 
 @override final  String id;
 @override final  TransactionType type;
-/// Rupiah, positive; [type] gives the sign.
 @override final  int amount;
 @override final  RecentDay day;
 /// The note, else the merchant, else the category name; null when there
@@ -1204,7 +1179,6 @@ class _RecentTransaction implements RecentTransaction {
 @override final  String? title;
 @override final  String? categoryName;
 @override final  String? icon;
-/// `#RRGGBB`.
 @override final  String? color;
 @override final  String? walletName;
 @override final  String? toWalletName;

@@ -7,14 +7,11 @@ import 'package:monai/core/data/database/tables/report_categories_table.dart';
 
 part 'monthly_report_dao.g.dart';
 
-/// Reads and writes the cached monthly reports.
 @DriftAccessor(tables: [MonthlyReports, ReportCategories])
 class MonthlyReportDao extends DatabaseAccessor<MonAIDatabase>
     with _$MonthlyReportDaoMixin {
   MonthlyReportDao(super.attachedDatabase);
 
-  /// The report for [month] with its breakdown sorted by position, or null
-  /// when none is cached.
   Stream<MonthlyReportWithCategories?> watch(DateTime month) {
     final query =
         select(monthlyReports).join([
@@ -37,8 +34,6 @@ class MonthlyReportDao extends DatabaseAccessor<MonAIDatabase>
     });
   }
 
-  /// Reports cached for the months from [from] to [to], without their
-  /// breakdowns, oldest first.
   Stream<List<MonthlyReportRow>> watchBetween(DateTime from, DateTime to) {
     const converter = YearMonthConverter();
     return (select(monthlyReports)
@@ -52,7 +47,6 @@ class MonthlyReportDao extends DatabaseAccessor<MonAIDatabase>
         .watch();
   }
 
-  /// Replaces a month's report and its whole breakdown.
   Future<void> replace(
     MonthlyReportRow report,
     List<ReportCategoryRow> categories,
@@ -65,7 +59,6 @@ class MonthlyReportDao extends DatabaseAccessor<MonAIDatabase>
     await batch((b) => b.insertAll(reportCategories, categories));
   });
 
-  /// Deletes the report for [month] and, by cascade, its breakdown.
   Future<void> deleteByMonth(DateTime month) =>
       (delete(monthlyReports)..where((t) => t.month.equalsValue(month))).go();
 }

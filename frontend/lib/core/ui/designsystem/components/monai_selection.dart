@@ -7,12 +7,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 
-/// 32 filter chip with 8 corners (Transactions filters).
-///
-/// Selected chips get a check; [hasDropdown] adds a chevron for chips that
-/// open a picker.
 class MonAIFilterChip extends StatelessWidget {
-  /// Creates a filter chip.
   const MonAIFilterChip({
     required this.label,
     required this.selected,
@@ -22,20 +17,10 @@ class MonAIFilterChip extends StatelessWidget {
     this.leadingIcon,
   });
 
-  /// The text.
   final String label;
-
-  /// Whether the filter is on.
   final bool selected;
-
-  /// Toggles the filter or opens its picker.
   final VoidCallback onTap;
-
-  /// Shows a chevron.
   final bool hasDropdown;
-
-  /// Shown before the text instead of the check, e.g. the calendar of a
-  /// month chip.
   final MonAIIconData? leadingIcon;
 
   @override
@@ -89,10 +74,8 @@ class MonAIFilterChip extends StatelessWidget {
   }
 }
 
-/// One option of a [MonAISegmentedControl], with optional selected colors.
 @immutable
 class MonAISegment<T> {
-  /// Creates a segment.
   const MonAISegment({
     required this.value,
     required this.label,
@@ -100,22 +83,13 @@ class MonAISegment<T> {
     this.selectedContent,
   });
 
-  /// The value [MonAISegmentedControl.onChanged] reports.
   final T value;
-
-  /// The text.
   final String label;
-
-  /// Fill when selected; defaults to `surface`.
   final Color? selectedContainer;
-
-  /// Text color when selected; defaults to `textPrimary`.
   final Color? selectedContent;
 }
 
-/// Pill segmented control (Expense / Income / Transfer).
 class MonAISegmentedControl<T> extends StatelessWidget {
-  /// Creates a segmented control.
   const MonAISegmentedControl({
     required this.segments,
     required this.selected,
@@ -123,13 +97,8 @@ class MonAISegmentedControl<T> extends StatelessWidget {
     super.key,
   });
 
-  /// The options, left to right.
   final List<MonAISegment<T>> segments;
-
-  /// The selected option's value.
   final T selected;
-
-  /// Called with the tapped option's value.
   final ValueChanged<T> onChanged;
 
   @override

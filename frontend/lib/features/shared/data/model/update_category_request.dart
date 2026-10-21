@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'update_category_request.freezed.dart';
 part 'update_category_request.g.dart';
 
-/// `PATCH /categories/{id}`. Only the fields that are set are sent.
+/// Only the fields that are set are sent.
 @freezed
 abstract class UpdateCategoryRequest with _$UpdateCategoryRequest {
   const factory UpdateCategoryRequest({

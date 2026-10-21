@@ -7,16 +7,12 @@ import 'package:monai/features/settings/domain/logic/provider_rules.dart';
 import 'package:monai/features/settings/presentation/widgets/provider_logo.dart';
 import 'package:monai/features/settings/presentation/widgets/provider_status_tag.dart';
 
-/// One provider in the admin list: logo, name, badge, type and aliases. A
-/// system provider shows a lock; others open the form when [onEdit] is set.
 class ProviderListRow extends StatelessWidget {
   const ProviderListRow({required this.provider, super.key, this.onEdit});
 
   static const _height = 68.0;
 
   final AdminPaymentProvider provider;
-
-  /// Null when the user may not edit providers.
   final VoidCallback? onEdit;
 
   @override

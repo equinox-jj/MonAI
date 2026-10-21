@@ -4,7 +4,6 @@ import 'package:monai/features/settings/data/model/admin_provider_response.dart'
 part 'admin_provider_list_response.freezed.dart';
 part 'admin_provider_list_response.g.dart';
 
-/// `GET /admin/payment-providers`, one page.
 @freezed
 abstract class AdminProviderListResponse with _$AdminProviderListResponse {
   const factory AdminProviderListResponse({

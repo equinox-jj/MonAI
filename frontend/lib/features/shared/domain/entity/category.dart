@@ -3,8 +3,7 @@ import 'package:monai/core/model/category_type.dart';
 
 part 'category.freezed.dart';
 
-/// A group of expenses or incomes. Hidden categories stay on old
-/// transactions but are left out of pickers.
+/// Hidden categories stay on old transactions but are left out of pickers.
 @freezed
 abstract class Category with _$Category {
   const factory Category({

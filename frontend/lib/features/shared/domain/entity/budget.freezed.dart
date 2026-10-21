@@ -16,8 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$Budget {
 
 /// The first of the month.
- DateTime get month; int get limitAmount; int get spent;/// Negative when over budget.
- int get remaining; double get progressPercent; BudgetStatus get status;
+ DateTime get month; int get limitAmount; int get spent; int get remaining; double get progressPercent; BudgetStatus get status;
 /// Create a copy of Budget
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -226,7 +225,6 @@ class _Budget implements Budget {
 @override final  DateTime month;
 @override final  int limitAmount;
 @override final  int spent;
-/// Negative when over budget.
 @override final  int remaining;
 @override final  double progressPercent;
 @override final  BudgetStatus status;

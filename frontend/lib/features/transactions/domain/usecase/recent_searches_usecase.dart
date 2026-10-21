@@ -4,7 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/transactions/domain/repository/search_history_repository.dart';
 import 'package:monai/features/transactions/domain/validation/search_query.dart';
 
-/// The last searches, newest first, offered while the search box is blank.
 class GetRecentSearchesUseCase implements UseCase<List<String>, NoParams> {
   GetRecentSearchesUseCase(this._repository);
 
@@ -15,8 +14,7 @@ class GetRecentSearchesUseCase implements UseCase<List<String>, NoParams> {
       _repository.recentSearches();
 }
 
-/// Remembers a submitted search, cleaned up like the search itself, and gives
-/// the updated list. Blank text changes nothing.
+/// Cleans the query up like the search itself. Blank text changes nothing.
 class AddRecentSearchUseCase implements UseCase<List<String>, String> {
   AddRecentSearchUseCase(this._repository);
 

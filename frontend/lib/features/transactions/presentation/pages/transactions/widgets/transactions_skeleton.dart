@@ -2,12 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// Placeholder day groups while the first page loads. Read out as one
-/// label.
 class TransactionsSkeleton extends StatelessWidget {
   const TransactionsSkeleton({super.key});
 
-  /// Two days of three and two rows.
   static const _groups = [
     [0.55, 0.40, 0.62],
     [0.48, 0.58],
@@ -31,8 +28,6 @@ class TransactionsSkeleton extends StatelessWidget {
 
 class _GroupSkeleton extends StatelessWidget {
   const _GroupSkeleton({required this.rows});
-
-  /// Each row's title width, as a share of the row.
   final List<double> rows;
 
   @override

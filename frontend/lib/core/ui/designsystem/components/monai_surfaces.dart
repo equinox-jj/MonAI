@@ -8,10 +8,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 
-/// Surface card with a 1px border and 16 corners. Tappable when [onTap] is
-/// set.
 class MonAICard extends StatelessWidget {
-  /// Creates a card.
   const MonAICard({
     required this.child,
     super.key,
@@ -19,13 +16,8 @@ class MonAICard extends StatelessWidget {
     this.padding = const .all(MonAISpacing.cardPadding),
   });
 
-  /// The card's content.
   final Widget child;
-
-  /// Makes the whole card tappable.
   final VoidCallback? onTap;
-
-  /// Inner padding; pass [EdgeInsets.zero] for stacked list rows.
   final EdgeInsetsGeometry padding;
 
   @override
@@ -52,10 +44,7 @@ class MonAICard extends StatelessWidget {
   }
 }
 
-/// Indigo gradient card with the decorative circle: the balance hero,
-/// onboarding panel and wallet cards. Content is white.
 class MonAIGradientCard extends StatelessWidget {
-  /// Creates a gradient card. [gradient] defaults to the hero gradient.
   const MonAIGradientCard({
     required this.child,
     super.key,
@@ -67,25 +56,12 @@ class MonAIGradientCard extends StatelessWidget {
     this.onTap,
   });
 
-  /// The card's content.
   final Widget child;
-
-  /// The background; defaults to `context.colors.heroGradient`.
   final Gradient? gradient;
-
-  /// Corner radius; wallet cards use [MonAIRadius.lgAll].
   final BorderRadius borderRadius;
-
-  /// Inner padding.
   final EdgeInsetsGeometry padding;
-
-  /// Adds the indigo glow (light theme only).
   final bool elevated;
-
-  /// Draws the translucent circle in the top-right corner.
   final bool decorated;
-
-  /// Makes the whole card tappable.
   final VoidCallback? onTap;
 
   @override
@@ -155,41 +131,20 @@ class _DecorCircle extends StatelessWidget {
   }
 }
 
-/// The navigation button of a [MonAITopBar].
-enum MonAITopBarNavigation {
-  /// A back arrow.
-  back,
+enum MonAITopBarNavigation { back, close, none }
 
-  /// A close cross, for full-screen forms.
-  close,
-
-  /// No button.
-  none,
-}
-
-/// Where a screen is shown, which decides its top bar's status-bar inset and
-/// navigation button.
 enum ScreenPlacement {
-  /// Its own screen: the top bar sits below the status bar.
   fullScreen,
 
-  /// Beside a list or menu on a wide screen: no navigation button, and the
-  /// host owns the status bar.
+  /// Beside a list on a wide screen: no navigation button, and the host owns
+  /// the status bar.
   pane,
 
-  /// A side sheet over the screen behind it on a wide screen, which owns the
-  /// status bar.
+  /// A side sheet on a wide screen; the screen behind it owns the status bar.
   sideSheet,
 }
 
-/// Screen header for pushed screens and full-screen forms: back/close, title,
-/// actions.
-///
-/// Only a [ScreenPlacement.fullScreen] bar pads for the status bar, and a
-/// [ScreenPlacement.pane] has no navigation button. Usable as
-/// [Scaffold.appBar].
 class MonAITopBar extends StatelessWidget implements PreferredSizeWidget {
-  /// Creates a top bar. [navigationTooltip] labels the back/close button.
   const MonAITopBar({
     required this.title,
     super.key,
@@ -201,25 +156,12 @@ class MonAITopBar extends StatelessWidget implements PreferredSizeWidget {
     this.actions = const [],
   });
 
-  /// The title.
   final String title;
-
-  /// The leading button.
   final MonAITopBarNavigation navigation;
-
-  /// Called by the leading button; defaults to [Navigator.maybePop].
   final VoidCallback? onNavigationPressed;
-
-  /// Defaults to the Material "Back" / "Close" label.
   final String? navigationTooltip;
-
-  /// Defaults to `titleLarge`.
   final TextStyle? titleStyle;
-
-  /// Where the screen is shown.
   final ScreenPlacement placement;
-
-  /// Trailing buttons.
   final List<Widget> actions;
 
   @override
@@ -279,16 +221,9 @@ class MonAITopBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// Tab-screen title ("Transactions", "Settings") with an optional trailing
-/// action.
 class MonAIScreenTitle extends StatelessWidget {
-  /// Creates a screen title.
   const MonAIScreenTitle({required this.title, super.key, this.action});
-
-  /// The title.
   final String title;
-
-  /// A trailing widget, e.g. an icon button.
   final Widget? action;
 
   @override
@@ -312,9 +247,7 @@ class MonAIScreenTitle extends StatelessWidget {
   }
 }
 
-/// Section title with an optional "See all"-style link.
 class MonAISectionHeader extends StatelessWidget {
-  /// Creates a section header.
   const MonAISectionHeader({
     required this.title,
     super.key,
@@ -323,16 +256,9 @@ class MonAISectionHeader extends StatelessWidget {
     this.style,
   });
 
-  /// The title.
   final String title;
-
-  /// The link text.
   final String? actionLabel;
-
-  /// Called by the link.
   final VoidCallback? onActionPressed;
-
-  /// Defaults to `headlineSmall`; card headers use `titleMedium`.
   final TextStyle? style;
 
   @override
@@ -357,9 +283,7 @@ class MonAISectionHeader extends StatelessWidget {
   }
 }
 
-/// Inline accent link with a 44 touch height.
 class MonAITextLink extends StatelessWidget {
-  /// Creates a text link.
   const MonAITextLink({
     required this.label,
     required this.onPressed,
@@ -368,16 +292,9 @@ class MonAITextLink extends StatelessWidget {
     this.style,
   });
 
-  /// The link text.
   final String label;
-
-  /// Called on tap.
   final VoidCallback? onPressed;
-
-  /// An icon after the text.
   final MonAIIconData? trailingIcon;
-
-  /// Defaults to `labelLarge`.
   final TextStyle? style;
 
   @override
@@ -416,12 +333,8 @@ class MonAITextLink extends StatelessWidget {
   }
 }
 
-/// A 1px divider in the theme's divider color.
 class MonAIDivider extends StatelessWidget {
-  /// Creates a divider. [indent] insets its start.
   const MonAIDivider({super.key, this.indent = 0});
-
-  /// Start inset.
   final double indent;
 
   @override

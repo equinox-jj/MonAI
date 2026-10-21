@@ -7,9 +7,9 @@ import 'package:monai/features/shared/domain/repository/transaction_repository.d
 import 'package:monai/features/shared/domain/usecase/refresh_transaction_dependents_usecase.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 
-/// Creates a transaction, then refreshes the totals it changes. Invalid
-/// input fails as [ValidationFailure] without calling the server, in the
-/// same shape as the server's own 422.
+/// Refreshes the totals it changes. Invalid input fails as
+/// [ValidationFailure] without calling the server, in the shape of the
+/// server's own 422.
 class CreateTransactionUseCase
     implements UseCase<Transaction, TransactionInput> {
   CreateTransactionUseCase({

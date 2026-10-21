@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Where the Wallets screen's buttons lead. The screen fills these in; the
-/// sections only call them.
 @immutable
 class WalletsActions {
   const WalletsActions({

@@ -3,7 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/budget_status.dart';
 
-/// What the preview's colors mean.
 class BudgetLegend extends StatelessWidget {
   const BudgetLegend({super.key});
 

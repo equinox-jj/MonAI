@@ -4,7 +4,6 @@ import 'package:monai/features/shared/domain/entity/draft_confidence.dart';
 part 'draft_confidence_data.freezed.dart';
 part 'draft_confidence_data.g.dart';
 
-/// The AI's confidence per draft field, as `/ai/*` responses send it.
 @freezed
 abstract class DraftConfidenceData with _$DraftConfidenceData {
   const factory DraftConfidenceData({

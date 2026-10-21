@@ -4,7 +4,6 @@ import 'package:monai/core/data/database/tables/wallets_table.dart';
 
 part 'wallet_dao.g.dart';
 
-/// Reads and writes the cached wallets.
 @DriftAccessor(tables: [Wallets])
 class WalletDao extends DatabaseAccessor<MonAIDatabase> with _$WalletDaoMixin {
   WalletDao(super.attachedDatabase);
@@ -18,7 +17,6 @@ class WalletDao extends DatabaseAccessor<MonAIDatabase> with _$WalletDaoMixin {
           ]))
           .watch();
 
-  /// The wallet with [id], or null when it isn't cached.
   Stream<WalletRow?> watch(String id) =>
       (select(wallets)..where((t) => t.id.equals(id))).watchSingleOrNull();
 
@@ -32,8 +30,6 @@ class WalletDao extends DatabaseAccessor<MonAIDatabase> with _$WalletDaoMixin {
   Future<void> deleteById(String id) =>
       (delete(wallets)..where((t) => t.id.equals(id))).go();
 
-  /// Swaps in a full list from the server, dropping wallets it no longer
-  /// returns.
   Future<void> replaceAll(List<WalletRow> rows) => transaction(() async {
     await delete(wallets).go();
     await upsertAll(rows);

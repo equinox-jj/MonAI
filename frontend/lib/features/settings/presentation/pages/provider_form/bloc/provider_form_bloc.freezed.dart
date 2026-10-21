@@ -1073,24 +1073,9 @@ as String,
 /// @nodoc
 mixin _$ProviderFormState {
 
-/// Adding a provider rather than editing one.
- bool get isNew;/// [UiStatus.success] once the form can be filled in: at once for a new
-/// provider, after the load for an existing one.
- UiStatus get status; ProviderFailure? get loadFailure;/// The provider as last loaded or saved; null for a new one.
- AdminPaymentProvider? get original; WalletType? get type; List<String> get aliases; bool get isActive;/// A picked logo, uploaded on Save.
- String? get newLogoPath;/// The provider's ID: its own when editing, else what the server will
-/// make from the name; empty while there is no name.
- String get slug;/// The name field isn't blank.
- bool get hasName;/// The sort order field holds a number.
- bool get sortOrderValid; FieldError? get nameError; FieldError? get aliasError;/// Bumped each time typed aliases are added, so the screen clears the
+ bool get isNew; UiStatus get status; ProviderFailure? get loadFailure; AdminPaymentProvider? get original; WalletType? get type; List<String> get aliases; bool get isActive; String? get newLogoPath; String get slug; bool get hasName; bool get sortOrderValid; FieldError? get nameError; FieldError? get aliasError;/// Bumped each time typed aliases are added, so the screen clears the
 /// alias field.
- int get aliasInputResets; bool get isSaving; bool get isDeleting; bool get isChangingStatus; ProviderFormDialog? get dialog;/// The user may save this form (create or update permission).
- bool get canSave;/// The user may delete this provider.
- bool get canDelete;/// When it was last saved, in local time.
- DateTime? get lastEdited;/// Why the last action (save, status, delete) failed; shown once.
- ProviderFailure? get actionFailure;/// The provider saved but its logo didn't; shown once.
- bool get logoFailed;/// Saved or deleted: the form closes.
- bool get done;
+ int get aliasInputResets; bool get isSaving; bool get isDeleting; bool get isChangingStatus; ProviderFormDialog? get dialog; bool get canSave; bool get canDelete; DateTime? get lastEdited; ProviderFailure? get actionFailure; bool get logoFailed; bool get done;
 /// Create a copy of ProviderFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1325,13 +1310,9 @@ class _ProviderFormState implements ProviderFormState {
   const _ProviderFormState({required this.isNew, this.status = UiStatus.initial, this.loadFailure, this.original, this.type,  List<String> aliases = const [], this.isActive = true, this.newLogoPath, this.slug = '', this.hasName = false, this.sortOrderValid = true, this.nameError, this.aliasError, this.aliasInputResets = 0, this.isSaving = false, this.isDeleting = false, this.isChangingStatus = false, this.dialog, this.canSave = false, this.canDelete = false, this.lastEdited, this.actionFailure, this.logoFailed = false, this.done = false}): _aliases = aliases;
   
 
-/// Adding a provider rather than editing one.
 @override final  bool isNew;
-/// [UiStatus.success] once the form can be filled in: at once for a new
-/// provider, after the load for an existing one.
 @override@JsonKey() final  UiStatus status;
 @override final  ProviderFailure? loadFailure;
-/// The provider as last loaded or saved; null for a new one.
 @override final  AdminPaymentProvider? original;
 @override final  WalletType? type;
  final  List<String> _aliases;
@@ -1342,14 +1323,9 @@ class _ProviderFormState implements ProviderFormState {
 }
 
 @override@JsonKey() final  bool isActive;
-/// A picked logo, uploaded on Save.
 @override final  String? newLogoPath;
-/// The provider's ID: its own when editing, else what the server will
-/// make from the name; empty while there is no name.
 @override@JsonKey() final  String slug;
-/// The name field isn't blank.
 @override@JsonKey() final  bool hasName;
-/// The sort order field holds a number.
 @override@JsonKey() final  bool sortOrderValid;
 @override final  FieldError? nameError;
 @override final  FieldError? aliasError;
@@ -1360,17 +1336,11 @@ class _ProviderFormState implements ProviderFormState {
 @override@JsonKey() final  bool isDeleting;
 @override@JsonKey() final  bool isChangingStatus;
 @override final  ProviderFormDialog? dialog;
-/// The user may save this form (create or update permission).
 @override@JsonKey() final  bool canSave;
-/// The user may delete this provider.
 @override@JsonKey() final  bool canDelete;
-/// When it was last saved, in local time.
 @override final  DateTime? lastEdited;
-/// Why the last action (save, status, delete) failed; shown once.
 @override final  ProviderFailure? actionFailure;
-/// The provider saved but its logo didn't; shown once.
 @override@JsonKey() final  bool logoFailed;
-/// Saved or deleted: the form closes.
 @override@JsonKey() final  bool done;
 
 /// Create a copy of ProviderFormState

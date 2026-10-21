@@ -10,9 +10,6 @@ import 'package:monai/features/settings/presentation/app_settings/cubit/app_sett
 abstract final class SessionHelper {
   const SessionHelper._();
 
-  /// Gets the app ready to launch and returns its router.
-  ///
-  /// Registers dependencies, restores the session and loads the app settings.
   /// Call once before `runApp`, after `WidgetsFlutterBinding.ensureInitialized`.
   static Future<GoRouter> init() async {
     // Restores before routing so the launch redirect sees the session. An

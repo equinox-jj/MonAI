@@ -28,13 +28,7 @@ part 'receipt_review_bloc.freezed.dart';
 part 'receipt_review_event.dart';
 part 'receipt_review_state.dart';
 
-/// Checks a scanned receipt's draft and saves it with the photo. Fields
-/// the AI filled are marked until the user changes them. The amount,
-/// merchant and note live in the screen's text fields and arrive with
-/// their edits and the save; input is checked on save, then again on every
-/// change until it is valid.
 class ReceiptReviewBloc extends Bloc<ReceiptReviewEvent, ReceiptReviewState> {
-  /// [now] is the clock; tests pass a fixed one.
   ReceiptReviewBloc({
     required ReceiptReviewArgs args,
     required this._save,
@@ -107,8 +101,7 @@ class ReceiptReviewBloc extends Bloc<ReceiptReviewEvent, ReceiptReviewState> {
     );
   }
 
-  /// A sparkle on what was read surely, a warning on the rest. A date after
-  /// today was read wrong, so it became today and needs checking.
+  /// A date after today was read wrong, so it became today and needs checking.
   static Map<ReceiptField, FieldMark> _marksOf(
     ReceiptDraft draft, {
     required bool dateInFuture,
@@ -217,8 +210,6 @@ class ReceiptReviewBloc extends Bloc<ReceiptReviewEvent, ReceiptReviewState> {
         _input(amount: '', merchant: '', note: event.text),
       );
 
-  /// A typed field loses its mark; once a save failed on the input, its
-  /// error is checked again with [input].
   void _edited(
     Emitter<ReceiptReviewState> emit,
     ReceiptField field,
@@ -239,7 +230,6 @@ class ReceiptReviewBloc extends Bloc<ReceiptReviewEvent, ReceiptReviewState> {
     );
   }
 
-  /// [next] with [field]'s mark and error removed: the user chose it.
   ReceiptReviewState _cleared(ReceiptField field, ReceiptReviewState next) =>
       next.copyWith(
         marks: {...next.marks}..remove(field),
@@ -299,8 +289,6 @@ class ReceiptReviewBloc extends Bloc<ReceiptReviewEvent, ReceiptReviewState> {
     }
   }
 
-  /// "Try again" after the AI failed: sends the same text again. A draft
-  /// replaces the empty fields; another failure is reported once.
   Future<void> _onRetryRequested(
     _RetryRequested event,
     Emitter<ReceiptReviewState> emit,

@@ -1,5 +1,5 @@
-/// The icons a category can have, as Material Symbols names, in the form's
-/// order. The last, `category`, is the fallback.
+/// Material Symbols names, in the form's order. The last, `category`, is the
+/// fallback.
 const categoryIconChoices = [
   'local_cafe',
   'restaurant',
@@ -21,8 +21,7 @@ const categoryIconChoices = [
   'category',
 ];
 
-/// The colors a category can have, `#RRGGBB`, in the form's order: orange,
-/// sky, pink, violet, emerald, amber, indigo, lime, teal and slate.
+/// `#RRGGBB`, in the form's order.
 const categoryColorChoices = [
   '#F97316',
   '#0EA5E9',
@@ -36,17 +35,12 @@ const categoryColorChoices = [
   '#64748B',
 ];
 
-/// A new category's icon.
 const defaultCategoryIcon = 'local_cafe';
-
-/// A new category's color: orange.
 const defaultCategoryColor = '#F97316';
 
-/// [icon] when the form offers it, otherwise the generic one.
 String categoryIconChoice(String? icon) =>
     categoryIconChoices.contains(icon) ? icon! : categoryIconChoices.last;
 
-/// [color] when the form offers it (any case), otherwise the first color.
 String categoryColorChoice(String? color) {
   final upper = color?.toUpperCase();
   return categoryColorChoices.contains(upper)

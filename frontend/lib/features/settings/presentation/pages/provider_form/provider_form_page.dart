@@ -19,7 +19,6 @@ import 'package:monai/features/settings/presentation/pages/provider_form/widgets
 import 'package:monai/features/settings/presentation/pages/provider_form/widgets/provider_form_type.dart';
 
 class ProviderFormPage extends StatelessWidget {
-  /// Adds a provider when [providerId] is null, else edits that one.
   const ProviderFormPage({
     super.key,
     this.providerId,
@@ -27,8 +26,6 @@ class ProviderFormPage extends StatelessWidget {
   });
 
   final String? providerId;
-
-  /// [ScreenPlacement.sideSheet] on tablet landscape.
   final ScreenPlacement placement;
 
   @override
@@ -42,9 +39,6 @@ class ProviderFormPage extends StatelessWidget {
   }
 }
 
-/// A new provider, or an existing one being edited: logo, name, type,
-/// aliases, sort order and status. Stateful only to own the text
-/// controllers.
 class ProviderFormUI extends StatefulWidget {
   const ProviderFormUI({
     super.key,
@@ -58,7 +52,6 @@ class ProviderFormUI extends StatefulWidget {
 }
 
 class _ProviderFormUIState extends State<ProviderFormUI> {
-  /// A new provider goes after the built-in ones.
   static const _defaultSortOrder = '100';
 
   final _name = TextEditingController();
@@ -376,7 +369,6 @@ class _Fields extends StatelessWidget {
   }
 }
 
-/// The name, with the provider's ID or an error under it.
 class _NameField extends StatelessWidget {
   const _NameField({required this.controller, required this.onChanged});
 
@@ -449,8 +441,6 @@ class _SortOrderField extends StatelessWidget {
   }
 }
 
-/// Create and its hint on a new provider; Delete and when it was last
-/// edited on an existing one.
 class _Footer extends StatelessWidget {
   const _Footer({required this.onCreate, required this.onDelete});
 
@@ -518,7 +508,6 @@ class _Footer extends StatelessWidget {
   }
 }
 
-/// A red outlined "Delete OVO".
 class _DeleteButton extends StatelessWidget {
   const _DeleteButton({required this.label, required this.onPressed});
 

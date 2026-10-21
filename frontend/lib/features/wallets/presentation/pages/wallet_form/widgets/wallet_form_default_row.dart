@@ -4,8 +4,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
 
-/// "Make this my default wallet". The default wallet's own row is checked
-/// and fixed: another wallet has to become the default instead.
 class WalletFormDefaultRow extends StatelessWidget {
   const WalletFormDefaultRow({required this.onToggled, super.key});
 

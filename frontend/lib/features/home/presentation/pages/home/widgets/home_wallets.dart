@@ -9,15 +9,9 @@ import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart'
 import 'package:monai/features/home/presentation/pages/home/widgets/home_actions.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// Wallet cards in a grid row on tablet portrait.
 const _gridColumns = 4;
-
-/// The tablet grid's card height.
 const _gridCardHeight = 128.0;
 
-/// "Wallets" with its cards: a horizontal row that runs to the screen edge
-/// on phones, a grid of four on tablet portrait.
-///
 /// The phone row pads itself, so place it without side padding.
 class HomeWallets extends StatelessWidget {
   const HomeWallets({

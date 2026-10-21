@@ -6,8 +6,6 @@ import 'package:monai/features/auth/domain/repository/auth_repository.dart';
 import 'package:monai/features/auth/domain/validation/auth_input.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 
-/// Signs in. Invalid input fails as [ValidationFailure] without calling the
-/// server, in the same shape as the server's own 422.
 class LoginUseCase implements UseCase<AuthSession, LoginParams> {
   LoginUseCase(this._repository);
 
@@ -25,7 +23,6 @@ class LoginUseCase implements UseCase<AuthSession, LoginParams> {
   }
 }
 
-/// The sign-in form as typed.
 class LoginParams {
   const LoginParams({required this.email, required this.password});
 

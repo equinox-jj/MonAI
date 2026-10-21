@@ -12,11 +12,7 @@ part 'export_csv_bloc.freezed.dart';
 part 'export_csv_event.dart';
 part 'export_csv_state.dart';
 
-/// Picks the months and the separator, writes the CSV and hands it to the
-/// share sheet. The range starts on the current month, covers at most 12
-/// months and never goes past this month.
 class ExportCsvBloc extends Bloc<ExportCsvEvent, ExportCsvState> {
-  /// [now] is the clock; tests pass a fixed one.
   ExportCsvBloc({
     required this._export,
     required this._getDelimiter,

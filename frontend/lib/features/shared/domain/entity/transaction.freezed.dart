@@ -15,8 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Transaction {
 
- String get id; TransactionType get type; int get amount; String get walletId;/// Local midnight of the transaction's day.
- DateTime get date; TransactionSource get source; DateTime get createdAt; DateTime get updatedAt;/// The destination wallet; transfers only.
+ String get id; TransactionType get type; int get amount; String get walletId;/// Local midnight.
+ DateTime get date; TransactionSource get source; DateTime get createdAt; DateTime get updatedAt;/// Transfers only.
  String? get toWalletId;/// Expenses and incomes only.
  String? get categoryId; String? get note; String? get merchant;/// Presigned and short-lived.
  String? get receiptUrl;
@@ -235,12 +235,12 @@ class _Transaction implements Transaction {
 @override final  TransactionType type;
 @override final  int amount;
 @override final  String walletId;
-/// Local midnight of the transaction's day.
+/// Local midnight.
 @override final  DateTime date;
 @override final  TransactionSource source;
 @override final  DateTime createdAt;
 @override final  DateTime updatedAt;
-/// The destination wallet; transfers only.
+/// Transfers only.
 @override final  String? toWalletId;
 /// Expenses and incomes only.
 @override final  String? categoryId;

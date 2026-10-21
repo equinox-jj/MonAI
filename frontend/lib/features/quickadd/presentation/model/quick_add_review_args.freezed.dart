@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$QuickAddReviewArgs {
 
- String get phrase;/// Two or more.
- List<QuickAddDraft> get drafts;
+ String get phrase; List<QuickAddDraft> get drafts;
 /// Create a copy of QuickAddReviewArgs
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -218,9 +217,7 @@ class _QuickAddReviewArgs implements QuickAddReviewArgs {
   
 
 @override final  String phrase;
-/// Two or more.
  final  List<QuickAddDraft> _drafts;
-/// Two or more.
 @override List<QuickAddDraft> get drafts {
   if (_drafts is EqualUnmodifiableListView) return _drafts;
   // ignore: implicit_dynamic_type

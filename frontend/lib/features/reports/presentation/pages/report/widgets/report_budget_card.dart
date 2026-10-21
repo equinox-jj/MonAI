@@ -7,7 +7,6 @@ import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 
-/// The month's budget progress, or the prompt to set one. Opens Budget.
 class ReportBudgetCard extends StatelessWidget {
   const ReportBudgetCard({required this.onOpenBudget, super.key});
 

@@ -3,7 +3,6 @@ import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/profile/domain/repository/profile_repository.dart';
 
-/// Removes the profile photo; the initials show instead.
 class RemoveAvatarUseCase implements UseCase<Unit, NoParams> {
   RemoveAvatarUseCase(this._repository);
 

@@ -3,27 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/features/auth/presentation/widgets/auth_hero_panel.dart';
 
-/// The phone form's width cap (tablet portrait) and the tablet card's width.
 const _formWidth = 480.0;
 
 const _logoTileSize = 56.0;
 const _logoIconSize = 30.0;
 const _tabletSubmitMinWidth = 160.0;
 
-/// Frame shared by Sign in and Register. Both are root screens, so neither
-/// has a back button.
-///
-/// Compact and medium widths: [fields] at the top and [actions] pinned to
-/// the bottom, scrolling together when the keyboard leaves too little room.
-/// Expanded: the gradient hero on the left, and [fields] plus [actions] in a
-/// card on the right.
 class AuthScaffold extends StatelessWidget {
   const AuthScaffold({required this.fields, required this.actions, super.key});
-
-  /// The header, banner and inputs, spaced evenly.
   final List<Widget> fields;
-
-  /// Usually [AuthActions].
   final Widget actions;
 
   @override
@@ -146,7 +134,6 @@ class _ExpandedAuthScaffold extends StatelessWidget {
   }
 }
 
-/// The gradient wallet tile above the Sign in title (phone only).
 class AuthLogoTile extends StatelessWidget {
   const AuthLogoTile({super.key});
 
@@ -182,7 +169,6 @@ class AuthLogoTile extends StatelessWidget {
   }
 }
 
-/// The screen's title and the line under it.
 class AuthHeader extends StatelessWidget {
   const AuthHeader({required this.title, required this.subtitle, super.key});
 
@@ -216,9 +202,6 @@ class AuthHeader extends StatelessWidget {
   }
 }
 
-/// The submit button and the link to the other auth screen. Compact: a
-/// full-width button over a centred "New here? Create an account".
-/// Expanded: the link on the left, a smaller button on the right.
 class AuthActions extends StatelessWidget {
   const AuthActions({
     required this.submitLabel,
@@ -232,11 +215,7 @@ class AuthActions extends StatelessWidget {
 
   final String submitLabel;
   final VoidCallback onSubmit;
-
-  /// Shows a spinner on the button while a submit is running.
   final bool loading;
-
-  /// The question before the link, e.g. "New here?"; compact only.
   final String prompt;
   final String linkLabel;
   final VoidCallback onLinkTap;

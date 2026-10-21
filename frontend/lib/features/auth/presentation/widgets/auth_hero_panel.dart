@@ -14,8 +14,6 @@ const _brandTileSize = 40.0;
 const _headlineFontSize = 45.0;
 const _headlineLineHeight = 52.0;
 
-/// Left half of the expanded auth layout. Decorative, so it is hidden from
-/// screen readers.
 class AuthHeroPanel extends StatelessWidget {
   const AuthHeroPanel({super.key});
 
@@ -75,8 +73,6 @@ class _HeroCircle extends StatelessWidget {
   }
 }
 
-/// The brand, headline and sample cards, scaled down when the window is too
-/// short to fit them.
 class _HeroContent extends StatelessWidget {
   const _HeroContent();
 

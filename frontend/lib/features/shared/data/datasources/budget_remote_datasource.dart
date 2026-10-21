@@ -5,13 +5,11 @@ import 'package:monai/features/shared/data/model/budget_response.dart';
 import 'package:monai/features/shared/data/model/set_budget_request.dart';
 
 abstract class BudgetRemoteDataSource {
-  /// `GET /budgets/{month}`; a 404 means no budget is set.
+  /// A 404 means no budget is set.
   Future<BudgetResponse> getBudget(String month);
 
-  /// `PUT /budgets/{month}`.
   Future<BudgetResponse> setBudget(String month, SetBudgetRequest request);
 
-  /// `DELETE /budgets/{month}`.
   Future<void> deleteBudget(String month);
 }
 

@@ -5,8 +5,6 @@ import 'package:monai/features/profile/domain/repository/profile_repository.dart
 import 'package:monai/features/profile/domain/validation/profile_input_validator.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 
-/// Renames the user. An invalid name fails as [ValidationFailure] without
-/// calling the server.
 class UpdateProfileNameUseCase implements UseCase<User, String> {
   UpdateProfileNameUseCase(this._repository);
 

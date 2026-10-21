@@ -4,7 +4,6 @@ import 'package:monai/features/shared/data/datasources/endpoint/report_endpoint.
 import 'package:monai/features/shared/data/model/monthly_report_response.dart';
 
 abstract class ReportRemoteDataSource {
-  /// `GET /reports/monthly?month={month}`.
   Future<MonthlyReportResponse> getMonthlyReport(String month);
 }
 

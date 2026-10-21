@@ -5,12 +5,8 @@ import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/settings/domain/logic/settings_rules.dart';
 
-/// Indonesian and English, then how a transaction row reads in the current
-/// one. Show it with [showMonAIBottomSheet]; a pick closes it.
 class SettingsLanguageSheet extends StatelessWidget {
   const SettingsLanguageSheet({required this.onPick, super.key});
-
-  /// Called with the picked language; the sheet closes after.
   final ValueChanged<AppLanguage> onPick;
 
   @override
@@ -85,8 +81,6 @@ class _LanguageCode extends StatelessWidget {
   }
 }
 
-/// A sample expense row in the app's current language; decorative, so
-/// hidden from screen readers.
 class _LanguagePreview extends StatelessWidget {
   const _LanguagePreview();
 

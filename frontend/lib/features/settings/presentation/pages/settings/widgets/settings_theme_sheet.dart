@@ -6,12 +6,8 @@ import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
 import 'package:monai/features/settings/presentation/pages/settings/model/settings_text.dart';
 
-/// System, Light and Dark side by side, each drawn as a tiny screen in its
-/// colors. Show it with [showMonAIBottomSheet]; a pick closes it.
 class SettingsThemeSheet extends StatelessWidget {
   const SettingsThemeSheet({required this.onPick, super.key});
-
-  /// Called with the picked theme; the sheet closes after.
   final ValueChanged<AppThemeMode> onPick;
 
   @override
@@ -151,8 +147,6 @@ class _ThemeOption extends StatelessWidget {
   }
 }
 
-/// A header bar, two cards and a button, in [palette]'s colors whatever the
-/// app's theme.
 class _MiniScreen extends StatelessWidget {
   const _MiniScreen({required this.palette});
 

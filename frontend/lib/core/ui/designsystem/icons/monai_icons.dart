@@ -1,15 +1,10 @@
 import 'package:flutter/foundation.dart';
 
-/// An icon from the bundled SVG set (Material Symbols Rounded, weight 400,
-/// grade 0, 24dp). Render it with `MonAIIcon`.
 @immutable
 final class MonAIIconData {
   const MonAIIconData._(this.name);
-
-  /// The Material Symbols name, e.g. `receipt_long`.
   final String name;
 
-  /// The SVG asset path.
   String get assetPath => 'assets/icons/$name.svg';
 
   @override
@@ -41,7 +36,6 @@ abstract final class MonAIIcons {
   static const apps = MonAIIconData._('apps');
   static const arrowBack = MonAIIconData._('arrow_back');
   static const arrowForward = MonAIIconData._('arrow_forward');
-  static const attachFile = MonAIIconData._('attach_file');
   static const autoAwesome = MonAIIconData._('auto_awesome');
   static const backspace = MonAIIconData._('backspace');
   static const block = MonAIIconData._('block');
@@ -99,16 +93,13 @@ abstract final class MonAIIcons {
   static const pets = MonAIIconData._('pets');
   static const photoCamera = MonAIIconData._('photo_camera');
   static const photoLibrary = MonAIIconData._('photo_library');
-  static const public = MonAIIconData._('public');
   static const radioButtonChecked = MonAIIconData._('radio_button_checked');
   static const radioButtonUnchecked = MonAIIconData._('radio_button_unchecked');
   static const receiptLong = MonAIIconData._('receipt_long');
   static const receiptLongFilled = MonAIIconData._('receipt_long_filled');
   static const redeem = MonAIIconData._('redeem');
   static const refresh = MonAIIconData._('refresh');
-  static const restartAlt = MonAIIconData._('restart_alt');
   static const restaurant = MonAIIconData._('restaurant');
-  static const rotate90DegreesCcw = MonAIIconData._('rotate_90_degrees_ccw');
   static const savings = MonAIIconData._('savings');
   static const school = MonAIIconData._('school');
   static const search = MonAIIconData._('search');
@@ -131,9 +122,7 @@ abstract final class MonAIIcons {
   static const warning = MonAIIconData._('warning');
   static const work = MonAIIconData._('work');
   static const zoomIn = MonAIIconData._('zoom_in');
-  static const zoomOut = MonAIIconData._('zoom_out');
 
-  /// Every icon above, for galleries and asset checks.
   static const all = [
     accountBalance,
     accountBalanceWallet,
@@ -144,7 +133,6 @@ abstract final class MonAIIcons {
     apps,
     arrowBack,
     arrowForward,
-    attachFile,
     autoAwesome,
     backspace,
     block,
@@ -202,16 +190,13 @@ abstract final class MonAIIcons {
     pets,
     photoCamera,
     photoLibrary,
-    public,
     radioButtonChecked,
     radioButtonUnchecked,
     receiptLong,
     receiptLongFilled,
     redeem,
     refresh,
-    restartAlt,
     restaurant,
-    rotate90DegreesCcw,
     savings,
     school,
     search,
@@ -234,6 +219,5 @@ abstract final class MonAIIcons {
     warning,
     work,
     zoomIn,
-    zoomOut,
   ];
 }

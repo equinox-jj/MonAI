@@ -6,8 +6,8 @@ import 'package:monai/features/shared/domain/event/transaction_deletion_events.d
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_transaction_dependents_usecase.dart';
 
-/// Deletes a transaction, announces it for an undo, then refreshes the
-/// totals it changed. Gives the deleted copy, null when it wasn't cached.
+/// Announces the delete for an undo, then refreshes the totals it changed.
+/// Gives the deleted copy, null when it wasn't cached.
 class DeleteTransactionUseCase implements UseCase<Transaction?, String> {
   DeleteTransactionUseCase({
     required this._repository,

@@ -3,10 +3,8 @@ import 'package:monai/core/data/database/daos/user_dao.dart';
 import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class ProfileLocalDataSource {
-  /// Caches [row] as the signed-in user.
   Future<void> saveUser(UserRow row);
 
-  /// Drops the cached user's profile photo.
   Future<void> clearAvatar();
 }
 

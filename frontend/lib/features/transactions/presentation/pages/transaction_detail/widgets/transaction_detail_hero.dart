@@ -5,7 +5,6 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// The category icon, the title, the signed amount and the type.
 class TransactionDetailHero extends StatelessWidget {
   const TransactionDetailHero({
     required this.transaction,

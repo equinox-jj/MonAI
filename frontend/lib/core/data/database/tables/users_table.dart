@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:monai/core/data/database/converters.dart';
 
-/// The signed-in user; the table holds at most one row.
 @DataClassName('UserRow')
 class Users extends Table {
   TextColumn get id => text()();

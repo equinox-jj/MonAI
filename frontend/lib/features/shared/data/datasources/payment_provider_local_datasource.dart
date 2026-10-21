@@ -3,22 +3,19 @@ import 'package:monai/core/data/database/daos/payment_provider_dao.dart';
 import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class PaymentProviderLocalDataSource {
-  /// The cached catalog in its sort order.
   Stream<List<PaymentProviderRow>> watchAll();
 
-  /// The ETag to revalidate the cached catalog with; null when nothing is
-  /// cached, so the next fetch downloads it whole.
+  /// Null when nothing is cached, so the next fetch downloads the whole catalog.
   Future<String?> etag();
 
-  /// Replaces the catalog and remembers its version and [etag].
   Future<void> replaceCatalog({
     required int version,
     required String? etag,
     required List<PaymentProviderRow> rows,
   });
 
-  /// Stores the bundled seed [rows] when nothing is cached yet. It has no
-  /// ETag, so the next fetch downloads the whole catalog over it.
+  /// Only when nothing is cached. The seed has no ETag, so the next fetch
+  /// downloads the whole catalog over it.
   Future<void> seedIfEmpty(List<PaymentProviderRow> rows);
 }
 

@@ -24,14 +24,10 @@ class ManageProvidersPage extends StatelessWidget {
   }
 }
 
-/// The provider catalog for admins, searchable by name or alias. The list
-/// reloads by itself after the form saves or deletes one.
 class ManageProvidersUI extends StatelessWidget {
   const ManageProvidersUI({super.key});
 
   static const _readableWidth = 720.0;
-
-  /// Room under the list for the floating Add button.
   static const _fabClearance = 96.0;
 
   ManageProvidersBloc _bloc(BuildContext context) =>
@@ -118,7 +114,6 @@ class ManageProvidersUI extends StatelessWidget {
   }
 }
 
-/// "Add provider", for users allowed to add one.
 class _AddButton extends StatelessWidget {
   const _AddButton({required this.onPressed});
 
@@ -152,8 +147,6 @@ typedef _List = ({
   ProviderFailure? loadFailure,
 });
 
-/// The matching providers in one card, or the loading, error and empty
-/// states.
 class _Body extends StatelessWidget {
   const _Body({
     required this.bottomPadding,

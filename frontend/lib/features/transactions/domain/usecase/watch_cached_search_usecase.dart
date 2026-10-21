@@ -6,7 +6,6 @@ import 'package:monai/features/shared/domain/entity/transaction_filter.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/transactions/domain/validation/search_query.dart';
 
-/// Offline search over every cached transaction. Blank text finds nothing.
 class WatchCachedSearchUseCase
     implements StreamUseCase<List<Transaction>, CachedSearchParams> {
   WatchCachedSearchUseCase(this._repository);
@@ -25,7 +24,6 @@ class WatchCachedSearchUseCase
   }
 }
 
-/// The search as typed and how many results to show.
 class CachedSearchParams {
   const CachedSearchParams({
     required this.query,

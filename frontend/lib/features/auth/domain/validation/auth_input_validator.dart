@@ -2,18 +2,12 @@ import 'dart:convert';
 
 import 'package:monai/core/base/error/field_error.dart';
 
-/// Checks auth forms on the device with the backend's rules
-/// (`backend/internal/auth/dto.go`), so a form shows the same errors offline
-/// as the server would send. The server stays the authority; this only saves
-/// a round trip, which on login also counts toward the rate limit.
-///
-/// Errors use the server's field names, codes and params, so a local error
-/// and a 422 reach the screen in the same shape. Takes input already cleaned
-/// up by `AuthInput`. Lengths count runes, as the backend's validator does,
-/// except the password maximum, which counts bytes.
+/// Mirrors the backend's rules (`backend/internal/auth/dto.go`), so a form
+/// shows the same errors offline, and a login skips a round trip that counts
+/// toward the rate limit. Errors use the server's field names, codes and
+/// params. Takes input already cleaned up by `AuthInput`. Lengths count runes,
+/// like the backend, except the password maximum, which counts bytes.
 abstract final class AuthInputValidator {
-  /// Minimum password length in runes; the register screen shows it in its
-  /// hint.
   static const passwordMin = 8;
 
   static const _nameMax = 100;
@@ -25,20 +19,15 @@ abstract final class AuthInputValidator {
   // Loose on purpose: catches typos without rejecting addresses the server
   // accepts.
   static final _email = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
-
-  /// Field names as the API sends them in `error.fields[].field`.
   static const nameField = 'name';
   static const emailField = 'email';
   static const passwordField = 'password';
   static const currentPasswordField = 'current_password';
   static const newPasswordField = 'new_password';
 
-  /// Whether [password] meets the minimum length; drives the register
-  /// screen's live hint.
   static bool isPasswordLongEnough(String password) =>
       password.runes.length >= passwordMin;
 
-  /// The problems with a register form, in field order; empty when valid.
   static List<FieldError> register({
     required String name,
     required String email,
@@ -49,35 +38,27 @@ abstract final class AuthInputValidator {
     ?registerPassword(password),
   ];
 
-  /// The problem with a register form's name; null when valid. Lets the
-  /// screen re-check one field as it is edited.
   static FieldError? registerName(String name) => _nameError(name);
 
-  /// The problem with a register form's email; null when valid.
   static FieldError? registerEmail(String email) =>
       _emailError(email, max: _emailMax);
 
-  /// The problem with a register form's password; null when valid.
   static FieldError? registerPassword(String password) =>
       _passwordError(password, min: passwordMin);
 
-  /// The problems with a login form; empty when valid. The server has no
-  /// password minimum on login, so a short one fails as wrong credentials.
+  /// The server has no password minimum on login, so a short one fails as wrong
+  /// credentials.
   static List<FieldError> login({
     required String email,
     required String password,
   }) => [?loginEmail(email), ?loginPassword(password)];
 
-  /// The problem with a login form's email; null when valid. Lets the screen
-  /// re-check one field as it is edited.
   static FieldError? loginEmail(String email) => _emailError(email);
 
-  /// The problem with a login form's password; null when valid.
   static FieldError? loginPassword(String password) => _passwordError(password);
 
-  /// The problems with a change-password form; empty when valid. The new
-  /// password follows the register rules and must differ from the current
-  /// one.
+  /// The new password follows the register rules and must differ from the
+  /// current one.
   static List<FieldError> changePassword({
     required String currentPassword,
     required String newPassword,
@@ -86,13 +67,9 @@ abstract final class AuthInputValidator {
     ?changeNewPassword(newPassword, currentPassword: currentPassword),
   ];
 
-  /// The problem with a change-password form's current password; null when
-  /// valid. Lets the screen re-check one field as it is edited.
   static FieldError? changeCurrentPassword(String currentPassword) =>
       currentPassword.isEmpty ? _required(currentPasswordField) : null;
 
-  /// The problem with a change-password form's new password, which must
-  /// differ from [currentPassword]; null when valid.
   static FieldError? changeNewPassword(
     String newPassword, {
     required String currentPassword,

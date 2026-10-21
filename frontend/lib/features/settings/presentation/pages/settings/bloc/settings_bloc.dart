@@ -16,11 +16,7 @@ part 'settings_bloc.freezed.dart';
 part 'settings_event.dart';
 part 'settings_state.dart';
 
-/// The Settings hub: shows the cache at once and refreshes the user, the
-/// month's budget and the categories in the background; signs out here or
-/// everywhere.
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
-  /// [now] is the clock; tests pass a fixed one.
   SettingsBloc({
     required this._watchOverview,
     required this._refresh,

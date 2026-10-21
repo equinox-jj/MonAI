@@ -5,7 +5,6 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/shared/domain/usecase/recent_transactions_params.dart';
 
-/// The newest transactions of a month, for the home screen.
 class WatchRecentTransactionsUseCase
     implements StreamUseCase<List<Transaction>, RecentTransactionsParams> {
   WatchRecentTransactionsUseCase(this._repository);

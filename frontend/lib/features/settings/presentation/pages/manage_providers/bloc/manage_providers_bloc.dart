@@ -16,9 +16,8 @@ part 'manage_providers_bloc.freezed.dart';
 part 'manage_providers_event.dart';
 part 'manage_providers_state.dart';
 
-/// The provider catalog for admins, inactive providers included, searchable
-/// by name or alias. Reloads whenever a provider is saved or deleted
-/// elsewhere. The list is network only, so it lives in the state.
+/// Reloads whenever a provider is saved or deleted elsewhere. The list is
+/// network only, so it lives in the state.
 class ManageProvidersBloc
     extends Bloc<ManageProvidersEvent, ManageProvidersState> {
   ManageProvidersBloc({
@@ -81,8 +80,6 @@ class ManageProvidersBloc
     Emitter<ManageProvidersState> emit,
   ) => _reload(emit, userInitiated: !event.quiet);
 
-  /// Loads the list. A list already on screen stays while it loads, and a
-  /// failure then shows as a message instead of the error state.
   Future<void> _reload(
     Emitter<ManageProvidersState> emit, {
     required bool userInitiated,

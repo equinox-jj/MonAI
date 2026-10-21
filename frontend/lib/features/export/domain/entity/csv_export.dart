@@ -12,36 +12,28 @@ enum CsvDelimiter {
   final String char;
 }
 
-/// The months to export, both included; each is the first of its month at
-/// local midnight.
+/// Both included; each month is the first at local midnight.
 @immutable
 class ExportRange {
   const ExportRange(this.from, this.to);
 
-  /// The current month, alone.
   factory ExportRange.thisMonth(DateTime now) {
     final month = DateTime(now.year, now.month);
     return ExportRange(month, month);
   }
 
-  /// The most months one export may cover.
   static const maxMonths = 12;
 
   final DateTime from;
   final DateTime to;
 
-  /// How many months the range covers.
   int get length => (to.year - from.year) * 12 + to.month - from.month + 1;
 
-  /// Every month in the range, oldest first.
   List<DateTime> get months =>
       List.generate(length, (i) => DateTime(from.year, from.month + i));
 
-  /// The range's last day.
   DateTime get lastDay => DateTime(to.year, to.month + 1, 0);
 
-  /// Starts no later than it ends, covers at most [maxMonths], and ends no
-  /// later than [now]'s month.
   bool isValidAt(DateTime now) =>
       !from.isAfter(to) &&
       length <= maxMonths &&
@@ -88,7 +80,6 @@ class ExportRange {
   String toString() => 'ExportRange($from, $to)';
 }
 
-/// A written CSV file, ready to share.
 @immutable
 class ExportedCsv {
   const ExportedCsv({
@@ -98,8 +89,6 @@ class ExportedCsv {
   });
 
   final String path;
-
-  /// Transactions in the file, without the header.
   final int rowCount;
 
   /// False when the device was offline and only cached transactions were

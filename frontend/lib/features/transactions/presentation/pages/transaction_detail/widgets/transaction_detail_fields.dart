@@ -6,7 +6,6 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// Category, wallet(s), date, merchant, note and how it was added.
 class TransactionDetailFields extends StatelessWidget {
   const TransactionDetailFields({
     required this.transaction,
@@ -73,8 +72,6 @@ class _Field {
   const _Field(this.label, this.value, {this.icon});
 
   final String label;
-
-  /// Null when the name isn't cached.
   final String? value;
   final MonAIIconData? icon;
 }

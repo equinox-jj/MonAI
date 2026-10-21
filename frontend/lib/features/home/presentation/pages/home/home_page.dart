@@ -30,8 +30,6 @@ class HomePage extends StatelessWidget {
   }
 }
 
-/// The dashboard, its skeleton while the first load runs, or the error when
-/// that load failed.
 class HomeUI extends StatelessWidget {
   const HomeUI({super.key});
 
@@ -68,7 +66,6 @@ class HomeUI extends StatelessWidget {
   void _refresh(BuildContext context) =>
       context.read<HomeBloc>().add(const HomeEvent.refreshed());
 
-  /// Pull-to-refresh keeps its spinner until the refresh finishes.
   Future<void> _pullToRefresh(BuildContext context) async {
     final bloc = context.read<HomeBloc>()..add(const HomeEvent.refreshed());
     await bloc.stream.firstWhere((state) => !state.isRefreshing);
@@ -143,7 +140,6 @@ typedef _Sections = ({
   bool showSpending,
 });
 
-/// Picks the layout for the window width and the sections worth showing.
 class _Dashboard extends StatelessWidget {
   const _Dashboard({required this.actions});
 
@@ -167,7 +163,6 @@ class _Dashboard extends StatelessWidget {
   }
 }
 
-/// Phones: one column. A month with nothing recorded leaves out quick add.
 class _CompactDashboard extends StatelessWidget {
   const _CompactDashboard({required this.actions, required this.sections});
 
@@ -222,8 +217,6 @@ class _CompactDashboard extends StatelessWidget {
   }
 }
 
-/// Tablet portrait: full-width header, balance and wallet grid, then the
-/// budget and spending cards side by side, then Recent.
 class _MediumDashboard extends StatelessWidget {
   const _MediumDashboard({required this.actions, required this.sections});
 
@@ -272,9 +265,6 @@ class _MediumDashboard extends StatelessWidget {
   }
 }
 
-/// Tablet landscape: the balance beside the budget, then spending beside
-/// Recent. The drawer already lists the wallets' tab, so there are no
-/// wallet cards.
 class _ExpandedDashboard extends StatelessWidget {
   const _ExpandedDashboard({required this.actions, required this.sections});
 

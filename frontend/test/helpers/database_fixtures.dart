@@ -7,7 +7,7 @@ import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/wallet_type.dart';
 
-/// A fresh in-memory database; close it in `tearDown`.
+/// Close it in `tearDown`.
 MonAIDatabase openTestDatabase() => MonAIDatabase(
   DatabaseConnection(NativeDatabase.memory(), closeStreamsSynchronously: true),
 );

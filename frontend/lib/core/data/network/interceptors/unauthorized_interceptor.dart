@@ -4,14 +4,10 @@ import 'package:monai/core/data/network/api_endpoints.dart';
 import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/core/data/storage/token_storage.dart';
 
-/// Ends the session on HTTP 401: clears the stored token and the offline
-/// cache, marks the session expired, then passes the error on.
-///
-/// A 401 on an authenticated request means the token expired or was revoked.
-/// Requests flagged `noAuth` (login, register) are skipped so a wrong password
-/// does not log anyone out. A 401 for a token that is no longer stored (a
-/// late reply from before a newer sign-in) is ignored too, so it can't end the
-/// new session.
+/// Ends the session on a 401: clears the token and the offline cache, marks
+/// the session expired, then passes the error on. Skips `noAuth` requests, so
+/// a wrong password logs no one out, and 401s for a token that is no longer
+/// stored (a late reply from before a newer sign-in).
 class UnauthorizedInterceptor extends Interceptor {
   UnauthorizedInterceptor({
     required this._tokenStorage,

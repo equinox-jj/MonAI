@@ -5,8 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
 import 'package:monai/features/settings/presentation/pages/settings/bloc/settings_bloc.dart';
 
-/// The user's photo, name, role and email; opens Edit profile. Placeholders
-/// until the user is cached.
 class SettingsProfileCard extends StatelessWidget {
   const SettingsProfileCard({required this.onTap, super.key});
 

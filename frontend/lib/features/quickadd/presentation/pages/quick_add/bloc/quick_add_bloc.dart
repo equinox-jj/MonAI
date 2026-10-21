@@ -43,7 +43,6 @@ class QuickAddBloc extends Bloc<QuickAddEvent, QuickAddState> {
 
   StreamSubscription<void>? _context;
 
-  /// The phrase as typed, read again once the context loads.
   String _text = '';
 
   void _onStarted(_Started event, Emitter<QuickAddState> emit) {

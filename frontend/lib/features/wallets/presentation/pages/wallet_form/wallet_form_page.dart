@@ -33,8 +33,6 @@ class WalletFormPage extends StatelessWidget {
   });
 
   final WalletFormMode mode;
-
-  /// [ScreenPlacement.sideSheet] on tablet landscape.
   final ScreenPlacement placement;
 
   @override
@@ -48,8 +46,6 @@ class WalletFormPage extends StatelessWidget {
   }
 }
 
-/// Adding a wallet from a provider or custom, or editing one: name, type,
-/// color, balance and default. Editing also archives and deletes.
 class WalletFormUI extends StatefulWidget {
   const WalletFormUI({super.key, this.placement = ScreenPlacement.fullScreen});
 
@@ -260,7 +256,6 @@ class _WalletFormUIState extends State<WalletFormUI> {
   }
 }
 
-/// The edit form's "Save" pill.
 class _SaveAction extends StatelessWidget {
   const _SaveAction({required this.onSave});
 
@@ -315,7 +310,6 @@ class _LoadError extends StatelessWidget {
   }
 }
 
-/// The form's scrolling fields, with an optional action pinned below.
 class _FormFrame extends StatelessWidget {
   const _FormFrame({required this.children, this.footer});
 
@@ -452,8 +446,6 @@ class _EditBody extends StatelessWidget {
   }
 }
 
-/// The name, with a hint that follows the picked provider, or the edited
-/// wallet's fixed type.
 class _NameField extends StatelessWidget {
   const _NameField({required this.controller, required this.onChanged});
 
@@ -534,8 +526,6 @@ class _BalanceField extends StatelessWidget {
   }
 }
 
-/// Archive and Delete; both are off for the default wallet, with a note
-/// why.
 class _ArchiveAndDelete extends StatelessWidget {
   const _ArchiveAndDelete({required this.onArchive, required this.onDelete});
 
@@ -594,7 +584,6 @@ class _ArchiveAndDelete extends StatelessWidget {
   }
 }
 
-/// The red-outlined "Delete".
 class _DeleteButton extends StatelessWidget {
   const _DeleteButton({required this.loading, required this.onPressed});
 
@@ -652,7 +641,6 @@ class _DeleteButton extends StatelessWidget {
   }
 }
 
-/// A wallet with transactions can't be deleted: "Archive {name} instead?".
 class _ArchiveInsteadDialog extends StatelessWidget {
   const _ArchiveInsteadDialog({required this.name});
 

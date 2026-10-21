@@ -20,8 +20,6 @@ const _walletMonogramSize = 36.0;
 const _breakdownLabelWidth = 64.0;
 const _breakdownPercentWidth = 32.0;
 
-/// The indigo panel at the top of each page. The illustration is decorative,
-/// so it is hidden from screen readers.
 class OnboardingHero extends StatelessWidget {
   const OnboardingHero({required this.step, super.key});
 
@@ -92,8 +90,6 @@ class _DecorCircle extends StatelessWidget {
   }
 }
 
-/// The page's sample cards, centered and scaled down when the panel is too
-/// short to fit them.
 class _Illustration extends StatelessWidget {
   const _Illustration({required this.step});
 
@@ -124,7 +120,6 @@ class _Illustration extends StatelessWidget {
   }
 }
 
-/// Page 1: a typed sentence becomes a categorised expense.
 class _CaptureIllustration extends StatelessWidget {
   const _CaptureIllustration();
 
@@ -159,7 +154,6 @@ class _CaptureIllustration extends StatelessWidget {
   }
 }
 
-/// Page 2: wallets stacked into one total.
 class _WalletsIllustration extends StatelessWidget {
   const _WalletsIllustration();
 
@@ -285,7 +279,6 @@ class _WalletsTotal extends StatelessWidget {
   }
 }
 
-/// Page 3: a budget nearing its limit and where the money went.
 class _InsightsIllustration extends StatelessWidget {
   const _InsightsIllustration();
 
@@ -384,8 +377,6 @@ class _BreakdownCard extends StatelessWidget {
   }
 }
 
-/// One category bar. [fill] is relative to the largest category, as in the
-/// report.
 class _BreakdownRow extends StatelessWidget {
   const _BreakdownRow({
     required this.label,

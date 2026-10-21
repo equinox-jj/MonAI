@@ -3,7 +3,7 @@ import 'package:monai/core/model/wallet_type.dart';
 
 part 'wallet_changes.freezed.dart';
 
-/// The fields of a wallet to change; null leaves a field as it is.
+/// Null leaves a field as it is.
 @freezed
 abstract class WalletChanges with _$WalletChanges {
   const factory WalletChanges({
@@ -17,7 +17,6 @@ abstract class WalletChanges with _$WalletChanges {
 
   const WalletChanges._();
 
-  /// Whether nothing would change.
   bool get isEmpty =>
       name == null &&
       type == null &&

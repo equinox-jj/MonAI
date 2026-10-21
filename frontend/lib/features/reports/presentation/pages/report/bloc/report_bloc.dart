@@ -17,9 +17,6 @@ part 'report_bloc.freezed.dart';
 part 'report_event.dart';
 part 'report_state.dart';
 
-/// A month's income, expense, net and spending by category, with its budget.
-/// Shows the saved report at once and refreshes it; months step back without
-/// a limit and forward up to the current one.
 class ReportBloc extends Bloc<ReportEvent, ReportState> {
   ReportBloc({
     required DateTime month,
@@ -71,8 +68,6 @@ class ReportBloc extends Bloc<ReportEvent, ReportState> {
   Future<void> _onRetried(_Retried event, Emitter<ReportState> emit) =>
       _refresh(state.month, emit);
 
-  /// Switches to [month]: watches its saved report and budget, then
-  /// refreshes both.
   Future<void> _show(DateTime month, Emitter<ReportState> emit) async {
     await _report?.cancel();
     await _budget?.cancel();

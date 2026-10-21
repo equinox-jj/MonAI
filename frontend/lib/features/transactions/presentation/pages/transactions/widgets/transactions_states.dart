@@ -8,7 +8,6 @@ import 'package:monai/features/transactions/presentation/model/transaction_text.
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/widgets/transactions_actions.dart';
 
-/// Replaces the list when the first load failed with nothing cached.
 class TransactionsLoadError extends StatelessWidget {
   const TransactionsLoadError({required this.actions, super.key});
 
@@ -45,7 +44,6 @@ class TransactionsLoadError extends StatelessWidget {
   }
 }
 
-/// No transactions this month, or none that match the filters.
 class TransactionsEmpty extends StatelessWidget {
   const TransactionsEmpty({required this.actions, super.key});
 

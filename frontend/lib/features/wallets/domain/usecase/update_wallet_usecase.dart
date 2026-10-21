@@ -7,12 +7,10 @@ import 'package:monai/features/shared/domain/entity/wallet_input.dart';
 import 'package:monai/features/shared/domain/repository/wallet_repository.dart';
 import 'package:monai/features/wallets/domain/validation/wallet_input_validator.dart';
 
-/// Saves an edited wallet, sending only what changed; an unchanged form
-/// makes no request. Invalid input fails as [ValidationFailure] without
-/// calling the server.
-///
-/// The type and color can't be cleared, and the default can only be moved
-/// to this wallet, never unset: another wallet has to become the default.
+/// Sends only what changed; an unchanged form makes no request. Invalid input
+/// fails as [ValidationFailure] without calling the server. The type and
+/// color can't be cleared, and the default can only move to this wallet,
+/// never be unset.
 class UpdateWalletUseCase implements UseCase<Wallet, UpdateWalletParams> {
   UpdateWalletUseCase(this._repository);
 
@@ -41,7 +39,6 @@ class UpdateWalletUseCase implements UseCase<Wallet, UpdateWalletParams> {
   );
 }
 
-/// The wallet as it is and the edited form.
 class UpdateWalletParams {
   const UpdateWalletParams({required this.wallet, required this.input});
 

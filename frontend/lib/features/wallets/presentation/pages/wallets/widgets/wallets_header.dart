@@ -3,7 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_actions.dart';
 
-/// "Wallets" with the "Add wallet" button.
 class WalletsHeader extends StatelessWidget {
   const WalletsHeader({required this.actions, super.key});
 

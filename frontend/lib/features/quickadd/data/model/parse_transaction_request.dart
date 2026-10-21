@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'parse_transaction_request.freezed.dart';
 part 'parse_transaction_request.g.dart';
 
-/// `POST /ai/parse-transaction`.
 @freezed
 abstract class ParseTransactionRequest with _$ParseTransactionRequest {
   const factory ParseTransactionRequest({

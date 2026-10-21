@@ -3,16 +3,13 @@ import 'package:monai/features/shared/domain/entity/payment_provider.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/entity/wallet_input.dart';
 
-/// [wallet]'s current balance once its starting balance becomes
-/// [initialBalance]: both move by the same amount.
+/// The current balance moves by the same amount as the starting balance.
 int shiftedBalance(Wallet wallet, int initialBalance) =>
     wallet.currentBalance + initialBalance - wallet.initialBalance;
 
-/// The new wallet the add form describes.
-///
-/// A wallet from a [provider] leaves a blank name and the type to the
-/// server. A bundled provider's id isn't one the server knows, so that
-/// wallet goes as a custom one with the provider's name and type.
+/// A wallet from a [provider] leaves a blank name and the type to the server.
+/// A bundled provider's id isn't one the server knows, so that wallet goes as
+/// a custom one with the provider's name and type.
 WalletInput newWalletInput({
   required PaymentProvider? provider,
   required String name,
@@ -40,8 +37,7 @@ WalletInput newWalletInput({
   ),
 };
 
-/// The edited [wallet] as the edit form describes it. The form can't change
-/// the type.
+/// The form can't change the type.
 WalletInput editedWalletInput(
   Wallet wallet, {
   required String name,
@@ -57,8 +53,6 @@ WalletInput editedWalletInput(
   isDefault: isDefault,
 );
 
-/// Each day's money out of a wallet from the 1st of [month] to [lastDay],
-/// for its chart; days with nothing are 0.
 List<int> dailyOutflowSeries(
   Map<DateTime, int> outflows,
   DateTime month,

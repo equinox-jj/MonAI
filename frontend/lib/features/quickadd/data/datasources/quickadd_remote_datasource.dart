@@ -5,7 +5,6 @@ import 'package:monai/features/quickadd/data/model/parse_transaction_request.dar
 import 'package:monai/features/quickadd/data/model/parse_transaction_response.dart';
 
 abstract class QuickaddRemoteDataSource {
-  /// `POST /ai/parse-transaction`.
   Future<ParseTransactionResponse> parseTransaction(
     ParseTransactionRequest request,
   );

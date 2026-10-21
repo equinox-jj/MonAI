@@ -12,11 +12,7 @@ part 'home_bloc.freezed.dart';
 part 'home_event.dart';
 part 'home_state.dart';
 
-/// Shows the cache at once and refreshes every section from the API in the
-/// background. A failed refresh keeps what is cached; only a first load with
-/// nothing cached replaces the dashboard with an error.
 class HomeBloc extends Bloc<HomeEvent, HomeState> {
-  /// [now] is the clock; tests pass a fixed one.
   HomeBloc({
     required this._watchDashboard,
     required this._refresh,
@@ -35,8 +31,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
   StreamSubscription<void>? _dashboard;
 
-  /// Reads the clock again, so the greeting, "today" and the month move on,
-  /// then fetches every section.
   Future<void> _onRefresh(HomeEvent event, Emitter<HomeState> emit) async {
     if (state.isRefreshing) return;
     final now = _now();

@@ -3,8 +3,7 @@ import 'package:monai/core/model/wallet_type.dart';
 
 part 'wallet.freezed.dart';
 
-/// A place money is kept: cash, a bank account or an e-wallet. Balances are
-/// rupiah; [currentBalance] is calculated by the server.
+/// [currentBalance] is calculated by the server.
 @freezed
 abstract class Wallet with _$Wallet {
   const factory Wallet({

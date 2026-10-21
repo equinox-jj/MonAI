@@ -3,8 +3,6 @@ final _whitespace = RegExp(r'\s+');
 List<String> _words(String name) =>
     name.trim().split(_whitespace).where((w) => w.isNotEmpty).toList();
 
-/// `JP` for "Joshua Putra Jeremia": the first letters of the first two
-/// words, uppercased.
 String initialsOf(String name) =>
     _words(name).take(2).map((w) => w[0].toUpperCase()).join();
 

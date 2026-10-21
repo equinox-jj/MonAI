@@ -108,7 +108,7 @@ void main() {
       expect(fields, hasLength(2));
       expect(fields.firstForField('password')?.code, 'min');
       expect(fields.firstForField('password')?.params, {'min': 8});
-      expect(fields.forField('email').single.params, isEmpty);
+      expect(fields.firstForField('email')?.params, isEmpty);
       expect(fields.firstForField('name'), isNull);
     });
   });

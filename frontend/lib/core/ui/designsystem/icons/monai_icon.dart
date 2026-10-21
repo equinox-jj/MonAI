@@ -4,12 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:monai/core/ui/designsystem/icons/monai_icons.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 
-/// Draws a [MonAIIconData] SVG tinted with [color].
-///
-/// Like [Icon], [size] and [color] default to the ambient [IconTheme], so an
-/// icon inside a button picks up the button's foreground color.
 class MonAIIcon extends StatelessWidget {
-  /// Creates an icon. Leave [semanticLabel] null for decorative icons.
   const MonAIIcon(
     this.icon, {
     super.key,
@@ -18,16 +13,9 @@ class MonAIIcon extends StatelessWidget {
     this.semanticLabel,
   });
 
-  /// The icon to draw.
   final MonAIIconData icon;
-
-  /// The square size; defaults to the [IconTheme] size, then 24.
   final double? size;
-
-  /// The tint; defaults to the [IconTheme] color.
   final Color? color;
-
-  /// Read by screen readers. Null hides the icon from them.
   final String? semanticLabel;
 
   @override

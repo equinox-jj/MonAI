@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:monai/core/model/category_type.dart';
 
-/// The user's categories, system ones included.
 @DataClassName('CategoryRow')
 @TableIndex(name: 'index_categories_type', columns: {#type})
 class Categories extends Table {

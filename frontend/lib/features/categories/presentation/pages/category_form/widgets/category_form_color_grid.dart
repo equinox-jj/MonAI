@@ -6,8 +6,6 @@ import 'package:monai/features/categories/domain/logic/category_choices.dart';
 import 'package:monai/features/categories/presentation/model/category_choice_text.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
 
-/// The colors to pick from, five to a row; the picked one ringed and
-/// checked.
 class CategoryFormColorGrid extends StatelessWidget {
   const CategoryFormColorGrid({required this.onPick, super.key});
 

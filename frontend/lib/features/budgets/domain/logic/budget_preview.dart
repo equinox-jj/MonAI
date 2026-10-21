@@ -1,7 +1,7 @@
 import 'package:monai/core/model/budget_status.dart';
 
-/// How a month's spending compares with a limit, worked out the way the
-/// server does so the budget screen can preview a limit before saving it.
+/// Worked out the way the server does, so the budget screen can preview a
+/// limit before saving it.
 class BudgetPreview {
   const BudgetPreview._({
     required this.limit,
@@ -10,7 +10,6 @@ class BudgetPreview {
     required this.percent,
   });
 
-  /// The preview of [spent] against [limit]; null without a limit.
   static BudgetPreview? of({required int limit, required int spent}) {
     if (limit <= 0) return null;
     final status = spent > limit
@@ -33,10 +32,8 @@ class BudgetPreview {
   /// Whole percent of the limit spent, rounded down; can pass 100.
   final int percent;
 
-  /// What's left of the limit; negative once over it.
   int get remaining => limit - spent;
 
-  /// The bar's fill, 0 to 1.
   double get progress => (spent / limit).clamp(0, 1).toDouble();
 
   @override

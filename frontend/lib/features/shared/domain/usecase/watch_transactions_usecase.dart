@@ -5,8 +5,6 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/shared/domain/usecase/transaction_list_params.dart';
 
-/// The loaded rows of a transaction list. Grow the limit by
-/// `TransactionRepository.pageSize` after each `LoadMoreTransactionsUseCase`.
 class WatchTransactionsUseCase
     implements StreamUseCase<List<Transaction>, TransactionPageParams> {
   WatchTransactionsUseCase(this._repository);

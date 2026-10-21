@@ -4,12 +4,8 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
 
-/// "Card color": a swatch per [WalletColor]; none is picked while the card
-/// uses its type's color.
 class WalletFormColorPicker extends StatelessWidget {
   const WalletFormColorPicker({required this.onPicked, super.key});
-
-  /// The color as `#RRGGBB`.
   final ValueChanged<String> onPicked;
 
   @override
@@ -98,7 +94,6 @@ class _Swatch extends StatelessWidget {
 }
 
 extension on WalletColor {
-  /// "Indigo", "Teal"…, for screen readers.
   String label(AppLocalizations l10n) => switch (this) {
     .indigo => l10n.walletColorIndigo,
     .teal => l10n.walletColorTeal,

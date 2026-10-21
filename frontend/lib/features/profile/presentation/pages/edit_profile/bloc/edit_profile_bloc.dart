@@ -21,10 +21,6 @@ part 'edit_profile_bloc.freezed.dart';
 part 'edit_profile_event.dart';
 part 'edit_profile_state.dart';
 
-/// The display name, the profile photo and deleting the account. The name
-/// and the password live in the screen's text fields and arrive with their
-/// edits and the actions. The account's deletion ends the session, and
-/// navigation follows it to Sign in.
 class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
   EditProfileBloc({
     required this._watchUser,
@@ -54,7 +50,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
 
   StreamSubscription<void>? _user;
 
-  /// The name field's text, to tell whether it differs from the saved one.
   String? _typedName;
 
   void _onStarted(_Started event, Emitter<EditProfileState> emit) {
@@ -258,7 +253,6 @@ class EditProfileBloc extends Bloc<EditProfileEvent, EditProfileState> {
     }
   }
 
-  /// Reports [failure] once, from [next].
   void _fail(
     Emitter<EditProfileState> emit,
     Failure failure,

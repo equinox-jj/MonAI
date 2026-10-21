@@ -110,7 +110,6 @@ void main() {
     return Future<void>.delayed(Duration.zero);
   }
 
-  /// Every state [bloc] emits from now on.
   List<WalletFormState> record(WalletFormBloc bloc) {
     final states = <WalletFormState>[];
     final sub = bloc.stream.listen(states.add);

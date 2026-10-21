@@ -10,8 +10,6 @@ import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 
 typedef _Totals = ({MonthlyReport report, ReportChange? change});
 
-/// Income and expense side by side, then the net on the gradient card with
-/// how spending compares with the month before.
 class ReportTotals extends StatelessWidget {
   const ReportTotals({super.key});
 

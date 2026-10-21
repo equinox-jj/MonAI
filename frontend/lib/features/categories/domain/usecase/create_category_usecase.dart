@@ -6,7 +6,6 @@ import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/category_input.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';
 
-/// Adds a category, after checking its name with the backend's rules.
 class CreateCategoryUseCase implements UseCase<Category, CategoryInput> {
   CreateCategoryUseCase(this._repository);
 

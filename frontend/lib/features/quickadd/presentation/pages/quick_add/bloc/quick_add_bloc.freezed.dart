@@ -423,12 +423,7 @@ as ParseContext,
 /// @nodoc
 mixin _$QuickAddState {
 
-/// The wallets, categories and providers to match; null until loaded.
- ParseContext? get context;/// The phrase the drafts were read from, trimmed.
- String get phrase; List<QuickAddDraft> get drafts; DraftEngine get engine;/// Why the AI couldn't help; set only on [DraftEngine.fallback].
- QuickAddAiFailure? get aiFailure;/// Waiting for the AI.
- bool get isAsking;/// Where to go next; the screen navigates once, then it is cleared.
- QuickAddNavigation? get navigation;
+ ParseContext? get context; String get phrase; List<QuickAddDraft> get drafts; DraftEngine get engine; QuickAddAiFailure? get aiFailure; bool get isAsking; QuickAddNavigation? get navigation;
 /// Create a copy of QuickAddState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -646,9 +641,7 @@ class _QuickAddState implements QuickAddState {
   const _QuickAddState({this.context, this.phrase = '',  List<QuickAddDraft> drafts = const [], this.engine = DraftEngine.local, this.aiFailure, this.isAsking = false, this.navigation}): _drafts = drafts;
   
 
-/// The wallets, categories and providers to match; null until loaded.
 @override final  ParseContext? context;
-/// The phrase the drafts were read from, trimmed.
 @override@JsonKey() final  String phrase;
  final  List<QuickAddDraft> _drafts;
 @override@JsonKey() List<QuickAddDraft> get drafts {
@@ -658,11 +651,8 @@ class _QuickAddState implements QuickAddState {
 }
 
 @override@JsonKey() final  DraftEngine engine;
-/// Why the AI couldn't help; set only on [DraftEngine.fallback].
 @override final  QuickAddAiFailure? aiFailure;
-/// Waiting for the AI.
 @override@JsonKey() final  bool isAsking;
-/// Where to go next; the screen navigates once, then it is cleared.
 @override final  QuickAddNavigation? navigation;
 
 /// Create a copy of QuickAddState

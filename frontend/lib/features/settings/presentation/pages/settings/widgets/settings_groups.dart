@@ -12,8 +12,6 @@ import 'package:monai/features/settings/presentation/pages/settings/widgets/sett
 
 typedef _MoneyValues = ({int? budgetLimit, int categoryCount, int walletCount});
 
-/// Budget, categories and wallets, each with its current value, then the CSV
-/// export.
 class SettingsMoneyGroup extends StatelessWidget {
   const SettingsMoneyGroup({required this.actions, super.key});
 
@@ -64,7 +62,6 @@ class SettingsMoneyGroup extends StatelessWidget {
   }
 }
 
-/// Theme and language, each opening its picker.
 class SettingsAppGroup extends StatelessWidget {
   const SettingsAppGroup({required this.actions, super.key});
 
@@ -102,7 +99,6 @@ class SettingsAppGroup extends StatelessWidget {
   }
 }
 
-/// Shown only to users who may change the provider catalog.
 class SettingsAdminGroup extends StatelessWidget {
   const SettingsAdminGroup({required this.actions, super.key});
 
@@ -126,9 +122,6 @@ class SettingsAdminGroup extends StatelessWidget {
   }
 }
 
-/// Change the password, sign out here or everywhere, and delete the account
-/// (on Edit profile, behind the password). A spinner covers the group while
-/// signing out.
 class SettingsAccountGroup extends StatelessWidget {
   const SettingsAccountGroup({required this.actions, super.key});
 

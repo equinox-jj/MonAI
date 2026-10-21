@@ -721,19 +721,7 @@ as List<Wallet>,
 /// @nodoc
 mixin _$WalletDetailState {
 
- String get id;/// The user's current date.
- DateTime get today;/// The first of the month the chart and the list show.
- DateTime get month;/// [UiStatus.loading] while nothing is cached, [UiStatus.failure] when
-/// that first load failed, otherwise [UiStatus.success].
- UiStatus get status; Wallet? get wallet;/// Each day's money out of the wallet this month.
- Map<DateTime, int> get outflows;/// This month's transactions in or out of the wallet, newest first.
- List<Transaction> get transactions;/// Every cached category and wallet by id, for the rows' names.
- Map<String, Category> get categories; Map<String, Wallet> get wallets;/// The server answered once.
- bool get loaded; bool get isRefreshing; bool get isArchiving; bool get isSettingDefault;/// The server no longer has the wallet; the screen closes.
- bool get isGone;/// Set once the wallet is archived; the screen closes.
- String? get archivedName;/// Why the first load failed, with nothing cached.
- WalletFailure? get loadFailure;/// Why a refresh or an action failed; shown once as a snackbar.
- WalletFailure? get actionFailure;
+ String get id; DateTime get today; DateTime get month; UiStatus get status; Wallet? get wallet; Map<DateTime, int> get outflows; List<Transaction> get transactions; Map<String, Category> get categories; Map<String, Wallet> get wallets; bool get loaded; bool get isRefreshing; bool get isArchiving; bool get isSettingDefault; bool get isGone; String? get archivedName; WalletFailure? get loadFailure; WalletFailure? get actionFailure;
 /// Create a copy of WalletDetailState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -962,35 +950,25 @@ class _WalletDetailState implements WalletDetailState {
   
 
 @override final  String id;
-/// The user's current date.
 @override final  DateTime today;
-/// The first of the month the chart and the list show.
 @override final  DateTime month;
-/// [UiStatus.loading] while nothing is cached, [UiStatus.failure] when
-/// that first load failed, otherwise [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
 @override final  Wallet? wallet;
-/// Each day's money out of the wallet this month.
  final  Map<DateTime, int> _outflows;
-/// Each day's money out of the wallet this month.
 @override@JsonKey() Map<DateTime, int> get outflows {
   if (_outflows is EqualUnmodifiableMapView) return _outflows;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_outflows);
 }
 
-/// This month's transactions in or out of the wallet, newest first.
  final  List<Transaction> _transactions;
-/// This month's transactions in or out of the wallet, newest first.
 @override@JsonKey() List<Transaction> get transactions {
   if (_transactions is EqualUnmodifiableListView) return _transactions;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_transactions);
 }
 
-/// Every cached category and wallet by id, for the rows' names.
  final  Map<String, Category> _categories;
-/// Every cached category and wallet by id, for the rows' names.
 @override@JsonKey() Map<String, Category> get categories {
   if (_categories is EqualUnmodifiableMapView) return _categories;
   // ignore: implicit_dynamic_type
@@ -1004,18 +982,13 @@ class _WalletDetailState implements WalletDetailState {
   return EqualUnmodifiableMapView(_wallets);
 }
 
-/// The server answered once.
 @override@JsonKey() final  bool loaded;
 @override@JsonKey() final  bool isRefreshing;
 @override@JsonKey() final  bool isArchiving;
 @override@JsonKey() final  bool isSettingDefault;
-/// The server no longer has the wallet; the screen closes.
 @override@JsonKey() final  bool isGone;
-/// Set once the wallet is archived; the screen closes.
 @override final  String? archivedName;
-/// Why the first load failed, with nothing cached.
 @override final  WalletFailure? loadFailure;
-/// Why a refresh or an action failed; shown once as a snackbar.
 @override final  WalletFailure? actionFailure;
 
 /// Create a copy of WalletDetailState

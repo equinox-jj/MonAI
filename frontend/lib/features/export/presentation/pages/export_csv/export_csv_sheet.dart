@@ -8,8 +8,6 @@ import 'package:monai/features/export/domain/entity/csv_export.dart';
 import 'package:monai/features/export/presentation/model/export_failure.dart';
 import 'package:monai/features/export/presentation/pages/export_csv/bloc/export_csv_bloc.dart';
 
-/// Opens the export sheet over [context]. Once the file is shared, a
-/// partial export (offline) is told in a snackbar.
 Future<void> showExportCsvSheet(BuildContext context) async {
   final exported = await showMonAIBottomSheet<ExportedCsv>(
     context,
@@ -24,7 +22,6 @@ Future<void> showExportCsvSheet(BuildContext context) async {
   }
 }
 
-/// The months and separator of a CSV export, and the Export button.
 class ExportCsvSheet extends StatelessWidget {
   const ExportCsvSheet({super.key});
 
@@ -91,7 +88,6 @@ class ExportCsvSheet extends StatelessWidget {
   }
 }
 
-/// A labelled month with arrows; the next arrow stops at this month.
 class _MonthRow extends StatelessWidget {
   const _MonthRow({
     required this.label,

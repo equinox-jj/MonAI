@@ -13,11 +13,8 @@ import 'package:monai/features/shared/domain/usecase/watch_recent_transactions_u
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 import 'package:rxdart/rxdart.dart';
 
-/// The cached dashboard for the month of the given moment, rebuilt whenever
-/// any section's cache changes. The moment also picks the greeting and what
-/// counts as "today".
-///
-/// A failed read of any section is passed on, and the stream keeps going.
+/// The moment also picks the greeting and what counts as "today". A failed
+/// read of any section is passed on, and the stream keeps going.
 class WatchHomeDashboardUseCase
     implements StreamUseCase<HomeDashboard, DateTime> {
   WatchHomeDashboardUseCase({

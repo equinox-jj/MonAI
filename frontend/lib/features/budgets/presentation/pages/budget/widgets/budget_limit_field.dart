@@ -7,8 +7,6 @@ import 'package:monai/core/utils/rupiah_input_formatter.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_bloc.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/model/budget_field_error_text.dart';
 
-/// The monthly limit, typed large in the middle with an underline that turns
-/// red on an error.
 class BudgetLimitField extends StatelessWidget {
   const BudgetLimitField({
     required this.controller,

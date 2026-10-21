@@ -795,16 +795,7 @@ as String,
 /// @nodoc
 mixin _$EditProfileState implements DiagnosticableTreeMixin {
 
-/// The signed-in user; null until the cache answers.
- User? get user;/// The typed name differs from the saved one.
- bool get nameChanged; FieldError? get nameError;/// A save failed on the name, so it is checked as the user types.
- bool get autovalidate; bool get isSavingName;/// The share of the photo uploaded, 0 to 1; null when not uploading.
- double? get uploadProgress;/// Picking, cropping or shrinking a photo before the upload.
- bool get isPreparingPhoto; bool get isRemovingPhoto;/// Under the password of the delete card.
- FieldError? get passwordError; bool get isDeleting;/// The confirm dialog shows once.
- bool get askDelete;/// What went through; shown once as a snackbar.
- ProfileNotice? get notice;/// Why a change failed; shown once as a snackbar.
- ProfileFailure? get failure;
+ User? get user; bool get nameChanged; FieldError? get nameError; bool get autovalidate; bool get isSavingName; double? get uploadProgress; bool get isPreparingPhoto; bool get isRemovingPhoto; FieldError? get passwordError; bool get isDeleting; bool get askDelete; ProfileNotice? get notice; ProfileFailure? get failure;
 /// Create a copy of EditProfileState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1035,27 +1026,18 @@ class _EditProfileState with DiagnosticableTreeMixin implements EditProfileState
   const _EditProfileState({this.user, this.nameChanged = false, this.nameError, this.autovalidate = false, this.isSavingName = false, this.uploadProgress, this.isPreparingPhoto = false, this.isRemovingPhoto = false, this.passwordError, this.isDeleting = false, this.askDelete = false, this.notice, this.failure});
   
 
-/// The signed-in user; null until the cache answers.
 @override final  User? user;
-/// The typed name differs from the saved one.
 @override@JsonKey() final  bool nameChanged;
 @override final  FieldError? nameError;
-/// A save failed on the name, so it is checked as the user types.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSavingName;
-/// The share of the photo uploaded, 0 to 1; null when not uploading.
 @override final  double? uploadProgress;
-/// Picking, cropping or shrinking a photo before the upload.
 @override@JsonKey() final  bool isPreparingPhoto;
 @override@JsonKey() final  bool isRemovingPhoto;
-/// Under the password of the delete card.
 @override final  FieldError? passwordError;
 @override@JsonKey() final  bool isDeleting;
-/// The confirm dialog shows once.
 @override@JsonKey() final  bool askDelete;
-/// What went through; shown once as a snackbar.
 @override final  ProfileNotice? notice;
-/// Why a change failed; shown once as a snackbar.
 @override final  ProfileFailure? failure;
 
 /// Create a copy of EditProfileState

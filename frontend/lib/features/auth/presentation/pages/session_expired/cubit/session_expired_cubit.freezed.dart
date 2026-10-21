@@ -15,7 +15,6 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SessionExpiredState {
 
-/// The dialog to show until the user signs in again; null for none.
  SignOutNotice? get notice;
 /// Create a copy of SessionExpiredState
 /// with the given fields replaced by the non-null parameter values.
@@ -216,7 +215,6 @@ class _SessionExpiredState implements SessionExpiredState {
   const _SessionExpiredState({this.notice});
   
 
-/// The dialog to show until the user signs in again; null for none.
 @override final  SignOutNotice? notice;
 
 /// Create a copy of SessionExpiredState

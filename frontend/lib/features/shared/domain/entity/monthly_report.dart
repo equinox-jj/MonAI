@@ -2,8 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'monthly_report.freezed.dart';
 
-/// A month's income and expense totals, compared with the month before.
-/// Amounts are rupiah; transfers are left out.
+/// Transfers are left out.
 @freezed
 abstract class MonthlyReport with _$MonthlyReport {
   const factory MonthlyReport({
@@ -22,7 +21,6 @@ abstract class MonthlyReport with _$MonthlyReport {
   }) = _MonthlyReport;
 }
 
-/// The totals of the month before a report's month.
 @freezed
 abstract class PreviousMonthTotals with _$PreviousMonthTotals {
   const factory PreviousMonthTotals({
@@ -32,7 +30,6 @@ abstract class PreviousMonthTotals with _$PreviousMonthTotals {
   }) = _PreviousMonthTotals;
 }
 
-/// One category's share of a month's expenses.
 @freezed
 abstract class CategoryBreakdown with _$CategoryBreakdown {
   const factory CategoryBreakdown({

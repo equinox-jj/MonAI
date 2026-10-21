@@ -8,13 +8,10 @@ import 'package:monai/features/auth/data/model/login_request.dart';
 import 'package:monai/features/auth/data/model/register_request.dart';
 
 abstract class AuthRemoteDataSource {
-  /// `POST /auth/login`.
   Future<AuthResponse> login(LoginRequest request);
 
-  /// `POST /auth/register`.
   Future<AuthResponse> register(RegisterRequest request);
 
-  /// `PUT /auth/password`.
   Future<AuthResponse> changePassword(ChangePasswordRequest request);
 }
 

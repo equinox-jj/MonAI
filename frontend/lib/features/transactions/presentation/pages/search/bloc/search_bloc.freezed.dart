@@ -1188,18 +1188,7 @@ as Map<DateTime, int>,
 /// @nodoc
 mixin _$SearchState {
 
-/// The first of the month searched on the server.
- DateTime get month;/// The user's current date; later months can't be picked.
- DateTime get today;/// [UiStatus.initial] while the text is blank (recent searches),
-/// [UiStatus.loading], [UiStatus.success] with results,
-/// [UiStatus.empty] without, or [UiStatus.failure].
- UiStatus get status;/// The text as typed.
- String get query;/// Searches every cached month on the device instead of [month].
- bool get allMonths; TransactionFilter get filter; List<Transaction> get results;/// The server page after [results]; null on the last one.
- String? get nextCursor;/// How many cached results an all-months search shows.
- int get limit; bool get isLoadingMore; TransactionLookups get lookups; Map<DateTime, int> get monthPickerTotals;/// The last searches, newest first.
- List<String> get recentSearches;/// Why the search failed.
- TransactionFailure? get failure;
+ DateTime get month; DateTime get today; UiStatus get status; String get query; bool get allMonths; TransactionFilter get filter; List<Transaction> get results; String? get nextCursor; int get limit; bool get isLoadingMore; TransactionLookups get lookups; Map<DateTime, int> get monthPickerTotals; List<String> get recentSearches; TransactionFailure? get failure;
 /// Create a copy of SearchState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1430,17 +1419,10 @@ class _SearchState implements SearchState {
   const _SearchState({required this.month, required this.today, this.status = UiStatus.initial, this.query = '', this.allMonths = false, this.filter = const TransactionFilter(),  List<Transaction> results = const [], this.nextCursor, this.limit = TransactionRepository.pageSize, this.isLoadingMore = false, this.lookups = const TransactionLookups(),  Map<DateTime, int> monthPickerTotals = const {},  List<String> recentSearches = const [], this.failure}): _results = results,_monthPickerTotals = monthPickerTotals,_recentSearches = recentSearches;
   
 
-/// The first of the month searched on the server.
 @override final  DateTime month;
-/// The user's current date; later months can't be picked.
 @override final  DateTime today;
-/// [UiStatus.initial] while the text is blank (recent searches),
-/// [UiStatus.loading], [UiStatus.success] with results,
-/// [UiStatus.empty] without, or [UiStatus.failure].
 @override@JsonKey() final  UiStatus status;
-/// The text as typed.
 @override@JsonKey() final  String query;
-/// Searches every cached month on the device instead of [month].
 @override@JsonKey() final  bool allMonths;
 @override@JsonKey() final  TransactionFilter filter;
  final  List<Transaction> _results;
@@ -1450,9 +1432,7 @@ class _SearchState implements SearchState {
   return EqualUnmodifiableListView(_results);
 }
 
-/// The server page after [results]; null on the last one.
 @override final  String? nextCursor;
-/// How many cached results an all-months search shows.
 @override@JsonKey() final  int limit;
 @override@JsonKey() final  bool isLoadingMore;
 @override@JsonKey() final  TransactionLookups lookups;
@@ -1463,16 +1443,13 @@ class _SearchState implements SearchState {
   return EqualUnmodifiableMapView(_monthPickerTotals);
 }
 
-/// The last searches, newest first.
  final  List<String> _recentSearches;
-/// The last searches, newest first.
 @override@JsonKey() List<String> get recentSearches {
   if (_recentSearches is EqualUnmodifiableListView) return _recentSearches;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_recentSearches);
 }
 
-/// Why the search failed.
 @override final  TransactionFailure? failure;
 
 /// Create a copy of SearchState

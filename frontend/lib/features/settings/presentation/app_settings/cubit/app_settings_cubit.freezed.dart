@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AppSettingsState {
 
-/// The picked theme; [AppThemeMode.system] follows the device.
- AppThemeMode get themeMode;/// The picked language; [AppLanguage.system] follows the device.
- AppLanguage get language;
+ AppThemeMode get themeMode; AppLanguage get language;
 /// Create a copy of AppSettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -218,9 +216,7 @@ class _AppSettingsState implements AppSettingsState {
   const _AppSettingsState({this.themeMode = AppThemeMode.system, this.language = AppLanguage.system});
   
 
-/// The picked theme; [AppThemeMode.system] follows the device.
 @override@JsonKey() final  AppThemeMode themeMode;
-/// The picked language; [AppLanguage.system] follows the device.
 @override@JsonKey() final  AppLanguage language;
 
 /// Create a copy of AppSettingsState

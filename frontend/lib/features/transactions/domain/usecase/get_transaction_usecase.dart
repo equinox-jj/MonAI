@@ -4,8 +4,8 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 
-/// One transaction, from the cache when it is there, else from the server,
-/// e.g. to open the edit form from a link.
+/// From the cache when it is there, else from the server, e.g. to open the
+/// edit form from a link.
 class GetTransactionUseCase implements UseCase<Transaction, String> {
   GetTransactionUseCase(this._repository);
 

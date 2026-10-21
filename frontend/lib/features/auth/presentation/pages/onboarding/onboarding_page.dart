@@ -25,7 +25,6 @@ class OnboardingPage extends StatelessWidget {
   }
 }
 
-/// Stateful only to own the [PageController].
 class OnboardingUI extends StatefulWidget {
   const OnboardingUI({super.key});
 

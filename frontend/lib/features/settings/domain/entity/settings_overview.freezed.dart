@@ -15,12 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SettingsOverview {
 
-/// Null until the user has been cached since sign-in.
- SettingsProfile? get profile;/// This month's limit in rupiah; null when none is set.
- int? get budgetLimit;/// Every category, hidden ones included.
- int get categoryCount;/// Wallets that aren't archived.
- int get walletCount;/// The user may add, edit or remove payment providers.
- bool get canManageProviders;
+ SettingsProfile? get profile; int? get budgetLimit; int get categoryCount; int get walletCount; bool get canManageProviders;
 /// Create a copy of SettingsOverview
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -236,15 +231,10 @@ class _SettingsOverview implements SettingsOverview {
   const _SettingsOverview({this.profile, this.budgetLimit, this.categoryCount = 0, this.walletCount = 0, this.canManageProviders = false});
   
 
-/// Null until the user has been cached since sign-in.
 @override final  SettingsProfile? profile;
-/// This month's limit in rupiah; null when none is set.
 @override final  int? budgetLimit;
-/// Every category, hidden ones included.
 @override@JsonKey() final  int categoryCount;
-/// Wallets that aren't archived.
 @override@JsonKey() final  int walletCount;
-/// The user may add, edit or remove payment providers.
 @override@JsonKey() final  bool canManageProviders;
 
 /// Create a copy of SettingsOverview
@@ -325,9 +315,7 @@ $SettingsProfileCopyWith<$Res>? get profile {
 /// @nodoc
 mixin _$SettingsProfile {
 
- String get name; String get email;/// `JP` for "Joshua Pardede".
- String get initials;/// Presigned and short-lived.
- String? get avatarUrl;/// The role's name for anyone above a regular user, e.g. "Admin".
+ String get name; String get email; String get initials; String? get avatarUrl;/// The role's name for anyone above a regular user, e.g. "Admin".
  String? get roleBadge;
 /// Create a copy of SettingsProfile
 /// with the given fields replaced by the non-null parameter values.
@@ -534,9 +522,7 @@ class _SettingsProfile implements SettingsProfile {
 
 @override final  String name;
 @override final  String email;
-/// `JP` for "Joshua Pardede".
 @override final  String initials;
-/// Presigned and short-lived.
 @override final  String? avatarUrl;
 /// The role's name for anyone above a regular user, e.g. "Admin".
 @override final  String? roleBadge;

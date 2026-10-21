@@ -2,12 +2,9 @@ import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/features/shared/domain/entity/transaction_input.dart';
 
-/// The one place transaction input is cleaned up. Use cases apply it once,
+/// The one place transaction input is cleaned up: use cases apply it once,
 /// then validate and send the same values.
 extension TransactionInputCleanup on TransactionInput {
-  /// Drops the destination wallet unless it is a transfer and the category
-  /// on a transfer, trims the note and merchant (blank becomes null), and
-  /// drops the time of day.
   TransactionInput get normalized {
     final isTransfer = type == TransactionType.transfer;
     return copyWith(
@@ -25,18 +22,14 @@ extension TransactionInputCleanup on TransactionInput {
   }
 }
 
-/// Checks a transaction form on the device with the backend's rules
-/// (`backend/internal/transaction/dto.go`), so a form shows the same errors
-/// offline as the server would send. Errors use the server's field names,
+/// Mirrors the backend's rules (`backend/internal/transaction/dto.go`), so a
+/// form shows the same errors offline. Errors use the server's field names,
 /// codes and params. Takes input already cleaned up by `normalized`.
 abstract final class TransactionInputValidator {
-  /// The largest amount the server accepts, in rupiah.
   static const amountMax = 999999999999;
 
   static const _noteMax = 200;
   static const _merchantMax = 100;
-
-  /// Field names as the API sends them in `error.fields[].field`.
   static const amountField = 'amount';
   static const walletField = 'wallet_id';
   static const toWalletField = 'to_wallet_id';
@@ -45,8 +38,7 @@ abstract final class TransactionInputValidator {
   static const noteField = 'note';
   static const merchantField = 'merchant';
 
-  /// The problems with [input], in field order; empty when valid. [today] is
-  /// the user's current date: a later date is rejected.
+  /// In field order; empty when valid. A date after [today] is rejected.
   static List<FieldError> validate(
     TransactionInput input, {
     required DateTime today,

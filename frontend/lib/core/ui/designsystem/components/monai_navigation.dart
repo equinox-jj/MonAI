@@ -8,17 +8,14 @@ import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// A top-level destination in the bottom bar, rail or drawer.
 @immutable
 class MonAINavItem {
-  /// Creates a destination. [selectedIcon] defaults to [icon].
   const MonAINavItem({
     required this.label,
     required this.icon,
     MonAIIconData? selectedIcon,
   }) : selectedIcon = selectedIcon ?? icon;
 
-  /// The design's four destinations, with the given localized labels.
   static List<MonAINavItem> main({
     required String home,
     required String transactions,
@@ -47,21 +44,12 @@ class MonAINavItem {
     ),
   ];
 
-  /// The text under the icon.
   final String label;
-
-  /// The outlined icon.
   final MonAIIconData icon;
-
-  /// The filled icon shown while selected.
   final MonAIIconData selectedIcon;
 }
 
-/// The main bottom bar: destinations with the raised "add" button in the
-/// middle. [items] are split evenly around the button (two on each side in
-/// the design). A null [onAdd] greys the button out (offline).
 class MonAIBottomBar extends StatelessWidget {
-  /// Creates the bottom bar.
   const MonAIBottomBar({
     required this.items,
     required this.selectedIndex,
@@ -71,19 +59,10 @@ class MonAIBottomBar extends StatelessWidget {
     super.key,
   });
 
-  /// The destinations.
   final List<MonAINavItem> items;
-
-  /// The selected destination.
   final int selectedIndex;
-
-  /// Called with the tapped destination's index.
   final ValueChanged<int> onSelect;
-
-  /// Opens "add transaction". Null disables the button.
   final VoidCallback? onAdd;
-
-  /// The add button's accessibility label.
   final String addLabel;
 
   @override
@@ -267,10 +246,7 @@ class _RaisedAddButton extends StatelessWidget {
   }
 }
 
-/// Medium-width navigation: an 80 rail with the "add" button above the
-/// destinations.
 class MonAINavigationRail extends StatelessWidget {
-  /// Creates the rail.
   const MonAINavigationRail({
     required this.items,
     required this.selectedIndex,
@@ -280,19 +256,10 @@ class MonAINavigationRail extends StatelessWidget {
     super.key,
   });
 
-  /// The destinations.
   final List<MonAINavItem> items;
-
-  /// The selected destination.
   final int selectedIndex;
-
-  /// Called with the tapped destination's index.
   final ValueChanged<int> onSelect;
-
-  /// Opens "add transaction". Null disables the button.
   final VoidCallback? onAdd;
-
-  /// The add button's accessibility label.
   final String addLabel;
 
   @override
@@ -393,10 +360,7 @@ class _RailItem extends StatelessWidget {
   }
 }
 
-/// Expanded-width navigation: a 240 permanent drawer with the app name, a
-/// full-width "add" button and pill-shaped destinations.
 class MonAINavigationDrawer extends StatelessWidget {
-  /// Creates the drawer.
   const MonAINavigationDrawer({
     required this.title,
     required this.items,
@@ -407,22 +371,11 @@ class MonAINavigationDrawer extends StatelessWidget {
     super.key,
   });
 
-  /// The app name.
   final String title;
-
-  /// The destinations.
   final List<MonAINavItem> items;
-
-  /// The selected destination.
   final int selectedIndex;
-
-  /// Called with the tapped destination's index.
   final ValueChanged<int> onSelect;
-
-  /// Opens "add transaction". Null disables the button.
   final VoidCallback? onAdd;
-
-  /// The add button's text.
   final String addLabel;
 
   @override
@@ -593,8 +546,6 @@ class _DrawerItem extends StatelessWidget {
   }
 }
 
-/// The rail and drawer "add" button: a rounded square rather than the bar's
-/// raised circle.
 class _AddSquareButton extends StatelessWidget {
   const _AddSquareButton({
     required this.onTap,

@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'category_list_response.freezed.dart';
 part 'category_list_response.g.dart';
 
-/// `GET /categories`.
 @freezed
 abstract class CategoryListResponse with _$CategoryListResponse {
   const factory CategoryListResponse({

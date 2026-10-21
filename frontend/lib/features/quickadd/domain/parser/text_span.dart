@@ -3,8 +3,6 @@ class TextSpan {
   const TextSpan(this.start, this.end);
 
   final int start;
-
-  /// Exclusive.
   final int end;
 
   bool overlaps(TextSpan other) => start < other.end && other.start < end;

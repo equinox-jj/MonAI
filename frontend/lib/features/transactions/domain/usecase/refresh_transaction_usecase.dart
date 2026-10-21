@@ -4,8 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 
-/// Re-fetches one transaction; one deleted elsewhere fails as
-/// [NotFoundFailure] and leaves the cache.
 class RefreshTransactionUseCase implements UseCase<Transaction, String> {
   RefreshTransactionUseCase(this._repository);
 

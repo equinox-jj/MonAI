@@ -21,8 +21,6 @@ class ChangePasswordBloc
   }
 
   final ChangePasswordUseCase _changePassword;
-
-  /// The backend's code for a wrong current password.
   static const _invalidPasswordCode = 'invalid_password';
 
   // Field errors stay hidden until a submit fails on the input; after that,

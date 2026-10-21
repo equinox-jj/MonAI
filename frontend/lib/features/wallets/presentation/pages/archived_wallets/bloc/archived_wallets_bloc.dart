@@ -15,7 +15,6 @@ part 'archived_wallets_bloc.freezed.dart';
 part 'archived_wallets_event.dart';
 part 'archived_wallets_state.dart';
 
-/// The archived wallets, each of which can be brought back.
 class ArchivedWalletsBloc
     extends Bloc<ArchivedWalletsEvent, ArchivedWalletsState> {
   ArchivedWalletsBloc({

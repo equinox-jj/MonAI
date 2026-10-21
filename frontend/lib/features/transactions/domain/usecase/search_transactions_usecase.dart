@@ -6,8 +6,7 @@ import 'package:monai/features/shared/domain/entity/transaction_search_page.dart
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/transactions/domain/validation/search_query.dart';
 
-/// One page of server search over a month's notes and merchants. Blank text
-/// finds nothing without calling the server.
+/// Blank text finds nothing without calling the server.
 class SearchTransactionsUseCase
     implements UseCase<TransactionSearchPage, SearchTransactionsParams> {
   SearchTransactionsUseCase(this._repository);
@@ -29,8 +28,6 @@ class SearchTransactionsUseCase
   }
 }
 
-/// The search as typed, the month (the first of the month) to search, and
-/// the cursor of the page after the first.
 class SearchTransactionsParams {
   const SearchTransactionsParams({
     required this.query,

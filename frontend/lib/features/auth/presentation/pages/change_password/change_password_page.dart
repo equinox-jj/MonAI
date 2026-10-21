@@ -23,9 +23,6 @@ class ChangePasswordPage extends StatelessWidget {
   }
 }
 
-/// The current and new password, with a note that every device gets signed
-/// out. Save sits in the top bar. Stateful only to own the text controllers
-/// and focus nodes.
 class ChangePasswordUI extends StatefulWidget {
   const ChangePasswordUI({super.key});
 
@@ -50,8 +47,6 @@ class _ChangePasswordUIState extends State<ChangePasswordUI> {
     super.dispose();
   }
 
-  /// Focus the first field with an error, so the keyboard and screen reader
-  /// land on it.
   void _onFailure(BuildContext context, ChangePasswordState state) {
     switch (state.focusField) {
       case .currentPassword:
@@ -162,7 +157,6 @@ class _SaveAction extends StatelessWidget {
   }
 }
 
-/// After a failed attempt that no field explains, the error banner.
 class _FormError extends StatelessWidget {
   const _FormError();
 
@@ -231,8 +225,6 @@ class _CurrentPasswordField extends StatelessWidget {
   }
 }
 
-/// An error replaces the length hint; otherwise the hint turns green once it
-/// is met.
 class _NewPasswordField extends StatelessWidget {
   const _NewPasswordField({
     required this.controller,

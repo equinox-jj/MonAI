@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// Placeholder blocks in the dashboard's shape while the first load runs.
-/// Read out as one label.
 class HomeSkeleton extends StatelessWidget {
   const HomeSkeleton({super.key});
 

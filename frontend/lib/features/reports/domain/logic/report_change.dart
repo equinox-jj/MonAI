@@ -1,13 +1,11 @@
-/// Which way a total moved since the month before.
 enum ChangeTrend { less, same, more }
 
-/// A change against the month before, rounded to whole percent the way the
-/// report shows it.
+/// Rounded to whole percent the way the report shows it.
 class ReportChange {
   const ReportChange._(this.trend, this.percent);
 
-  /// The change for [changePercent]; null when the month before had nothing
-  /// to compare with. A change that rounds to 0% is [ChangeTrend.same].
+  /// Null when the month before had nothing to compare with. A change that
+  /// rounds to 0% is [ChangeTrend.same].
   static ReportChange? of(double? changePercent) {
     if (changePercent == null) return null;
     final percent = changePercent.abs().round();
@@ -20,8 +18,6 @@ class ReportChange {
   }
 
   final ChangeTrend trend;
-
-  /// Whole percent, without a sign.
   final int percent;
 
   @override

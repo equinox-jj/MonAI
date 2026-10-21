@@ -5,8 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/transaction_detail_page.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
 
-/// Tablet landscape: the selected transaction beside the list, or a prompt
-/// to pick one.
 class TransactionsDetailPane extends StatelessWidget {
   const TransactionsDetailPane({super.key});
 

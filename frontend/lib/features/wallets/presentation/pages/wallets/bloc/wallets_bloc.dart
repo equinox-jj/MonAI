@@ -16,9 +16,6 @@ part 'wallets_bloc.freezed.dart';
 part 'wallets_event.dart';
 part 'wallets_state.dart';
 
-/// The wallets tab: every wallet that isn't archived, their total and how
-/// many are archived. Shows the cache at once and refreshes in the
-/// background; only a first load with nothing cached becomes an error.
 class WalletsBloc extends Bloc<WalletsEvent, WalletsState> {
   WalletsBloc({
     required this._watchWallets,
@@ -113,7 +110,6 @@ class WalletsBloc extends Bloc<WalletsEvent, WalletsState> {
     );
   }
 
-  /// [state] with the status its data calls for.
   static WalletsState _settled(WalletsState state) => state.copyWith(
     status: switch (state) {
       _ when state.wallets.isNotEmpty => UiStatus.success,

@@ -39,7 +39,6 @@ void main() {
     return Future<void>.delayed(Duration.zero);
   }
 
-  /// Every review the bloc hands over, in order.
   List<ReceiptReviewArgs> reviews(ScanReceiptBloc bloc) {
     final seen = <ReceiptReviewArgs>[];
     final sub = bloc.stream.listen((s) {

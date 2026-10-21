@@ -5,7 +5,6 @@ import 'package:monai/features/settings/domain/entity/admin_payment_provider.dar
 import 'package:monai/features/shared/data/mapper/api_values.dart';
 
 extension AdminProviderDataMapper on AdminProviderData {
-  /// Throws the malformed-response error when a required field is missing.
   AdminPaymentProvider toEntity() => AdminPaymentProvider(
     id: requireField(id),
     slug: requireField(slug),
@@ -21,8 +20,6 @@ extension AdminProviderDataMapper on AdminProviderData {
 }
 
 extension AdminProviderResponseMapper on AdminProviderResponse {
-  /// The provider in `data`; throws the malformed-response error when it is
-  /// missing.
   AdminPaymentProvider toEntity() => requireField(data).toEntity();
 }
 

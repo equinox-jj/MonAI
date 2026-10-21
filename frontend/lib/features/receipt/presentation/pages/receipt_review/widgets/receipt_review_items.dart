@@ -4,7 +4,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
 
-/// The lines read from the receipt and their total, open to start with.
 class ReceiptReviewItems extends StatelessWidget {
   const ReceiptReviewItems({
     required this.items,
@@ -13,8 +12,6 @@ class ReceiptReviewItems extends StatelessWidget {
   });
 
   final List<ReceiptItem> items;
-
-  /// The sum of the items that have an amount.
   final int total;
 
   @override
@@ -82,7 +79,6 @@ class _ItemRow extends StatelessWidget {
     );
   }
 
-  /// `2`, or `1.5` for a weighed item.
   static String _quantityText(double quantity) =>
       quantity == quantity.roundToDouble()
       ? quantity.toInt().toString()

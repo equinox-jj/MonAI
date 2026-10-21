@@ -2,7 +2,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'user.freezed.dart';
 
-/// The signed-in user.
 @freezed
 abstract class User with _$User {
   const factory User({
@@ -22,12 +21,9 @@ abstract class User with _$User {
 
   const User._();
 
-  /// Whether the user holds the permission [code], e.g.
-  /// `payment_provider.update`.
   bool hasPermission(String code) => permissions.contains(code);
 }
 
-/// The user's role.
 @freezed
 abstract class UserRole with _$UserRole {
   const factory UserRole({required String slug, required String name}) =

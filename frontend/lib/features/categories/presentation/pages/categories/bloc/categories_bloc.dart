@@ -18,8 +18,6 @@ part 'categories_bloc.freezed.dart';
 part 'categories_event.dart';
 part 'categories_state.dart';
 
-/// The expense and income categories: hide or show them, and delete custom
-/// ones, moving their transactions first when they have any.
 class CategoriesBloc extends Bloc<CategoriesEvent, CategoriesState> {
   CategoriesBloc({
     required this._watchCategories,

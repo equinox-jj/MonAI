@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'parse_receipt_request.freezed.dart';
 part 'parse_receipt_request.g.dart';
 
-/// `POST /ai/parse-receipt`.
 @freezed
 abstract class ParseReceiptRequest with _$ParseReceiptRequest {
   const factory ParseReceiptRequest({

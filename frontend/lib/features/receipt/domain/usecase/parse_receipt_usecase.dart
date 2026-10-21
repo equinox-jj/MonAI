@@ -5,10 +5,8 @@ import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
 import 'package:monai/features/receipt/domain/repository/receipt_repository.dart';
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 
-/// Turns a receipt's text into a draft (merchant, total, date, category,
-/// items) with the AI, dated in the user's own timezone.
+/// Dated in the user's own timezone.
 class ParseReceiptUseCase implements UseCase<ReceiptDraft, String> {
-  /// [now] is the clock; tests pass a fixed one.
   ParseReceiptUseCase({
     required this._repository,
     required this._watchUser,

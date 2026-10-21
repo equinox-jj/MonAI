@@ -3,15 +3,14 @@ import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/payment_provider_endpoint.dart';
 import 'package:monai/features/shared/data/model/payment_provider_catalog_response.dart';
 
-/// A changed catalog and the ETag to send next time.
 typedef PaymentProviderCatalogResult = ({
   PaymentProviderCatalogResponse body,
   String? etag,
 });
 
 abstract class PaymentProviderRemoteDataSource {
-  /// `GET /payment-providers`, sending [etag] as `If-None-Match`. Null when
-  /// the server answers 304: the cached catalog is current.
+  /// Sends [etag] as `If-None-Match`; null on a 304, when the cached catalog is
+  /// current.
   Future<PaymentProviderCatalogResult?> getCatalog({String? etag});
 }
 

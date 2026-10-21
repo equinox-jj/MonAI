@@ -5,11 +5,10 @@ import 'package:monai/features/shared/domain/repository/budget_repository.dart';
 import 'package:monai/features/shared/domain/repository/report_repository.dart';
 import 'package:monai/features/shared/domain/repository/wallet_repository.dart';
 
-/// Re-fetches what the server recalculates after a transaction changes:
-/// wallet balances, and the budget and report of each affected month. Best
-/// effort, all at once: the change itself already succeeded, so this never
-/// fails and a stale total heals on the next refresh. Gives whether every
-/// refresh succeeded.
+/// Re-fetches what the server recalculates after a transaction changes: wallet
+/// balances and each affected month's budget and report. Never fails: the
+/// change already succeeded, and a stale total heals on the next refresh.
+/// Gives whether every refresh succeeded.
 class RefreshTransactionDependentsUseCase
     implements UseCase<bool, List<DateTime>> {
   RefreshTransactionDependentsUseCase({
@@ -22,8 +21,7 @@ class RefreshTransactionDependentsUseCase
   final BudgetRepository _budgets;
   final ReportRepository _reports;
 
-  /// [months] are dates in the affected months; duplicates are refreshed
-  /// once.
+  /// [months] are dates in the affected months; duplicates are refreshed once.
   @override
   Future<Either<Failure, bool>> call(List<DateTime> months) async {
     final firstDays = {

@@ -17,7 +17,6 @@ class Transactions extends Table {
   TextColumn get id => text()();
   TextColumn get type => textEnum<TransactionType>()();
 
-  /// Rupiah, always positive; [type] gives the direction.
   IntColumn get amount => integer()();
   TextColumn get walletId => text()();
   TextColumn get toWalletId => text().nullable()();

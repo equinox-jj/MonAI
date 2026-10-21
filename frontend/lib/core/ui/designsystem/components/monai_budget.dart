@@ -10,9 +10,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 import 'package:monai/core/model/budget_status.dart';
 
-/// Colors of a budget's progress.
 extension BudgetStatusColor on BudgetStatus {
-  /// Brand on track, amber from 80%, red over the limit.
   Color color(MonAIColors c) => switch (this) {
     .ok => c.accent,
     .warning => c.warning,
@@ -20,21 +18,14 @@ extension BudgetStatusColor on BudgetStatus {
   };
 }
 
-/// What's left of a budget, amber with a warning near the limit and red
-/// with an error once over it. [text] is already formatted ("Rp 585.000
-/// left").
 class MonAIBudgetRemaining extends StatelessWidget {
-  /// Creates the remaining line.
   const MonAIBudgetRemaining({
     required this.text,
     required this.status,
     super.key,
   });
 
-  /// "Rp 585.000 left" or "Rp 20.000 over".
   final String text;
-
-  /// Picks the color and icon.
   final BudgetStatus status;
 
   @override
@@ -64,9 +55,7 @@ class MonAIBudgetRemaining extends StatelessWidget {
   }
 }
 
-/// Dashed card asking to set the month's spending limit.
 class MonAIBudgetPromptCard extends StatelessWidget {
-  /// Creates the prompt.
   const MonAIBudgetPromptCard({
     required this.title,
     required this.body,
@@ -75,16 +64,9 @@ class MonAIBudgetPromptCard extends StatelessWidget {
     super.key,
   });
 
-  /// "Set an October budget".
   final String title;
-
-  /// The explanation under the title.
   final String body;
-
-  /// "Set".
   final String actionLabel;
-
-  /// Opens the budget.
   final VoidCallback onTap;
 
   @override

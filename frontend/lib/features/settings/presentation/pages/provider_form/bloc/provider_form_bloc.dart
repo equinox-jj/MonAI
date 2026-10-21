@@ -25,11 +25,10 @@ part 'provider_form_bloc.freezed.dart';
 part 'provider_form_event.dart';
 part 'provider_form_state.dart';
 
-/// Adds a provider, or edits the one with the given id: name, type, aliases,
-/// sort order, status and logo. On an existing provider, the status switch
-/// and Delete apply at once, after a confirmation; everything else waits for
-/// Save. The name, the alias being typed and the sort order live in the
-/// screen's text fields and arrive with each edit and with Save.
+/// On an existing provider, the status switch and Delete apply at once after a
+/// confirmation; everything else waits for Save. The name, the alias being
+/// typed and the sort order live in the screen's text fields and arrive with
+/// each edit and with Save.
 class ProviderFormBloc extends Bloc<ProviderFormEvent, ProviderFormState> {
   ProviderFormBloc({
     required String? providerId,
@@ -136,7 +135,6 @@ class ProviderFormBloc extends Bloc<ProviderFormEvent, ProviderFormState> {
     emit(state.copyWith(type: event.type));
   }
 
-  /// Typing a comma adds what came before it, like Enter.
   void _onAliasTyped(_AliasTyped event, Emitter<ProviderFormState> emit) {
     emit(
       event.text.contains(',')
@@ -178,7 +176,6 @@ class ProviderFormBloc extends Bloc<ProviderFormEvent, ProviderFormState> {
     }
   }
 
-  /// Opens the system photo picker; the picked image uploads on Save.
   Future<void> _onLogoPickRequested(
     _LogoPickRequested event,
     Emitter<ProviderFormState> emit,
@@ -371,7 +368,6 @@ class ProviderFormBloc extends Bloc<ProviderFormEvent, ProviderFormState> {
     canDelete: canDeleteProvider(_currentUser, from.original),
   );
 
-  /// [text]'s comma-separated aliases added; the alias field is cleared.
   ProviderFormState _withAliases(ProviderFormState from, String text) =>
       from.copyWith(
         aliases: withTypedAliases(from.aliases, text),

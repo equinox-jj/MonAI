@@ -4,11 +4,8 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
 
-/// The category as it will look: its icon large, then a chip with its name.
 class CategoryFormPreview extends StatelessWidget {
   const CategoryFormPreview({required this.name, super.key});
-
-  /// The name field, so the chip follows typing.
   final TextEditingController name;
 
   static const _iconSize = 72.0;

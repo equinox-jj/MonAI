@@ -4,7 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/repository/budget_repository.dart';
 
-/// Re-fetches the budget of a month (the first of the month).
 class RefreshBudgetUseCase implements UseCase<Budget?, DateTime> {
   RefreshBudgetUseCase(this._repository);
 

@@ -15,8 +15,6 @@ import 'package:monai/features/auth/presentation/widgets/auth_scaffold.dart';
 /// A successful register needs no navigation here: the saved session sends
 /// the router to Home.
 class RegisterPage extends StatelessWidget {
-  /// [initialEmail] is the email typed on Sign in, if the user came from
-  /// there.
   const RegisterPage({super.key, this.initialEmail = ''});
 
   final String initialEmail;
@@ -30,7 +28,6 @@ class RegisterPage extends StatelessWidget {
   }
 }
 
-/// Stateful only to own the text controllers and focus nodes.
 class RegisterUI extends StatefulWidget {
   const RegisterUI({super.key, this.initialEmail = ''});
 
@@ -59,8 +56,6 @@ class _RegisterUIState extends State<RegisterUI> {
     super.dispose();
   }
 
-  /// Focus the first field with an error, so the keyboard and screen reader
-  /// land on it.
   void _onFailure(BuildContext context, RegisterState state) {
     switch (state.focusField) {
       case .name:
@@ -108,8 +103,6 @@ class _RegisterUIState extends State<RegisterUI> {
   }
 }
 
-/// The layout. Built once; each part below subscribes to only the state it
-/// shows.
 class _RegisterForm extends StatelessWidget {
   const _RegisterForm({
     required this.name,
@@ -162,7 +155,6 @@ class _RegisterForm extends StatelessWidget {
   }
 }
 
-/// The title and, after a failed attempt, the error banner.
 class _Header extends StatelessWidget {
   const _Header();
 
@@ -278,8 +270,6 @@ class _EmailField extends StatelessWidget {
   }
 }
 
-/// An error replaces the length hint; otherwise the hint turns green once it
-/// is met.
 class _PasswordField extends StatelessWidget {
   const _PasswordField({
     required this.controller,

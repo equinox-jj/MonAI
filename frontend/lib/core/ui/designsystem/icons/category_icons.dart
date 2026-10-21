@@ -1,7 +1,5 @@
 import 'package:monai/core/ui/designsystem/icons/monai_icons.dart';
 
-/// Category icon names the API can send (Material Symbols names) mapped to
-/// the bundled icons.
 const _categoryIcons = {
   'restaurant': MonAIIcons.restaurant,
   'local_cafe': MonAIIcons.localCafe,
@@ -28,8 +26,5 @@ const _categoryIcons = {
   'home': MonAIIcons.home,
 };
 
-/// The icon for a category's Material Symbols [name] from the API
-/// (`restaurant`). Names without a bundled icon, and null, get the generic
-/// category icon.
 MonAIIconData categoryIcon(String? name) =>
     _categoryIcons[name] ?? MonAIIcons.category;

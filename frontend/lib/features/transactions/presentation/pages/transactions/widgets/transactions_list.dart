@@ -17,9 +17,6 @@ typedef _ListData = ({
   bool hasMore,
 });
 
-/// The month's transactions under their day headers, as a sliver; swipe a
-/// row left to delete it. A spinner closes the list while more pages
-/// follow.
 class TransactionsListSliver extends StatelessWidget {
   const TransactionsListSliver({
     required this.actions,
@@ -28,8 +25,6 @@ class TransactionsListSliver extends StatelessWidget {
   });
 
   final TransactionsActions actions;
-
-  /// Highlights the row shown in the detail pane.
   final bool showSelection;
 
   @override

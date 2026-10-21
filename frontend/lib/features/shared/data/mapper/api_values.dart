@@ -12,28 +12,22 @@ import 'package:monai/core/model/wallet_type.dart';
 const _date = DateOnlyConverter();
 const _month = YearMonthConverter();
 
-/// Throws the malformed-response error for a missing required field.
 Never malformed() =>
     throw const UnknownException(message: 'Malformed response');
 
-/// [value], or a malformed-response error when it is null.
 T requireField<T>(T? value) => value ?? malformed();
 
-/// `yyyy-MM-dd` to a local-midnight date.
 DateTime parseApiDate(String? value) =>
     DateTime.tryParse(requireField(value)) ?? malformed();
 
-/// A date as `yyyy-MM-dd`.
 String formatApiDate(DateTime date) => _date.toSql(date);
 
-/// `yyyy-MM` to the first of the month at local midnight.
 DateTime parseApiMonth(String? value) {
   final raw = requireField(value);
   if (!RegExp(r'^\d{4}-\d{2}$').hasMatch(raw)) malformed();
   return _month.fromSql(raw);
 }
 
-/// A month as `yyyy-MM`.
 String formatApiMonth(DateTime month) => _month.toSql(month);
 
 const _walletTypes = {
@@ -84,22 +78,18 @@ CategoryType parseCategoryType(String? value) => _parse(_categoryTypes, value);
 
 BudgetStatus parseBudgetStatus(String? value) => _parse(_budgetStatuses, value);
 
-/// The API value of a [WalletType], e.g. `E_WALLET`.
 extension WalletTypeApi on WalletType {
   String get apiValue => _format(_walletTypes, this);
 }
 
-/// The API value of a [TransactionType], e.g. `EXPENSE`.
 extension TransactionTypeApi on TransactionType {
   String get apiValue => _format(_transactionTypes, this);
 }
 
-/// The API value of a [TransactionSource], e.g. `QUICK_ADD`.
 extension TransactionSourceApi on TransactionSource {
   String get apiValue => _format(_transactionSources, this);
 }
 
-/// The API value of a [CategoryType], e.g. `EXPENSE`.
 extension CategoryTypeApi on CategoryType {
   String get apiValue => _format(_categoryTypes, this);
 }

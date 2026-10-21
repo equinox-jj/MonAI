@@ -4,7 +4,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/wallets/domain/validation/wallet_input_validator.dart';
 
 extension WalletFieldErrorText on FieldError {
-  /// The message under the field, from the device's checks or the server's.
   String text(AppLocalizations l10n) => switch ((field, code)) {
     (WalletInputValidator.nameField, 'max_length') =>
       l10n.walletFormErrorNameTooLong(WalletInputValidator.nameMax),

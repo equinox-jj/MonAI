@@ -6,7 +6,6 @@ import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_wallet_avatar.dart';
 
-/// `Today, 10 Oct`, `Yesterday, 9 Oct`, else `Thu, 8 Oct 2026`.
 String receiptDateText(
   DateTime day,
   DateTime today,
@@ -21,7 +20,6 @@ String receiptDateText(
   return DateFormat('EEE, d MMM y', locale).format(day);
 }
 
-/// The text of the review's [MonAIDatePickerSheet], up to [today].
 MonAIDatePickerLabels receiptDatePickerLabels(
   AppLocalizations l10n, {
   required DateTime today,
@@ -38,7 +36,6 @@ MonAIDatePickerLabels receiptDatePickerLabels(
 );
 
 extension ReceiptCategoryOption on Category {
-  /// This category in [MonAICategoryPickerSheet].
   MonAICategoryOption get pickerOption => MonAICategoryOption(
     id: id,
     name: name,
@@ -48,7 +45,6 @@ extension ReceiptCategoryOption on Category {
 }
 
 extension ReceiptWalletOption on Wallet {
-  /// This wallet with its balance in [MonAIRadioPickerSheet].
   MonAIRadioPickerOption pickerOption(AppLocalizations l10n) =>
       MonAIRadioPickerOption(
         id: id,

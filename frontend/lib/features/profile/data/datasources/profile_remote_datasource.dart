@@ -8,21 +8,16 @@ import 'package:monai/features/profile/data/model/update_profile_request.dart';
 import 'package:monai/features/shared/data/model/me_response.dart';
 
 abstract class ProfileRemoteDataSource {
-  /// `PATCH /me`.
   Future<MeResponse> updateProfile(UpdateProfileRequest request);
 
-  /// `PUT /me/avatar`, multipart `file`. [onProgress] gets the share sent,
-  /// 0 to 1.
   Future<MeResponse> uploadAvatar(
     Uint8List bytes, {
     required String filename,
     void Function(double progress)? onProgress,
   });
 
-  /// `DELETE /me/avatar`.
   Future<void> removeAvatar();
 
-  /// `DELETE /me`.
   Future<void> deleteAccount(DeleteAccountRequest request);
 }
 

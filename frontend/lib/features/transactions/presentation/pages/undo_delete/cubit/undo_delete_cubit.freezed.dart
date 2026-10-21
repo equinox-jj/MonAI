@@ -15,10 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$UndoDeleteState {
 
-/// The transaction that can still be restored; null hides the undo.
- Transaction? get deleted;/// Names for [deleted]'s title.
- TransactionLookups get lookups; bool get isRestoring;/// Why the last restore failed; shown once.
- TransactionFailure? get restoreFailure;
+ Transaction? get deleted; TransactionLookups get lookups; bool get isRestoring; TransactionFailure? get restoreFailure;
 /// Create a copy of UndoDeleteState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -242,12 +239,9 @@ class _UndoDeleteState implements UndoDeleteState {
   const _UndoDeleteState({this.deleted, this.lookups = const TransactionLookups(), this.isRestoring = false, this.restoreFailure});
   
 
-/// The transaction that can still be restored; null hides the undo.
 @override final  Transaction? deleted;
-/// Names for [deleted]'s title.
 @override@JsonKey() final  TransactionLookups lookups;
 @override@JsonKey() final  bool isRestoring;
-/// Why the last restore failed; shown once.
 @override final  TransactionFailure? restoreFailure;
 
 /// Create a copy of UndoDeleteState

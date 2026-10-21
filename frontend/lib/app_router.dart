@@ -39,147 +39,87 @@ import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wall
 import 'package:monai/features/wallets/presentation/pages/wallet_form/wallet_form_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
 
-/// The app's route paths.
 abstract final class AppRoutes {
-  /// Where the app starts; it only redirects to the first screen.
   static const launch = '/';
-
-  /// First-launch introduction.
   static const onboarding = '/onboarding';
-
-  /// Sign in.
   static const signIn = '/sign-in';
-
-  /// Create an account.
   static const register = '/register';
-
-  /// The signed-in start screen, the first tab.
   static const home = '/home';
-
-  /// The transactions tab.
   static const transactions = '/transactions';
-
-  /// The wallets tab.
   static const wallets = '/wallets';
-
-  /// The settings tab.
   static const settings = '/settings';
-
-  /// The categories; reached from Settings.
   static const categories = '/settings/categories';
-
-  /// Edit profile; reached from Settings.
   static const profile = '/settings/profile';
-
-  /// Change password; reached from Settings.
   static const changePassword = '/settings/password';
-
-  /// The payment provider catalog for admins; reached from Settings.
   static const providers = '/settings/providers';
-
-  /// The add-provider form.
   static const providerNew = '$providers/new';
 
-  /// The edit form of provider [id].
   static String providerEdit(String id) => '$providers/$id/edit';
 
-  /// The query parameter Edit profile opens scrolled to a section by.
   static const focusParam = 'focus';
 
-  /// Edit profile, scrolled to its delete-account card.
   static final profileDeleteAccount = Uri(
     path: profile,
     queryParameters: {focusParam: 'delete'},
   ).toString();
 
-  /// The add-category form, for a category of [type].
   static String categoryNew(CategoryType type) => Uri(
     path: '$categories/new',
     queryParameters: {typeParam: type.name},
   ).toString();
 
-  /// The edit form of category [id].
   static String categoryEdit(String id) => '$categories/$id/edit';
 
-  /// The add-wallet form.
   static const walletNew = '/wallets/new';
-
-  /// The archived wallets.
   static const walletsArchived = '/wallets/archived';
 
-  /// The detail of wallet [id].
   static String walletDetail(String id) => '$wallets/$id';
 
-  /// The edit form of wallet [id].
   static String walletEdit(String id) => '$wallets/$id/edit';
 
-  /// Search over notes and merchants; see [transactionSearchIn].
   static const transactionSearch = '/transactions/search';
 
-  /// The add-transaction form; see [newTransaction]. Pass a
-  /// `QuickAddDraft` as `extra` to start from it; see [pushQuickAddForm].
+  /// Pass a `QuickAddDraft` as `extra` to start from it; see [pushQuickAddForm].
   static const transactionNew = '/transactions/new';
 
-  /// The query parameter Search starts in, as `yyyy-MM`.
+  /// Search's starting month, as `yyyy-MM`.
   static const monthParam = 'month';
-
-  /// The query parameters the add form starts with.
   static const typeParam = 'type';
   static const walletParam = 'wallet';
 
-  /// Search, starting in [month] when given.
   static String transactionSearchIn([DateTime? month]) =>
       _inMonth(transactionSearch, month);
 
-  /// The add form, starting as a [type] (`expense`, `income`, `transfer`)
-  /// out of [walletId] when given.
   static String newTransaction({String? type, String? walletId}) => Uri(
     path: transactionNew,
     queryParameters: {typeParam: ?type, walletParam: ?walletId},
   ).toString().replaceFirst(RegExp(r'\?$'), '');
 
-  /// The detail of transaction [id].
   static String transactionDetail(String id) => '$transactions/$id';
 
-  /// The edit form of transaction [id].
   static String transactionEdit(String id) => '$transactions/$id/edit';
 
-  /// Quick add: a typed phrase to transaction drafts.
   static const quickAdd = '/quick-add';
 
-  /// The review of several quick-add drafts; pass its `QuickAddReviewArgs`
-  /// as `extra`. Pops with a `QuickAddReviewExit`.
+  /// Takes `QuickAddReviewArgs` as `extra`; pops with a `QuickAddReviewExit`.
   static const quickAddReview = '/quick-add/review';
-
-  /// The receipt scanner.
   static const receiptScan = '/receipt/scan';
 
-  /// The review of a scanned receipt; pass its `ReceiptReviewArgs` as
-  /// `extra`.
+  /// Takes `ReceiptReviewArgs` as `extra`.
   static const receiptReview = '/receipt/review';
-
-  /// A month's budget; see [budgetFor].
   static const budget = '/budget';
 
-  /// The budget of [month], or of the current month when null.
   static String budgetFor([DateTime? month]) => _inMonth(budget, month);
 
-  /// A month's report; see [reportFor].
   static const report = '/report';
 
-  /// The report of [month], or of the current month when null.
   static String reportFor([DateTime? month]) => _inMonth(report, month);
 
-  /// The query parameter Sign in and Register hand the typed email over in.
   static const emailParam = 'email';
-
-  /// The screens a signed-out user may see.
   static const signedOutRoutes = {onboarding, signIn, register};
 
-  /// Sign in, starting with [email] when given.
   static String signInWith({String email = ''}) => _withEmail(signIn, email);
 
-  /// Register, starting with [email] when given.
   static String registerWith({String email = ''}) =>
       _withEmail(register, email);
 
@@ -199,14 +139,9 @@ abstract final class AppRoutes {
   ).toString();
 }
 
-/// Builds the app's router, starting at [initialLocation].
-///
-/// The [AppRoutes.launch] route picks the first screen with
-/// [launchRedirect], asking [isOnboardingCompleted] only for a signed-out
-/// user. After that, navigation follows [sessionManager]: a sign-in leaves the
-/// auth screens for Home, and a sign-out returns to Sign in. An expired
-/// session stays put under the session-expired dialog until the user signs in
-/// again.
+/// Navigation follows [sessionManager]: a sign-in leaves the auth screens for
+/// Home, a sign-out returns to Sign in. An expired session stays put under the
+/// session-expired dialog until the user signs in again.
 GoRouter createAppRouter({
   required SessionManager sessionManager,
   required Future<bool> Function() isOnboardingCompleted,
@@ -521,8 +456,7 @@ GoRouter createAppRouter({
   );
 }
 
-/// Opens the add form filled from a quick-add [draft]; true once it was
-/// saved, false when the user closed it.
+/// True once the draft was saved, false when the user closed the form.
 Future<bool> pushQuickAddForm(
   BuildContext context,
   QuickAddDraft draft,
@@ -531,8 +465,6 @@ Future<bool> pushQuickAddForm(
   extra: draft,
 ) is SavedFormOutcome;
 
-/// An add or edit form, built for where it shows: a side sheet over the
-/// screen on tablet landscape, otherwise a full-screen dialog.
 Page<void> _formPage(
   BuildContext context,
   GoRouterState state,
@@ -574,8 +506,6 @@ Page<void> _formPage(
 
 const _sideSheetWidth = 480.0;
 
-/// The first of the month in a `yyyy-MM` query value; null when missing or
-/// malformed.
 DateTime? parseMonthParam(String? value) {
   final match = RegExp(r'^(\d{4})-(\d{2})$').firstMatch(value ?? '');
   if (match == null) return null;
@@ -584,8 +514,6 @@ DateTime? parseMonthParam(String? value) {
   return DateTime(int.parse(match.group(1)!), month);
 }
 
-/// Where the session sends a user at [location], or null to stay.
-///
 /// [AppRoutes.launch] is left alone: go_router runs this before the route's
 /// own [launchRedirect], which picks the first screen.
 String? sessionRedirect(SessionStatus status, String location) {
@@ -598,10 +526,6 @@ String? sessionRedirect(SessionStatus status, String location) {
   };
 }
 
-/// The first screen for a user whose session is [status] at launch.
-///
-/// A signed-in user starts on Home; anyone else starts on Sign in once
-/// [isOnboardingCompleted], and on Onboarding before that.
 Future<String> launchRedirect(
   SessionStatus status,
   Future<bool> Function() isOnboardingCompleted,

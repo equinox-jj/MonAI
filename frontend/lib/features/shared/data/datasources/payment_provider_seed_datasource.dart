@@ -7,12 +7,11 @@ import 'package:monai/features/shared/data/mapper/payment_provider_mapper.dart';
 import 'package:monai/features/shared/data/model/payment_provider_catalog_response.dart';
 
 abstract class PaymentProviderSeedDataSource {
-  /// The catalog bundled with the app, for a first launch without network.
-  /// Its ids start with [seedIdPrefix]: the server's are made on install.
+  /// For a first launch without network. Its ids start with [seedIdPrefix],
+  /// since the server's ids are made on install.
   Future<List<PaymentProviderRow>> load();
 }
 
-/// The prefix of a bundled provider's id, which the server doesn't know.
 const seedIdPrefix = 'seed:';
 
 class PaymentProviderSeedDataSourceImpl extends PaymentProviderSeedDataSource
@@ -20,8 +19,6 @@ class PaymentProviderSeedDataSourceImpl extends PaymentProviderSeedDataSource
   PaymentProviderSeedDataSourceImpl({required this._bundle});
 
   final AssetBundle _bundle;
-
-  /// The bundled catalog, in the `GET /payment-providers` shape.
   static const assetPath = 'assets/seed/payment_providers.json';
 
   @override

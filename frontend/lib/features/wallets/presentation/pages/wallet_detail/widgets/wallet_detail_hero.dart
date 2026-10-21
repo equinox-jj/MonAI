@@ -8,7 +8,6 @@ import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
 
-/// The wallet's card: monogram, name, type, "Default" and current balance.
 class WalletDetailHero extends StatelessWidget {
   const WalletDetailHero({super.key});
 

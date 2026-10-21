@@ -559,16 +559,8 @@ $MonthlyReportCopyWith<$Res>? get report {
 /// @nodoc
 mixin _$BudgetState {
 
-/// The first of the month.
- DateTime get month;/// The saved budget; null when the month has none.
- Budget? get budget;/// The month's spending from the report, for a month without a budget.
- int? get reportSpent;/// The limit in the field, in rupiah; 0 when empty.
- int get limit;/// The user changed the limit: a budget loading late no longer fills it.
- bool get limitTouched;/// The limit's error, shown under the field.
- FieldError? get limitError;/// A save failed on the limit, so its error updates as the user types.
- bool get autovalidate; bool get isSaving; bool get isDeleting;/// Set once saved or removed; the screen closes.
- BudgetOutcome? get outcome;/// Why a save or remove failed; shown once as a snackbar.
- BudgetFailure? get actionFailure;
+ DateTime get month; Budget? get budget; int? get reportSpent; int get limit;/// The user changed the limit: a budget loading late no longer fills it.
+ bool get limitTouched; FieldError? get limitError; bool get autovalidate; bool get isSaving; bool get isDeleting; BudgetOutcome? get outcome; BudgetFailure? get actionFailure;
 /// Create a copy of BudgetState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -790,25 +782,17 @@ class _BudgetState implements BudgetState {
   const _BudgetState({required this.month, this.budget, this.reportSpent, this.limit = 0, this.limitTouched = false, this.limitError, this.autovalidate = false, this.isSaving = false, this.isDeleting = false, this.outcome, this.actionFailure});
   
 
-/// The first of the month.
 @override final  DateTime month;
-/// The saved budget; null when the month has none.
 @override final  Budget? budget;
-/// The month's spending from the report, for a month without a budget.
 @override final  int? reportSpent;
-/// The limit in the field, in rupiah; 0 when empty.
 @override@JsonKey() final  int limit;
 /// The user changed the limit: a budget loading late no longer fills it.
 @override@JsonKey() final  bool limitTouched;
-/// The limit's error, shown under the field.
 @override final  FieldError? limitError;
-/// A save failed on the limit, so its error updates as the user types.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
 @override@JsonKey() final  bool isDeleting;
-/// Set once saved or removed; the screen closes.
 @override final  BudgetOutcome? outcome;
-/// Why a save or remove failed; shown once as a snackbar.
 @override final  BudgetFailure? actionFailure;
 
 /// Create a copy of BudgetState

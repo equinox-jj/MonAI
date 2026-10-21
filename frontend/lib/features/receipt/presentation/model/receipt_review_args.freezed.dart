@@ -15,11 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReceiptReviewArgs {
 
-/// The photo as taken or picked, saved with the transaction.
- String get photoPath;/// The text read on the phone, sent to the AI again on "Try again".
- String get ocrText; ReceiptDraft get draft;/// Why the AI gave no draft, so [draft] is empty for the user to fill
-/// in; null when it read the receipt.
- ReceiptAiFailure? get aiFailure;
+ String get photoPath; String get ocrText; ReceiptDraft get draft; ReceiptAiFailure? get aiFailure;
 /// Create a copy of ReceiptReviewArgs
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -231,13 +227,9 @@ class _ReceiptReviewArgs implements ReceiptReviewArgs {
   const _ReceiptReviewArgs({required this.photoPath, required this.ocrText, required this.draft, this.aiFailure});
   
 
-/// The photo as taken or picked, saved with the transaction.
 @override final  String photoPath;
-/// The text read on the phone, sent to the AI again on "Try again".
 @override final  String ocrText;
 @override final  ReceiptDraft draft;
-/// Why the AI gave no draft, so [draft] is empty for the user to fill
-/// in; null when it read the receipt.
 @override final  ReceiptAiFailure? aiFailure;
 
 /// Create a copy of ReceiptReviewArgs

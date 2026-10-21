@@ -3,8 +3,8 @@ import 'package:monai/core/model/wallet_type.dart';
 
 part 'wallet_input.freezed.dart';
 
-/// A new wallet as entered. With a [providerId], the server fills a blank
-/// [name] and a null [type] from the provider.
+/// With a [providerId], the server fills a blank [name] and a null [type] from
+/// the provider.
 @freezed
 abstract class WalletInput with _$WalletInput {
   const factory WalletInput({

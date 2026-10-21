@@ -2,44 +2,29 @@ import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Small, non-sensitive app settings kept on the device. Every
-/// [SharedPreferences] key lives behind this abstraction. None of them are
-/// cleared on sign out.
+/// Non-sensitive device settings. None of them are cleared on sign out.
 abstract interface class AppPreferences {
-  /// Whether onboarding was finished on this device.
   Future<bool> isOnboardingCompleted();
 
-  /// Remembers that onboarding was finished.
   Future<void> setOnboardingCompleted();
 
-  /// The picked theme; [AppThemeMode.system] until one is picked.
   Future<AppThemeMode> themeMode();
 
-  /// Remembers the picked theme.
   Future<void> setThemeMode(AppThemeMode mode);
 
-  /// The picked language; [AppLanguage.system] until one is picked.
   Future<AppLanguage> language();
 
-  /// Remembers the picked language.
   Future<void> setLanguage(AppLanguage language);
 
-  /// The last transaction searches, newest first.
   Future<List<String>> recentSearches();
 
-  /// Puts [query] first in [recentSearches], dropping an older copy of it and
-  /// the oldest past the limit. Blank text is ignored.
   Future<void> addRecentSearch(String query);
 
-  /// The name of the CSV separator last exported with, or null before the
-  /// first export.
   Future<String?> csvDelimiter();
 
-  /// Remembers the CSV separator by [name].
   Future<void> setCsvDelimiter(String name);
 }
 
-/// [AppPreferences] backed by [SharedPreferences].
 class SharedAppPreferences implements AppPreferences {
   const SharedAppPreferences(this._prefs);
 
@@ -50,8 +35,6 @@ class SharedAppPreferences implements AppPreferences {
   static const _kLanguage = 'language';
   static const _kRecentSearches = 'recent_searches';
   static const _kCsvDelimiter = 'csv_delimiter';
-
-  /// How many searches [recentSearches] keeps.
   static const recentSearchLimit = 5;
 
   @override

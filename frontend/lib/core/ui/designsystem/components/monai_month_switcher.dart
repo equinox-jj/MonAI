@@ -6,10 +6,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_radius.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 
-/// A pill with the shown month between previous and next arrows.
 class MonAIMonthSwitcher extends StatelessWidget {
-  /// Creates a month switcher. A null [onNext] disables the next arrow, e.g.
-  /// on the current month.
   const MonAIMonthSwitcher({
     required this.label,
     required this.previousTooltip,
@@ -19,13 +16,8 @@ class MonAIMonthSwitcher extends StatelessWidget {
     super.key,
   });
 
-  /// "October 2026".
   final String label;
-
-  /// Names the previous month for screen readers.
   final String previousTooltip;
-
-  /// Names the next month for screen readers.
   final String nextTooltip;
 
   final VoidCallback? onPrevious;

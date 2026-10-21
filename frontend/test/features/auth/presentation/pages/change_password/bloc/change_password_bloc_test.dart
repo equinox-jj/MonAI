@@ -47,7 +47,6 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  /// Submits the form and returns the settled state.
   Future<ChangePasswordState> submit(
     Either<Failure, SessionStatus> result, {
     ChangePasswordEvent event = _submitted,

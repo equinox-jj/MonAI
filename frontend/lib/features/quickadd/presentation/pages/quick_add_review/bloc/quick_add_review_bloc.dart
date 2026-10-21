@@ -28,14 +28,8 @@ part 'quick_add_review_bloc.freezed.dart';
 part 'quick_add_review_event.dart';
 part 'quick_add_review_state.dart';
 
-/// Steps through several quick-add drafts one at a time: each is checked,
-/// then saved or skipped. Fields quick add filled are marked until the user
-/// changes them. The amount and note live in the screen's text fields and
-/// arrive with their edits and the save; input is checked on save, then
-/// again on every change until it is valid.
 class QuickAddReviewBloc
     extends Bloc<QuickAddReviewEvent, QuickAddReviewState> {
-  /// [now] is the clock; tests pass a fixed one.
   QuickAddReviewBloc({
     required QuickAddReviewArgs args,
     required this._save,
@@ -74,7 +68,6 @@ class QuickAddReviewBloc
     );
   }
 
-  /// [state] showing draft [index], or done past the last one.
   static QuickAddReviewState _atDraft(QuickAddReviewState state, int index) {
     if (index >= state.drafts.length) {
       return state.copyWith(index: index, marks: const {}, errors: const {});
@@ -90,7 +83,6 @@ class QuickAddReviewBloc
     );
   }
 
-  /// A sparkle on what was read surely, a warning on the rest.
   static Map<QuickAddField, MonAIFieldMark> _marksOf(QuickAddDraft draft) {
     final confidence = draft.confidence;
     MonAIFieldMark of(double value) =>
@@ -206,8 +198,6 @@ class QuickAddReviewBloc
   void _onNoteEdited(_NoteEdited event, Emitter<QuickAddReviewState> emit) =>
       _edited(emit, QuickAddField.note, _input(amount: '', note: event.text));
 
-  /// A typed field loses its mark; once a save failed on the input, its
-  /// error is checked again with [input].
   void _edited(
     Emitter<QuickAddReviewState> emit,
     QuickAddField field,
@@ -228,7 +218,6 @@ class QuickAddReviewBloc
     );
   }
 
-  /// [next] with [field]'s mark and error removed: the user chose it.
   QuickAddReviewState _cleared(QuickAddField field, QuickAddReviewState next) =>
       next.copyWith(
         marks: {...next.marks}..remove(field),

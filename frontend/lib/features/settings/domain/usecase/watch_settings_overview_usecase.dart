@@ -9,11 +9,6 @@ import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_wallets_usecase.dart';
 import 'package:rxdart/rxdart.dart';
 
-/// The cached Settings hub for a month (the first of the month), rebuilt
-/// whenever the user, the month's budget, the categories or the wallets
-/// change.
-///
-/// A failed read of any section is passed on, and the stream keeps going.
 class WatchSettingsOverviewUseCase
     implements StreamUseCase<SettingsOverview, DateTime> {
   WatchSettingsOverviewUseCase({

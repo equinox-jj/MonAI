@@ -9,7 +9,6 @@ import 'package:monai/core/base/error/field_error.dart';
 export 'package:monai/core/base/error/failure.dart';
 export 'package:monai/core/base/error/field_error.dart';
 
-/// Converts a [DioException] into a typed [AppException].
 AppException mapDioException(DioException e) {
   switch (e.type) {
     case DioExceptionType.connectionTimeout:
@@ -86,8 +85,8 @@ AppException _mapResponse(Response<dynamic>? response) {
   }
 }
 
-/// The `Retry-After` header in whole seconds; null when absent, negative or
-/// an HTTP date (the backend only sends seconds).
+/// Whole seconds only; null when absent, negative or an HTTP date (the backend
+/// only sends seconds).
 Duration? _retryAfter(Response<dynamic>? response) {
   final seconds = int.tryParse(
     response?.headers.value('retry-after')?.trim() ?? '',
@@ -113,8 +112,6 @@ String? _extractCode(Object? data) {
   return null;
 }
 
-/// Parses `error.fields[]` of a 422 body into [FieldError]s. Returns an empty
-/// list when the body has no fields.
 List<FieldError> parseFieldErrors(Object? data) {
   if (data is! Map) return const [];
   final error = data['error'];
@@ -127,7 +124,6 @@ List<FieldError> parseFieldErrors(Object? data) {
   ];
 }
 
-/// Converts any thrown error (typically [AppException]) into a domain [Failure].
 Failure mapExceptionToFailure(Object error) {
   if (error is AppException) {
     final message = error.message;

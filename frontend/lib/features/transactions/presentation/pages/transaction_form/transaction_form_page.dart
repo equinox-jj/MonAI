@@ -27,8 +27,6 @@ class TransactionFormPage extends StatelessWidget {
   });
 
   final TransactionFormMode mode;
-
-  /// [ScreenPlacement.sideSheet] on tablet landscape.
   final ScreenPlacement placement;
 
   @override
@@ -42,8 +40,6 @@ class TransactionFormPage extends StatelessWidget {
   }
 }
 
-/// The add and edit form: type, amount on a keypad, category, wallet, date
-/// and note. Closing with unsaved changes asks first.
 class TransactionFormUI extends StatefulWidget {
   const TransactionFormUI({
     super.key,
@@ -322,7 +318,6 @@ class _FormBody extends StatelessWidget {
   }
 }
 
-/// Over a quick-add draft with unsure fields: asks the user to check them.
 class _QuickAddNote extends StatelessWidget {
   const _QuickAddNote();
 
@@ -358,7 +353,6 @@ class _Keypad extends StatelessWidget {
   }
 }
 
-/// Room for the keyboard under the Save button.
 class _KeyboardSpace extends StatelessWidget {
   const _KeyboardSpace();
 
@@ -390,7 +384,6 @@ class _NoteField extends StatelessWidget {
   }
 }
 
-/// Editing only: saving recalculates the totals.
 class _EditNote extends StatelessWidget {
   const _EditNote();
 

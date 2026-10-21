@@ -3,7 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/data/services/avatar_photo_service.dart';
 
-/// Where the new profile photo comes from, or removing it.
 class EditProfilePhotoSheet extends StatelessWidget {
   const EditProfilePhotoSheet({
     required this.hasPhoto,
@@ -12,7 +11,6 @@ class EditProfilePhotoSheet extends StatelessWidget {
     super.key,
   });
 
-  /// Offers "Remove photo" only when there is one.
   final bool hasPhoto;
   final ValueChanged<AvatarPhotoSource> onSource;
   final VoidCallback onRemove;

@@ -3,8 +3,7 @@ import 'package:monai/core/data/database/daos/transaction_dao.dart';
 import 'package:monai/core/model/transaction_type.dart';
 
 abstract class QuickaddLocalDataSource {
-  /// The category the user last gave a [type] transaction whose note or
-  /// merchant is [text] (lowercase, trimmed), or null.
+  /// [text] is lowercase and trimmed; null when the user never did.
   Future<String?> categoryForText(String text, TransactionType type);
 }
 

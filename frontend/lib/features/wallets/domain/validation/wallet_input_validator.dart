@@ -1,33 +1,27 @@
 import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/features/shared/domain/entity/wallet_input.dart';
 
-/// The one place wallet input is cleaned up. Use cases apply it once, then
+/// The one place wallet input is cleaned up: use cases apply it once, then
 /// validate and send the same values.
 extension WalletInputCleanup on WalletInput {
-  /// The name without surrounding spaces.
   WalletInput get normalized => copyWith(name: name.trim());
 }
 
-/// Checks a wallet form on the device with the backend's rules
-/// (`backend/internal/wallet/dto.go`). Errors use the server's field names,
-/// codes and params. Takes input already cleaned up by `normalized`.
+/// Mirrors the backend's rules (`backend/internal/wallet/dto.go`). Errors use
+/// the server's field names, codes and params. Takes input already cleaned up
+/// by `normalized`.
 abstract final class WalletInputValidator {
-  /// The longest name the server accepts, in characters.
   static const nameMax = 30;
-
-  /// The largest opening balance the server accepts, in rupiah.
   static const initialBalanceMax = 999999999999999;
 
   static final _color = RegExp(r'^#[0-9A-Fa-f]{6}$');
-
-  /// Field names as the API sends them in `error.fields[].field`.
   static const nameField = 'name';
   static const typeField = 'type';
   static const initialBalanceField = 'initial_balance';
   static const colorField = 'color';
 
-  /// The problems with [input], in field order; empty when valid. A wallet
-  /// linked to a provider may leave its name and type to the provider.
+  /// In field order; empty when valid. A wallet linked to a provider may leave
+  /// its name and type to the provider.
   static List<FieldError> validate(WalletInput input) {
     final custom = input.providerId == null;
     return [

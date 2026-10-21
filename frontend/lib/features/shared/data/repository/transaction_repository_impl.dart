@@ -225,7 +225,6 @@ class TransactionRepositoryImpl extends TransactionRepository
     cursor: cursor,
   );
 
-  /// The cursor of the next page; null on the last page.
   String? _nextCursor(TransactionListResponse response) =>
       (response.meta?.hasMore ?? false) ? response.meta?.nextCursor : null;
 

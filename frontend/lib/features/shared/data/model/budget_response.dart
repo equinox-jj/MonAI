@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'budget_response.freezed.dart';
 part 'budget_response.g.dart';
 
-/// `GET /budgets/{month}`.
 @freezed
 abstract class BudgetResponse with _$BudgetResponse {
   const factory BudgetResponse({

@@ -5,8 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/wallet_detail_actions.dart';
 
-/// Edit, Transfer and Archive tiles. The default wallet's Archive is off,
-/// with a note why.
 class WalletDetailButtons extends StatelessWidget {
   const WalletDetailButtons({required this.actions, super.key});
 

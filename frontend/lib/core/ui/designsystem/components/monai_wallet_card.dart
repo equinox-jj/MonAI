@@ -9,13 +9,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// A wallet on its gradient: monogram, name and the "Default" pill at the
-/// top, the balance at the bottom. Size it with its parent.
-///
-/// [compact] is the small tablet-grid card: smaller monogram, name and
-/// balance, no [balanceLabel].
 class MonAIWalletCard extends StatelessWidget {
-  /// Creates a wallet card.
   const MonAIWalletCard({
     required this.name,
     required this.monogram,
@@ -28,28 +22,13 @@ class MonAIWalletCard extends StatelessWidget {
     this.onTap,
   });
 
-  /// The wallet's name.
   final String name;
-
-  /// Two or three letters standing in for the logo.
   final String monogram;
-
-  /// The card colors.
   final WalletGradient gradient;
-
-  /// Already formatted, or the hidden-amount mask.
   final String balance;
-
-  /// A line above the balance, e.g. "Bank · balance".
   final String? balanceLabel;
-
-  /// The pill text when this is the default wallet; null hides the pill.
   final String? defaultLabel;
-
-  /// The small tablet-grid layout.
   final bool compact;
-
-  /// Opens the wallet.
   final VoidCallback? onTap;
 
   @override

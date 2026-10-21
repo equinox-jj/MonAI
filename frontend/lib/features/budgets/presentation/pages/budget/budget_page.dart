@@ -14,8 +14,6 @@ import 'package:monai/features/budgets/presentation/pages/budget/widgets/budget_
 
 class BudgetPage extends StatelessWidget {
   const BudgetPage({required this.month, super.key});
-
-  /// Any day in the budget's month.
   final DateTime month;
 
   @override
@@ -28,8 +26,6 @@ class BudgetPage extends StatelessWidget {
   }
 }
 
-/// A month's spending limit: typed or picked from presets, previewed against
-/// the month's spending, then saved or removed.
 class BudgetUI extends StatefulWidget {
   const BudgetUI({super.key});
 

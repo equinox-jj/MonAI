@@ -2,12 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-/// Ring segments clockwise from 12 o'clock, e.g. spending by category.
-///
-/// [shares] are percentages; [colors] has one color per share. Fills its
-/// parent's size; put labels on top with a [Stack].
+/// [shares] are percentages, one [colors] entry each, clockwise from 12
+/// o'clock. Fills its parent; put labels on top with a [Stack].
 class MonAIDonut extends StatelessWidget {
-  /// Creates a donut.
   const MonAIDonut({
     required this.shares,
     required this.colors,
@@ -16,16 +13,9 @@ class MonAIDonut extends StatelessWidget {
     this.semanticsLabel,
   });
 
-  /// Each segment's percentage of the ring.
   final List<double> shares;
-
-  /// One color per share.
   final List<Color> colors;
-
-  /// The ring's thickness.
   final double stroke;
-
-  /// Read out in place of the drawing.
   final String? semanticsLabel;
 
   @override
@@ -48,7 +38,6 @@ class _DonutPainter extends CustomPainter {
     required this.stroke,
   });
 
-  /// Gap between segments, in degrees.
   static const _gapDegrees = 1.5;
 
   final List<double> shares;

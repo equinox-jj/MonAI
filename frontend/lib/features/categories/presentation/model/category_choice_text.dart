@@ -1,8 +1,6 @@
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// Spoken names of the form's icons and colors.
 extension CategoryChoiceText on AppLocalizations {
-  /// The name of a Material Symbols [icon] from the icon grid.
   String categoryIconName(String icon) => switch (icon) {
     'local_cafe' => categoryIconLocalCafe,
     'restaurant' => categoryIconRestaurant,
@@ -24,7 +22,6 @@ extension CategoryChoiceText on AppLocalizations {
     _ => categoryIconCategory,
   };
 
-  /// The name of a `#RRGGBB` [color] from the swatches.
   String categoryColorName(String color) => switch (color) {
     '#F97316' => categoryColorOrange,
     '#0EA5E9' => categoryColorSky,

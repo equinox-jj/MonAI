@@ -17,8 +17,6 @@ part 'transaction_detail_bloc.freezed.dart';
 part 'transaction_detail_event.dart';
 part 'transaction_detail_state.dart';
 
-/// One transaction: the cached copy at once, refreshed from the API. It
-/// closes once the transaction is gone, deleted here or anywhere else.
 class TransactionDetailBloc
     extends Bloc<TransactionDetailEvent, TransactionDetailState> {
   TransactionDetailBloc({
@@ -35,7 +33,6 @@ class TransactionDetailBloc
     on<_LookupsChanged>(_onLookupsChanged);
   }
 
-  /// The transaction shown.
   final String id;
 
   final WatchTransactionUseCase _watchTransaction;

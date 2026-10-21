@@ -4,7 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/repository/wallet_repository.dart';
 
-/// One wallet by id; null when it isn't cached.
 class WatchWalletUseCase implements StreamUseCase<Wallet?, String> {
   WatchWalletUseCase(this._repository);
 

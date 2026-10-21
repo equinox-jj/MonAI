@@ -29,10 +29,7 @@ part 'wallet_detail_bloc.freezed.dart';
 part 'wallet_detail_event.dart';
 part 'wallet_detail_state.dart';
 
-/// One wallet: its balance, this month's money out by day and this month's
-/// transactions. Shows the cache at once and refreshes in the background.
 class WalletDetailBloc extends Bloc<WalletDetailEvent, WalletDetailState> {
-  /// [now] is the clock; tests pass a fixed one.
   WalletDetailBloc({
     required String id,
     required this._watchWallet,
@@ -131,8 +128,6 @@ class WalletDetailBloc extends Bloc<WalletDetailEvent, WalletDetailState> {
     Emitter<WalletDetailState> emit,
   ) => _refresh(emit);
 
-  /// Re-fetches the wallet and its month. Only the wallet's result is
-  /// reported: the list is best effort.
   Future<void> _refresh(Emitter<WalletDetailState> emit) async {
     if (state.isRefreshing) return;
     emit(state.copyWith(isRefreshing: true));
@@ -238,7 +233,6 @@ class WalletDetailBloc extends Bloc<WalletDetailEvent, WalletDetailState> {
     emit(state.copyWith(wallets: {for (final w in event.wallets) w.id: w}));
   }
 
-  /// Reports [failure] once and ends what was running.
   void _fail(
     Emitter<WalletDetailState> emit,
     Failure failure, {
@@ -257,7 +251,6 @@ class WalletDetailBloc extends Bloc<WalletDetailEvent, WalletDetailState> {
     emit(state.copyWith(actionFailure: null));
   }
 
-  /// [state] with the status its data calls for.
   static WalletDetailState _settled(WalletDetailState state) => state.copyWith(
     status: switch (state) {
       WalletDetailState(wallet: _?) => UiStatus.success,

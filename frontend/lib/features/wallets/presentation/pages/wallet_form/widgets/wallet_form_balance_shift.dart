@@ -5,7 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
 
-/// Editing the starting balance: how the current balance moves with it.
 class WalletFormBalanceShift extends StatelessWidget {
   const WalletFormBalanceShift({super.key});
 

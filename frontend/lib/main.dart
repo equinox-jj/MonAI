@@ -22,8 +22,6 @@ class MyApp extends StatelessWidget {
   const MyApp({required this.router, required this.appSettings, super.key});
 
   final GoRouter router;
-
-  /// The picked theme and language.
   final AppSettingsCubit appSettings;
 
   @override

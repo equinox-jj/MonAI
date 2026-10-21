@@ -6,16 +6,10 @@ import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// The app's light and dark [ThemeData].
-///
-/// No dynamic color: the design is brand-colored in both modes. Both themes
-/// carry [MonAIColors] and [MonAITextStyles] as extensions, and stock Material
-/// widgets are themed to match the design's colors, type and shapes.
+/// No dynamic color: the design is brand-colored in both modes.
 abstract final class MonAITheme {
-  /// The light theme.
   static ThemeData light() => _build(MonAIColors.light);
 
-  /// The dark theme.
   static ThemeData dark() => _build(MonAIColors.dark);
 
   static ThemeData _build(MonAIColors c) {

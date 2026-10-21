@@ -4,7 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/repository/user_repository.dart';
 
-/// Re-fetches the signed-in user.
 class RefreshUserUseCase implements UseCase<User, NoParams> {
   RefreshUserUseCase(this._repository);
 

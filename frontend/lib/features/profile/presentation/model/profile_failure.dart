@@ -1,30 +1,17 @@
 import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// Why a profile change failed, as the user is told in a snackbar.
 enum ProfileFailure {
-  /// No connection or a timeout.
   network,
-
-  /// Too many attempts; the server asks to wait.
   rateLimited,
 
   /// The only admin can't delete their account.
   lastAdmin,
-
-  /// The photo stays over the upload limit even compressed.
   photoTooLarge,
-
-  /// The photo isn't a JPEG, PNG or WebP.
   photoUnsupported,
-
-  /// The photo file couldn't be opened.
   unreadablePhoto,
-
-  /// Anything else.
   unexpected;
 
-  /// The kind of [failure].
   static ProfileFailure of(Failure failure) => switch (failure) {
     NetworkFailure() || TimeoutFailure() => network,
     TooManyRequestsFailure() => rateLimited,
@@ -53,5 +40,4 @@ enum ProfileFailure {
   };
 }
 
-/// A change that went through, confirmed in a snackbar.
 enum ProfileNotice { nameSaved, photoUpdated, photoRemoved }

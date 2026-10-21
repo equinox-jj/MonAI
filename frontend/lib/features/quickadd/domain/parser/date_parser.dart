@@ -1,6 +1,5 @@
 import 'package:monai/features/quickadd/domain/parser/text_span.dart';
 
-/// A date found in lowercase quick-add text, with the characters it covers.
 class DateMatch {
   const DateMatch(this.date, this.span, this.confidence);
 
@@ -134,7 +133,6 @@ abstract final class DateParser {
     ),
   ];
 
-  /// The first date in [text], or null. [today] is local midnight.
   static DateMatch? find(String text, DateTime today) {
     for (final (regex, resolve) in _rules) {
       for (final match in regex.allMatches(text)) {

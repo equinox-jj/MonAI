@@ -8,7 +8,6 @@ import 'package:monai/features/categories/domain/validation/category_input_valid
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_field_error_text.dart';
 
-/// The name, with its type and length under it, or its error.
 class CategoryFormNameField extends StatelessWidget {
   const CategoryFormNameField({
     required this.controller,

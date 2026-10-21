@@ -4,8 +4,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/search/bloc/search_bloc.dart';
 
-/// While the search box is blank: the recent searches, or what to search
-/// for when there are none.
 class SearchRecent extends StatelessWidget {
   const SearchRecent({required this.onUse, super.key});
 

@@ -5,9 +5,6 @@ import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_wallet_avatar.dart';
 
-/// "All wallets" and every wallet, archived ones too; Apply sends the choice
-/// (null for all) to [onApply] and closes. Show it with
-/// [showMonAIBottomSheet].
 class TransactionWalletFilterSheet extends StatefulWidget {
   const TransactionWalletFilterSheet({
     required this.wallets,

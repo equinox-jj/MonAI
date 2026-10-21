@@ -12,8 +12,6 @@ import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/walle
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_mode.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
 
-/// The wallets feature's use cases and blocs; its repository is shared (see
-/// `SharedDI`).
 class WalletsDI {
   WalletsDI._();
 

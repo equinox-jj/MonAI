@@ -6,7 +6,6 @@ import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/bloc/quick_add_bloc.dart';
 
-/// The phrase input with what was understood as chips under it.
 class QuickAddPhrase extends StatelessWidget {
   const QuickAddPhrase({
     required this.controller,
@@ -16,7 +15,6 @@ class QuickAddPhrase extends StatelessWidget {
     super.key,
   });
 
-  /// The API's limit.
   static const _maxLength = 300;
 
   final TextEditingController controller;

@@ -16,8 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$QuickAddDraft {
 
  TransactionType get type;/// Local midnight.
- DateTime get date;/// Rupiah.
- int? get amount; String? get walletId;/// Transfers only.
+ DateTime get date; int? get amount; String? get walletId;/// Transfers only.
  String? get toWalletId;/// Expense and income only.
  String? get categoryId; String? get note; String? get merchant; DraftConfidence get confidence;
 /// Create a copy of QuickAddDraft
@@ -239,7 +238,6 @@ class _QuickAddDraft implements QuickAddDraft {
 @override final  TransactionType type;
 /// Local midnight.
 @override final  DateTime date;
-/// Rupiah.
 @override final  int? amount;
 @override final  String? walletId;
 /// Transfers only.

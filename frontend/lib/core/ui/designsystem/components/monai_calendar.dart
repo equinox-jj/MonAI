@@ -6,11 +6,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// A month of days on the [shownMonth] page, with [selected] filled and
-/// [today] outlined. Days after [today] can't be picked, and it only pages
-/// back from the current month. Draws only the weeks the month needs.
 class MonAICalendar extends StatelessWidget {
-  /// Creates a calendar.
   const MonAICalendar({
     required this.selected,
     required this.shownMonth,
@@ -21,25 +17,12 @@ class MonAICalendar extends StatelessWidget {
     super.key,
   });
 
-  /// The day grid, for tests.
   static const daysKey = ValueKey('monai-calendar-days');
-
-  /// The picked day.
   final DateTime selected;
-
-  /// Any day in the month on screen.
   final DateTime shownMonth;
-
-  /// The last day that can be picked.
   final DateTime today;
-
-  /// Called with the tapped day.
   final ValueChanged<DateTime> onSelect;
-
-  /// Called with the first of the month to page to.
   final ValueChanged<DateTime> onShowMonth;
-
-  /// The screen-reader label of a future day, from its full date.
   final String Function(String date) dayUnavailableLabel;
 
   @override

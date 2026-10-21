@@ -5,7 +5,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/budgets/domain/logic/budget_presets.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_bloc.dart';
 
-/// Quick limits in one row; the one matching the field is selected.
 class BudgetPresets extends StatelessWidget {
   const BudgetPresets({required this.onPick, super.key});
 

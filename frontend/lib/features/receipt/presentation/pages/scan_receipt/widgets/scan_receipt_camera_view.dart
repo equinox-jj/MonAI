@@ -6,8 +6,6 @@ import 'package:monai/features/receipt/presentation/pages/scan_receipt/bloc/scan
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_phase.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_frame.dart';
 
-/// The viewfinder: the live preview with the receipt frame, or why the
-/// camera can't be used; the gallery and "Type instead" work either way.
 class ScanReceiptCameraView extends StatelessWidget {
   const ScanReceiptCameraView({
     required this.preview,
@@ -19,7 +17,6 @@ class ScanReceiptCameraView extends StatelessWidget {
     super.key,
   });
 
-  /// Builds the live camera preview.
   final Widget Function() preview;
   final VoidCallback onClose;
   final VoidCallback onToggleFlash;
@@ -137,7 +134,6 @@ class _Header extends StatelessWidget {
   }
 }
 
-/// A 44 white icon on a translucent black circle, for use over the camera.
 class ScanReceiptRoundButton extends StatelessWidget {
   const ScanReceiptRoundButton({
     required this.icon,
@@ -345,7 +341,6 @@ class _GalleryButton extends StatelessWidget {
   }
 }
 
-/// The white shutter ring; dimmed while it can't take a photo.
 class _Shutter extends StatelessWidget {
   const _Shutter({required this.label, required this.onPressed});
 

@@ -9,7 +9,6 @@ import 'package:monai/features/settings/domain/entity/admin_payment_provider.dar
 /// catalog's ETag on their next refresh. Every call needs a
 /// `payment_provider.*` permission; without it the API answers 403.
 abstract class AdminProviderRepository {
-  /// Every provider, inactive ones included, by sort order then name.
   Future<Either<Failure, List<AdminPaymentProvider>>> listProviders();
 
   Future<Either<Failure, AdminPaymentProvider>> getProvider(String id);
@@ -29,13 +28,10 @@ abstract class AdminProviderRepository {
     required bool active,
   });
 
-  /// Removes the provider and frees its aliases.
   Future<Either<Failure, Unit>> deleteProvider(String id);
 
-  /// The picked image at [path] shrunk to a logo the API accepts.
   Future<Either<Failure, Uint8List>> compressLogo(String path);
 
-  /// Makes [bytes] provider [id]'s logo.
   Future<Either<Failure, AdminPaymentProvider>> uploadLogo(
     String id,
     Uint8List bytes,

@@ -29,11 +29,8 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-/// The profile card and the Money, App, Admin and Account groups.
 class SettingsUI extends StatelessWidget {
   const SettingsUI({super.key});
-
-  /// Wide windows keep the list at a readable width.
   static const _maxContentWidth = 720.0;
 
   void _openProfile(BuildContext context) => context.push(AppRoutes.profile);

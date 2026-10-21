@@ -326,8 +326,6 @@ class $TransactionsTable extends Transactions
 class TransactionRow extends DataClass implements Insertable<TransactionRow> {
   final String id;
   final TransactionType type;
-
-  /// Rupiah, always positive; [type] gives the direction.
   final int amount;
   final String walletId;
   final String? toWalletId;
@@ -1343,11 +1341,7 @@ class WalletRow extends DataClass implements Insertable<WalletRow> {
   final String name;
   final WalletType type;
   final String? logoUrl;
-
-  /// Rupiah.
   final int initialBalance;
-
-  /// Rupiah.
   final int currentBalance;
   final String? icon;
   final String? color;
@@ -2845,14 +2839,8 @@ class $BudgetsTable extends Budgets with TableInfo<$BudgetsTable, BudgetRow> {
 
 class BudgetRow extends DataClass implements Insertable<BudgetRow> {
   final DateTime month;
-
-  /// Rupiah.
   final int limitAmount;
-
-  /// Rupiah, the month's expenses.
   final int spent;
-
-  /// Rupiah; negative when over budget.
   final int remaining;
   final double progressPercent;
   final BudgetStatus status;
@@ -4053,20 +4041,12 @@ class $MonthlyReportsTable extends MonthlyReports
 class MonthlyReportRow extends DataClass
     implements Insertable<MonthlyReportRow> {
   final DateTime month;
-
-  /// Rupiah.
   final int incomeTotal;
-
-  /// Rupiah.
   final int expenseTotal;
-
-  /// Rupiah, income minus expenses.
   final int net;
   final DateTime previousMonth;
   final int previousIncomeTotal;
   final int previousExpenseTotal;
-
-  /// Null when the previous month had no expenses.
   final double? expenseChangePercent;
   const MonthlyReportRow({
     required this.month,
@@ -4665,15 +4645,9 @@ class ReportCategoryRow extends DataClass
   final String name;
   final String? icon;
   final String? color;
-
-  /// Rupiah.
   final int amount;
   final double sharePercent;
-
-  /// Rupiah.
   final int previousAmount;
-
-  /// Null when the category had no expenses the previous month.
   final double? changePercent;
   const ReportCategoryRow({
     required this.month,

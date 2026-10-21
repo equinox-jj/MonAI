@@ -3,37 +3,27 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_phase.dart';
 
-/// The scanner's back camera. An interface so screen tests run without the
-/// platform plugin.
+/// An interface so screen tests run without the platform plugin.
 abstract class ReceiptCamera {
-  /// Opens the camera, asking for permission the first time.
   Future<CameraStatus> open();
 
-  /// Frees the camera, e.g. while the app is in the background.
   Future<void> close();
 
-  /// Takes a photo and gives its file path. Throws when it fails.
   Future<String> takePicture();
 
-  /// Turns the flash on or off for the next photo.
   Future<void> setFlash({required bool on});
 
-  /// The live preview filling its box; empty until [open] succeeds.
   Widget preview();
 }
 
-/// Picks a photo from the gallery; null when nothing was picked.
 typedef PickReceiptPhoto = Future<String?> Function();
 
-/// The system photo picker, which needs no storage permission.
 Future<String?> pickReceiptFromGallery() async =>
     (await ImagePicker().pickImage(source: ImageSource.gallery))?.path;
 
-/// [ReceiptCamera] backed by the `camera` plugin.
 class PluginReceiptCamera implements ReceiptCamera {
   CameraController? _controller;
 
-  /// The plugin's codes for a refused or restricted permission.
   static const _deniedCodes = {
     'CameraAccessDenied',
     'CameraAccessDeniedWithoutPrompt',

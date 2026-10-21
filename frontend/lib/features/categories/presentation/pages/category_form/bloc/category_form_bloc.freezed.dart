@@ -497,17 +497,7 @@ as String,
 /// @nodoc
 mixin _$CategoryFormState {
 
- CategoryFormMode get mode;/// [UiStatus.loading] while the edited category loads, otherwise
-/// [UiStatus.success].
- UiStatus get status;/// The category's type; an edited one keeps its own.
- CategoryType get type;/// The category being edited.
- Category? get original; String get icon; String get color;/// The name's error, shown under the field.
- FieldError? get nameError;/// A save failed on the name, so its error updates as the user types.
- bool get autovalidate; bool get isSaving;/// Set once saved, or when the edited category is gone; the screen
-/// closes.
- bool get done;/// Why a save failed, or why the form closed early; shown once as a
-/// snackbar.
- CategoryFailure? get actionFailure;
+ CategoryFormMode get mode; UiStatus get status; CategoryType get type; Category? get original; String get icon; String get color; FieldError? get nameError; bool get autovalidate; bool get isSaving; bool get done; CategoryFailure? get actionFailure;
 /// Create a copy of CategoryFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -739,25 +729,15 @@ class _CategoryFormState implements CategoryFormState {
   
 
 @override final  CategoryFormMode mode;
-/// [UiStatus.loading] while the edited category loads, otherwise
-/// [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// The category's type; an edited one keeps its own.
 @override final  CategoryType type;
-/// The category being edited.
 @override final  Category? original;
 @override@JsonKey() final  String icon;
 @override@JsonKey() final  String color;
-/// The name's error, shown under the field.
 @override final  FieldError? nameError;
-/// A save failed on the name, so its error updates as the user types.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
-/// Set once saved, or when the edited category is gone; the screen
-/// closes.
 @override@JsonKey() final  bool done;
-/// Why a save failed, or why the form closed early; shown once as a
-/// snackbar.
 @override final  CategoryFailure? actionFailure;
 
 /// Create a copy of CategoryFormState

@@ -9,7 +9,6 @@ analyzer:
     - windows/**
     - macos/**
     - linux/**
-    - "bricks/**"
     - "**/*.g.dart"
     - "**/*.freezed.dart"
     - "lib/generated/**"

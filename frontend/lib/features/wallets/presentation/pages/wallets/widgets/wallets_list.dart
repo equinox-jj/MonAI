@@ -8,8 +8,6 @@ import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallet
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_total_card.dart';
 import 'package:monai/features/wallets/presentation/widgets/wallet_card.dart';
 
-/// The total card, a card per wallet and the archived wallets' button.
-/// [showSelection] rings the wallet shown beside the list.
 class WalletsListSliver extends StatelessWidget {
   const WalletsListSliver({
     required this.actions,
@@ -34,7 +32,6 @@ class WalletsListSliver extends StatelessWidget {
             (state.wallets, showSelection ? state.shownId : null),
         builder: (context, selected) {
           final (wallets, selectedId) = selected;
-          // The total card, the wallets, then the archived button.
           return SliverList.separated(
             itemCount: wallets.length + 2,
             separatorBuilder: (_, _) => const SizedBox(height: MonAISpacing.x4),
@@ -62,7 +59,6 @@ class WalletsListSliver extends StatelessWidget {
   }
 }
 
-/// Rings the wallet shown beside the list.
 class _SelectableCard extends StatelessWidget {
   const _SelectableCard({required this.selected, required this.child});
 
@@ -89,7 +85,6 @@ class _SelectableCard extends StatelessWidget {
   }
 }
 
-/// "Show N archived wallets"; nothing while none are archived.
 class _ArchivedButton extends StatelessWidget {
   const _ArchivedButton({required this.onTap});
 

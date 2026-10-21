@@ -6,8 +6,6 @@ import 'package:monai/features/categories/domain/logic/category_choices.dart';
 import 'package:monai/features/categories/presentation/model/category_choice_text.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
 
-/// The icons to pick from, six to a row; the picked one in the category's
-/// color.
 class CategoryFormIconGrid extends StatelessWidget {
   const CategoryFormIconGrid({required this.onPick, super.key});
 

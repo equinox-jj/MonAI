@@ -5,7 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/widgets/onboarding_hero.dart';
 
-/// One page: the illustration, then the title and body.
 class OnboardingStepContent extends StatelessWidget {
   const OnboardingStepContent({required this.step, super.key});
 

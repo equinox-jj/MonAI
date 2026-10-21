@@ -435,15 +435,7 @@ as bool,
 /// @nodoc
 mixin _$ManageProvidersState {
 
-/// [UiStatus.loading] until the first load lands; [UiStatus.failure]
-/// when it failed and nothing is shown.
- UiStatus get status;/// Every provider, by sort order.
- List<AdminPaymentProvider> get providers; String get query;/// A pull-to-refresh is running over a shown list.
- bool get isRefreshing;/// Why the first load failed.
- ProviderFailure? get loadFailure;/// Why a reload over a shown list failed; shown once as a message.
- ProviderFailure? get refreshFailure;/// The user may add providers.
- bool get canCreate;/// The user may open a provider to change it.
- bool get canEdit;
+ UiStatus get status; List<AdminPaymentProvider> get providers; String get query; bool get isRefreshing; ProviderFailure? get loadFailure; ProviderFailure? get refreshFailure; bool get canCreate; bool get canEdit;
 /// Create a copy of ManageProvidersState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -650,12 +642,8 @@ class _ManageProvidersState implements ManageProvidersState {
   const _ManageProvidersState({this.status = UiStatus.initial,  List<AdminPaymentProvider> providers = const [], this.query = '', this.isRefreshing = false, this.loadFailure, this.refreshFailure, this.canCreate = false, this.canEdit = false}): _providers = providers;
   
 
-/// [UiStatus.loading] until the first load lands; [UiStatus.failure]
-/// when it failed and nothing is shown.
 @override@JsonKey() final  UiStatus status;
-/// Every provider, by sort order.
  final  List<AdminPaymentProvider> _providers;
-/// Every provider, by sort order.
 @override@JsonKey() List<AdminPaymentProvider> get providers {
   if (_providers is EqualUnmodifiableListView) return _providers;
   // ignore: implicit_dynamic_type
@@ -663,15 +651,10 @@ class _ManageProvidersState implements ManageProvidersState {
 }
 
 @override@JsonKey() final  String query;
-/// A pull-to-refresh is running over a shown list.
 @override@JsonKey() final  bool isRefreshing;
-/// Why the first load failed.
 @override final  ProviderFailure? loadFailure;
-/// Why a reload over a shown list failed; shown once as a message.
 @override final  ProviderFailure? refreshFailure;
-/// The user may add providers.
 @override@JsonKey() final  bool canCreate;
-/// The user may open a provider to change it.
 @override@JsonKey() final  bool canEdit;
 
 /// Create a copy of ManageProvidersState

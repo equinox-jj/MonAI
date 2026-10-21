@@ -3,9 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_field.dart';
 
-/// A labelled field of the review, tinted by how it was filled: indigo
-/// with a sparkle when the AI read it surely, amber with a warning when the
-/// user should check it, red with the message when it is invalid.
 class ReceiptReviewFieldBox extends StatelessWidget {
   const ReceiptReviewFieldBox({
     required this.label,
@@ -21,20 +18,10 @@ class ReceiptReviewFieldBox extends StatelessWidget {
   static const _height = 52.0;
 
   final String label;
-
-  /// The value: text, or a text field.
   final Widget child;
-
-  /// How the AI filled it; null once the user changed it.
   final FieldMark? mark;
-
-  /// The field's error message.
   final String? error;
-
-  /// A widget before the value, e.g. the category's icon.
   final Widget? leading;
-
-  /// Opens a picker. Null for a text field.
   final VoidCallback? onTap;
 
   final double height;
@@ -131,8 +118,8 @@ class ReceiptReviewFieldBox extends StatelessWidget {
   }
 }
 
-/// A text field drawn without a frame of its own, for inside
-/// [ReceiptReviewFieldBox]; the app's input theme would add a second box.
+/// For a text field inside [ReceiptReviewFieldBox]; the app's input theme
+/// would draw a second box.
 InputDecoration receiptBareDecoration({String? hint, TextStyle? hintStyle}) =>
     InputDecoration(
       isCollapsed: true,

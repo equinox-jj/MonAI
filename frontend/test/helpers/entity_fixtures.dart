@@ -187,6 +187,5 @@ AdminPaymentProvider adminProvider({
   logoUrl: logoUrl,
 );
 
-/// A user holding [permissions], e.g. `payment_provider.create`.
 User userWith(Set<String> permissions) =>
     user().copyWith(permissions: permissions);

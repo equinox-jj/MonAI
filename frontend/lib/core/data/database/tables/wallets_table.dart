@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:monai/core/model/wallet_type.dart';
 
-/// The user's wallets, balances as calculated by the server.
 @DataClassName('WalletRow')
 class Wallets extends Table {
   TextColumn get id => text()();
@@ -10,10 +9,8 @@ class Wallets extends Table {
   TextColumn get type => textEnum<WalletType>()();
   TextColumn get logoUrl => text().nullable()();
 
-  /// Rupiah.
   IntColumn get initialBalance => integer()();
 
-  /// Rupiah.
   IntColumn get currentBalance => integer()();
   TextColumn get icon => text().nullable()();
   TextColumn get color => text().nullable()();

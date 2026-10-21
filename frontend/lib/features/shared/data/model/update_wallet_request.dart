@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'update_wallet_request.freezed.dart';
 part 'update_wallet_request.g.dart';
 
-/// `PATCH /wallets/{id}`. Only the fields that are set are sent.
+/// Only the fields that are set are sent.
 @freezed
 abstract class UpdateWalletRequest with _$UpdateWalletRequest {
   const factory UpdateWalletRequest({

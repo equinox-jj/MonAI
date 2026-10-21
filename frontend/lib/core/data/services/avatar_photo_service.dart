@@ -2,18 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 
-/// Where a new profile photo comes from.
 enum AvatarPhotoSource { camera, gallery }
 
-/// Picks a photo for the profile and crops it square, with the platform's
-/// camera, photo picker and cropper.
 abstract class AvatarPhotoService {
-  /// The path of a photo taken or picked from [source], or null when the
-  /// user cancelled. The system photo picker needs no storage permission.
+  /// Null when the user cancelled. The system photo picker needs no storage
+  /// permission.
   Future<String?> pick(AvatarPhotoSource source);
 
-  /// The path of [path] cropped to a square, or null when the user
-  /// cancelled. [title], [done] and [cancel] are the cropper's words.
   Future<String?> cropSquare(
     String path, {
     required String title,
@@ -22,7 +17,6 @@ abstract class AvatarPhotoService {
   });
 }
 
-/// [AvatarPhotoService] backed by `image_picker` and `image_cropper`.
 class AvatarPhotoServiceImpl implements AvatarPhotoService {
   AvatarPhotoServiceImpl({ImagePicker? picker, ImageCropper? cropper})
     : _picker = picker ?? ImagePicker(),

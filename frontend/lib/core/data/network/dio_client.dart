@@ -4,7 +4,6 @@ import 'package:monai/core/data/network/interceptors/auth_interceptor.dart';
 import 'package:monai/core/data/network/interceptors/logger_interceptor.dart';
 import 'package:monai/core/data/network/interceptors/unauthorized_interceptor.dart';
 
-/// Builds and owns the configured [Dio] instance used across the app.
 class DioClient {
   DioClient({
     required AuthInterceptor authInterceptor,
@@ -27,6 +26,5 @@ class DioClient {
       ]);
   }
 
-  /// The configured Dio instance.
   final Dio dio;
 }

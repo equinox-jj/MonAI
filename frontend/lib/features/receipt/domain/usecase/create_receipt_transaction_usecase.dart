@@ -11,12 +11,10 @@ import 'package:monai/features/shared/domain/usecase/create_transaction_usecase.
 import 'package:monai/features/shared/domain/usecase/upload_receipt_usecase.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 
-/// Saves a scanned receipt: checks the input, uploads the compressed photo,
-/// then creates the transaction with it. Invalid input fails as
-/// [ValidationFailure] before anything is uploaded.
+/// Uploads the compressed photo, then creates the transaction with it. Invalid
+/// input fails as [ValidationFailure] before anything is uploaded.
 class CreateReceiptTransactionUseCase
     implements UseCase<Transaction, CreateReceiptTransactionParams> {
-  /// [now] is the clock; tests pass a fixed one.
   CreateReceiptTransactionUseCase({
     required this._repository,
     required this._upload,
@@ -62,7 +60,6 @@ class CreateReceiptTransactionUseCase
   }
 }
 
-/// A scanned receipt's transaction and the photo to save with it.
 class CreateReceiptTransactionParams {
   const CreateReceiptTransactionParams({
     required this.input,
@@ -70,7 +67,5 @@ class CreateReceiptTransactionParams {
   });
 
   final TransactionInput input;
-
-  /// The photo as taken or picked; it is compressed before the upload.
   final String photoPath;
 }

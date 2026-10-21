@@ -4,9 +4,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// The categories in an Expense and an Income group; Apply sends the choice
-/// (null for all) to [onApply] and closes. Show it with
-/// [showMonAIBottomSheet].
 class TransactionCategoryFilterSheet extends StatefulWidget {
   const TransactionCategoryFilterSheet({
     required this.categories,
@@ -136,8 +133,6 @@ class _CategoryGroup extends StatelessWidget {
   }
 }
 
-/// A category as a pill: its icon in a tinted circle and its name, checked
-/// when [selected].
 class CategoryChoiceChip extends StatelessWidget {
   const CategoryChoiceChip({
     required this.category,

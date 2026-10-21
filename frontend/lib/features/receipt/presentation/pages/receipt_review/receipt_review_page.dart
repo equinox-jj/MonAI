@@ -33,8 +33,6 @@ class ReceiptReviewPage extends StatelessWidget {
   }
 }
 
-/// A scanned receipt's draft to check and save with its photo. One column
-/// on phones; the photo beside the draft on tablet landscape.
 class ReceiptReviewUI extends StatefulWidget {
   const ReceiptReviewUI({required this.args, super.key});
 
@@ -85,7 +83,6 @@ class _ReceiptReviewUIState extends State<ReceiptReviewUI> {
 
   void _retryParse() => _bloc.add(const ReceiptReviewEvent.retryRequested());
 
-  /// A new draft from "Try again" fills the text fields too.
   void _refillFields(BuildContext context, ReceiptReviewState state) {
     final draft = state.draft;
     _amount.text = switch (draft.amount) {
@@ -102,7 +99,6 @@ class _ReceiptReviewUIState extends State<ReceiptReviewUI> {
     }
   }
 
-  /// Back to the scanner, which opens the camera again.
   void _retake() => context.pop();
 
   void _openCategoryPicker() {
@@ -296,7 +292,6 @@ class _ReceiptReviewUIState extends State<ReceiptReviewUI> {
   }
 }
 
-/// The draft's fields; [wide] pairs them up beside the photo.
 class _DraftForm extends StatelessWidget {
   const _DraftForm({
     required this.wide,
@@ -388,7 +383,6 @@ class _Pair extends StatelessWidget {
   }
 }
 
-/// "Save expense" or "Save income", spinning while it saves.
 class _SaveButton extends StatelessWidget {
   const _SaveButton({required this.onSave, this.size = MonAIButtonSize.large});
 

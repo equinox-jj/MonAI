@@ -5,7 +5,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// "Today · Sat, 10 Oct" above a day's transactions, with the day's net.
 class TransactionDayHeader extends StatelessWidget {
   const TransactionDayHeader({
     required this.day,
@@ -16,8 +15,6 @@ class TransactionDayHeader extends StatelessWidget {
 
   final DateTime day;
   final DateTime today;
-
-  /// Income minus expenses; left out when null.
   final int? net;
 
   @override

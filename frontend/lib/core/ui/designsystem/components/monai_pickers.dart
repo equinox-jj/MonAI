@@ -11,10 +11,8 @@ import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 
-/// One choice of a [MonAIRadioPickerSheet], e.g. a wallet.
 @immutable
 class MonAIRadioPickerOption {
-  /// Creates an option.
   const MonAIRadioPickerOption({
     required this.id,
     required this.title,
@@ -23,26 +21,14 @@ class MonAIRadioPickerOption {
     this.leading,
   });
 
-  /// Sent to `onPick` when this option is chosen.
   final String id;
-
-  /// The option's name.
   final String title;
-
-  /// A second line, e.g. a balance.
   final String? subtitle;
-
-  /// A tag after the title, e.g. "DEFAULT".
   final String? tag;
-
-  /// A widget at the start, e.g. a monogram.
   final Widget? leading;
 }
 
-/// A list of radio options with a note under it; Done sends the pick to
-/// [onPick] and closes. Show it with [showMonAIBottomSheet].
 class MonAIRadioPickerSheet extends StatefulWidget {
-  /// Creates a radio picker.
   const MonAIRadioPickerSheet({
     required this.options,
     required this.selectedId,
@@ -52,19 +38,10 @@ class MonAIRadioPickerSheet extends StatefulWidget {
     this.note,
   });
 
-  /// The choices, in order.
   final List<MonAIRadioPickerOption> options;
-
-  /// The choice the sheet opens with.
   final String? selectedId;
-
-  /// Gets the chosen id on Done.
   final ValueChanged<String> onPick;
-
-  /// The Done button's text.
   final String doneLabel;
-
-  /// Small text under the list, e.g. why some options are missing.
   final String? note;
 
   @override
@@ -129,10 +106,8 @@ class _MonAIRadioPickerSheetState extends State<MonAIRadioPickerSheet> {
   }
 }
 
-/// One category of a [MonAICategoryPickerSheet].
 @immutable
 class MonAICategoryOption {
-  /// Creates a category option.
   const MonAICategoryOption({
     required this.id,
     required this.name,
@@ -140,23 +115,13 @@ class MonAICategoryOption {
     required this.color,
   });
 
-  /// Sent to `onPick` when this category is used.
   final String id;
-
-  /// The category's name.
   final String name;
-
-  /// The category's icon.
   final MonAIIconData icon;
-
-  /// The category's color.
   final Color color;
 }
 
-/// Every category in a four-column grid; the button uses the chosen one,
-/// sends it to [onPick] and closes. Show it with [showMonAIBottomSheet].
 class MonAICategoryPickerSheet extends StatefulWidget {
-  /// Creates a category picker.
   const MonAICategoryPickerSheet({
     required this.options,
     required this.selectedId,
@@ -167,22 +132,11 @@ class MonAICategoryPickerSheet extends StatefulWidget {
     super.key,
   });
 
-  /// The categories, in order.
   final List<MonAICategoryOption> options;
-
-  /// The category the sheet opens with.
   final String? selectedId;
-
-  /// Gets the chosen id.
   final ValueChanged<String> onPick;
-
-  /// The button's text while nothing is chosen.
   final String doneLabel;
-
-  /// The button's text for a chosen category, e.g. "Use Food".
   final String Function(String name) useLabel;
-
-  /// Shown instead of the grid when there are no categories.
   final String emptyLabel;
 
   @override
@@ -316,10 +270,8 @@ class _CategoryTile extends StatelessWidget {
   }
 }
 
-/// The text of a [MonAIDatePickerSheet].
 @immutable
 class MonAIDatePickerLabels {
-  /// Creates the labels.
   const MonAIDatePickerLabels({
     required this.title,
     required this.dateText,
@@ -331,35 +283,17 @@ class MonAIDatePickerLabels {
     required this.set,
   });
 
-  /// Above the chosen date, e.g. "Transaction date".
   final String title;
-
-  /// The chosen date as shown, e.g. "Today, 10 Oct".
   final String Function(DateTime date) dateText;
-
-  /// The Today shortcut.
   final String today;
-
-  /// The Yesterday shortcut.
   final String yesterday;
-
-  /// Read out for a day after today, from its full date.
   final String Function(String date) dayUnavailable;
-
-  /// Under the calendar, e.g. "Future dates can't be picked".
   final String futureNote;
-
-  /// Closes without picking.
   final String cancel;
-
-  /// Sends the pick and closes.
   final String set;
 }
 
-/// A calendar up to [today], with Today and Yesterday shortcuts; Set sends
-/// the pick to [onPick] and closes. Show it with [showMonAIBottomSheet].
 class MonAIDatePickerSheet extends StatefulWidget {
-  /// Creates a date picker.
   const MonAIDatePickerSheet({
     required this.selected,
     required this.today,
@@ -368,16 +302,9 @@ class MonAIDatePickerSheet extends StatefulWidget {
     super.key,
   });
 
-  /// The date the sheet opens with.
   final DateTime selected;
-
-  /// The last day that can be picked.
   final DateTime today;
-
-  /// Gets the picked day at local midnight.
   final ValueChanged<DateTime> onPick;
-
-  /// The sheet's text.
   final MonAIDatePickerLabels labels;
 
   @override
@@ -402,7 +329,6 @@ class _MonAIDatePickerSheetState extends State<MonAIDatePickerSheet> {
 
   void _pick(DateTime date) => _selected.value = DateUtils.dateOnly(date);
 
-  /// A shortcut also pages the calendar to its month.
   void _jumpTo(DateTime date) {
     _pick(date);
     _shownMonth.value = _monthOf(date);

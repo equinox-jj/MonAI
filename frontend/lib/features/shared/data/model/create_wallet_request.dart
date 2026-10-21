@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'create_wallet_request.freezed.dart';
 part 'create_wallet_request.g.dart';
 
-/// `POST /wallets`. Omitted fields take the server's defaults.
+/// Omitted fields take the server's defaults.
 @freezed
 abstract class CreateWalletRequest with _$CreateWalletRequest {
   const factory CreateWalletRequest({

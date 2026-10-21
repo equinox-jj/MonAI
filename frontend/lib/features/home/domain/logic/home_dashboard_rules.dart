@@ -8,32 +8,24 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// Rows in the recent transactions list.
 const kRecentTransactionLimit = 5;
-
-/// Slices the spending card shows, "Others" included.
 const kMaxSpendingSlices = 5;
 
-/// Morning from 05:00, afternoon from 12:00, evening from 18:00.
 HomeGreeting greetingFor(DateTime now) => switch (now.hour) {
   >= 5 && < 12 => .morning,
   >= 12 && < 18 => .afternoon,
   _ => .evening,
 };
 
-/// Days after [today] until its month ends; 0 on the last day.
 int daysLeftInMonth(DateTime today) {
   final lastDay = DateTime(today.year, today.month + 1, 0).day;
   return lastDay - today.day;
 }
 
-/// Rupiah across wallets that are not archived.
 int totalBalance(List<Wallet> wallets) => wallets
     .where((w) => !w.isArchived)
     .fold(0, (sum, w) => sum + w.currentBalance);
 
-/// Wallets that are not archived, the default first, otherwise in the
-/// cache's order.
 List<Wallet> visibleWallets(List<Wallet> wallets) {
   final active = wallets.where((w) => !w.isArchived);
   return [
@@ -42,7 +34,6 @@ List<Wallet> visibleWallets(List<Wallet> wallets) {
   ];
 }
 
-/// The report's totals for the balance card.
 MonthSummary toSummary(MonthlyReport report) => MonthSummary(
   incomeTotal: report.incomeTotal,
   expenseTotal: report.expenseTotal,
@@ -75,8 +66,6 @@ SpendingSlice _toSlice(CategoryBreakdown c) => SpendingSlice(
   sharePercent: c.sharePercent,
 );
 
-/// [transaction] joined with its cached category and wallets, dated
-/// relative to [now].
 RecentTransaction toRecent(
   Transaction transaction, {
   required Map<String, Category> categoriesById,
@@ -113,7 +102,6 @@ RecentDay _dayOf(Transaction transaction, DateTime now) {
   return RecentDay.earlier(day);
 }
 
-/// Builds the dashboard for [now]'s month from what the cache holds.
 HomeDashboard buildHomeDashboard({
   required DateTime now,
   required User? user,

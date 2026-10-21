@@ -7,9 +7,8 @@ import 'package:monai/features/shared/domain/repository/transaction_repository.d
 import 'package:monai/features/shared/domain/usecase/refresh_transaction_dependents_usecase.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 
-/// Saves an edited transaction, then refreshes the totals of its old and new
-/// month. Invalid input fails as [ValidationFailure] without calling the
-/// server.
+/// Refreshes the totals of both its old and new month. Invalid input fails as
+/// [ValidationFailure] without calling the server.
 class UpdateTransactionUseCase
     implements UseCase<Transaction, UpdateTransactionParams> {
   UpdateTransactionUseCase({
@@ -40,7 +39,6 @@ class UpdateTransactionUseCase
   }
 }
 
-/// The transaction as it was, and the edited form.
 class UpdateTransactionParams {
   const UpdateTransactionParams({required this.original, required this.input});
 

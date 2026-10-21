@@ -7,8 +7,6 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 /// `ke gopay` moves money into it.
 enum WalletRole { source, destination, unspecified }
 
-/// A wallet named in lowercase quick-add text. [span] includes the marker
-/// word before it.
 class WalletMatch {
   const WalletMatch(this.walletId, this.span, this.role, this.confidence);
 
@@ -47,7 +45,6 @@ class WalletMatcher {
 
   final List<_Term> _terms;
 
-  /// Every wallet named in [text], in order.
   List<WalletMatch> findAll(String text) {
     final taken = <TextSpan>[];
     final matches = <WalletMatch>[];

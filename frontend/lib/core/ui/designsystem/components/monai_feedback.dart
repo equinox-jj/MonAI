@@ -8,16 +8,13 @@ import 'package:monai/core/ui/designsystem/theme/monai_radius.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
-import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// The color family of an alert, banner or state.
 enum MonAIAlertTone {
   info,
   success,
   warning,
   error;
 
-  /// The icon used when none is given.
   MonAIIconData get defaultIcon => switch (this) {
     info => MonAIIcons.autoAwesome,
     success => MonAIIcons.checkCircle,
@@ -57,10 +54,7 @@ class _ToneColors {
   final Color content;
 }
 
-/// Inline message box, e.g. the sign-in error or the "We'll set up a Cash
-/// wallet" note.
 class MonAIInlineAlert extends StatelessWidget {
-  /// Creates an inline alert.
   const MonAIInlineAlert({
     required this.message,
     super.key,
@@ -68,13 +62,8 @@ class MonAIInlineAlert extends StatelessWidget {
     this.icon,
   });
 
-  /// The text.
   final String message;
-
-  /// The color family.
   final MonAIAlertTone tone;
-
-  /// Defaults to [MonAIAlertTone.defaultIcon].
   final MonAIIconData? icon;
 
   @override
@@ -117,77 +106,6 @@ class MonAIInlineAlert extends StatelessWidget {
   }
 }
 
-/// Full-width 40 strip under a screen title: "**You're offline** · Showing
-/// saved data".
-class MonAIStatusStrip extends StatelessWidget {
-  /// Creates a status strip.
-  const MonAIStatusStrip({
-    required this.title,
-    super.key,
-    this.detail,
-    this.icon = MonAIIcons.cloudOff,
-    this.tone = MonAIAlertTone.warning,
-  });
-
-  /// The bold part.
-  final String title;
-
-  /// The text after the dot.
-  final String? detail;
-
-  /// The leading icon.
-  final MonAIIconData icon;
-
-  /// The color family.
-  final MonAIAlertTone tone;
-
-  @override
-  Widget build(BuildContext context) {
-    final t = tone._colors(context.colors);
-    final borderSide = BorderSide(color: t.border ?? t.container);
-    return Semantics(
-      liveRegion: true,
-      child: Container(
-        height: MonAISizes.statusStrip,
-        padding: const .symmetric(horizontal: MonAISpacing.x4),
-        decoration: BoxDecoration(
-          color: t.container,
-          border: Border(top: borderSide, bottom: borderSide),
-        ),
-        child: Row(
-          spacing: MonAISpacing.x2,
-          children: [
-            MonAIIcon(icon, size: MonAISizes.iconMd, color: t.icon),
-            Expanded(
-              child: Text.rich(
-                TextSpan(
-                  children: [
-                    TextSpan(
-                      text: title,
-                      style: const TextStyle().withWeight(.w600),
-                    ),
-                    if (detail case final detail?) TextSpan(text: ' · $detail'),
-                  ],
-                ),
-                maxLines: 1,
-                overflow: .ellipsis,
-                style: context.textStyles.bodyCompact.copyWith(
-                  color: t.content,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Shows the design's dark floating snackbar, with an optional leading
-/// [icon] and action ("Undo").
-///
-/// [iconColor] defaults to the warning amber; pass e.g. the success green for
-/// a confirmation.
 ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showMonAISnackBar(
   BuildContext context, {
   required String message,
@@ -266,13 +184,7 @@ class _SnackBarContent extends StatelessWidget {
   }
 }
 
-/// Centered 312 dialog: tone icon, title, body, optional extra content, then
-/// dismiss + confirm buttons aligned to the end.
-///
-/// Show it with [showDialog]. A lone action (no [dismissLabel]) spans the
-/// dialog, as in "Session expired".
 class MonAIAlertDialog extends StatelessWidget {
-  /// Creates an alert dialog.
   const MonAIAlertDialog({
     required this.title,
     required this.message,
@@ -288,37 +200,16 @@ class MonAIAlertDialog extends StatelessWidget {
     this.content,
   });
 
-  /// The heading.
   final String title;
-
-  /// The body.
   final String message;
-
-  /// The main action's label.
   final String confirmLabel;
-
-  /// The main action.
   final VoidCallback onConfirm;
-
-  /// The secondary button's label; none when null.
   final String? dismissLabel;
-
-  /// Defaults to popping the dialog.
   final VoidCallback? onDismiss;
-
-  /// An icon on a tone-colored circle above the title.
   final MonAIIconData? icon;
-
-  /// The icon's color family.
   final MonAIAlertTone tone;
-
-  /// Makes the confirm button red.
   final bool destructive;
-
-  /// Shows a spinner on the confirm button.
   final bool confirmLoading;
-
-  /// Extra content between the message and the buttons.
   final Widget? content;
 
   @override
@@ -409,8 +300,6 @@ class _DialogIcon extends StatelessWidget {
   }
 }
 
-/// Shows a modal bottom sheet with the design's 24 top corners, 32×4 handle,
-/// 24 side padding and optional [title].
 Future<T?> showMonAIBottomSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
@@ -426,18 +315,11 @@ Future<T?> showMonAIBottomSheet<T>(
   );
 }
 
-/// The body of a bottom sheet: handle, optional title and [child].
-///
 /// [showMonAIBottomSheet] wraps its builder in this; use it directly only for
 /// custom sheet routes.
 class MonAIBottomSheet extends StatelessWidget {
-  /// Creates a sheet body.
   const MonAIBottomSheet({required this.child, super.key, this.title});
-
-  /// The sheet's content.
   final Widget child;
-
-  /// The heading.
   final String? title;
 
   @override
@@ -492,10 +374,7 @@ class MonAIBottomSheet extends StatelessWidget {
   }
 }
 
-/// The two equal buttons at the foot of a picker sheet: an outlined one and
-/// the main action.
 class MonAISheetButtons extends StatelessWidget {
-  /// Creates sheet buttons.
   const MonAISheetButtons({
     required this.secondaryLabel,
     required this.onSecondary,
@@ -505,19 +384,10 @@ class MonAISheetButtons extends StatelessWidget {
     this.primaryLoading = false,
   });
 
-  /// The outlined button's label, e.g. "Cancel".
   final String secondaryLabel;
-
-  /// The outlined button's action.
   final VoidCallback? onSecondary;
-
-  /// The main button's label, e.g. "Apply".
   final String primaryLabel;
-
-  /// The main button's action.
   final VoidCallback? onPrimary;
-
-  /// Shows a spinner on the main button.
   final bool primaryLoading;
 
   @override

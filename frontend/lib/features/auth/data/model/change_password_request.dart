@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'change_password_request.freezed.dart';
 part 'change_password_request.g.dart';
 
-/// The body of `PUT /auth/password`.
 @freezed
 abstract class ChangePasswordRequest with _$ChangePasswordRequest {
   const factory ChangePasswordRequest({

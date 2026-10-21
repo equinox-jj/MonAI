@@ -23,7 +23,6 @@ class ArchivedWalletsPage extends StatelessWidget {
   }
 }
 
-/// Wallets hidden from pickers, each with "Unarchive".
 class ArchivedWalletsUI extends StatelessWidget {
   const ArchivedWalletsUI({super.key});
 

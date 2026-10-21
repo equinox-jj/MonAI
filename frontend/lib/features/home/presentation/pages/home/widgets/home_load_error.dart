@@ -5,7 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/home/domain/usecase/refresh_home_usecase.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
 
-/// Replaces the dashboard when the first load failed with nothing cached.
 class HomeLoadError extends StatelessWidget {
   const HomeLoadError({required this.onRetry, super.key});
 

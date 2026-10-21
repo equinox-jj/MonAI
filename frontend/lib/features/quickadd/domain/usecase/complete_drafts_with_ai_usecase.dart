@@ -18,7 +18,6 @@ import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 /// whose unsure fields stay highlighted. Never fails.
 class CompleteDraftsWithAiUseCase
     implements UseCase<QuickAddReading, CompleteDraftsParams> {
-  /// [now] is the clock; tests pass a fixed one.
   CompleteDraftsWithAiUseCase({
     required this._repository,
     required this._watchUser,
@@ -35,8 +34,6 @@ class CompleteDraftsWithAiUseCase
   final QuickaddRepository _repository;
   final WatchUserUseCase _watchUser;
   final DateTime Function() _now;
-
-  /// How long to wait for the AI before using the phone's reading.
   final Duration timeout;
 
   @override
@@ -139,8 +136,6 @@ class CompleteDraftsParams {
   });
 
   final String text;
-
-  /// The phone's reading of [text].
   final List<QuickAddDraft> local;
   final ParseContext context;
 }

@@ -2,8 +2,6 @@ import 'package:dio/dio.dart';
 import 'package:monai/core/data/network/api_endpoints.dart';
 import 'package:monai/core/data/storage/token_storage.dart';
 
-/// Attaches `Authorization: Bearer <token>` unless the request is flagged
-/// `noAuth`.
 class AuthInterceptor extends Interceptor {
   AuthInterceptor(this._tokenStorage);
 

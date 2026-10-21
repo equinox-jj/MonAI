@@ -4,9 +4,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/app_router.dart';
 
-/// The signed-in app: the main tabs around the current one. Phones get a
-/// bottom bar, tablet portrait a rail and tablet landscape a drawer.
-///
 /// Each tab is a branch of [navigationShell], which keeps its own stack and
 /// state while another tab is shown.
 class DashboardPage extends StatelessWidget {
@@ -14,7 +11,6 @@ class DashboardPage extends StatelessWidget {
 
   final StatefulNavigationShell navigationShell;
 
-  /// Shows the tab at [index]; tapping the current tab returns it to its root.
   void _selectTab(int index) => navigationShell.goBranch(
     index,
     initialLocation: index == navigationShell.currentIndex,
@@ -70,7 +66,6 @@ class DashboardPage extends StatelessWidget {
   }
 }
 
-/// The tablet layout: the rail or drawer at the start, the tab beside it.
 class _SideNavLayout extends StatelessWidget {
   const _SideNavLayout({required this.navigation, required this.child});
 

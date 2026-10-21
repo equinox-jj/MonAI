@@ -425,15 +425,7 @@ as String,
 /// @nodoc
 mixin _$ChangePasswordState {
 
-/// [UiStatus.loading] while saving. [UiStatus.success] stays while the
-/// app signs out; [UiStatus.failure] after a rejected attempt.
- UiStatus get status; FieldError? get currentPasswordError; FieldError? get newPasswordError;/// The new password meets the minimum length; drives the live hint.
- bool get newPasswordLongEnough;/// A problem with the whole attempt (offline, rate limited), shown as a
-/// banner.
- AuthFormError? get formError;/// A submit failed on the input, so each edit re-checks its field.
- bool get autovalidate;/// The first field with an error after a failed submit; the screen
-/// focuses it so the keyboard and screen reader land on the error.
- AuthField? get focusField;
+ UiStatus get status; FieldError? get currentPasswordError; FieldError? get newPasswordError; bool get newPasswordLongEnough; AuthFormError? get formError; bool get autovalidate; AuthField? get focusField;
 /// Create a copy of ChangePasswordState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -651,20 +643,12 @@ class _ChangePasswordState implements ChangePasswordState {
   const _ChangePasswordState({this.status = UiStatus.initial, this.currentPasswordError, this.newPasswordError, this.newPasswordLongEnough = false, this.formError, this.autovalidate = false, this.focusField});
   
 
-/// [UiStatus.loading] while saving. [UiStatus.success] stays while the
-/// app signs out; [UiStatus.failure] after a rejected attempt.
 @override@JsonKey() final  UiStatus status;
 @override final  FieldError? currentPasswordError;
 @override final  FieldError? newPasswordError;
-/// The new password meets the minimum length; drives the live hint.
 @override@JsonKey() final  bool newPasswordLongEnough;
-/// A problem with the whole attempt (offline, rate limited), shown as a
-/// banner.
 @override final  AuthFormError? formError;
-/// A submit failed on the input, so each edit re-checks its field.
 @override@JsonKey() final  bool autovalidate;
-/// The first field with an error after a failed submit; the screen
-/// focuses it so the keyboard and screen reader land on the error.
 @override final  AuthField? focusField;
 
 /// Create a copy of ChangePasswordState

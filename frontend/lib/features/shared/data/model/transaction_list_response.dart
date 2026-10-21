@@ -4,7 +4,6 @@ import 'package:monai/features/shared/data/model/transaction_response.dart';
 part 'transaction_list_response.freezed.dart';
 part 'transaction_list_response.g.dart';
 
-/// `GET /transactions`, one cursor page.
 @freezed
 abstract class TransactionListResponse with _$TransactionListResponse {
   const factory TransactionListResponse({

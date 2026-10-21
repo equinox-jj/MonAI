@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 
-/// The lime corners the receipt goes between, with a scan line across.
 class ScanReceiptFrame extends StatelessWidget {
   const ScanReceiptFrame({super.key});
 
@@ -29,7 +28,6 @@ class ScanReceiptFrame extends StatelessWidget {
   }
 }
 
-/// A glowing lime line, as a scanner draws across the receipt.
 class ScanReceiptScanLine extends StatelessWidget {
   const ScanReceiptScanLine({super.key, this.thickness = 2});
 
@@ -71,7 +69,6 @@ class _CornersPainter extends CustomPainter {
     const inset = _stroke / 2;
     final right = size.width - inset;
     final bottom = size.height - inset;
-    // Each corner: along one edge, round the corner, along the other.
     final corners = Path()
       ..moveTo(inset, _length)
       ..lineTo(inset, _radius)

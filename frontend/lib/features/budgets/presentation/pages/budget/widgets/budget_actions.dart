@@ -6,7 +6,6 @@ import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_blo
 
 typedef _Actions = ({bool canSave, bool isSaving, bool hasBudget, bool isBusy});
 
-/// "Save budget", and "Remove budget" when the month has one.
 class BudgetActions extends StatelessWidget {
   const BudgetActions({
     required this.monthName,
@@ -50,7 +49,6 @@ class BudgetActions extends StatelessWidget {
   }
 }
 
-/// A red text button.
 class _RemoveButton extends StatelessWidget {
   const _RemoveButton({required this.label, required this.onPressed});
 

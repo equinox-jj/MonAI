@@ -13,8 +13,6 @@ import 'package:monai/features/shared/domain/entity/payment_provider.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// What the parser matches against: the user's active wallets, visible
-/// categories and the provider catalog.
 class ParseContext {
   const ParseContext({
     required this.wallets,

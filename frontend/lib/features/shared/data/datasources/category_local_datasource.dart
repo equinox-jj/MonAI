@@ -5,23 +5,17 @@ import 'package:monai/core/data/database/monai_database.dart';
 import 'package:monai/core/model/category_type.dart';
 
 abstract class CategoryLocalDataSource {
-  /// Every cached category, hidden ones included, by name.
   Stream<List<CategoryRow>> watchAll();
 
-  /// The cached categories of [type], hidden ones included, by name.
   Stream<List<CategoryRow>> watchByType(CategoryType type);
 
-  /// The cached category [id], or null.
   Future<CategoryRow?> find(String id);
 
-  /// Replaces the whole cache with the server's list.
   Future<void> replaceAll(List<CategoryRow> rows);
 
-  /// Adds or replaces one category.
   Future<void> save(CategoryRow row);
 
-  /// Drops category [id], moving its cached transactions to [moveTo] when
-  /// given, as the server did.
+  /// Moves its cached transactions to [moveTo] when given, as the server did.
   Future<void> delete(String id, {String? moveTo});
 }
 

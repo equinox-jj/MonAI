@@ -15,11 +15,7 @@ import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/s
 
 class ScanReceiptPage extends StatelessWidget {
   const ScanReceiptPage({super.key, this.camera, this.pickPhoto});
-
-  /// Replaces the device camera in tests.
   final ReceiptCamera? camera;
-
-  /// Replaces the gallery in tests.
   final PickReceiptPhoto? pickPhoto;
 
   @override
@@ -34,8 +30,6 @@ class ScanReceiptPage extends StatelessWidget {
   }
 }
 
-/// The receipt scanner: the viewfinder, then the reading steps, then the
-/// review or a "couldn't read" sheet. Dark in either theme, like a camera.
 class ScanReceiptUI extends StatefulWidget {
   const ScanReceiptUI({required this.pickPhoto, super.key, this.camera});
 

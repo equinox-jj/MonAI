@@ -64,10 +64,6 @@ class CreateProviderUseCase
 
 class CreateProviderParams {
   const CreateProviderParams({required this.input, this.logoPath});
-
-  /// The form as filled in.
   final ProviderInput input;
-
-  /// A picked logo to upload; null for none.
   final String? logoPath;
 }

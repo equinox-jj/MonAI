@@ -7,8 +7,6 @@ import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboardin
 
 const _transition = Duration(milliseconds: 250);
 
-/// The step dots and the page's actions: Skip, Back/Next, or the account
-/// buttons.
 class OnboardingFooter extends StatelessWidget {
   const OnboardingFooter({super.key});
 
@@ -41,8 +39,6 @@ class OnboardingFooter extends StatelessWidget {
               ],
             ),
           ),
-          // The first page can skip ahead, the middle one steps Back/Next,
-          // the last offers the account actions.
           AnimatedSwitcher(
             duration: _transition,
             child: switch (state.step) {

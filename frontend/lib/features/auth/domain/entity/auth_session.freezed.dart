@@ -15,9 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AuthSession {
 
- String get accessToken;/// Always `Bearer`.
- String get tokenType;/// How long [accessToken] stays valid from when it was issued.
- Duration get expiresIn; User get user;
+ String get accessToken; String get tokenType; Duration get expiresIn; User get user;
 /// Create a copy of AuthSession
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -230,9 +228,7 @@ class _AuthSession implements AuthSession {
   
 
 @override final  String accessToken;
-/// Always `Bearer`.
 @override final  String tokenType;
-/// How long [accessToken] stays valid from when it was issued.
 @override final  Duration expiresIn;
 @override final  User user;
 

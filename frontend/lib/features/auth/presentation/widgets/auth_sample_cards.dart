@@ -4,18 +4,11 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 
-// Cards drawn on the auth illustrations: the onboarding pages and, later,
-// the tablet auth hero.
-
-/// The sample expense's category color: the server's default Food hex.
 const authSampleFoodColor = Color(0xFFF97316);
-
-/// Corners of the larger illustration cards.
 const authIllustrationCardRadius = BorderRadius.all(Radius.circular(20));
 
 const _sampleExpense = 35000;
 
-/// A white card floating on the gradient.
 class AuthIllustrationCard extends StatelessWidget {
   const AuthIllustrationCard({
     required this.borderRadius,
@@ -56,7 +49,6 @@ class AuthIllustrationCard extends StatelessWidget {
   }
 }
 
-/// The sample quick-add sentence.
 class AuthSamplePromptCard extends StatelessWidget {
   const AuthSamplePromptCard({super.key});
 
@@ -91,7 +83,6 @@ class AuthSamplePromptCard extends StatelessWidget {
   }
 }
 
-/// The expense the sample sentence becomes.
 class AuthSampleExpenseCard extends StatelessWidget {
   const AuthSampleExpenseCard({super.key});
 

@@ -10,16 +10,8 @@ import 'package:monai/features/shared/domain/usecase/refresh_recent_transactions
 import 'package:monai/features/shared/domain/usecase/refresh_user_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_wallets_usecase.dart';
 
-/// Why a Home refresh failed.
-enum HomeLoadFailure {
-  /// No connection or a timeout.
-  network,
+enum HomeLoadFailure { network, unexpected }
 
-  /// Anything else.
-  unexpected,
-}
-
-/// What a Home refresh fetched.
 class HomeRefreshResult {
   const HomeRefreshResult({
     required this.budgetLoaded,
@@ -39,9 +31,6 @@ class HomeRefreshResult {
   final HomeLoadFailure? failure;
 }
 
-/// Re-fetches every Home section of the month (the first of the month) in
-/// parallel into the cache.
-///
 /// Always returns [Right]: a section that fails keeps its cached data and is
 /// reported in [HomeRefreshResult.failure].
 class RefreshHomeUseCase implements UseCase<HomeRefreshResult, DateTime> {

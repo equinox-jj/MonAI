@@ -1,7 +1,6 @@
 import 'package:drift/drift.dart';
 
-/// The cached payment provider catalog's version and ETag; a single row whose
-/// [id] is `PaymentProviderDao.catalogRowId`.
+/// A single row whose [id] is `PaymentProviderDao.catalogRowId`.
 @DataClassName('PaymentProviderCatalogRow')
 class PaymentProviderCatalog extends Table {
   IntColumn get id => integer()();

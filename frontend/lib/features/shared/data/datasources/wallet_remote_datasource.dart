@@ -7,19 +7,14 @@ import 'package:monai/features/shared/data/model/wallet_list_response.dart';
 import 'package:monai/features/shared/data/model/wallet_response.dart';
 
 abstract class WalletRemoteDataSource {
-  /// `GET /wallets?include_archived=true`.
   Future<WalletListResponse> getWallets();
 
-  /// `GET /wallets/{id}`.
   Future<WalletResponse> getWallet(String id);
 
-  /// `POST /wallets`.
   Future<WalletResponse> createWallet(CreateWalletRequest request);
 
-  /// `PATCH /wallets/{id}`.
   Future<WalletResponse> updateWallet(String id, UpdateWalletRequest request);
 
-  /// `DELETE /wallets/{id}`.
   Future<void> deleteWallet(String id);
 }
 

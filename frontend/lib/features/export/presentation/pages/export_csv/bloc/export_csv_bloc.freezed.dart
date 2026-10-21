@@ -497,11 +497,7 @@ as String,
 /// @nodoc
 mixin _$ExportCsvState {
 
-/// The months to export.
- ExportRange get range;/// The latest month that can be exported: the current one.
- DateTime get currentMonth; CsvDelimiter get delimiter; bool get isExporting;/// Why the last export failed; cleared by any change.
- ExportFailure? get failure;/// Set once the file was shared; the sheet closes.
- ExportedCsv? get exported;
+ ExportRange get range; DateTime get currentMonth; CsvDelimiter get delimiter; bool get isExporting; ExportFailure? get failure; ExportedCsv? get exported;
 /// Create a copy of ExportCsvState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -706,15 +702,11 @@ class _ExportCsvState implements ExportCsvState {
   const _ExportCsvState({required this.range, required this.currentMonth, this.delimiter = CsvDelimiter.comma, this.isExporting = false, this.failure, this.exported});
   
 
-/// The months to export.
 @override final  ExportRange range;
-/// The latest month that can be exported: the current one.
 @override final  DateTime currentMonth;
 @override@JsonKey() final  CsvDelimiter delimiter;
 @override@JsonKey() final  bool isExporting;
-/// Why the last export failed; cleared by any change.
 @override final  ExportFailure? failure;
-/// Set once the file was shared; the sheet closes.
 @override final  ExportedCsv? exported;
 
 /// Create a copy of ExportCsvState

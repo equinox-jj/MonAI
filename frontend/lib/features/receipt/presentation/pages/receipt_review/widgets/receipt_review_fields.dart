@@ -14,13 +14,11 @@ import 'package:monai/features/receipt/presentation/pages/receipt_review/model/r
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_field_box.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// A field's mark and error message, for a [BlocSelector].
 typedef _FieldLook = (FieldMark?, FieldError?);
 
 _FieldLook _lookOf(ReceiptReviewState state, ReceiptField field) =>
     (state.markOf(field), state.errorOf(field));
 
-/// Expense or income; a receipt is never a transfer.
 class ReceiptReviewTypeTabs extends StatelessWidget {
   const ReceiptReviewTypeTabs({super.key});
 
@@ -56,7 +54,6 @@ class ReceiptReviewTypeTabs extends StatelessWidget {
   }
 }
 
-/// The total, typed with the number keyboard: `187.500`.
 class ReceiptReviewAmount extends StatelessWidget {
   const ReceiptReviewAmount({
     required this.controller,
@@ -114,7 +111,6 @@ class ReceiptReviewAmount extends StatelessWidget {
   }
 }
 
-/// The store, as printed on the receipt.
 class ReceiptReviewMerchant extends StatelessWidget {
   const ReceiptReviewMerchant({
     required this.controller,
@@ -122,7 +118,6 @@ class ReceiptReviewMerchant extends StatelessWidget {
     super.key,
   });
 
-  /// The API's limit.
   static const _maxLength = 100;
 
   final TextEditingController controller;
@@ -280,7 +275,6 @@ class ReceiptReviewDate extends StatelessWidget {
   }
 }
 
-/// The optional note.
 class ReceiptReviewNote extends StatelessWidget {
   const ReceiptReviewNote({
     required this.controller,
@@ -288,7 +282,6 @@ class ReceiptReviewNote extends StatelessWidget {
     super.key,
   });
 
-  /// The API's limit.
   static const _maxLength = 200;
 
   final TextEditingController controller;

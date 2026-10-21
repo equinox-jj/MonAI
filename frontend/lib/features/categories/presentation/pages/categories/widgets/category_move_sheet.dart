@@ -3,8 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// Asks where a deleted category's transactions should go. Pops with the
-/// picked category's id, or null on Cancel.
 class CategoryMoveSheet extends StatefulWidget {
   const CategoryMoveSheet({
     required this.category,
@@ -12,10 +10,7 @@ class CategoryMoveSheet extends StatefulWidget {
     super.key,
   });
 
-  /// The category being deleted.
   final Category category;
-
-  /// Where its transactions can go; the first is picked to start with.
   final List<Category> targets;
 
   @override

@@ -5,11 +5,8 @@ import 'package:monai/features/shared/domain/entity/transaction_filter.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// The filters a chip opens a sheet for.
 enum TransactionFilterKind { month, wallet, category, type }
 
-/// "All types", then Wallet, Category and Type, each named after its choice
-/// once one is applied. Search shows its month first instead of "All types".
 class TransactionFilterChips extends StatelessWidget {
   const TransactionFilterChips({
     required this.filter,
@@ -23,11 +20,7 @@ class TransactionFilterChips extends StatelessWidget {
   final TransactionFilter filter;
   final TransactionLookups lookups;
   final ValueChanged<TransactionFilterKind> onOpen;
-
-  /// "All types": drops every filter.
   final VoidCallback onClearAll;
-
-  /// Shows a month chip first with this label.
   final String? monthLabel;
 
   @override
@@ -89,7 +82,6 @@ class TransactionFilterChips extends StatelessWidget {
   }
 }
 
-/// A chip; without a [kind] it is "All types".
 class _Chip {
   const _Chip({
     required this.label,

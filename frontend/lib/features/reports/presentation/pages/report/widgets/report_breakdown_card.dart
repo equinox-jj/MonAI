@@ -8,8 +8,6 @@ import 'package:monai/features/reports/domain/logic/report_change.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 
-/// "Spending by category": a donut of the month's expenses and one row per
-/// category, largest first, with its change since the month before.
 class ReportBreakdownCard extends StatelessWidget {
   const ReportBreakdownCard({super.key});
 

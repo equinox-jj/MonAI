@@ -24,8 +24,6 @@ class QuickAddPage extends StatelessWidget {
   }
 }
 
-/// Type a transaction the way you'd say it; quick add reads it into drafts
-/// for the form or the review. Nothing is saved here.
 class QuickAddUI extends StatefulWidget {
   const QuickAddUI({super.key});
 

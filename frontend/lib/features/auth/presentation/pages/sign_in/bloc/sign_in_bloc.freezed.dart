@@ -387,13 +387,7 @@ as String,
 /// @nodoc
 mixin _$SignInState {
 
-/// [UiStatus.loading] while signing in. [UiStatus.success] stays until
-/// the app leaves for Home; [UiStatus.failure] after a rejected attempt.
- UiStatus get status; FieldError? get emailError; FieldError? get passwordError;/// A problem with the whole attempt, shown as a banner.
- AuthFormError? get formError;/// A submit failed on the input, so each edit re-checks its field.
- bool get autovalidate;/// The first field with an error after a failed submit; the screen
-/// focuses it so the keyboard and screen reader land on the error.
- AuthField? get focusField;
+ UiStatus get status; FieldError? get emailError; FieldError? get passwordError; AuthFormError? get formError; bool get autovalidate; AuthField? get focusField;
 /// Create a copy of SignInState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -610,17 +604,11 @@ class _SignInState implements SignInState {
   const _SignInState({this.status = UiStatus.initial, this.emailError, this.passwordError, this.formError, this.autovalidate = false, this.focusField});
   
 
-/// [UiStatus.loading] while signing in. [UiStatus.success] stays until
-/// the app leaves for Home; [UiStatus.failure] after a rejected attempt.
 @override@JsonKey() final  UiStatus status;
 @override final  FieldError? emailError;
 @override final  FieldError? passwordError;
-/// A problem with the whole attempt, shown as a banner.
 @override final  AuthFormError? formError;
-/// A submit failed on the input, so each edit re-checks its field.
 @override@JsonKey() final  bool autovalidate;
-/// The first field with an error after a failed submit; the screen
-/// focuses it so the keyboard and screen reader land on the error.
 @override final  AuthField? focusField;
 
 /// Create a copy of SignInState

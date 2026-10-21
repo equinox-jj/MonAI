@@ -6,7 +6,6 @@ import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
 
-/// Expense, Income and Transfer.
 class TransactionFormTypeTabs extends StatelessWidget {
   const TransactionFormTypeTabs({super.key});
 

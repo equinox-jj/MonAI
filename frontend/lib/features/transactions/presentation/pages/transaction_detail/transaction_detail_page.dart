@@ -21,11 +21,7 @@ class TransactionDetailPage extends StatelessWidget {
   });
 
   final String id;
-
-  /// [ScreenPlacement.pane] beside the transactions list on a wide screen.
   final ScreenPlacement placement;
-
-  /// Called instead of going back once the transaction is deleted.
   final VoidCallback? onClosed;
 
   @override
@@ -40,7 +36,6 @@ class TransactionDetailPage extends StatelessWidget {
   }
 }
 
-/// One transaction's amount and fields, with Edit and Delete.
 class TransactionDetailUI extends StatelessWidget {
   const TransactionDetailUI({
     super.key,

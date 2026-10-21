@@ -5,13 +5,11 @@ import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/auth/presentation/pages/session_expired/cubit/session_expired_cubit.dart';
 
-/// Wraps the app and, once the server rejects the token or the password is
-/// changed, covers it with a dialog saying so. The session is already
-/// cleared, so the only way out is to sign in again: outside taps don't
-/// dismiss it.
-///
-/// It sits above the router's navigator (`MaterialApp.router`'s `builder`),
-/// so it is drawn over every route without being one.
+/// Covers the app with a dialog once the server rejects the token or the
+/// password is changed. The session is already cleared, so only signing in
+/// again closes it. It sits above the router's navigator
+/// (`MaterialApp.router`'s `builder`), so it is drawn over every route
+/// without being one.
 class SessionExpiredGate extends StatelessWidget {
   const SessionExpiredGate({required this.child, super.key});
 

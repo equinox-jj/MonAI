@@ -20,8 +20,6 @@ import 'package:monai/features/transactions/presentation/pages/transaction_form/
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/undo_delete/cubit/undo_delete_cubit.dart';
 
-/// The transactions feature's search history, use cases and blocs; the
-/// transaction repository itself is shared (see `SharedDI`).
 class TransactionsDI {
   TransactionsDI._();
 

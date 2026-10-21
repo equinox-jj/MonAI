@@ -4,14 +4,10 @@ import 'package:monai/core/data/database/daos/monthly_report_with_categories.dar
 import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class ReportLocalDataSource {
-  /// The report for [month] with its breakdown, or null when none is cached.
   Stream<MonthlyReportWithCategories?> watch(DateTime month);
 
-  /// The reports cached for the months from [from] to [to], without their
-  /// breakdowns, oldest first.
   Stream<List<MonthlyReportRow>> watchBetween(DateTime from, DateTime to);
 
-  /// Replaces a month's report and its whole breakdown.
   Future<void> replace(MonthlyReportWithCategories rows);
 }
 

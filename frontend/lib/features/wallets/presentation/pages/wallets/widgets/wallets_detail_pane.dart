@@ -5,7 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/wallet_detail_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
 
-/// Tablet landscape: the picked wallet beside the list, else the first.
 class WalletsDetailPane extends StatelessWidget {
   const WalletsDetailPane({super.key});
 

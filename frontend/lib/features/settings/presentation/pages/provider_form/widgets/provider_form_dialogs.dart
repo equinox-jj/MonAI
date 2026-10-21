@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// Asks before hiding [name] from users adding a wallet; pops true to go
-/// ahead.
 class ProviderDeactivateDialog extends StatelessWidget {
   const ProviderDeactivateDialog({required this.name, super.key});
 
@@ -31,7 +29,6 @@ class ProviderDeactivateDialog extends StatelessWidget {
   }
 }
 
-/// Asks before deleting [name]; pops true to go ahead.
 class ProviderDeleteDialog extends StatelessWidget {
   const ProviderDeleteDialog({required this.name, super.key});
 
@@ -61,7 +58,6 @@ class ProviderDeleteDialog extends StatelessWidget {
   }
 }
 
-/// What happens, in a soft box under the message.
 class _Notes extends StatelessWidget {
   const _Notes({required this.notes});
 

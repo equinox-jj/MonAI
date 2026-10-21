@@ -13,14 +13,11 @@ import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/bloc/quick_add_review_bloc.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// A field's mark and error message, for a [BlocSelector].
 typedef _FieldLook = (MonAIFieldMark?, FieldError?);
 
 _FieldLook _lookOf(QuickAddReviewState state, QuickAddField field) =>
     (state.markOf(field), state.errorOf(field));
 
-/// The draft's category icon over its amount, typed with the number
-/// keyboard, and its type.
 class QuickAddReviewHero extends StatelessWidget {
   const QuickAddReviewHero({
     required this.controller,
@@ -165,8 +162,6 @@ class QuickAddReviewCategory extends StatelessWidget {
   }
 }
 
-/// The wallet the money leaves or arrives in; for a transfer, [field] is
-/// the source or the destination.
 class QuickAddReviewWallet extends StatelessWidget {
   const QuickAddReviewWallet({
     required this.field,
@@ -279,7 +274,6 @@ class QuickAddReviewDate extends StatelessWidget {
   }
 }
 
-/// The optional note.
 class QuickAddReviewNote extends StatelessWidget {
   const QuickAddReviewNote({
     required this.controller,
@@ -287,7 +281,6 @@ class QuickAddReviewNote extends StatelessWidget {
     super.key,
   });
 
-  /// The API's limit.
   static const _maxLength = 200;
 
   final TextEditingController controller;

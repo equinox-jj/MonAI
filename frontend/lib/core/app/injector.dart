@@ -36,13 +36,10 @@ import 'package:monai/features/transactions/di/transactions_di.dart';
 import 'package:monai/features/wallets/di/wallets_di.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// Global service locator.
 final GetIt sl = GetIt.instance;
 
-/// Registers every dependency. Call once before `runApp`.
-///
-/// Core services are registered here; each feature registers its own data
-/// sources, repositories, use cases and blocs in its `*DI.init()`.
+/// Call once before `runApp`. Each feature registers its own dependencies in
+/// its `*DI.init()`.
 Future<void> configureDependencies() async {
   // ---- SharedPreferences ----
   final prefs = await SharedPreferences.getInstance();

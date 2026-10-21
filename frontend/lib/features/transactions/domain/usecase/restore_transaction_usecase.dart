@@ -5,8 +5,8 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_transaction_dependents_usecase.dart';
 
-/// Undoes a delete, then refreshes the totals it changes. Fails with code
-/// `wallet_archived` when one of its wallets has been archived since.
+/// Refreshes the totals it changes. Fails with `wallet_archived` when one of
+/// its wallets has been archived since.
 class RestoreTransactionUseCase implements UseCase<Transaction, String> {
   RestoreTransactionUseCase({
     required this._repository,

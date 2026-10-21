@@ -10,35 +10,28 @@ import 'package:monai/features/settings/data/model/provider_status_request.dart'
 import 'package:monai/features/settings/data/model/update_provider_request.dart';
 
 abstract class AdminProviderRemoteDataSource {
-  /// `GET /admin/payment-providers`: page [page] of every status;
-  /// [perPage] is at most 100.
+  /// Every status; [perPage] is at most 100.
   Future<AdminProviderListResponse> listProviders({
     required int page,
     required int perPage,
   });
 
-  /// `GET /admin/payment-providers/{id}`.
   Future<AdminProviderResponse> getProvider(String id);
 
-  /// `POST /admin/payment-providers`.
   Future<AdminProviderResponse> createProvider(CreateProviderRequest request);
 
-  /// `PATCH /admin/payment-providers/{id}`.
   Future<AdminProviderResponse> updateProvider(
     String id,
     UpdateProviderRequest request,
   );
 
-  /// `PATCH /admin/payment-providers/{id}/status`.
   Future<AdminProviderResponse> setStatus(
     String id,
     ProviderStatusRequest request,
   );
 
-  /// `DELETE /admin/payment-providers/{id}`.
   Future<void> deleteProvider(String id);
 
-  /// `PUT /admin/payment-providers/{id}/logo`, multipart `file`.
   Future<AdminProviderResponse> uploadLogo(
     String id,
     Uint8List bytes, {
@@ -51,8 +44,6 @@ class AdminProviderRemoteDataSourceImpl extends AdminProviderRemoteDataSource
   AdminProviderRemoteDataSourceImpl({required this._dio});
 
   final Dio _dio;
-
-  /// Every status, inactive providers included.
   static const _allStatuses = 'ALL';
 
   @override

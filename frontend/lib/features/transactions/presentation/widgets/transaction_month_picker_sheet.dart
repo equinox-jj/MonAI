@@ -5,9 +5,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// A year of months with what was spent in each, where cached; months after
-/// [currentMonth] can't be picked. "Show October 2026" sends the pick to
-/// [onApply] and closes. Show it with [showMonAIBottomSheet].
 class TransactionMonthPickerSheet extends StatefulWidget {
   const TransactionMonthPickerSheet({
     required this.selected,
@@ -18,15 +15,9 @@ class TransactionMonthPickerSheet extends StatefulWidget {
     super.key,
   });
 
-  /// The first of the month shown now.
   final DateTime selected;
   final DateTime currentMonth;
-
-  /// Spent per cached month of the year shown, keyed by the first of the
-  /// month.
   final Map<DateTime, int> totals;
-
-  /// A year page is shown, so its totals are needed.
   final ValueChanged<int> onYearShown;
   final ValueChanged<DateTime> onApply;
 

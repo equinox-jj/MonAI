@@ -3,8 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'transaction_request.freezed.dart';
 part 'transaction_request.g.dart';
 
-/// `POST /transactions`, and the whole form for `PATCH /transactions/{id}`.
-///
 /// On a patch, a null `to_wallet_id`, `category_id`, `note` or `merchant` is
 /// sent and clears the field. `source` and `receipt_key` are left out when
 /// null, so a patch keeps them.

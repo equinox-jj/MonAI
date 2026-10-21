@@ -8,19 +8,12 @@ import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-// Display text for the wallets screens. Day and month names follow the
-// app's locale.
-
 extension WalletText on Wallet {
-  /// "Bank · Rp 3.065.000", for the archived list.
   String typeAndBalanceText(AppLocalizations l10n) =>
       '${type.label(l10n)} · ${formatRupiah(currentBalance)}';
 }
 
-/// A transaction as a wallet's "This month" list shows it, seen from
-/// [walletId].
 extension WalletTransactionText on Transaction {
-  /// The note, merchant or category; else "Transfer" or "Transaction".
   String titleIn(AppLocalizations l10n, Map<String, Category> categories) =>
       note ??
       merchant ??
@@ -30,8 +23,6 @@ extension WalletTransactionText on Transaction {
         .expense || .income => l10n.walletDetailUntitled,
       };
 
-  /// `Shopping · 9 Oct`, or `Transfer to GoPay · 9 Oct` from this wallet
-  /// and `Transfer from BCA · 9 Oct` into it.
   String metaIn(
     AppLocalizations l10n, {
     required String walletId,
@@ -55,8 +46,6 @@ extension WalletTransactionText on Transaction {
     return [what, day].nonNulls.join(' · ');
   }
 
-  /// `−Rp 35.000` / `+Rp 8.500.000`; a transfer is signed by whether it
-  /// leaves [walletId].
   String amountIn(String walletId) => switch (type) {
     .expense => formatRupiahSigned(amount, negative: true),
     .income => formatRupiahSigned(amount, negative: false),
@@ -72,12 +61,10 @@ extension WalletTransactionText on Transaction {
     .transfer => .transfer,
   };
 
-  /// The category's icon, or the transfer icon.
   MonAIIconData iconIn(Map<String, Category> categories) => type == .transfer
       ? MonAIIcons.swapHoriz
       : categoryIcon(categories[categoryId]?.icon);
 
-  /// The category's color; [transferColor] for a transfer.
   Color colorIn(
     Map<String, Category> categories, {
     required Color transferColor,

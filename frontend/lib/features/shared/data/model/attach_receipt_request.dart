@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'attach_receipt_request.freezed.dart';
 part 'attach_receipt_request.g.dart';
 
-/// `PATCH /transactions/{id}` with only a new receipt.
 @freezed
 abstract class AttachReceiptRequest with _$AttachReceiptRequest {
   const factory AttachReceiptRequest({

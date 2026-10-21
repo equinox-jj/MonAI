@@ -4,8 +4,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
 
-/// The Active switch. On an existing provider it applies at once; a system
-/// provider is always active.
 class ProviderFormActiveRow extends StatelessWidget {
   const ProviderFormActiveRow({required this.onToggled, super.key});
 

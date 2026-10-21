@@ -32,15 +32,9 @@ class TransactionsPage extends StatelessWidget {
   }
 }
 
-/// The month's transactions with their filters. Tablet landscape shows the
-/// tapped transaction beside the list.
 class TransactionsUI extends StatelessWidget {
   const TransactionsUI({super.key});
-
-  /// How close to the end of the list the next page is fetched.
   static const _loadMoreExtent = 600.0;
-
-  /// The list's width beside the detail pane.
   static const _listPaneWidth = 420.0;
 
   void _openSearch(BuildContext context) => context.push(
@@ -110,7 +104,6 @@ class TransactionsUI extends StatelessWidget {
     }
   }
 
-  /// Pull-to-refresh keeps its spinner until the refresh finishes.
   Future<void> _pullToRefresh(BuildContext context) async {
     final bloc = context.read<TransactionsBloc>()
       ..add(const TransactionsEvent.refreshed());
@@ -235,7 +228,6 @@ class _TransactionsScrollView extends StatelessWidget {
   }
 }
 
-/// The month picker, fed the totals of whichever year it shows.
 class _MonthPicker extends StatelessWidget {
   const _MonthPicker({required this.selected, required this.bloc});
 

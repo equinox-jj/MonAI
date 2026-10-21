@@ -7,18 +7,12 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_ai_failure.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/bloc/receipt_review_bloc.dart';
 
-/// What the review is: fields the AI filled are marked, or the AI gave no
-/// draft, with why and "Try again".
 class ReceiptReviewBanner extends StatelessWidget {
   const ReceiptReviewBanner({required this.onRetry, super.key, this.photoPath});
 
   static const _thumbWidth = 44.0;
   static const _thumbHeight = 56.0;
-
-  /// Sends the receipt's text to the AI again.
   final VoidCallback onRetry;
-
-  /// Shows a thumbnail of the photo; the tablet layout shows it whole.
   final String? photoPath;
 
   @override
@@ -102,7 +96,6 @@ class _Thumbnail extends StatelessWidget {
   }
 }
 
-/// "We filled the fields marked ✦ from your receipt…"
 class _FilledText extends StatelessWidget {
   const _FilledText({required this.color});
 
@@ -132,7 +125,6 @@ class _FilledText extends StatelessWidget {
   }
 }
 
-/// Why the AI gave no draft, with "Try again".
 class _FailedText extends StatelessWidget {
   const _FailedText({
     required this.failure,

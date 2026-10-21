@@ -2,14 +2,12 @@ import 'package:flutter/material.dart';
 
 import 'package:monai/core/ui/designsystem/theme/monai_palette.dart';
 
-/// Semantic colors from the MonAI design, as a [ThemeExtension].
-///
-/// Read them with `context.colors`. Naming: `text*` for foreground copy,
-/// `surface*` for fills, `border*` for strokes, and paired
-/// `x` / `xContainer` / `onXContainer` for status colors.
+/// Read with `context.colors`. Naming: `text*` for foreground copy, `surface*`
+/// for fills, `border*` for strokes, and paired `x` / `xContainer` /
+/// `onXContainer` for status colors.
 @immutable
 class MonAIColors extends ThemeExtension<MonAIColors> {
-  /// Creates a color set. Use [light] or [dark] instead of calling this.
+  /// Use [light] or [dark] instead of calling this.
   const MonAIColors({
     required this.isDark,
     required this.primary,
@@ -60,7 +58,6 @@ class MonAIColors extends ThemeExtension<MonAIColors> {
     required this.disabledContent,
   });
 
-  /// The light theme colors.
   static final light = MonAIColors(
     isDark: false,
     primary: MonAIPalette.indigo600,
@@ -111,7 +108,6 @@ class MonAIColors extends ThemeExtension<MonAIColors> {
     disabledContent: MonAIPalette.gray400,
   );
 
-  /// The dark theme colors.
   static final dark = MonAIColors(
     isDark: true,
     primary: MonAIPalette.indigo600,
@@ -162,35 +158,23 @@ class MonAIColors extends ThemeExtension<MonAIColors> {
     disabledContent: MonAIPalette.gray500,
   );
 
-  /// Whether these are the dark theme colors.
   final bool isDark;
 
   // Brand
 
-  /// Filled buttons, FAB, selected radio. Stays indigo 600 in dark mode.
   final Color primary;
 
   final Color onPrimary;
-
-  /// Links, icon accents, active tab icon.
   final Color accent;
-
-  /// 2px focus ring and selected-option border.
   final Color focus;
 
   final Color primaryContainer;
 
   final Color onPrimaryContainer;
-
-  /// Border of a selected filter chip, dashed empty-state border.
   final Color primaryContainerBorder;
-
-  /// Lime highlight used for badges and pills on the indigo gradient.
   final Color highlight;
 
   final Color onHighlight;
-
-  /// Secondary text on the indigo gradient.
   final Color onGradientMuted;
 
   final Color heroGradientStart;
@@ -202,19 +186,11 @@ class MonAIColors extends ThemeExtension<MonAIColors> {
   final Color background;
 
   final Color surface;
-
-  /// Inputs, segmented-control track, progress track.
   final Color surfaceSunken;
-
-  /// Number-pad keys.
   final Color surfaceKey;
-
-  /// Snackbar background.
   final Color inverseSurface;
 
   final Color onInverseSurface;
-
-  /// Snackbar action label.
   final Color inverseAccent;
 
   final Color scrim;
@@ -226,11 +202,7 @@ class MonAIColors extends ThemeExtension<MonAIColors> {
   final Color textSecondary;
 
   final Color textTertiary;
-
-  /// Disabled text, chevrons, version footer.
   final Color textDisabled;
-
-  /// Icon buttons in top bars and outlined button labels.
   final Color iconStrong;
 
   // Strokes
@@ -283,7 +255,6 @@ class MonAIColors extends ThemeExtension<MonAIColors> {
 
   final Color disabledContent;
 
-  /// The indigo gradient behind the balance hero and onboarding panel.
   LinearGradient get heroGradient => LinearGradient(
     begin: .topLeft,
     end: .bottomRight,

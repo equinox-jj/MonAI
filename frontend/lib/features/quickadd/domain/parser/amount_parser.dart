@@ -1,12 +1,8 @@
 import 'package:monai/features/quickadd/domain/parser/text_span.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 
-/// An amount found in lowercase quick-add text, with the characters it
-/// covers.
 class AmountMatch {
   const AmountMatch(this.amount, this.span, this.confidence);
-
-  /// Rupiah.
   final int amount;
   final TextSpan span;
   final double confidence;
@@ -44,7 +40,6 @@ abstract final class AmountParser {
     'sejuta': 1000000,
   };
 
-  /// Every amount in [text], in order.
   static List<AmountMatch> findAll(String text) {
     final numbers = _number.allMatches(text).map(_numberMatch).nonNulls;
     final slang = _slang

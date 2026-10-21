@@ -5,20 +5,15 @@ import 'package:monai/core/data/storage/app_preferences.dart';
 import 'package:monai/core/data/storage/token_storage.dart';
 
 abstract class AuthLocalDataSource {
-  /// Whether onboarding was finished on this device.
   Future<bool> isOnboardingCompleted();
 
-  /// Remembers that onboarding was finished, so it shows only once.
   Future<void> markOnboardingCompleted();
 
-  /// Stores [accessToken] and marks the session signed in.
   Future<void> startSession(String accessToken);
 
-  /// Deletes every cached row, e.g. a previous account's data.
   Future<void> clearCache();
 
-  /// Marks the session signed in when a token is stored; returns whether one
-  /// is.
+  /// True when a token is stored, which also marks the session signed in.
   Future<bool> restoreSession();
 }
 

@@ -88,7 +88,6 @@ void main() {
 
   tearDown(sl.reset);
 
-  /// The detail pane's bloc, for tablet landscape.
   void registerDetail() {
     final watchWallet = _MockWatchWallet();
     when(() => watchWallet(any())).thenAnswer(

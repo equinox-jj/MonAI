@@ -4,8 +4,7 @@ import 'package:monai/core/model/transaction_type.dart';
 
 part 'transaction_input.freezed.dart';
 
-/// A transaction as entered, for a create or a full update. Clean it up with
-/// `normalized` before validating and sending it.
+/// Clean it up with `normalized` before validating and sending it.
 @freezed
 abstract class TransactionInput with _$TransactionInput {
   const factory TransactionInput({

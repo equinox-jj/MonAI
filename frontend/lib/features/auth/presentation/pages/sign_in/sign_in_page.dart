@@ -14,8 +14,6 @@ import 'package:monai/features/auth/presentation/widgets/auth_scaffold.dart';
 /// A successful sign-in needs no navigation here: the saved session sends
 /// the router to Home.
 class SignInPage extends StatelessWidget {
-  /// [initialEmail] is the email typed on Register, if the user came from
-  /// there.
   const SignInPage({super.key, this.initialEmail = ''});
 
   final String initialEmail;
@@ -29,7 +27,6 @@ class SignInPage extends StatelessWidget {
   }
 }
 
-/// Stateful only to own the text controllers and focus nodes.
 class SignInUI extends StatefulWidget {
   const SignInUI({super.key, this.initialEmail = ''});
 
@@ -54,8 +51,6 @@ class _SignInUIState extends State<SignInUI> {
     super.dispose();
   }
 
-  /// Focus the first field with an error, so the keyboard and screen reader
-  /// land on it.
   void _onFailure(BuildContext context, SignInState state) {
     switch (state.focusField) {
       case .email:
@@ -96,8 +91,6 @@ class _SignInUIState extends State<SignInUI> {
   }
 }
 
-/// The layout. Built once; each part below subscribes to only the state it
-/// shows.
 class _SignInForm extends StatelessWidget {
   const _SignInForm({
     required this.email,
@@ -136,7 +129,6 @@ class _SignInForm extends StatelessWidget {
   }
 }
 
-/// The logo, title and, after a failed attempt, the error banner.
 class _Header extends StatelessWidget {
   const _Header();
 

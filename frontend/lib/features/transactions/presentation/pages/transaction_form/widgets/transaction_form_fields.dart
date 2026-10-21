@@ -10,10 +10,8 @@ import 'package:monai/features/transactions/presentation/model/transaction_text.
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_field_error.dart';
 
-/// Which wallet a picker sets.
 enum _WalletTarget { source, destination }
 
-/// The wallet and the date; a transfer's From → To above the date.
 class TransactionFormFields extends StatelessWidget {
   const TransactionFormFields({super.key});
 
@@ -164,8 +162,6 @@ class TransactionFormFields extends StatelessWidget {
   }
 }
 
-/// A tappable box with a small label over its value; amber with a warning
-/// when quick add filled it unsurely.
 class _SelectBox extends StatelessWidget {
   const _SelectBox({
     required this.label,
@@ -179,8 +175,6 @@ class _SelectBox extends StatelessWidget {
   final String value;
   final VoidCallback onTap;
   final MonAIIconData? icon;
-
-  /// Marks the value for the user to check.
   final bool check;
 
   @override

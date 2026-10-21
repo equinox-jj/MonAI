@@ -9,8 +9,6 @@ import 'package:monai/features/transactions/presentation/pages/transaction_form/
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_field_error.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_category_filter_sheet.dart';
 
-/// The categories of the form's type as a row of chips, with "All
-/// categories" for the full grid. Hidden for transfers.
 class TransactionFormCategory extends StatelessWidget {
   const TransactionFormCategory({super.key});
 

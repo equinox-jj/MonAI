@@ -29,9 +29,6 @@ part 'wallet_form_bloc.freezed.dart';
 part 'wallet_form_event.dart';
 part 'wallet_form_state.dart';
 
-/// The add and edit wallet form. The name and balance live in the screen's
-/// text fields and arrive with each edit and with save. Input is checked on
-/// save with the backend's rules, then again on every change.
 class WalletFormBloc extends Bloc<WalletFormEvent, WalletFormState> {
   WalletFormBloc({
     required WalletFormMode mode,
@@ -76,7 +73,6 @@ class WalletFormBloc extends Bloc<WalletFormEvent, WalletFormState> {
   StreamSubscription<void>? _providers;
   StreamSubscription<void>? _wallets;
 
-  /// The name last sent with an edit or save, for checks on other fields.
   String _lastName = '';
 
   Future<void> _onStarted(_Started event, Emitter<WalletFormState> emit) async {
@@ -155,8 +151,6 @@ class WalletFormBloc extends Bloc<WalletFormEvent, WalletFormState> {
     );
   }
 
-  /// Picking a provider names the wallet after it and takes its type;
-  /// "Custom" (null) clears both for the user to choose.
   void _onProviderPicked(_ProviderPicked event, Emitter<WalletFormState> emit) {
     final slug = event.slug;
     if (slug == state.providerSlug) return;
@@ -199,8 +193,6 @@ class WalletFormBloc extends Bloc<WalletFormEvent, WalletFormState> {
     _recheck(emit, {WalletInputValidator.initialBalanceField: null});
   }
 
-  /// Once a save failed on the input, re-checks the edited fields; [edited]
-  /// maps each to its text when the form field holds it.
   void _recheck(Emitter<WalletFormState> emit, Map<String, String?> edited) {
     if (!state.autovalidate) return;
     final name = edited[WalletInputValidator.nameField] ?? _lastName;
@@ -308,8 +300,6 @@ class WalletFormBloc extends Bloc<WalletFormEvent, WalletFormState> {
     }
   }
 
-  /// A wallet with transactions can't be deleted: the screen offers to
-  /// archive it instead.
   Future<void> _onDeleteRequested(
     _DeleteRequested event,
     Emitter<WalletFormState> emit,
@@ -335,7 +325,6 @@ class WalletFormBloc extends Bloc<WalletFormEvent, WalletFormState> {
     }
   }
 
-  /// Reports [failure] once and ends the save, archive or delete.
   void _fail(
     Emitter<WalletFormState> emit,
     Failure failure, {

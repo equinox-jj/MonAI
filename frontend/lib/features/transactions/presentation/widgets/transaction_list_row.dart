@@ -6,7 +6,6 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// One transaction in a list: icon, title, meta line and signed amount.
 class TransactionListRow extends StatelessWidget {
   const TransactionListRow({
     required this.transaction,
@@ -22,12 +21,7 @@ class TransactionListRow extends StatelessWidget {
   final TransactionLookups lookups;
   final ValueChanged<String> onTap;
   final bool showDivider;
-
-  /// Shown in the detail pane beside the list.
   final bool selected;
-
-  /// The meta line ends with the day rather than the time, for lists not
-  /// grouped by day.
   final bool showDate;
 
   @override

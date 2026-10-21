@@ -2,7 +2,6 @@ import 'package:monai/core/model/category_type.dart';
 import 'package:monai/features/quickadd/domain/parser/text_span.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// A category guessed from lowercase text.
 class CategoryMatch {
   const CategoryMatch(this.categoryId, this.confidence);
 
@@ -12,8 +11,6 @@ class CategoryMatch {
 
 class _Group {
   const _Group(this.categoryNames, this.keywords);
-
-  /// The default category's names in English and Indonesian.
   final List<String> categoryNames;
   final List<String> keywords;
 }
@@ -83,8 +80,7 @@ abstract final class CategoryKeywords {
     _Group(['bonus'], ['bonus', 'thr', 'insentif', 'komisi']),
   ];
 
-  /// The category [text] points to among [categories] of [type], or null
-  /// when nothing matches. Several hits pick the earliest in the text.
+  /// Several hits pick the earliest in the text.
   static CategoryMatch? find(
     String text,
     List<Category> categories,

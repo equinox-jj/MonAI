@@ -1,7 +1,6 @@
-/// One entry of `error.fields[]` in a 422 `validation_failed` response.
-///
-/// [code] (e.g. `required`, `min`, `email`) and [params] (e.g. `{"min": 8}`)
-/// drive localized text; [message] is the server's English fallback.
+/// One `error.fields[]` entry of a 422 response. [code] and [params] (e.g.
+/// `min`, `{"min": 8}`) drive the localized text; [message] is the English
+/// fallback.
 class FieldError {
   const FieldError({
     required this.field,
@@ -10,7 +9,6 @@ class FieldError {
     this.params = const {},
   });
 
-  /// Parses one `fields[]` item. Missing keys fall back to empty values.
   factory FieldError.fromJson(Map<dynamic, dynamic> json) {
     final rawParams = json['params'];
     return FieldError(
@@ -23,16 +21,9 @@ class FieldError {
     );
   }
 
-  /// The request field name (snake_case, as sent by the client).
   final String field;
-
-  /// Machine-readable rule that failed.
   final String code;
-
-  /// English fallback message.
   final String message;
-
-  /// Rule parameters used to fill the localized message.
   final Map<String, dynamic> params;
 
   @override
@@ -57,13 +48,7 @@ class FieldError {
   String toString() => 'FieldError($field, $code, $message, $params)';
 }
 
-/// Lookup helpers over a list of [FieldError]s.
 extension FieldErrorList on List<FieldError> {
-  /// Every error reported for [field].
-  List<FieldError> forField(String field) =>
-      where((e) => e.field == field).toList();
-
-  /// The first error reported for [field], or null if none.
   FieldError? firstForField(String field) {
     for (final e in this) {
       if (e.field == field) return e;

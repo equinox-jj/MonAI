@@ -5,7 +5,6 @@ import 'package:monai/features/shared/data/model/monthly_report_response.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 
 extension MonthlyReportDataMapper on MonthlyReportData {
-  /// The report row and its breakdown rows, in the server's order.
   MonthlyReportWithCategories toRows() {
     final reportMonth = parseApiMonth(month);
     final previousData = requireField(previous);

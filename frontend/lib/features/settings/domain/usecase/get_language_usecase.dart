@@ -4,7 +4,6 @@ import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/repository/settings_repository.dart';
 
-/// The picked app language.
 class GetLanguageUseCase implements UseCase<AppLanguage, NoParams> {
   GetLanguageUseCase(this._repository);
 

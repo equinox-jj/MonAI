@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'login_request.freezed.dart';
 part 'login_request.g.dart';
 
-/// The body of `POST /auth/login`.
 @freezed
 abstract class LoginRequest with _$LoginRequest {
   const factory LoginRequest({

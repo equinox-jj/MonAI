@@ -25,8 +25,6 @@ abstract final class TransactionCsvWriter {
   // A cell starting with one of these runs as a formula in a spreadsheet.
   static final _formulaStart = RegExp(r'^[=+\-@\t\r]');
 
-  /// The CSV of [transactions], naming wallets and categories by
-  /// [walletNames] and [categoryNames] (an unknown id is left blank).
   static String write(
     List<Transaction> transactions, {
     required Map<String, String> walletNames,

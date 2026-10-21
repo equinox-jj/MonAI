@@ -4,8 +4,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 
-/// All types, Expense, Income or Transfer; Apply sends the choice (null for
-/// all) to [onApply] and closes. Show it with [showMonAIBottomSheet].
 class TransactionTypeFilterSheet extends StatefulWidget {
   const TransactionTypeFilterSheet({
     required this.selected,
@@ -24,8 +22,6 @@ class TransactionTypeFilterSheet extends StatefulWidget {
 class _TransactionTypeFilterSheetState
     extends State<TransactionTypeFilterSheet> {
   late final _selected = ValueNotifier<TransactionType?>(widget.selected);
-
-  /// Null is "All types".
   static const _options = <TransactionType?>[null, ...TransactionType.values];
 
   @override

@@ -18,7 +18,6 @@ import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.da
 /// the separator for next time.
 class ExportTransactionsCsvUseCase
     implements UseCase<ExportedCsv, ExportCsvParams> {
-  /// [now] is the clock; tests pass a fixed one.
   ExportTransactionsCsvUseCase({
     required this._repository,
     required this._wallets,
@@ -94,8 +93,7 @@ class ExportTransactionsCsvUseCase
     return 'monai-transactions-$span.csv';
   }
 
-  /// Every transaction of [range] and whether it came from the server. The
-  /// first connection failure switches to the cache.
+  /// The first connection failure switches to the cache.
   Future<Either<Failure, (List<Transaction>, bool)>> _fetch(
     ExportRange range,
   ) async {

@@ -9,8 +9,6 @@ import 'package:monai/features/wallets/domain/validation/wallet_input_validator.
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_field_error_text.dart';
 
-/// The add form's "Type": a custom wallet's choice, or the provider's type
-/// shown fixed.
 class WalletFormTypePicker extends StatelessWidget {
   const WalletFormTypePicker({required this.onPicked, super.key});
 

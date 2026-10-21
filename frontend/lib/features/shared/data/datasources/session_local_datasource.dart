@@ -4,13 +4,12 @@ import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/core/data/storage/token_storage.dart';
 
 abstract class SessionLocalDataSource {
-  /// Removes the token, clears the cache and marks the session signed out.
   /// Only a token that fails to clear throws: once it is gone the user is
   /// signed out, and the next sign-in clears a cache left behind.
   Future<void> endSession();
 
-  /// Ends the session like [endSession], after a password change: the app
-  /// shows the password-changed dialog instead of going straight to Sign in.
+  /// Like [endSession], but the app shows the password-changed dialog instead
+  /// of going straight to Sign in.
   Future<void> endSessionAfterPasswordChange();
 }
 

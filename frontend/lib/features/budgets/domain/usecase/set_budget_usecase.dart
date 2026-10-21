@@ -5,10 +5,8 @@ import 'package:monai/features/budgets/domain/validation/budget_limit_rule.dart'
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/repository/budget_repository.dart';
 
-/// The month and limit to save.
 typedef SetBudgetParams = ({DateTime month, int limit});
 
-/// Sets a month's spending limit, after checking it with the backend's rule.
 class SetBudgetUseCase implements UseCase<Budget, SetBudgetParams> {
   SetBudgetUseCase(this._repository);
 

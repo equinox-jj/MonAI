@@ -3,7 +3,6 @@ import 'package:monai/core/model/wallet_type.dart';
 
 part 'payment_provider.freezed.dart';
 
-/// A bank or e-wallet from the server's catalog that a wallet can link to.
 @freezed
 abstract class PaymentProvider with _$PaymentProvider {
   const factory PaymentProvider({

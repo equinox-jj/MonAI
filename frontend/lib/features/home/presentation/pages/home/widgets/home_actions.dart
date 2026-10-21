@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Where Home's buttons and links lead. The screen fills these in; the
-/// sections only call them.
 @immutable
 class HomeActions {
   const HomeActions({

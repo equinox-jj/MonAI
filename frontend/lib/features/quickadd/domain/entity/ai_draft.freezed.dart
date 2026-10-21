@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$AiDraft {
 
- TransactionType? get type;/// Rupiah.
- int? get amount; String? get walletId; String? get toWalletId; String? get categoryId;/// Local midnight.
+ TransactionType? get type; int? get amount; String? get walletId; String? get toWalletId; String? get categoryId;/// Local midnight.
  DateTime? get date; String? get note; String? get merchant; DraftConfidence get confidence;
 /// Create a copy of AiDraft
 /// with the given fields replaced by the non-null parameter values.
@@ -235,7 +234,6 @@ class _AiDraft implements AiDraft {
   
 
 @override final  TransactionType? type;
-/// Rupiah.
 @override final  int? amount;
 @override final  String? walletId;
 @override final  String? toWalletId;

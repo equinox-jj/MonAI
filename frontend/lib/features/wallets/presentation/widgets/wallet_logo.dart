@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/utils/monograms.dart';
 
-/// A provider's or wallet's round logo: the image at [logoUrl], else the
-/// monogram of [name].
 class WalletLogo extends StatelessWidget {
   const WalletLogo({
     required this.name,

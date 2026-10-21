@@ -1,6 +1,5 @@
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// What a category is, which decides what the user may do with it.
 enum CategoryKind {
   /// Seeded for every user: can be hidden, not deleted.
   standard,
@@ -11,7 +10,6 @@ enum CategoryKind {
   /// "Other": always kept so every transaction has a category.
   system;
 
-  /// The kind of [category].
   static CategoryKind of(Category category) => category.isSystem
       ? system
       : category.isDefault
@@ -19,11 +17,9 @@ enum CategoryKind {
       : custom;
 }
 
-/// The server's rules for changing a category, checked before asking it.
 extension CategoryRules on Category {
   CategoryKind get kind => CategoryKind.of(this);
 
-  /// A default category, or a hidden custom one to show it again.
   bool get canToggleHidden => switch (kind) {
     .standard => true,
     .custom => isHidden,

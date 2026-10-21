@@ -387,11 +387,7 @@ as OnboardingExit,
 /// @nodoc
 mixin _$OnboardingState {
 
-/// The current page, from 0.
- int get page;/// [UiStatus.loading] while saving the onboarding flag, then
-/// [UiStatus.success] once the user may leave.
- UiStatus get status;/// Where to go once [status] is success; the screen navigates on it.
- OnboardingExit? get exit;
+ int get page; UiStatus get status; OnboardingExit? get exit;
 /// Create a copy of OnboardingState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -593,12 +589,8 @@ class _OnboardingState implements OnboardingState {
   const _OnboardingState({this.page = 0, this.status = UiStatus.initial, this.exit});
   
 
-/// The current page, from 0.
 @override@JsonKey() final  int page;
-/// [UiStatus.loading] while saving the onboarding flag, then
-/// [UiStatus.success] once the user may leave.
 @override@JsonKey() final  UiStatus status;
-/// Where to go once [status] is success; the screen navigates on it.
 @override final  OnboardingExit? exit;
 
 /// Create a copy of OnboardingState

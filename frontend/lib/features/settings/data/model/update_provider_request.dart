@@ -3,8 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'update_provider_request.freezed.dart';
 part 'update_provider_request.g.dart';
 
-/// `PATCH /admin/payment-providers/{id}`; null fields are left out, so they
-/// don't change.
+/// Null fields are left out, so they don't change.
 @freezed
 abstract class UpdateProviderRequest with _$UpdateProviderRequest {
   const factory UpdateProviderRequest({

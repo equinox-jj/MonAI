@@ -34,7 +34,6 @@ date BETWEEN ?1 AND ?2
 
   static const _listOrder = 'ORDER BY date DESC, id DESC';
 
-  /// The first [limit] transactions [filter] matches.
   Stream<List<TransactionRow>> watchPage(
     TransactionFilter filter, {
     required int limit,
@@ -44,8 +43,6 @@ date BETWEEN ?1 AND ?2
     readsFrom: {transactions},
   ).watch().map(_rows);
 
-  /// Offline search: the first [limit] transactions [filter] matches whose
-  /// note or merchant matches [match]. Build [match] with `toFtsMatchQuery`.
   Stream<List<TransactionRow>> watchSearch(
     String match,
     TransactionFilter filter, {
@@ -66,8 +63,6 @@ LIMIT ?7''',
     readsFrom: {transactions, transactionsFts},
   ).watch().map(_rows);
 
-  /// Each cached day's net for the list's day headers, for the transactions
-  /// [filter] matches.
   Stream<List<DailyNet>> watchDailyNets(TransactionFilter filter) =>
       customSelect(
         '''
@@ -93,9 +88,7 @@ GROUP BY date''',
             .toList(),
       );
 
-  /// Each cached day's money leaving [walletId]: its expenses plus transfers
-  /// out of it, for the wallet detail's "Money out" chart. Transfers into the
-  /// wallet don't count.
+  /// Expenses plus transfers out of [walletId]; transfers into it don't count.
   Stream<List<DailyAmount>> watchDailyOutflows(
     DateTime from,
     DateTime to,
@@ -128,18 +121,15 @@ GROUP BY date''',
             .toList(),
       );
 
-  /// The transaction with [id], or null when it isn't cached.
   Stream<TransactionRow?> watch(String id) =>
       (select(transactions)..where((t) => t.id.equals(id))).watchSingleOrNull();
 
-  /// The newest [limit] transactions dated from [from] to [to].
   Stream<List<TransactionRow>> watchRecent(
     DateTime from,
     DateTime to, {
     required int limit,
   }) => (_between(from, to)..limit(limit)).watch();
 
-  /// Every cached transaction dated from [from] to [to], for an export.
   Future<List<TransactionRow>> between(DateTime from, DateTime to) =>
       _between(from, to).get();
 
@@ -174,13 +164,11 @@ GROUP BY date''',
   Future<void> deleteById(String id) =>
       (delete(transactions)..where((t) => t.id.equals(id))).go();
 
-  /// Follows the server moving a deleted category's transactions to [to].
   Future<void> moveCategory(String from, String to) =>
       (update(transactions)..where((t) => t.categoryId.equals(from))).write(
         TransactionsCompanion(categoryId: Value(to)),
       );
 
-  /// Drops a date range before a refresh re-fills it.
   Future<void> deleteInRange(DateTime from, DateTime to) =>
       (delete(transactions)..where((t) => _dateBetween(t, from, to))).go();
 
@@ -197,7 +185,6 @@ GROUP BY date''',
         .go();
   }
 
-  /// Drops the rows a filtered list shows, before its refresh re-fills them.
   Future<void> deleteMatching(TransactionFilter filter) => customUpdate(
     'DELETE FROM transactions WHERE $_filterWhere',
     variables: _filterVariables(filter),
@@ -205,7 +192,6 @@ GROUP BY date''',
     updateKind: UpdateKind.delete,
   );
 
-  /// Where paging left off for [queryKey], or null before its first page.
   Future<TransactionRemoteKeyRow?> remoteKey(String queryKey) => (select(
     transactionRemoteKeys,
   )..where((t) => t.queryKey.equals(queryKey))).getSingleOrNull();
@@ -214,9 +200,7 @@ GROUP BY date''',
       into(transactionRemoteKeys)
           .insertOnConflictUpdate(key.toCompanion(false));
 
-  /// A list refresh: replaces what [filter] covers with its first page and
-  /// saves where the next page starts, in one transaction so the list never
-  /// shows a gap.
+  /// In one transaction, so the list never shows a gap.
   Future<void> replaceQueryPage(
     TransactionFilter filter,
     List<TransactionRow> rows,
@@ -227,7 +211,6 @@ GROUP BY date''',
     await upsertRemoteKey(key);
   });
 
-  /// A list append: adds the next page and moves the cursor on.
   Future<void> appendQueryPage(
     List<TransactionRow> rows,
     TransactionRemoteKeyRow key,

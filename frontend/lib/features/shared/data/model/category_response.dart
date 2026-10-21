@@ -4,7 +4,6 @@ import 'package:monai/features/shared/data/model/category_list_response.dart';
 part 'category_response.freezed.dart';
 part 'category_response.g.dart';
 
-/// `POST /categories` and `PATCH /categories/{id}`.
 @freezed
 abstract class CategoryResponse with _$CategoryResponse {
   const factory CategoryResponse({

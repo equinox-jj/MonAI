@@ -2,34 +2,17 @@ import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/domain/validation/default_wallet_rule.dart';
 
-/// Why a wallets screen couldn't load or change something, as the user is
-/// told.
 enum WalletFailure {
-  /// No connection or a timeout.
   network,
-
-  /// The wallet no longer exists.
   notFound,
-
-  /// The default wallet can't be archived or deleted.
   defaultWalletRequired,
-
-  /// A wallet with transactions can only be archived.
   hasTransactions,
-
-  /// An archived wallet can't be the default.
   archived,
-
-  /// Another wallet already has the name.
   nameTaken,
-
-  /// Anything else.
   unexpected;
 
-  /// The server's `error.code` for a wallet with transactions.
   static const hasTransactionsCode = 'wallet_has_transactions';
 
-  /// The kind of [failure].
   static WalletFailure of(Failure failure) => switch (failure) {
     NetworkFailure() || TimeoutFailure() => network,
     NotFoundFailure() => notFound,
@@ -40,7 +23,6 @@ enum WalletFailure {
     _ => unexpected,
   };
 
-  /// The message for a failed load or action.
   String message(AppLocalizations l10n) => switch (this) {
     network => l10n.walletsErrorNetwork,
     notFound => l10n.walletsErrorNotFound,

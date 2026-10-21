@@ -14,8 +14,7 @@ import 'package:monai/features/transactions/presentation/model/transaction_failu
 part 'undo_delete_cubit.freezed.dart';
 part 'undo_delete_state.dart';
 
-/// Offers to undo each transaction deleted anywhere in the app, for
-/// [undoWindow]. One app-wide instance sits around the signed-in screens.
+/// One app-wide instance sits around the signed-in screens.
 class UndoDeleteCubit extends Cubit<UndoDeleteState> {
   UndoDeleteCubit({
     required this._watchDeletions,
@@ -23,7 +22,6 @@ class UndoDeleteCubit extends Cubit<UndoDeleteState> {
     required this._restore,
   }) : super(const UndoDeleteState());
 
-  /// How long the undo stays offered.
   static const undoWindow = Duration(seconds: 5);
 
   final WatchTransactionDeletionsUseCase _watchDeletions;
@@ -33,7 +31,6 @@ class UndoDeleteCubit extends Cubit<UndoDeleteState> {
   StreamSubscription<void>? _deletions;
   StreamSubscription<void>? _lookups;
 
-  /// Starts listening for deletes.
   void started() {
     _deletions ??= _watchDeletions(const NoParams())
         .listen((result) => result.match((_) {}, _offerUndo));
@@ -48,7 +45,6 @@ class UndoDeleteCubit extends Cubit<UndoDeleteState> {
   void _offerUndo(Transaction deleted) =>
       emit(state.copyWith(deleted: deleted, restoreFailure: null));
 
-  /// Restores the offered transaction.
   Future<void> undo() async {
     final deleted = state.deleted;
     if (deleted == null || state.isRestoring) return;
@@ -68,7 +64,6 @@ class UndoDeleteCubit extends Cubit<UndoDeleteState> {
     }
   }
 
-  /// The undo timed out or was swiped away.
   void dismissed() {
     if (state.deleted != null) emit(state.copyWith(deleted: null));
   }

@@ -9,7 +9,6 @@ import 'package:monai/features/quickadd/domain/parser/quick_add_parser.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 
-/// `Today`, `Yesterday`, else `Thu, 8 Oct`.
 String quickAddDayText(
   DateTime day,
   DateTime today,
@@ -23,7 +22,6 @@ String quickAddDayText(
   return DateFormat('EEE, d MMM', locale).format(day);
 }
 
-/// `Today, 10 Oct`, `Yesterday, 9 Oct`, else `Thu, 8 Oct 2026`.
 String quickAddDateText(
   DateTime day,
   DateTime today,
@@ -38,7 +36,6 @@ String quickAddDateText(
   return DateFormat('EEE, d MMM y', locale).format(day);
 }
 
-/// The text of the review's [MonAIDatePickerSheet], up to [today].
 MonAIDatePickerLabels quickAddDatePickerLabels(
   AppLocalizations l10n, {
   required DateTime today,
@@ -54,8 +51,6 @@ MonAIDatePickerLabels quickAddDatePickerLabels(
   set: l10n.transactionFormSetDate,
 );
 
-/// A draft's amount as a signed rupiah: `−Rp 35.000`, `+Rp 8.000.000`, or
-/// `Rp —` without one.
 String quickAddAmountText(QuickAddDraft draft, AppLocalizations l10n) =>
     switch ((draft.amount, draft.type)) {
       (null, _) => l10n.quickAddNoAmount,
@@ -66,7 +61,6 @@ String quickAddAmountText(QuickAddDraft draft, AppLocalizations l10n) =>
       ),
     };
 
-/// One "understood" chip under the phrase.
 @immutable
 class QuickAddChip {
   const QuickAddChip({
@@ -77,8 +71,6 @@ class QuickAddChip {
 
   final MonAIIconData icon;
   final String text;
-
-  /// Shown amber: missing, guessed or unsure.
   final bool unsure;
 
   @override
@@ -92,8 +84,6 @@ class QuickAddChip {
   int get hashCode => Object.hash(icon, text, unsure);
 }
 
-/// Chips for every draft's amount and category, then the wallets and dates
-/// they share, without repeats.
 List<QuickAddChip> quickAddChips(
   List<QuickAddDraft> drafts,
   ParseContext context,
@@ -147,7 +137,6 @@ List<QuickAddChip> quickAddChips(
   return chips.toSet().toList();
 }
 
-/// One draft in the list under the phrase.
 @immutable
 class QuickAddDraftRow {
   const QuickAddDraftRow({
@@ -161,13 +150,9 @@ class QuickAddDraftRow {
 
   final TransactionType type;
   final String title;
-
-  /// `Food · GoPay · Today`.
   final String meta;
   final String amount;
   final bool missingAmount;
-
-  /// Drawn as the row's icon; null for a transfer or no category.
   final Category? category;
 
   @override
@@ -226,7 +211,6 @@ QuickAddDraftRow _row(
   );
 }
 
-/// Who read the phrase, or which guess the user should know about.
 enum QuickAddEngineNoteKind { onPhone, defaultWallet, willAskAi, askedAi }
 
 @immutable
@@ -234,8 +218,6 @@ class QuickAddEngineNote {
   const QuickAddEngineNote(this.kind, [this.walletName]);
 
   final QuickAddEngineNoteKind kind;
-
-  /// The default wallet in use, for [QuickAddEngineNoteKind.defaultWallet].
   final String? walletName;
 
   String text(AppLocalizations l10n) => switch (kind) {
@@ -261,8 +243,6 @@ class QuickAddEngineNote {
   int get hashCode => Object.hash(kind, walletName);
 }
 
-/// Null with no drafts, or when the AI couldn't help (the fallback banner
-/// says so instead).
 QuickAddEngineNote? quickAddEngineNote(
   List<QuickAddDraft> drafts,
   DraftEngine engine,
@@ -283,7 +263,6 @@ QuickAddEngineNote? quickAddEngineNote(
   };
 }
 
-/// The fallback banner's title for [failure].
 String quickAddFallbackTitle(
   QuickAddAiFailure? failure,
   AppLocalizations l10n,

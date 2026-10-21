@@ -6,8 +6,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/undo_delete/cubit/undo_delete_cubit.dart';
 
-/// Wraps the signed-in screens: after any transaction is deleted, a snackbar
-/// offers to undo it for a few seconds.
 class UndoDeleteHost extends StatelessWidget {
   const UndoDeleteHost({required this.child, super.key});
 
@@ -22,8 +20,6 @@ class UndoDeleteHost extends StatelessWidget {
   }
 }
 
-/// Shows the undo and restore-failure snackbars of the [UndoDeleteCubit]
-/// above it.
 class UndoDeleteListener extends StatelessWidget {
   const UndoDeleteListener({required this.child, super.key});
 

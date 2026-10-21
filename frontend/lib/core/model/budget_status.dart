@@ -1,4 +1,3 @@
-/// A month's spending against its budget, as calculated by the server.
 enum BudgetStatus {
   /// Below 80% of the limit.
   ok,

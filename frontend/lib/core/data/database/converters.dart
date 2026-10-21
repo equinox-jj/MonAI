@@ -2,9 +2,8 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 
-/// Stores a calendar date as ISO `yyyy-MM-dd` text, which sorts in date order
-/// so `ORDER BY` and `BETWEEN` work on the column directly. Reads back as
-/// local midnight; any time of day is dropped on write.
+/// ISO `yyyy-MM-dd` text, so `ORDER BY` and `BETWEEN` work on the column.
+/// Reads back as local midnight; the time of day is dropped on write.
 class DateOnlyConverter extends TypeConverter<DateTime, String> {
   const DateOnlyConverter();
 
@@ -16,8 +15,7 @@ class DateOnlyConverter extends TypeConverter<DateTime, String> {
       '${_year(value)}-${_two(value.month)}-${_two(value.day)}';
 }
 
-/// Stores a month as ISO `yyyy-MM` text, which sorts in month order. Reads back
-/// as the first day of the month at local midnight.
+/// ISO `yyyy-MM` text; reads back as the first of the month at local midnight.
 class YearMonthConverter extends TypeConverter<DateTime, String> {
   const YearMonthConverter();
 
@@ -31,7 +29,6 @@ class YearMonthConverter extends TypeConverter<DateTime, String> {
   String toSql(DateTime value) => '${_year(value)}-${_two(value.month)}';
 }
 
-/// Stores a list of strings as a JSON array.
 class StringListConverter extends TypeConverter<List<String>, String> {
   const StringListConverter();
 

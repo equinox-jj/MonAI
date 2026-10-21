@@ -6,7 +6,6 @@ import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
 
-/// Cash, Bank, E-wallet or Other; none is picked on a new provider.
 class ProviderFormType extends StatelessWidget {
   const ProviderFormType({required this.onPick, super.key});
 

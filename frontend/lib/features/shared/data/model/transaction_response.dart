@@ -3,8 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'transaction_response.freezed.dart';
 part 'transaction_response.g.dart';
 
-/// `GET`, `POST`, `PATCH` `/transactions/{id}` and
-/// `POST /transactions/{id}/restore`.
 @freezed
 abstract class TransactionResponse with _$TransactionResponse {
   const factory TransactionResponse({

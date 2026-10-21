@@ -6,7 +6,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 
-/// Uploads a receipt photo and gives it to an existing transaction.
 class AttachReceiptUseCase
     implements UseCase<Transaction, AttachReceiptParams> {
   AttachReceiptUseCase(this._repository);
@@ -29,8 +28,6 @@ class AttachReceiptUseCase
   }
 }
 
-/// The transaction and its encoded receipt photo (JPEG or WebP, at most
-/// 5 MB).
 class AttachReceiptParams {
   const AttachReceiptParams({
     required this.transactionId,

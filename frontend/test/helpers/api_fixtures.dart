@@ -128,7 +128,6 @@ Map<String, dynamic> meJson() => {
   'created_at': timestampJson,
 };
 
-/// The success envelope around [data], with [meta] when given.
 Map<String, dynamic> envelope(Object? data, {Map<String, dynamic>? meta}) => {
   'success': true,
   'message': 'OK',
@@ -136,7 +135,6 @@ Map<String, dynamic> envelope(Object? data, {Map<String, dynamic>? meta}) => {
   'meta': ?meta,
 };
 
-/// A 2xx response to [path] carrying [data].
 Response<Map<String, dynamic>> okResponse(
   String path,
   Map<String, dynamic>? data, {
@@ -149,7 +147,6 @@ Response<Map<String, dynamic>> okResponse(
   headers: Headers.fromMap(headers),
 );
 
-/// What Dio throws for an error response to [path].
 DioException errorResponse(String path, int statusCode, String code) {
   final options = RequestOptions(path: path);
   return DioException(

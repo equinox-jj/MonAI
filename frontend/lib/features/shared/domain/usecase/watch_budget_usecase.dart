@@ -4,7 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/repository/budget_repository.dart';
 
-/// The budget of a month (the first of the month); null when none is set.
 class WatchBudgetUseCase implements StreamUseCase<Budget?, DateTime> {
   WatchBudgetUseCase(this._repository);
 

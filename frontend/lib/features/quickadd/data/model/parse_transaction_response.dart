@@ -4,7 +4,6 @@ import 'package:monai/features/shared/data/model/draft_confidence_data.dart';
 part 'parse_transaction_response.freezed.dart';
 part 'parse_transaction_response.g.dart';
 
-/// `POST /ai/parse-transaction`.
 @freezed
 abstract class ParseTransactionResponse with _$ParseTransactionResponse {
   const factory ParseTransactionResponse({

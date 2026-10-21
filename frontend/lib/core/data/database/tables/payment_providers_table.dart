@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 import 'package:monai/core/data/database/converters.dart';
 import 'package:monai/core/model/wallet_type.dart';
 
-/// The catalog of banks and e-wallets a wallet can be linked to.
 @DataClassName('PaymentProviderRow')
 class PaymentProviders extends Table {
   TextColumn get id => text()();

@@ -32,12 +32,7 @@ part 'transactions_bloc.freezed.dart';
 part 'transactions_event.dart';
 part 'transactions_state.dart';
 
-/// One month of transactions, narrowed by the filters, a page at a time.
-/// Shows the cache at once and refreshes from the API in the background; a
-/// failed refresh keeps what is cached, and only a first load with nothing
-/// cached becomes an error.
 class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
-  /// [now] is the clock; tests pass a fixed one.
   TransactionsBloc({
     required this._watchTransactions,
     required this._refreshTransactions,
@@ -107,7 +102,6 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     return _show(emit, state.month, state.filter);
   }
 
-  /// Reads the clock again, so "today" and the latest month move on.
   Future<void> _onRefreshed(
     _Refreshed event,
     Emitter<TransactionsState> emit,
@@ -188,8 +182,6 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     await _show(emit, state.month, filter);
   }
 
-  /// Switches the list to [month] and [filter]: the cache at once, then a
-  /// refresh.
   Future<void> _show(
     Emitter<TransactionsState> emit,
     DateTime month,
@@ -261,9 +253,7 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     );
   }
 
-  /// Re-fetches the first page and the month's report, and the names when
-  /// [refreshNames]. Only the list's result is reported: the totals and
-  /// names are best effort.
+  /// Only the list's result is reported: the totals and names are best effort.
   Future<void> _refresh(
     Emitter<TransactionsState> emit, {
     required bool refreshNames,
@@ -414,14 +404,13 @@ class TransactionsBloc extends Bloc<TransactionsEvent, TransactionsState> {
     emit(state.copyWith(monthPickerTotals: event.totals));
   }
 
-  /// Shows a failure once: the screen's listener has seen it by now.
+  /// The screen's listener has seen it by now.
   void _clearActionFailure(Emitter<TransactionsState> emit) {
     if (state.actionFailure != null) {
       emit(state.copyWith(actionFailure: null));
     }
   }
 
-  /// [state] with the status its data calls for.
   static TransactionsState _settled(TransactionsState state) => state.copyWith(
     status: switch (state) {
       _ when state.visibleTransactions.isNotEmpty => UiStatus.success,

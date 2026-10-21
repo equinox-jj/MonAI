@@ -11,20 +11,10 @@ import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// The state a field's border and supporting text show.
-enum MonAIFieldTone {
-  /// Gray border, gray supporting text.
-  neutral,
+enum MonAIFieldTone { neutral, error, success }
 
-  /// Red 2px border, trailing error icon, red supporting text.
-  error,
-
-  /// Green supporting text with a check icon, e.g. "At least 8 characters".
-  success,
-}
-
-/// An input decoration with no fill, border or counter, so the app's
-/// `inputDecorationTheme` doesn't draw a second box inside the design's frame.
+/// No fill, border or counter, so the app's `inputDecorationTheme` doesn't
+/// draw a second box inside the design's frame.
 InputDecoration _bareDecoration(String? hint, TextStyle? hintStyle) {
   return InputDecoration(
     isCollapsed: true,
@@ -44,13 +34,7 @@ InputDecoration _bareDecoration(String? hint, TextStyle? hintStyle) {
   );
 }
 
-/// Filled text field: label above, gray fill, 12 corners, 2px indigo ring on
-/// focus.
-///
-/// Pass a null [label] for label-less fields like the note input (then give
-/// [placeholder]). [compact] makes it 48 tall instead of 56.
 class MonAITextField extends StatefulWidget {
-  /// Creates a text field.
   const MonAITextField({
     super.key,
     this.controller,
@@ -76,67 +60,26 @@ class MonAITextField extends StatefulWidget {
     this.maxLength,
   });
 
-  /// Holds the text. Created internally when null.
   final TextEditingController? controller;
-
-  /// Focus of the input. Created internally when null.
   final FocusNode? focusNode;
-
-  /// Called on every edit.
   final ValueChanged<String>? onChanged;
-
-  /// Called when the keyboard action is pressed.
   final ValueChanged<String>? onSubmitted;
-
-  /// Shown above the field.
   final String? label;
-
-  /// Shown inside the field while it's empty.
   final String? placeholder;
-
-  /// An icon at the start of the field.
   final MonAIIconData? leadingIcon;
-
-  /// Fixed text before the input, e.g. the "Rp" of a money field.
   final String? prefix;
-
-  /// A widget at the end of the field, e.g. a visibility toggle.
   final Widget? trailing;
-
-  /// Helper or error text under the field.
   final String? supportingText;
-
-  /// An inline link after [supportingText], e.g. "Sign in instead".
   final String? supportingLinkLabel;
-
-  /// Called when [supportingLinkLabel] is tapped.
   final VoidCallback? onSupportingLinkTap;
-
-  /// Border and supporting-text state.
   final MonAIFieldTone tone;
-
-  /// 48 tall instead of 56, for secondary inputs like the note.
   final bool compact;
-
-  /// Whether the field accepts input.
   final bool enabled;
-
-  /// Hides the text, for passwords.
   final bool obscureText;
-
-  /// The keyboard to show.
   final TextInputType? keyboardType;
-
-  /// The keyboard's action button.
   final TextInputAction? textInputAction;
-
-  /// What autofill should offer, e.g. [AutofillHints.email].
   final Iterable<String>? autofillHints;
-
-  /// Restricts or reformats input.
   final List<TextInputFormatter>? inputFormatters;
-
-  /// Maximum characters, without a visible counter.
   final int? maxLength;
 
   @override
@@ -242,8 +185,7 @@ class _MonAITextFieldState extends State<MonAITextField> {
   }
 }
 
-/// The filled, rounded box around the input. Only this rebuilds when focus
-/// changes, to swap the border.
+/// Only this rebuilds when focus changes, to swap the border.
 class _FieldFrame extends StatelessWidget {
   const _FieldFrame({
     required this.focusNode,
@@ -357,10 +299,7 @@ class _SupportingTextState extends State<_SupportingText> {
   }
 }
 
-/// [MonAITextField] with a lock icon and a show/hide toggle.
 class MonAIPasswordField extends StatefulWidget {
-  /// Creates a password field. The toggle labels are read by screen readers;
-  /// pass localized strings.
   const MonAIPasswordField({
     required this.showPasswordLabel,
     required this.hidePasswordLabel,
@@ -378,43 +317,18 @@ class MonAIPasswordField extends StatefulWidget {
     this.autofillHints = const [AutofillHints.password],
   });
 
-  /// Holds the text. Created internally when null.
   final TextEditingController? controller;
-
-  /// Focus of the input.
   final FocusNode? focusNode;
-
-  /// Called on every edit.
   final ValueChanged<String>? onChanged;
-
-  /// Called when the keyboard action is pressed.
   final ValueChanged<String>? onSubmitted;
-
-  /// Shown above the field.
   final String? label;
-
-  /// Shown inside the field while it's empty.
   final String? placeholder;
-
-  /// Helper or error text under the field.
   final String? supportingText;
-
-  /// Border and supporting-text state.
   final MonAIFieldTone tone;
-
-  /// Whether the field accepts input.
   final bool enabled;
-
-  /// The keyboard's action button.
   final TextInputAction? textInputAction;
-
-  /// Autofill hints; [AutofillHints.newPassword] on sign-up.
   final Iterable<String>? autofillHints;
-
-  /// Toggle label while the password is hidden.
   final String showPasswordLabel;
-
-  /// Toggle label while the password is visible.
   final String hidePasswordLabel;
 
   @override
@@ -462,11 +376,7 @@ class _MonAIPasswordFieldState extends State<MonAIPasswordField> {
   }
 }
 
-/// Pill search input on a surface (Transactions, search results).
-///
-/// Shows a clear button while it has text.
 class MonAISearchField extends StatefulWidget {
-  /// Creates a search field.
   const MonAISearchField({
     required this.placeholder,
     required this.clearLabel,
@@ -477,22 +387,11 @@ class MonAISearchField extends StatefulWidget {
     this.autofocus = false,
   });
 
-  /// Shown while empty.
   final String placeholder;
-
-  /// The clear button's accessibility label.
   final String clearLabel;
-
-  /// Holds the text. Created internally when null.
   final TextEditingController? controller;
-
-  /// Called on every edit, including clear.
   final ValueChanged<String>? onChanged;
-
-  /// Called when search is pressed on the keyboard.
   final ValueChanged<String>? onSubmitted;
-
-  /// Focuses the field when it first appears.
   final bool autofocus;
 
   @override
@@ -561,10 +460,7 @@ class _MonAISearchFieldState extends State<MonAISearchField> {
   }
 }
 
-/// A pill that looks like an input but opens another screen: the Home search
-/// and quick-add entries. [text] is placeholder-colored.
 class MonAIPillField extends StatelessWidget {
-  /// Creates a pill field.
   const MonAIPillField({
     required this.text,
     required this.leadingIcon,
@@ -574,19 +470,10 @@ class MonAIPillField extends StatelessWidget {
     this.height = MonAISizes.searchField,
   });
 
-  /// The placeholder-like text.
   final String text;
-
-  /// The icon at the start.
   final MonAIIconData leadingIcon;
-
-  /// Opens the real input.
   final VoidCallback onTap;
-
-  /// Defaults to the tertiary text color; quick-add uses the accent.
   final Color? leadingIconColor;
-
-  /// 48 for search, [MonAISizes.quickAddField] for quick-add.
   final double height;
 
   @override
@@ -643,100 +530,6 @@ class _PillFrame extends StatelessWidget {
               right: MonAISpacing.x1_5,
             ),
             child: Row(spacing: MonAISpacing.x2_5, children: children),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Read-only field that opens a picker: wallet, date, transfer From/To.
-///
-/// A [label] (small caption above [value]) makes the field 56 tall.
-class MonAISelectField extends StatelessWidget {
-  /// Creates a select field. A null [onTap] disables it.
-  const MonAISelectField({
-    required this.value,
-    required this.onTap,
-    super.key,
-    this.leadingIcon,
-    this.label,
-    this.showChevron = false,
-  });
-
-  /// The selected value.
-  final String value;
-
-  /// Opens the picker. Null disables the field.
-  final VoidCallback? onTap;
-
-  /// An accent icon at the start.
-  final MonAIIconData? leadingIcon;
-
-  /// Caption above [value], e.g. "From".
-  final String? label;
-
-  /// Shows an expand chevron at the end.
-  final bool showChevron;
-
-  @override
-  Widget build(BuildContext context) {
-    final c = context.colors;
-    final t = context.textTheme;
-    final enabled = onTap != null;
-    return Semantics(
-      button: true,
-      enabled: enabled,
-      child: SizedBox(
-        height: label != null ? MonAISizes.input : MonAISizes.inputCompact,
-        child: Material(
-          color: c.surfaceSunken,
-          shape: RoundedRectangleBorder(
-            borderRadius: MonAIRadius.mdAll,
-            side: BorderSide(color: c.border),
-          ),
-          clipBehavior: .antiAlias,
-          child: InkWell(
-            onTap: onTap,
-            child: Padding(
-              padding: const .symmetric(horizontal: MonAISpacing.x3),
-              child: Row(
-                spacing: MonAISpacing.x2,
-                children: [
-                  if (leadingIcon case final icon?)
-                    MonAIIcon(icon, size: MonAISizes.iconLg, color: c.accent),
-                  Expanded(
-                    child: Column(
-                      mainAxisAlignment: .center,
-                      crossAxisAlignment: .start,
-                      children: [
-                        if (label case final label?)
-                          Text(
-                            label,
-                            style: t.labelSmall
-                                ?.withWeight(.w400)
-                                .copyWith(color: c.textTertiary),
-                          ),
-                        Text(
-                          value,
-                          style: t.labelLarge?.copyWith(
-                            color: enabled ? c.textPrimary : c.textDisabled,
-                          ),
-                          maxLines: 1,
-                          overflow: .ellipsis,
-                        ),
-                      ],
-                    ),
-                  ),
-                  if (showChevron)
-                    MonAIIcon(
-                      MonAIIcons.expandMore,
-                      size: MonAISizes.iconMd,
-                      color: c.textTertiary,
-                    ),
-                ],
-              ),
-            ),
           ),
         ),
       ),

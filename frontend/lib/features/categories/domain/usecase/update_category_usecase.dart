@@ -7,11 +7,10 @@ import 'package:monai/features/shared/domain/entity/category_changes.dart';
 import 'package:monai/features/shared/domain/entity/category_input.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';
 
-/// The category as it was and as the form now has it.
 typedef UpdateCategoryParams = ({Category original, CategoryInput input});
 
-/// Saves a category's name, icon and color, sending only what changed.
-/// Nothing changed succeeds at once with the category as it was.
+/// Sends only what changed; nothing changed succeeds at once with the
+/// category as it was.
 class UpdateCategoryUseCase implements UseCase<Category, UpdateCategoryParams> {
   UpdateCategoryUseCase(this._repository);
 

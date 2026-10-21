@@ -6,8 +6,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_camera_view.dart';
 
-/// The blurred photo under a sheet: no text was found, so retake it or
-/// enter the transaction by hand.
 class ScanReceiptNoText extends StatelessWidget {
   const ScanReceiptNoText({
     required this.photoPath,
@@ -19,8 +17,6 @@ class ScanReceiptNoText extends StatelessWidget {
   });
 
   final String photoPath;
-
-  /// The app's theme; the scanner around the sheet is always dark.
   final ThemeData sheetTheme;
   final VoidCallback onClose;
   final VoidCallback onRetake;

@@ -2,11 +2,8 @@ import 'dart:async';
 
 import 'package:monai/core/base/error/exceptions.dart';
 
-/// Mixed into local data sources to centralize cache-error translation.
-/// Wraps each local operation, converting any failure into [CacheException].
+/// Mixed into local data sources: any failure becomes a [CacheException].
 mixin BaseLocalDataSource {
-  /// Runs [op]; any throw becomes a [CacheException]. An already-typed
-  /// [CacheException] passes through unchanged.
   Future<T> safeCacheCall<T>(Future<T> Function() op) async {
     try {
       return await op();
@@ -17,8 +14,6 @@ mixin BaseLocalDataSource {
     }
   }
 
-  /// The stream [watch] opens, with every error turned into a
-  /// [CacheException].
   Stream<T> safeCacheStream<T>(Stream<T> Function() watch) {
     final Stream<T> source;
     try {

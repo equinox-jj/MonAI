@@ -8,12 +8,8 @@ import 'package:monai/features/shared/domain/usecase/watch_visible_categories_us
 import 'package:monai/features/shared/domain/usecase/watch_wallets_usecase.dart';
 import 'package:rxdart/rxdart.dart';
 
-/// What the phone-side parser matches: active wallets, visible categories
-/// of both types and the provider catalog's aliases, dated today. Updated
-/// whenever a cache changes; a failed read is passed on.
 class WatchQuickAddContextUseCase
     implements StreamUseCase<ParseContext, NoParams> {
-  /// [now] is the clock; tests pass a fixed one.
   WatchQuickAddContextUseCase({
     required this._wallets,
     required this._categories,

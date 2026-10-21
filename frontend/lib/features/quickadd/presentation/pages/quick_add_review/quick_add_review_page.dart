@@ -30,9 +30,7 @@ class QuickAddReviewPage extends StatelessWidget {
   }
 }
 
-/// Several quick-add drafts, checked and saved or skipped one at a time,
-/// then a summary. Leaving after a save goes home, so nothing is saved
-/// twice.
+/// Leaving after a save goes home, so nothing is saved twice.
 class QuickAddReviewUI extends StatefulWidget {
   const QuickAddReviewUI({super.key});
 
@@ -59,7 +57,6 @@ class _QuickAddReviewUIState extends State<QuickAddReviewUI> {
 
   QuickAddReviewBloc get _bloc => context.read<QuickAddReviewBloc>();
 
-  /// The text fields get the draft now on screen.
   void _fill(BuildContext context, QuickAddReviewState state) {
     final draft = state.original;
     if (draft == null) return;
@@ -82,7 +79,6 @@ class _QuickAddReviewUIState extends State<QuickAddReviewUI> {
 
   void _skip() => _bloc.add(const QuickAddReviewEvent.skipRequested());
 
-  /// Back to quick add with the phrase, unless something was saved.
   void _back() => Navigator.pop(
     context,
     _bloc.state.savedCount > 0 ? QuickAddReviewExit.home : null,
@@ -253,7 +249,6 @@ class _QuickAddReviewUIState extends State<QuickAddReviewUI> {
   }
 }
 
-/// "1 of 2", or "Done".
 class _Counter extends StatelessWidget {
   const _Counter();
 
@@ -282,7 +277,6 @@ class _Counter extends StatelessWidget {
   }
 }
 
-/// One bar per draft: done, current, to come.
 class _Progress extends StatelessWidget {
   const _Progress();
 
@@ -321,7 +315,6 @@ class _Progress extends StatelessWidget {
   }
 }
 
-/// The phrase the drafts came from.
 class _Phrase extends StatelessWidget {
   const _Phrase();
 
@@ -409,7 +402,6 @@ class _Draft extends StatelessWidget {
   }
 }
 
-/// Skip and Save while reviewing; Start over and Back to home when done.
 class _Actions extends StatelessWidget {
   const _Actions({
     required this.onSkip,

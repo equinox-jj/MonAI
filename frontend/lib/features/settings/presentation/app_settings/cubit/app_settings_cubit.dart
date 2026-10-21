@@ -11,8 +11,7 @@ import 'package:monai/features/settings/domain/usecase/set_theme_mode_usecase.da
 part 'app_settings_cubit.freezed.dart';
 part 'app_settings_state.dart';
 
-/// The theme and language the whole app is drawn in. Lives as long as the
-/// app: `MyApp` builds the [MaterialApp] from it, and Settings changes it.
+/// Lives as long as the app: `MyApp` builds the [MaterialApp] from it.
 class AppSettingsCubit extends Cubit<AppSettingsState> {
   AppSettingsCubit({
     required this._getThemeMode,
@@ -26,7 +25,6 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
   final GetLanguageUseCase _getLanguage;
   final SetLanguageUseCase _setLanguage;
 
-  /// Reads the saved picks. An unreadable one keeps following the device.
   Future<void> load() async {
     final themeMode = await _getThemeMode(const NoParams());
     final language = await _getLanguage(const NoParams());
@@ -39,16 +37,12 @@ class AppSettingsCubit extends Cubit<AppSettingsState> {
     );
   }
 
-  /// Switches the theme at once, then saves it. A failed save keeps it for
-  /// this run only.
   Future<void> themeModePicked(AppThemeMode mode) async {
     if (mode == state.themeMode) return;
     emit(state.copyWith(themeMode: mode));
     await _setThemeMode(mode);
   }
 
-  /// Switches the language at once, then saves it. A failed save keeps it
-  /// for this run only.
   Future<void> languagePicked(AppLanguage language) async {
     if (language == state.language) return;
     emit(state.copyWith(language: language));

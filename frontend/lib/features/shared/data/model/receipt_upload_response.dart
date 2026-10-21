@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'receipt_upload_response.freezed.dart';
 part 'receipt_upload_response.g.dart';
 
-/// `POST /transactions/receipt`.
 @freezed
 abstract class ReceiptUploadResponse with _$ReceiptUploadResponse {
   const factory ReceiptUploadResponse({

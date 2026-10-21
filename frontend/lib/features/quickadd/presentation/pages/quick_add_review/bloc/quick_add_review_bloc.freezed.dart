@@ -919,18 +919,7 @@ as List<Category>,
 /// @nodoc
 mixin _$QuickAddReviewState {
 
- QuickAddReviewArgs get args;/// The user's current date; later dates can't be picked.
- DateTime get today;/// The draft on screen; [QuickAddReviewStateX.isDone] past the last.
- int get index;/// The choices for the draft on screen; the amount and note live in
-/// the screen's text fields.
- QuickAddDraft get current;/// What happened to each draft before [index].
- List<QuickAddReviewResult> get results;/// The fields of [current] still as quick add filled them.
- Map<QuickAddField, MonAIFieldMark> get marks;/// Active wallets, to pick from.
- List<Wallet> get wallets;/// Every cached category; see [QuickAddReviewStateX.categories].
- List<Category> get allCategories;/// One error per invalid field, keyed by the API's field name.
- Map<String, FieldError> get errors;/// A save failed on the input, so errors update as the user edits.
- bool get autovalidate; bool get isSaving;/// Why a save failed; shown once as a snackbar.
- QuickAddSaveFailure? get actionFailure;
+ QuickAddReviewArgs get args; DateTime get today; int get index; QuickAddDraft get current; List<QuickAddReviewResult> get results; Map<QuickAddField, MonAIFieldMark> get marks; List<Wallet> get wallets; List<Category> get allCategories; Map<String, FieldError> get errors; bool get autovalidate; bool get isSaving; QuickAddSaveFailure? get actionFailure;
 /// Create a copy of QuickAddReviewState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1160,62 +1149,46 @@ class _QuickAddReviewState implements QuickAddReviewState {
   
 
 @override final  QuickAddReviewArgs args;
-/// The user's current date; later dates can't be picked.
 @override final  DateTime today;
-/// The draft on screen; [QuickAddReviewStateX.isDone] past the last.
 @override@JsonKey() final  int index;
-/// The choices for the draft on screen; the amount and note live in
-/// the screen's text fields.
 @override final  QuickAddDraft current;
-/// What happened to each draft before [index].
  final  List<QuickAddReviewResult> _results;
-/// What happened to each draft before [index].
 @override@JsonKey() List<QuickAddReviewResult> get results {
   if (_results is EqualUnmodifiableListView) return _results;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_results);
 }
 
-/// The fields of [current] still as quick add filled them.
  final  Map<QuickAddField, MonAIFieldMark> _marks;
-/// The fields of [current] still as quick add filled them.
 @override@JsonKey() Map<QuickAddField, MonAIFieldMark> get marks {
   if (_marks is EqualUnmodifiableMapView) return _marks;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_marks);
 }
 
-/// Active wallets, to pick from.
  final  List<Wallet> _wallets;
-/// Active wallets, to pick from.
 @override@JsonKey() List<Wallet> get wallets {
   if (_wallets is EqualUnmodifiableListView) return _wallets;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_wallets);
 }
 
-/// Every cached category; see [QuickAddReviewStateX.categories].
  final  List<Category> _allCategories;
-/// Every cached category; see [QuickAddReviewStateX.categories].
 @override@JsonKey() List<Category> get allCategories {
   if (_allCategories is EqualUnmodifiableListView) return _allCategories;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_allCategories);
 }
 
-/// One error per invalid field, keyed by the API's field name.
  final  Map<String, FieldError> _errors;
-/// One error per invalid field, keyed by the API's field name.
 @override@JsonKey() Map<String, FieldError> get errors {
   if (_errors is EqualUnmodifiableMapView) return _errors;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_errors);
 }
 
-/// A save failed on the input, so errors update as the user edits.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
-/// Why a save failed; shown once as a snackbar.
 @override final  QuickAddSaveFailure? actionFailure;
 
 /// Create a copy of QuickAddReviewState

@@ -995,24 +995,9 @@ as List<Category>,
 /// @nodoc
 mixin _$ReceiptReviewState {
 
-/// The photo and what the scanner read.
- ReceiptReviewArgs get args;/// The user's current date; later dates can't be picked.
- DateTime get today;/// What the AI read; replaced when "Try again" succeeds.
- ReceiptDraft get draft;/// Expense or income.
- TransactionType get type;/// Local midnight.
- DateTime get date; String? get walletId; String? get categoryId;/// Why the AI gave no draft; null once it read the receipt.
- ReceiptAiFailure? get aiFailure;/// "Try again" is waiting for the AI.
- bool get isRetrying;/// Bumped when "Try again" brings a new [draft], so the screen refills
+ ReceiptReviewArgs get args; DateTime get today; ReceiptDraft get draft; TransactionType get type; DateTime get date; String? get walletId; String? get categoryId; ReceiptAiFailure? get aiFailure; bool get isRetrying;/// Bumped when "Try again" brings a new [draft], so the screen refills
 /// its text fields.
- int get draftVersion;/// Why "Try again" failed; shown once as a snackbar.
- ReceiptAiFailure? get retryFailure;/// The fields still as the AI filled them.
- Map<ReceiptField, FieldMark> get marks;/// Active wallets, to pick from.
- List<Wallet> get wallets;/// Every cached category; see [ReceiptReviewStateX.categories].
- List<Category> get allCategories;/// One error per invalid field, keyed by the API's field name.
- Map<String, FieldError> get errors;/// A save failed on the input, so errors update as the user edits.
- bool get autovalidate; bool get isSaving;/// Set once saved, as the new transaction's id; the screen leaves.
- String? get savedId;/// Why a save failed; shown once as a snackbar.
- ReceiptFailure? get actionFailure;
+ int get draftVersion; ReceiptAiFailure? get retryFailure; Map<ReceiptField, FieldMark> get marks; List<Wallet> get wallets; List<Category> get allCategories; Map<String, FieldError> get errors; bool get autovalidate; bool get isSaving; String? get savedId; ReceiptFailure? get actionFailure;
 /// Create a copy of ReceiptReviewState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1248,69 +1233,50 @@ class _ReceiptReviewState implements ReceiptReviewState {
   const _ReceiptReviewState({required this.args, required this.today, required this.draft, required this.type, required this.date, this.walletId, this.categoryId, this.aiFailure, this.isRetrying = false, this.draftVersion = 0, this.retryFailure,  Map<ReceiptField, FieldMark> marks = const {},  List<Wallet> wallets = const [],  List<Category> allCategories = const [],  Map<String, FieldError> errors = const {}, this.autovalidate = false, this.isSaving = false, this.savedId, this.actionFailure}): _marks = marks,_wallets = wallets,_allCategories = allCategories,_errors = errors;
   
 
-/// The photo and what the scanner read.
 @override final  ReceiptReviewArgs args;
-/// The user's current date; later dates can't be picked.
 @override final  DateTime today;
-/// What the AI read; replaced when "Try again" succeeds.
 @override final  ReceiptDraft draft;
-/// Expense or income.
 @override final  TransactionType type;
-/// Local midnight.
 @override final  DateTime date;
 @override final  String? walletId;
 @override final  String? categoryId;
-/// Why the AI gave no draft; null once it read the receipt.
 @override final  ReceiptAiFailure? aiFailure;
-/// "Try again" is waiting for the AI.
 @override@JsonKey() final  bool isRetrying;
 /// Bumped when "Try again" brings a new [draft], so the screen refills
 /// its text fields.
 @override@JsonKey() final  int draftVersion;
-/// Why "Try again" failed; shown once as a snackbar.
 @override final  ReceiptAiFailure? retryFailure;
-/// The fields still as the AI filled them.
  final  Map<ReceiptField, FieldMark> _marks;
-/// The fields still as the AI filled them.
 @override@JsonKey() Map<ReceiptField, FieldMark> get marks {
   if (_marks is EqualUnmodifiableMapView) return _marks;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_marks);
 }
 
-/// Active wallets, to pick from.
  final  List<Wallet> _wallets;
-/// Active wallets, to pick from.
 @override@JsonKey() List<Wallet> get wallets {
   if (_wallets is EqualUnmodifiableListView) return _wallets;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_wallets);
 }
 
-/// Every cached category; see [ReceiptReviewStateX.categories].
  final  List<Category> _allCategories;
-/// Every cached category; see [ReceiptReviewStateX.categories].
 @override@JsonKey() List<Category> get allCategories {
   if (_allCategories is EqualUnmodifiableListView) return _allCategories;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_allCategories);
 }
 
-/// One error per invalid field, keyed by the API's field name.
  final  Map<String, FieldError> _errors;
-/// One error per invalid field, keyed by the API's field name.
 @override@JsonKey() Map<String, FieldError> get errors {
   if (_errors is EqualUnmodifiableMapView) return _errors;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_errors);
 }
 
-/// A save failed on the input, so errors update as the user edits.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
-/// Set once saved, as the new transaction's id; the screen leaves.
 @override final  String? savedId;
-/// Why a save failed; shown once as a snackbar.
 @override final  ReceiptFailure? actionFailure;
 
 /// Create a copy of ReceiptReviewState

@@ -6,20 +6,9 @@ import 'package:monai/core/ui/designsystem/theme/monai_sizes.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 
-/// How a field the AI or the phone filled is shown.
-enum MonAIFieldMark {
-  /// Read with confidence: a sparkle.
-  ai,
+enum MonAIFieldMark { ai, check }
 
-  /// Missing, guessed or unsure: a warning asking the user to check it.
-  check,
-}
-
-/// A labelled field of a drafted transaction, tinted by how it was filled:
-/// indigo with a sparkle when read surely, amber with a warning when the
-/// user should check it, red with the message when it is invalid.
 class MonAIMarkedField extends StatelessWidget {
-  /// Creates a marked field.
   const MonAIMarkedField({
     required this.label,
     required this.child,
@@ -33,37 +22,21 @@ class MonAIMarkedField extends StatelessWidget {
     this.height = defaultHeight,
   });
 
-  /// The height of a one-line field.
   static const defaultHeight = 52.0;
 
   final String label;
-
-  /// The value: text, or a text field drawn with [bareDecoration].
   final Widget child;
-
-  /// How it was filled; null once the user changed it.
   final MonAIFieldMark? mark;
-
-  /// The field's error message.
   final String? error;
-
-  /// Shown under a [MonAIFieldMark.check] field, e.g. "Please check this
-  /// value".
   final String? checkCaption;
-
-  /// Read out for the sparkle of a [MonAIFieldMark.ai] field.
   final String? aiLabel;
-
-  /// A widget before the value, e.g. the category's icon.
   final Widget? leading;
-
-  /// Opens a picker. Null for a text field.
   final VoidCallback? onTap;
 
   final double height;
 
-  /// A text field drawn without a frame of its own, for inside a
-  /// [MonAIMarkedField]; the app's input theme would add a second box.
+  /// For a text field inside a [MonAIMarkedField]; the app's input theme would
+  /// draw a second box.
   static InputDecoration bareDecoration({String? hint, TextStyle? hintStyle}) =>
       InputDecoration(
         isCollapsed: true,

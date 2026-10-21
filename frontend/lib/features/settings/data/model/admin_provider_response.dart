@@ -3,8 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'admin_provider_response.freezed.dart';
 part 'admin_provider_response.g.dart';
 
-/// `GET`, `POST` and `PATCH /admin/payment-providers/...`, and
-/// `PUT /admin/payment-providers/{id}/logo`.
 @freezed
 abstract class AdminProviderResponse with _$AdminProviderResponse {
   const factory AdminProviderResponse({
@@ -17,7 +15,6 @@ abstract class AdminProviderResponse with _$AdminProviderResponse {
       _$AdminProviderResponseFromJson(json);
 }
 
-/// The API's `AdminPaymentProvider`.
 @freezed
 abstract class AdminProviderData with _$AdminProviderData {
   const factory AdminProviderData({

@@ -27,7 +27,6 @@ class CategoriesPage extends StatelessWidget {
   }
 }
 
-/// The expense and income categories, with hide, delete and edit.
 class CategoriesUI extends StatelessWidget {
   const CategoriesUI({super.key});
 
@@ -200,8 +199,6 @@ typedef _List = ({
   CategoryFailure? loadFailure,
 });
 
-/// The tab's categories in one card with the note under it, or the
-/// loading, error and empty states.
 class _Body extends StatelessWidget {
   const _Body({
     required this.onRetry,

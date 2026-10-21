@@ -16,10 +16,6 @@ typedef _Header = ({
   bool isFirstRun,
 });
 
-/// Greeting and name, then the avatar that opens Settings.
-///
-/// Phones add search (left out while there's nothing to search); tablets put
-/// the quick-add bar in the header instead.
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
     required this.actions,
@@ -98,7 +94,6 @@ class HomeHeader extends StatelessWidget {
   }
 }
 
-/// The quick-add bar's width in the tablet-landscape header.
 const _expandedQuickAddWidth = 400.0;
 
 class _Greeting extends StatelessWidget {
@@ -110,8 +105,6 @@ class _Greeting extends StatelessWidget {
 
   final String greeting;
   final String userName;
-
-  /// The tablet header's bigger name.
   final bool large;
 
   @override

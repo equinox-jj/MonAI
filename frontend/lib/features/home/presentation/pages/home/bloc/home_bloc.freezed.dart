@@ -360,18 +360,9 @@ $HomeDashboardCopyWith<$Res> get dashboard {
 /// @nodoc
 mixin _$HomeState {
 
-/// [UiStatus.loading] while the first load runs with nothing cached
-/// (the skeleton), [UiStatus.failure] when that load failed (the error),
-/// otherwise [UiStatus.success] (the dashboard).
- UiStatus get status;/// What the cache holds; null before its first read.
- HomeDashboard? get dashboard;/// A refresh is running.
- bool get isRefreshing;/// The eye toggle masks every amount.
- bool get isBalanceHidden;/// The month's budget was fetched, so a missing one means "not set".
+ UiStatus get status; HomeDashboard? get dashboard; bool get isRefreshing; bool get isBalanceHidden;/// The month's budget was fetched, so a missing one means "not set".
  bool get budgetLoaded;/// The month's transactions were fetched, so none means a first run.
- bool get recentLoaded;/// Why the first load failed, with nothing cached.
- HomeLoadFailure? get loadFailure;/// Why the last refresh failed while cached data is on screen; shown
-/// once as a snackbar.
- HomeLoadFailure? get refreshFailure;
+ bool get recentLoaded; HomeLoadFailure? get loadFailure; HomeLoadFailure? get refreshFailure;
 /// Create a copy of HomeState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -590,24 +581,15 @@ class _HomeState implements HomeState {
   const _HomeState({this.status = UiStatus.initial, this.dashboard, this.isRefreshing = false, this.isBalanceHidden = false, this.budgetLoaded = false, this.recentLoaded = false, this.loadFailure, this.refreshFailure});
   
 
-/// [UiStatus.loading] while the first load runs with nothing cached
-/// (the skeleton), [UiStatus.failure] when that load failed (the error),
-/// otherwise [UiStatus.success] (the dashboard).
 @override@JsonKey() final  UiStatus status;
-/// What the cache holds; null before its first read.
 @override final  HomeDashboard? dashboard;
-/// A refresh is running.
 @override@JsonKey() final  bool isRefreshing;
-/// The eye toggle masks every amount.
 @override@JsonKey() final  bool isBalanceHidden;
 /// The month's budget was fetched, so a missing one means "not set".
 @override@JsonKey() final  bool budgetLoaded;
 /// The month's transactions were fetched, so none means a first run.
 @override@JsonKey() final  bool recentLoaded;
-/// Why the first load failed, with nothing cached.
 @override final  HomeLoadFailure? loadFailure;
-/// Why the last refresh failed while cached data is on screen; shown
-/// once as a snackbar.
 @override final  HomeLoadFailure? refreshFailure;
 
 /// Create a copy of HomeState

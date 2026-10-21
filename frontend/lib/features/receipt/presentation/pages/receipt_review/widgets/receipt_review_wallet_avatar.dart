@@ -3,7 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// A wallet's monogram on its card color.
 class ReceiptWalletAvatar extends StatelessWidget {
   const ReceiptWalletAvatar({required this.wallet, super.key});
 

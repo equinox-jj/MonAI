@@ -18,8 +18,6 @@ typedef _Results = ({
   DateTime month,
 });
 
-/// The result count and total, the matches, and a link to widen or narrow
-/// the search.
 class SearchResults extends StatelessWidget {
   const SearchResults({
     required this.onOpen,

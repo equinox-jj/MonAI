@@ -8,11 +8,6 @@ import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart'
 import 'package:monai/features/home/presentation/pages/home/model/home_text.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_actions.dart';
 
-/// "Recent" with the month's newest transactions, or the first-run prompt
-/// when there are none.
-///
-/// Tablet landscape puts the header inside the card, beside the spending
-/// card.
 class HomeRecent extends StatelessWidget {
   const HomeRecent({
     required this.actions,

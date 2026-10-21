@@ -358,11 +358,7 @@ $SettingsOverviewCopyWith<$Res> get overview {
 /// @nodoc
 mixin _$SettingsState {
 
-/// What the cache holds; empty values until its first read.
- SettingsOverview get overview;/// The installed version; empty until read, or when it can't be.
- String get appVersion;/// A sign-out is running: its row shows progress and taps are ignored.
- bool get isSigningOut;/// Why the last sign-out failed; shown once as a snackbar.
- SettingsSignOutFailure? get signOutFailure;
+ SettingsOverview get overview; String get appVersion; bool get isSigningOut; SettingsSignOutFailure? get signOutFailure;
 /// Create a copy of SettingsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -574,13 +570,9 @@ class _SettingsState implements SettingsState {
   const _SettingsState({this.overview = const SettingsOverview(), this.appVersion = '', this.isSigningOut = false, this.signOutFailure});
   
 
-/// What the cache holds; empty values until its first read.
 @override@JsonKey() final  SettingsOverview overview;
-/// The installed version; empty until read, or when it can't be.
 @override@JsonKey() final  String appVersion;
-/// A sign-out is running: its row shows progress and taps are ignored.
 @override@JsonKey() final  bool isSigningOut;
-/// Why the last sign-out failed; shown once as a snackbar.
 @override final  SettingsSignOutFailure? signOutFailure;
 
 /// Create a copy of SettingsState

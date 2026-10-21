@@ -14,8 +14,6 @@ typedef _Spending = ({
   DateTime? month,
 });
 
-/// "Where it went": a donut of the month's expense by category with its
-/// legend, and a link to the full report.
 class HomeSpendingCard extends StatelessWidget {
   const HomeSpendingCard({
     required this.onOpenReport,

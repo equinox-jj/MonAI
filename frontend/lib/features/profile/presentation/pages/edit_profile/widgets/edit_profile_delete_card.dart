@@ -5,8 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/profile/presentation/model/profile_field_error_text.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/bloc/edit_profile_bloc.dart';
 
-/// What deleting the account takes with it, the password to confirm, and
-/// the button.
 class EditProfileDeleteCard extends StatelessWidget {
   const EditProfileDeleteCard({
     required this.password,

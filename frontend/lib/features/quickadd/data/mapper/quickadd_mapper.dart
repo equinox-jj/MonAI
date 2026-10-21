@@ -25,7 +25,6 @@ extension TransactionDraftDataMapper on TransactionDraftData {
 TransactionType? _type(String? value) =>
     TransactionType.values.where((t) => t.apiValue == value).firstOrNull;
 
-/// `yyyy-MM-dd` at local midnight, or null when it isn't one.
 DateTime? _date(String? value) {
   if (value == null || !RegExp(r'^\d{4}-\d{2}-\d{2}$').hasMatch(value)) {
     return null;

@@ -5,14 +5,10 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
 import 'package:monai/features/settings/presentation/widgets/provider_logo.dart';
 
-/// The logo card: Upload while there is none, Replace once there is. A
-/// picked image shows at once and uploads on Save.
 class ProviderFormLogo extends StatelessWidget {
   const ProviderFormLogo({required this.name, required this.onPick, super.key});
 
   static const _logoSize = 56.0;
-
-  /// The name field, for the monogram.
   final TextEditingController name;
   final VoidCallback onPick;
 

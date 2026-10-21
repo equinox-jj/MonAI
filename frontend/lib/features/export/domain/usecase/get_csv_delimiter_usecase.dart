@@ -4,7 +4,7 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/export/domain/entity/csv_export.dart';
 import 'package:monai/features/export/domain/repository/export_repository.dart';
 
-/// The separator last exported with; a comma before the first export.
+/// A comma before the first export.
 class GetCsvDelimiterUseCase implements UseCase<CsvDelimiter, NoParams> {
   GetCsvDelimiterUseCase(this._repository);
 

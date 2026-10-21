@@ -6,8 +6,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/budgets/domain/logic/budget_preview.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_bloc.dart';
 
-/// The typed limit against this month's spending; hidden while the field is
-/// empty.
 class BudgetPreviewCard extends StatelessWidget {
   const BudgetPreviewCard({super.key});
 

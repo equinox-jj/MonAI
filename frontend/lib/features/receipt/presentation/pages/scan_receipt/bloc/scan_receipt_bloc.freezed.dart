@@ -537,10 +537,7 @@ String toString() {
 /// @nodoc
 mixin _$ScanReceiptState {
 
- ScanPhase get phase; CameraStatus get camera; bool get flashOn;/// A photo is being taken; the shutter waits.
- bool get isCapturing;/// Taking the photo failed; shown once as a snackbar.
- bool get captureFailed;/// Set once a photo was read; the screen opens the review.
- ReceiptReviewArgs? get review;
+ ScanPhase get phase; CameraStatus get camera; bool get flashOn; bool get isCapturing; bool get captureFailed; ReceiptReviewArgs? get review;
 /// Create a copy of ScanReceiptState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -769,11 +766,8 @@ class _ScanReceiptState implements ScanReceiptState {
 @override@JsonKey() final  ScanPhase phase;
 @override@JsonKey() final  CameraStatus camera;
 @override@JsonKey() final  bool flashOn;
-/// A photo is being taken; the shutter waits.
 @override@JsonKey() final  bool isCapturing;
-/// Taking the photo failed; shown once as a snackbar.
 @override@JsonKey() final  bool captureFailed;
-/// Set once a photo was read; the screen opens the review.
 @override final  ReceiptReviewArgs? review;
 
 /// Create a copy of ScanReceiptState

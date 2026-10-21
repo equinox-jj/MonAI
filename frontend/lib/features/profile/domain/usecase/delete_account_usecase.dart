@@ -5,10 +5,9 @@ import 'package:monai/features/profile/domain/repository/profile_repository.dart
 import 'package:monai/features/profile/domain/validation/profile_input_validator.dart';
 import 'package:monai/features/shared/domain/usecase/logout_usecase.dart';
 
-/// Deletes the account and everything in it, confirmed with the user's
-/// password, then signs out here: the token and the cache go, and
-/// navigation follows the session to Sign in. A missing password fails as
-/// [ValidationFailure] without calling the server.
+/// Then signs out here: the token and the cache go, and navigation follows the
+/// session to Sign in. A missing password fails as [ValidationFailure] without
+/// calling the server.
 class DeleteAccountUseCase implements UseCase<Unit, String> {
   DeleteAccountUseCase({required this._repository, required this._logout});
 

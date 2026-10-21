@@ -3,7 +3,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/profile/domain/validation/profile_input_validator.dart';
 
 extension ProfileFieldErrorText on FieldError {
-  /// The message under the field, from the device's checks or the server's.
   String text(AppLocalizations l10n) => switch ((field, code)) {
     (ProfileInputValidator.nameField, 'required') =>
       l10n.profileErrorNameRequired,

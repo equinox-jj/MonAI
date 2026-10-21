@@ -8,7 +8,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/wallets/domain/logic/wallet_totals.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
 
-/// The money across the wallets with a bar and legend of its split by type.
 class WalletsTotalCard extends StatelessWidget {
   const WalletsTotalCard({super.key});
 
@@ -58,7 +57,6 @@ class WalletsTotalCard extends StatelessWidget {
   }
 }
 
-/// The type's color on the bar and in the legend.
 Color _typeColor(BuildContext context, WalletType type) =>
     WalletGradients.forType(type, dark: context.colors.isDark).end;
 

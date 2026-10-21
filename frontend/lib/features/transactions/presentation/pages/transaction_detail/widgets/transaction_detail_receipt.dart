@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// The receipt photo's thumbnail with a View button.
 class TransactionDetailReceipt extends StatelessWidget {
   const TransactionDetailReceipt({
     required this.url,
@@ -76,7 +75,6 @@ class TransactionDetailReceipt extends StatelessWidget {
   }
 }
 
-/// The receipt photo full screen; pinch to zoom.
 class TransactionReceiptViewer extends StatelessWidget {
   const TransactionReceiptViewer({required this.url, super.key});
 

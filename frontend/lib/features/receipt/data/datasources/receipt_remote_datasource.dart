@@ -5,7 +5,6 @@ import 'package:monai/features/receipt/data/model/parse_receipt_request.dart';
 import 'package:monai/features/receipt/data/model/parse_receipt_response.dart';
 
 abstract class ReceiptRemoteDataSource {
-  /// `POST /ai/parse-receipt`.
   Future<ParseReceiptResponse> parseReceipt(ParseReceiptRequest request);
 }
 

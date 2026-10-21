@@ -4,9 +4,8 @@ import 'package:monai/features/shared/domain/entity/draft_confidence.dart';
 
 part 'quick_add_draft.freezed.dart';
 
-/// A transaction read from a quick-add phrase, on the phone or by the AI.
-/// Nothing is saved until the user confirms it; a field that couldn't be
-/// read is null with confidence 0.
+/// Nothing is saved until the user confirms it; a field that couldn't be read
+/// is null with confidence 0.
 @freezed
 abstract class QuickAddDraft with _$QuickAddDraft {
   const factory QuickAddDraft({
@@ -14,8 +13,6 @@ abstract class QuickAddDraft with _$QuickAddDraft {
 
     /// Local midnight.
     required DateTime date,
-
-    /// Rupiah.
     int? amount,
     String? walletId,
 

@@ -1,14 +1,10 @@
 import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// One wallet type's part of the money across wallets; [percent] is whole.
 typedef WalletTypeShare = ({WalletType type, int amount, int percent});
 
-/// The money across [wallets] and how it splits by type, biggest share
-/// first.
-///
-/// Only positive balances make up the shares, which add up to 100; a type
-/// with nothing in it is left out.
+/// Biggest share first. Only positive balances make up the shares, which add
+/// up to 100; a type with nothing in it is left out.
 ({int total, List<WalletTypeShare> shares}) walletTotalsOf(
   List<Wallet> wallets,
 ) {

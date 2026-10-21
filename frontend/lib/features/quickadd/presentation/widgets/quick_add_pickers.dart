@@ -6,7 +6,6 @@ import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// A wallet's monogram on its card color.
 class QuickAddWalletAvatar extends StatelessWidget {
   const QuickAddWalletAvatar({required this.wallet, super.key});
 
@@ -28,7 +27,6 @@ class QuickAddWalletAvatar extends StatelessWidget {
 }
 
 extension QuickAddCategoryOption on Category {
-  /// This category in [MonAICategoryPickerSheet].
   MonAICategoryOption get pickerOption => MonAICategoryOption(
     id: id,
     name: name,
@@ -38,7 +36,6 @@ extension QuickAddCategoryOption on Category {
 }
 
 extension QuickAddWalletOption on Wallet {
-  /// This wallet with its balance in [MonAIRadioPickerSheet].
   MonAIRadioPickerOption pickerOption(AppLocalizations l10n) =>
       MonAIRadioPickerOption(
         id: id,

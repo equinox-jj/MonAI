@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'wallet_response.freezed.dart';
 part 'wallet_response.g.dart';
 
-/// `GET`, `POST` and `PATCH` `/wallets/{id}`.
 @freezed
 abstract class WalletResponse with _$WalletResponse {
   const factory WalletResponse({

@@ -1140,22 +1140,10 @@ $TransactionLookupsCopyWith<$Res> get lookups {
 /// @nodoc
 mixin _$TransactionFormState {
 
- TransactionFormMode get mode;/// The user's current date; later dates can't be picked.
- DateTime get today;/// What is entered now.
- TransactionDraft get draft;/// What the form started with, to tell whether anything changed.
- TransactionDraft get baseline;/// [UiStatus.loading] while the edited transaction loads,
-/// [UiStatus.failure] when it couldn't be, otherwise
-/// [UiStatus.success].
- UiStatus get status;/// The transaction being edited.
- Transaction? get original; TransactionLookups get lookups;/// One error per invalid field, keyed by the API's field name.
- Map<String, FieldError> get errors;/// Fields a quick-add draft filled unsurely, keyed by the API's field
+ TransactionFormMode get mode; DateTime get today; TransactionDraft get draft;/// What the form started with, to tell whether anything changed.
+ TransactionDraft get baseline; UiStatus get status; Transaction? get original; TransactionLookups get lookups; Map<String, FieldError> get errors;/// Fields a quick-add draft filled unsurely, keyed by the API's field
 /// name; each is marked until the user changes it.
- Set<String> get unsure;/// A save failed on the input, so errors update as the user edits.
- bool get autovalidate; bool get isSaving; bool get isDeleting;/// Close was asked with unsaved changes: the discard dialog shows once.
- bool get askDiscard;/// Set once the form is done; the screen closes.
- TransactionFormOutcome? get outcome;/// Why the edited transaction couldn't be loaded.
- TransactionFailure? get loadFailure;/// Why a save or delete failed; shown once as a snackbar.
- TransactionFailure? get actionFailure;
+ Set<String> get unsure; bool get autovalidate; bool get isSaving; bool get isDeleting; bool get askDiscard; TransactionFormOutcome? get outcome; TransactionFailure? get loadFailure; TransactionFailure? get actionFailure;
 /// Create a copy of TransactionFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1431,22 +1419,14 @@ class _TransactionFormState implements TransactionFormState {
   
 
 @override final  TransactionFormMode mode;
-/// The user's current date; later dates can't be picked.
 @override final  DateTime today;
-/// What is entered now.
 @override final  TransactionDraft draft;
 /// What the form started with, to tell whether anything changed.
 @override final  TransactionDraft baseline;
-/// [UiStatus.loading] while the edited transaction loads,
-/// [UiStatus.failure] when it couldn't be, otherwise
-/// [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// The transaction being edited.
 @override final  Transaction? original;
 @override@JsonKey() final  TransactionLookups lookups;
-/// One error per invalid field, keyed by the API's field name.
  final  Map<String, FieldError> _errors;
-/// One error per invalid field, keyed by the API's field name.
 @override@JsonKey() Map<String, FieldError> get errors {
   if (_errors is EqualUnmodifiableMapView) return _errors;
   // ignore: implicit_dynamic_type
@@ -1464,17 +1444,12 @@ class _TransactionFormState implements TransactionFormState {
   return EqualUnmodifiableSetView(_unsure);
 }
 
-/// A save failed on the input, so errors update as the user edits.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
 @override@JsonKey() final  bool isDeleting;
-/// Close was asked with unsaved changes: the discard dialog shows once.
 @override@JsonKey() final  bool askDiscard;
-/// Set once the form is done; the screen closes.
 @override final  TransactionFormOutcome? outcome;
-/// Why the edited transaction couldn't be loaded.
 @override final  TransactionFailure? loadFailure;
-/// Why a save or delete failed; shown once as a snackbar.
 @override final  TransactionFailure? actionFailure;
 
 /// Create a copy of TransactionFormState

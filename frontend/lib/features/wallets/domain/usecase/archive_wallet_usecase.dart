@@ -6,8 +6,8 @@ import 'package:monai/features/shared/domain/entity/wallet_changes.dart';
 import 'package:monai/features/shared/domain/repository/wallet_repository.dart';
 import 'package:monai/features/wallets/domain/validation/default_wallet_rule.dart';
 
-/// Archives a wallet: it leaves pickers but keeps its transactions. The
-/// default wallet is refused without calling the server.
+/// It leaves pickers but keeps its transactions. The default wallet is refused
+/// without calling the server.
 class ArchiveWalletUseCase implements UseCase<Wallet, Wallet> {
   ArchiveWalletUseCase(this._repository);
 

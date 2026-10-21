@@ -34,7 +34,6 @@ part 'transaction_form_state.dart';
 /// rules, then again on every change until it is valid.
 class TransactionFormBloc
     extends Bloc<TransactionFormEvent, TransactionFormState> {
-  /// [now] is the clock; tests pass a fixed one.
   TransactionFormBloc({
     required TransactionFormMode mode,
     required this._getTransaction,
@@ -74,11 +73,8 @@ class TransactionFormBloc
 
   StreamSubscription<void>? _lookups;
 
-  /// The note the form started with: the edited transaction's own, or the
-  /// quick-add draft's.
   String _baselineNote;
 
-  /// Where the form goes once it is left: closed, or to the scanner.
   TransactionFormOutcome _leaveTo = const TransactionFormOutcome.closed();
 
   /// The fields only the device checks live; the note is checked on save.
@@ -128,7 +124,6 @@ class TransactionFormBloc
     );
   }
 
-  /// The fields of [draft] the user should check: missing or read unsurely.
   static Set<String> _unsureOf(QuickAddDraft draft) => {
     if (draft.amount == null || draft.isAmountUnsure)
       TransactionInputValidator.amountField,
@@ -140,7 +135,6 @@ class TransactionFormBloc
     if (draft.isDateUnsure) TransactionInputValidator.dateField,
   };
 
-  /// [unsure] without the fields [next] changed from [previous].
   static Set<String> _stillUnsure(
     Set<String> unsure,
     TransactionDraft previous,
@@ -227,8 +221,6 @@ class TransactionFormBloc
     }
   }
 
-  /// [draft] with the default wallet as its source when it has none, and a
-  /// different wallet as a transfer's destination.
   TransactionDraft _withDefaultWallets(TransactionDraft draft) {
     final wallets = state.wallets;
     final source =
@@ -325,7 +317,6 @@ class TransactionFormBloc
     _edit(emit, state.draft.copyWith(date: date));
   }
 
-  /// Applies an edit, re-checking the fields once a save failed on them.
   void _edit(Emitter<TransactionFormState> emit, TransactionDraft draft) {
     final unsure = _stillUnsure(state.unsure, state.draft, draft);
     if (!state.autovalidate) {
@@ -416,7 +407,6 @@ class TransactionFormBloc
     _leave(emit, const TransactionFormOutcome.scanReceipt(), note: event.note);
   }
 
-  /// Leaves for [outcome], asking first when something changed.
   void _leave(
     Emitter<TransactionFormState> emit,
     TransactionFormOutcome outcome, {
@@ -462,7 +452,6 @@ class TransactionFormBloc
     }
   }
 
-  /// Reports [failure] once and ends the save or delete.
   void _fail(
     Emitter<TransactionFormState> emit,
     Failure failure, {

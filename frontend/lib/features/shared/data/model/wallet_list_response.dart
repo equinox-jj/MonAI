@@ -4,7 +4,6 @@ import 'package:monai/features/shared/data/model/wallet_response.dart';
 part 'wallet_list_response.freezed.dart';
 part 'wallet_list_response.g.dart';
 
-/// `GET /wallets`.
 @freezed
 abstract class WalletListResponse with _$WalletListResponse {
   const factory WalletListResponse({

@@ -15,11 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$TransactionDraft {
 
- TransactionType get type;/// Local midnight.
- DateTime get date;/// Rupiah typed on the keypad.
- int get amount; String? get walletId;/// Transfers only.
- String? get toWalletId;/// Expenses and incomes only.
- String? get categoryId;
+ TransactionType get type; DateTime get date; int get amount; String? get walletId; String? get toWalletId; String? get categoryId;
 /// Create a copy of TransactionDraft
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -225,14 +221,10 @@ class _TransactionDraft implements TransactionDraft {
   
 
 @override final  TransactionType type;
-/// Local midnight.
 @override final  DateTime date;
-/// Rupiah typed on the keypad.
 @override@JsonKey() final  int amount;
 @override final  String? walletId;
-/// Transfers only.
 @override final  String? toWalletId;
-/// Expenses and incomes only.
 @override final  String? categoryId;
 
 /// Create a copy of TransactionDraft

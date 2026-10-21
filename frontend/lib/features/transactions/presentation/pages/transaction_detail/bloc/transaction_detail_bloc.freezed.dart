@@ -446,13 +446,7 @@ $TransactionLookupsCopyWith<$Res> get lookups {
 /// @nodoc
 mixin _$TransactionDetailState {
 
-/// [UiStatus.loading] until the transaction is cached,
-/// [UiStatus.failure] when it couldn't be fetched or no longer exists,
-/// otherwise [UiStatus.success].
- UiStatus get status; Transaction? get transaction; TransactionLookups get lookups; bool get isRefreshing; bool get isDeleting;/// The transaction was deleted, here or elsewhere: the screen closes.
- bool get isClosed;/// Why the transaction couldn't be shown.
- TransactionFailure? get loadFailure;/// Why a delete failed; shown once as a snackbar.
- TransactionFailure? get actionFailure;
+ UiStatus get status; Transaction? get transaction; TransactionLookups get lookups; bool get isRefreshing; bool get isDeleting; bool get isClosed; TransactionFailure? get loadFailure; TransactionFailure? get actionFailure;
 /// Create a copy of TransactionDetailState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -680,19 +674,13 @@ class _TransactionDetailState implements TransactionDetailState {
   const _TransactionDetailState({this.status = UiStatus.initial, this.transaction, this.lookups = const TransactionLookups(), this.isRefreshing = false, this.isDeleting = false, this.isClosed = false, this.loadFailure, this.actionFailure});
   
 
-/// [UiStatus.loading] until the transaction is cached,
-/// [UiStatus.failure] when it couldn't be fetched or no longer exists,
-/// otherwise [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
 @override final  Transaction? transaction;
 @override@JsonKey() final  TransactionLookups lookups;
 @override@JsonKey() final  bool isRefreshing;
 @override@JsonKey() final  bool isDeleting;
-/// The transaction was deleted, here or elsewhere: the screen closes.
 @override@JsonKey() final  bool isClosed;
-/// Why the transaction couldn't be shown.
 @override final  TransactionFailure? loadFailure;
-/// Why a delete failed; shown once as a snackbar.
 @override final  TransactionFailure? actionFailure;
 
 /// Create a copy of TransactionDetailState

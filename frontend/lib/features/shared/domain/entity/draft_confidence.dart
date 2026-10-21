@@ -2,8 +2,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'draft_confidence.freezed.dart';
 
-/// How sure the reader of a phrase or receipt (the phone or the AI) is of
-/// each field of a draft, from 0 to 1.
+/// From 0 to 1, per draft field.
 @freezed
 abstract class DraftConfidence with _$DraftConfidence {
   const factory DraftConfidence({

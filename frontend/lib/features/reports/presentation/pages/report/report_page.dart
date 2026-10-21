@@ -16,8 +16,6 @@ import 'package:monai/features/reports/presentation/pages/report/widgets/report_
 
 class ReportPage extends StatelessWidget {
   const ReportPage({required this.month, super.key});
-
-  /// The month to open on; a future one opens the current month.
   final DateTime month;
 
   @override
@@ -30,8 +28,6 @@ class ReportPage extends StatelessWidget {
   }
 }
 
-/// A month's report: totals, spending by category and the budget, with
-/// arrows to step through months.
 class ReportUI extends StatelessWidget {
   const ReportUI({super.key});
 
@@ -134,8 +130,6 @@ class _MonthSwitcher extends StatelessWidget {
   }
 }
 
-/// The report, its skeleton while loading, or the error when it couldn't
-/// be loaded.
 class _Body extends StatelessWidget {
   const _Body({required this.onRetry, required this.onOpenBudget});
 

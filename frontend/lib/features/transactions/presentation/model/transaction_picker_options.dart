@@ -7,7 +7,6 @@ import 'package:monai/features/transactions/presentation/model/transaction_text.
 import 'package:monai/features/transactions/presentation/widgets/transaction_wallet_avatar.dart';
 
 extension CategoryPickerOption on Category {
-  /// This category in [MonAICategoryPickerSheet].
   MonAICategoryOption get pickerOption => MonAICategoryOption(
     id: id,
     name: name,
@@ -17,7 +16,6 @@ extension CategoryPickerOption on Category {
 }
 
 extension WalletPickerOption on Wallet {
-  /// This wallet with its balance in [MonAIRadioPickerSheet].
   MonAIRadioPickerOption pickerOption(AppLocalizations l10n) =>
       MonAIRadioPickerOption(
         id: id,
@@ -28,7 +26,6 @@ extension WalletPickerOption on Wallet {
       );
 }
 
-/// The text of the form's [MonAIDatePickerSheet], up to [today].
 MonAIDatePickerLabels transactionDatePickerLabels(
   AppLocalizations l10n, {
   required DateTime today,

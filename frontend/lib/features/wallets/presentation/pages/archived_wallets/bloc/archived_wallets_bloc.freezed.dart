@@ -355,13 +355,7 @@ as List<Wallet>,
 /// @nodoc
 mixin _$ArchivedWalletsState {
 
-/// [UiStatus.initial] until the cache is read, [UiStatus.empty] with
-/// nothing archived, otherwise [UiStatus.success].
- UiStatus get status;/// The archived wallets, in the cache's order.
- List<Wallet> get wallets;/// Being brought back.
- Set<String> get restoringIds;/// Just brought back; shown once as a snackbar.
- Wallet? get restored;/// Why an unarchive failed; shown once as a snackbar.
- WalletFailure? get actionFailure;
+ UiStatus get status; List<Wallet> get wallets; Set<String> get restoringIds; Wallet? get restored; WalletFailure? get actionFailure;
 /// Create a copy of ArchivedWalletsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -577,30 +571,22 @@ class _ArchivedWalletsState implements ArchivedWalletsState {
   const _ArchivedWalletsState({this.status = UiStatus.initial,  List<Wallet> wallets = const [],  Set<String> restoringIds = const {}, this.restored, this.actionFailure}): _wallets = wallets,_restoringIds = restoringIds;
   
 
-/// [UiStatus.initial] until the cache is read, [UiStatus.empty] with
-/// nothing archived, otherwise [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// The archived wallets, in the cache's order.
  final  List<Wallet> _wallets;
-/// The archived wallets, in the cache's order.
 @override@JsonKey() List<Wallet> get wallets {
   if (_wallets is EqualUnmodifiableListView) return _wallets;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_wallets);
 }
 
-/// Being brought back.
  final  Set<String> _restoringIds;
-/// Being brought back.
 @override@JsonKey() Set<String> get restoringIds {
   if (_restoringIds is EqualUnmodifiableSetView) return _restoringIds;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableSetView(_restoringIds);
 }
 
-/// Just brought back; shown once as a snackbar.
 @override final  Wallet? restored;
-/// Why an unarchive failed; shown once as a snackbar.
 @override final  WalletFailure? actionFailure;
 
 /// Create a copy of ArchivedWalletsState

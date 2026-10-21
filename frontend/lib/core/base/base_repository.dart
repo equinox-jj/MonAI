@@ -4,11 +4,8 @@ import 'package:fpdart/fpdart.dart';
 
 import 'package:monai/core/base/error/error_mapper.dart';
 
-/// Mixed into repository implementations to centralize the try/catch that
-/// converts thrown exceptions into a domain [Failure]. This is the single
-/// boundary where exceptions stop and `Either` begins.
+/// The single boundary where thrown exceptions become an `Either` [Failure].
 mixin BaseRepository {
-  /// Runs [body], returning `Right` on success or `Left(Failure)` on any throw.
   Future<Either<Failure, T>> safeCall<T>(Future<T> Function() body) async {
     try {
       final value = await body();
@@ -18,9 +15,7 @@ mixin BaseRepository {
     }
   }
 
-  /// Wraps each value of the stream [watch] opens in `Right`, and turns each
-  /// error, including one thrown while opening it, into a `Left(Failure)`
-  /// event. The stream keeps going after an error.
+  /// Errors become `Left` events; the stream keeps going after one.
   Stream<Either<Failure, T>> safeStream<T>(Stream<T> Function() watch) {
     final Stream<T> source;
     try {

@@ -6,8 +6,6 @@ import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.da
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:rxdart/rxdart.dart';
 
-/// Every cached category and wallet, to name what a transaction refers to;
-/// updated whenever either cache changes. A failed read is passed on.
 class WatchTransactionLookupsUseCase
     implements StreamUseCase<TransactionLookups, NoParams> {
   WatchTransactionLookupsUseCase({

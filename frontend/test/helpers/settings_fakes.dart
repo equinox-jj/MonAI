@@ -45,9 +45,9 @@ const cachedOverview = SettingsOverview(
   walletCount: 2,
 );
 
-/// Mocked use cases behind a real [SettingsBloc] and [AppSettingsCubit], for
-/// widget tests that reach the Settings tab. By default the cache holds
-/// [cachedOverview], the version is `1.0.0`, and saves and sign-outs succeed.
+/// Mocked use cases behind a real [SettingsBloc] and [AppSettingsCubit]. By
+/// default the cache holds [cachedOverview], the version is `1.0.0`, and saves
+/// and sign-outs succeed.
 class SettingsFakes {
   SettingsFakes({SettingsOverview overview = cachedOverview}) {
     registerFallbackValue(DateTime(2026));
@@ -79,7 +79,7 @@ class SettingsFakes {
   final getLanguage = MockGetLanguage();
   final setLanguage = MockSetLanguage();
 
-  /// The app-wide theme and language; close it in a tear-down.
+  /// Close it in a tear-down.
   late final appSettings = AppSettingsCubit(
     getThemeMode: getThemeMode,
     setThemeMode: setThemeMode,
@@ -87,12 +87,10 @@ class SettingsFakes {
     setLanguage: setLanguage,
   );
 
-  /// Makes the cache hold [overview].
   void cacheHolds(SettingsOverview overview) => when(
     () => watch(any()),
   ).thenAnswer((_) => Stream.value(Right<Failure, SettingsOverview>(overview)));
 
-  /// Registers a [SettingsBloc] factory on `sl`, as `SettingsPage` reads it.
   void register() => sl.registerFactory(
     () => SettingsBloc(
       watchOverview: watch,

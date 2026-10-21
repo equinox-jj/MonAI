@@ -20,8 +20,6 @@ class CategoryFormPage extends StatelessWidget {
   });
 
   final CategoryFormMode mode;
-
-  /// [ScreenPlacement.sideSheet] on tablet landscape.
   final ScreenPlacement placement;
 
   @override
@@ -35,8 +33,6 @@ class CategoryFormPage extends StatelessWidget {
   }
 }
 
-/// Adding a category or editing one: name, icon and color, previewed live.
-/// Editing a custom category can also delete it.
 class CategoryFormUI extends StatefulWidget {
   const CategoryFormUI({
     super.key,
@@ -227,7 +223,6 @@ class _Fields extends StatelessWidget {
   }
 }
 
-/// A red outlined "Delete category".
 class _DeleteButton extends StatelessWidget {
   const _DeleteButton({required this.onPressed});
 

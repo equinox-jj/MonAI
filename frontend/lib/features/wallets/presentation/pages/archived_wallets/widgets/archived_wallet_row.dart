@@ -5,7 +5,6 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_text.dart';
 import 'package:monai/features/wallets/presentation/widgets/wallet_logo.dart';
 
-/// An archived wallet: grey monogram, name, type and balance, "Unarchive".
 class ArchivedWalletRow extends StatelessWidget {
   const ArchivedWalletRow({
     required this.wallet,

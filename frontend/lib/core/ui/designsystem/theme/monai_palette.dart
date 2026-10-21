@@ -1,7 +1,5 @@
 import 'package:flutter/painting.dart';
 
-/// Raw palette from the MonAI design canvas.
-///
 /// Widgets read semantic colors through `context.colors` ([MonAIColors]),
 /// never these values directly.
 abstract final class MonAIPalette {

@@ -9,7 +9,6 @@ import 'package:monai/features/shared/data/model/transaction_list_response.dart'
 import 'package:monai/features/shared/data/model/transaction_request.dart';
 import 'package:monai/features/shared/data/model/transaction_response.dart';
 
-/// The query of `GET /transactions`; null filters are left out.
 class TransactionQuery {
   const TransactionQuery({
     required this.month,
@@ -26,8 +25,6 @@ class TransactionQuery {
   final int limit;
   final String? walletId;
   final String? categoryId;
-
-  /// API value, e.g. `EXPENSE`.
   final String? type;
   final String? search;
   final String? cursor;
@@ -44,34 +41,26 @@ class TransactionQuery {
 }
 
 abstract class TransactionRemoteDataSource {
-  /// `GET /transactions`.
   Future<TransactionListResponse> getTransactions(TransactionQuery query);
 
-  /// `GET /transactions/{id}`.
   Future<TransactionResponse> getTransaction(String id);
 
-  /// `POST /transactions`.
   Future<TransactionResponse> createTransaction(TransactionRequest request);
 
-  /// `PATCH /transactions/{id}` with the whole form.
   Future<TransactionResponse> updateTransaction(
     String id,
     TransactionRequest request,
   );
 
-  /// `PATCH /transactions/{id}` with only a receipt.
   Future<TransactionResponse> attachReceipt(
     String id,
     AttachReceiptRequest request,
   );
 
-  /// `DELETE /transactions/{id}`.
   Future<void> deleteTransaction(String id);
 
-  /// `POST /transactions/{id}/restore`.
   Future<TransactionResponse> restoreTransaction(String id);
 
-  /// `POST /transactions/receipt`, multipart `file`.
   Future<ReceiptUploadResponse> uploadReceipt(
     Uint8List bytes, {
     required String filename,

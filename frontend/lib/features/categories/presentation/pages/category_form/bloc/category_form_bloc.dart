@@ -20,8 +20,6 @@ part 'category_form_bloc.freezed.dart';
 part 'category_form_event.dart';
 part 'category_form_state.dart';
 
-/// The add and edit category form: name, icon and color. The name lives in
-/// the screen's text field and arrives with each edit and with save.
 class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryFormState> {
   CategoryFormBloc({
     required CategoryFormMode mode,

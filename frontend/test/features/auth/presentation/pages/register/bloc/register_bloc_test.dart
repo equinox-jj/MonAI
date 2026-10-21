@@ -43,7 +43,6 @@ void main() {
 
   tearDown(() => bloc.close());
 
-  /// Types a form, submits it and returns the settled state.
   Future<RegisterState> submit(Either<Failure, AuthSession> result) async {
     when(() => register(any())).thenAnswer((_) async => result);
     bloc.add(

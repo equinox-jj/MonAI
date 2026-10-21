@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'payment_provider_catalog_response.freezed.dart';
 part 'payment_provider_catalog_response.g.dart';
 
-/// `GET /payment-providers`.
 @freezed
 abstract class PaymentProviderCatalogResponse
     with _$PaymentProviderCatalogResponse {

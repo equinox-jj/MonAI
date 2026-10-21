@@ -491,16 +491,7 @@ $BudgetCopyWith<$Res>? get budget {
 /// @nodoc
 mixin _$ReportState {
 
-/// The first of the shown month.
- DateTime get month;/// The first of this month: the latest month the report shows.
- DateTime get currentMonth;/// [UiStatus.loading] while a month without a saved report loads,
-/// [UiStatus.failure] when it couldn't be, otherwise
-/// [UiStatus.success].
- UiStatus get status;/// The month's report; null until loaded.
- MonthlyReport? get report;/// The month's budget; null when none is set.
- Budget? get budget;/// Why the report couldn't be loaded.
- ReportFailure? get loadFailure;/// Why a saved report couldn't be refreshed; shown once as a snackbar.
- ReportFailure? get refreshFailure;
+ DateTime get month; DateTime get currentMonth; UiStatus get status; MonthlyReport? get report; Budget? get budget; ReportFailure? get loadFailure; ReportFailure? get refreshFailure;
 /// Create a copy of ReportState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -730,21 +721,12 @@ class _ReportState implements ReportState {
   const _ReportState({required this.month, required this.currentMonth, this.status = UiStatus.initial, this.report, this.budget, this.loadFailure, this.refreshFailure});
   
 
-/// The first of the shown month.
 @override final  DateTime month;
-/// The first of this month: the latest month the report shows.
 @override final  DateTime currentMonth;
-/// [UiStatus.loading] while a month without a saved report loads,
-/// [UiStatus.failure] when it couldn't be, otherwise
-/// [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// The month's report; null until loaded.
 @override final  MonthlyReport? report;
-/// The month's budget; null when none is set.
 @override final  Budget? budget;
-/// Why the report couldn't be loaded.
 @override final  ReportFailure? loadFailure;
-/// Why a saved report couldn't be refreshed; shown once as a snackbar.
 @override final  ReportFailure? refreshFailure;
 
 /// Create a copy of ReportState

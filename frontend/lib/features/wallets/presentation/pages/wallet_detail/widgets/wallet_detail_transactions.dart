@@ -10,7 +10,6 @@ import 'package:monai/features/wallets/presentation/model/wallet_text.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/wallet_detail_actions.dart';
 
-/// "This month" with the wallet's transactions, newest first.
 class WalletDetailTransactions extends StatelessWidget {
   const WalletDetailTransactions({required this.actions, super.key});
 

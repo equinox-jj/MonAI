@@ -5,8 +5,6 @@ import 'package:monai/features/settings/domain/entity/admin_payment_provider.dar
 import 'package:monai/features/settings/domain/event/provider_change_events.dart';
 import 'package:monai/features/settings/domain/repository/admin_provider_repository.dart';
 
-/// Shows a provider to users adding a wallet, or hides it; existing wallets
-/// keep working either way.
 class SetProviderActiveUseCase
     implements UseCase<AdminPaymentProvider, SetProviderActiveParams> {
   SetProviderActiveUseCase({required this._repository, required this._events});

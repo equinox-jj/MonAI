@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/utils/monograms.dart';
 
-/// A provider's logo: a newly picked image, the saved one, or its monogram
-/// while there is none.
 class ProviderLogo extends StatelessWidget {
   const ProviderLogo({
     required this.name,
@@ -18,12 +16,8 @@ class ProviderLogo extends StatelessWidget {
 
   final String name;
   final String? logoUrl;
-
-  /// A picked image not uploaded yet; shown over [logoUrl].
   final String? localPath;
   final double size;
-
-  /// Faded, for an inactive provider.
   final bool dimmed;
 
   @override

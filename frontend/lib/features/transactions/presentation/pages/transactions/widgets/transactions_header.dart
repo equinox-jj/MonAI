@@ -12,8 +12,6 @@ import 'package:monai/features/transactions/presentation/pages/transactions/bloc
 import 'package:monai/features/transactions/presentation/pages/transactions/widgets/transactions_actions.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_filter_chips.dart';
 
-/// The title, the search box, the month switcher, the filter chips and the
-/// month's income and expense.
 class TransactionsHeader extends StatelessWidget {
   const TransactionsHeader({required this.actions, super.key});
 
@@ -150,7 +148,6 @@ class _Filters extends StatelessWidget {
   }
 }
 
-/// The month's income and expense from its report.
 class _MonthTotals extends StatelessWidget {
   const _MonthTotals();
 

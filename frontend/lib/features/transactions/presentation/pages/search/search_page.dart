@@ -22,8 +22,6 @@ import 'package:monai/features/transactions/presentation/widgets/transaction_wal
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key, this.initialMonth});
-
-  /// The month to search first; the current one when null.
   final DateTime? initialMonth;
 
   @override
@@ -37,7 +35,6 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-/// Search over notes and merchants, with the same filters as the list.
 class SearchUI extends StatefulWidget {
   const SearchUI({super.key});
 
@@ -47,8 +44,6 @@ class SearchUI extends StatefulWidget {
 
 class _SearchUIState extends State<SearchUI> {
   final _query = TextEditingController();
-
-  /// How close to the end of the results the next page is fetched.
   static const _loadMoreExtent = 600.0;
 
   @override
@@ -224,7 +219,6 @@ class _SearchUIState extends State<SearchUI> {
   }
 }
 
-/// The month picker, fed the totals of whichever year it shows.
 class _MonthPicker extends StatelessWidget {
   const _MonthPicker({required this.selected, required this.bloc});
 

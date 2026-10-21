@@ -11,8 +11,6 @@ import 'package:monai/features/transactions/presentation/pages/transaction_form/
 
 final _digits = NumberFormat.decimalPattern('id');
 
-/// The amount typed on the keypad, signed and colored by type, with the
-/// saved amount under it while editing.
 class TransactionFormAmount extends StatelessWidget {
   const TransactionFormAmount({super.key});
 

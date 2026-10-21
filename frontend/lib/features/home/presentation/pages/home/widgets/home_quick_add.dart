@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// The natural-language entry and the receipt scanner, with a hint below.
 class HomeQuickAdd extends StatelessWidget {
   const HomeQuickAdd({
     required this.onQuickAdd,
@@ -34,8 +33,6 @@ class HomeQuickAdd extends StatelessWidget {
   }
 }
 
-/// The quick-add pill and the scan button side by side; the tablet header
-/// shows it without the hint.
 class HomeQuickAddBar extends StatelessWidget {
   const HomeQuickAddBar({
     required this.onQuickAdd,
@@ -46,8 +43,6 @@ class HomeQuickAddBar extends StatelessWidget {
 
   final VoidCallback onQuickAdd;
   final VoidCallback onScanReceipt;
-
-  /// 52 on phones and tablet portrait, 48 in tablet landscape.
   final double height;
 
   @override

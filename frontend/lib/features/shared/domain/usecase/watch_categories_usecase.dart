@@ -4,7 +4,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';
 
-/// Every category, hidden ones included, to label transactions.
 class WatchCategoriesUseCase
     implements StreamUseCase<List<Category>, NoParams> {
   WatchCategoriesUseCase(this._repository);

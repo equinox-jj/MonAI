@@ -11,13 +11,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// Centered icon, title, message and actions for empty and error states.
-///
-/// [MonAIAlertTone.error] gives the red icon circle; any other tone is
-/// indigo. [footnote] is a small gray line under the actions, e.g.
-/// "Error code: internal_error".
 class MonAIStateMessage extends StatelessWidget {
-  /// Creates a state message.
   const MonAIStateMessage({
     required this.icon,
     required this.title,
@@ -33,37 +27,16 @@ class MonAIStateMessage extends StatelessWidget {
     this.footnote,
   });
 
-  /// The icon in the circle.
   final MonAIIconData icon;
-
-  /// The heading.
   final String title;
-
-  /// The explanation.
   final String message;
-
-  /// Red for errors, indigo otherwise.
   final MonAIAlertTone tone;
-
-  /// The main button's label; none when null.
   final String? actionLabel;
-
-  /// An icon on the main button.
   final MonAIIconData? actionIcon;
-
-  /// The main button's action.
   final VoidCallback? onAction;
-
-  /// Shows a spinner on the main button ("Trying…").
   final bool actionLoading;
-
-  /// A link under the main button.
   final String? secondaryActionLabel;
-
-  /// The link's action.
   final VoidCallback? onSecondaryAction;
-
-  /// A small gray line at the bottom.
   final String? footnote;
 
   @override
@@ -126,10 +99,7 @@ class MonAIStateMessage extends StatelessWidget {
   }
 }
 
-/// A shimmering placeholder block. Leave [width] null to fill the available
-/// width; use [onGradient] inside a [MonAIGradientCard].
 class MonAISkeleton extends StatefulWidget {
-  /// Creates a skeleton block.
   const MonAISkeleton({
     required this.height,
     super.key,
@@ -138,16 +108,9 @@ class MonAISkeleton extends StatefulWidget {
     this.onGradient = false,
   });
 
-  /// The block's height.
   final double height;
-
-  /// The block's width; fills the parent when null.
   final double? width;
-
-  /// Corner radius; pass [MonAIRadius.fullAll] for circles and pills.
   final BorderRadius borderRadius;
-
-  /// Uses translucent white, for placeholders on a gradient.
   final bool onGradient;
 
   @override
@@ -186,7 +149,6 @@ class _MonAISkeletonState extends State<MonAISkeleton>
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, _) {
-            // Slides a highlight band from left to right across the block.
             final x = _controller.value * 3 - 1.5;
             return DecoratedBox(
               decoration: BoxDecoration(
@@ -205,9 +167,7 @@ class _MonAISkeletonState extends State<MonAISkeleton>
   }
 }
 
-/// 8 rounded progress bar, e.g. budget used. [progress] is clamped to 0..1.
 class MonAIProgressBar extends StatelessWidget {
-  /// Creates a progress bar.
   const MonAIProgressBar({
     required this.progress,
     super.key,
@@ -215,13 +175,8 @@ class MonAIProgressBar extends StatelessWidget {
     this.trackColor,
   });
 
-  /// 0 to 1.
   final double progress;
-
-  /// Fill color; defaults to `accent`.
   final Color? color;
-
-  /// Track color; defaults to `surfaceSunken`.
   final Color? trackColor;
 
   @override
@@ -248,20 +203,14 @@ class MonAIProgressBar extends StatelessWidget {
   }
 }
 
-/// Onboarding step dots: the current step is a 24 bar. Steps animate between
-/// dot and bar.
 class MonAIPageIndicator extends StatelessWidget {
-  /// Creates a page indicator.
   const MonAIPageIndicator({
     required this.pageCount,
     required this.currentPage,
     super.key,
   });
 
-  /// Number of steps.
   final int pageCount;
-
-  /// The current step, from 0.
   final int currentPage;
 
   @override

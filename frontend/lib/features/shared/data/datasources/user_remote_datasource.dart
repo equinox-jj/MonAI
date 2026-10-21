@@ -4,7 +4,6 @@ import 'package:monai/features/shared/data/datasources/endpoint/user_endpoint.da
 import 'package:monai/features/shared/data/model/me_response.dart';
 
 abstract class UserRemoteDataSource {
-  /// `GET /me`.
   Future<MeResponse> getMe();
 }
 

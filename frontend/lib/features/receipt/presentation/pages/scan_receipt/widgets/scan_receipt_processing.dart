@@ -7,7 +7,6 @@ import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/sca
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_camera_view.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_frame.dart';
 
-/// The photo being read, with what has been done so far.
 class ScanReceiptProcessing extends StatelessWidget {
   const ScanReceiptProcessing({
     required this.photoPath,
@@ -18,8 +17,6 @@ class ScanReceiptProcessing extends StatelessWidget {
 
   final String photoPath;
   final ProcessingStep step;
-
-  /// Back to the camera.
   final VoidCallback onCancel;
 
   @override
@@ -183,7 +180,6 @@ class _PhotoState extends State<_Photo> with SingleTickerProviderStateMixin {
   }
 }
 
-/// Read on the phone, then the AI, then the draft.
 class _Steps extends StatelessWidget {
   const _Steps({required this.step});
 

@@ -6,11 +6,8 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_field_error_text.dart';
 
-/// The error of [fields], the first that has one; nothing when valid.
 class TransactionFormFieldError extends StatelessWidget {
   const TransactionFormFieldError({required this.fields, super.key});
-
-  /// API field names, e.g. `wallet_id`.
   final List<String> fields;
 
   @override

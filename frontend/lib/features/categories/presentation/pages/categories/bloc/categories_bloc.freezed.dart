@@ -543,16 +543,7 @@ as List<Category>,
 /// @nodoc
 mixin _$CategoriesState {
 
- CategoryType get type;/// [UiStatus.loading] while nothing is saved and the first load runs,
-/// [UiStatus.failure] when it failed, otherwise [UiStatus.success].
- UiStatus get status;/// Every category, hidden ones included.
- List<Category> get categories;/// Categories with a hide or delete running.
- Set<String> get busyIds;/// Why the categories couldn't be loaded.
- CategoryFailure? get loadFailure;/// A delete was refused for this category's transactions: the screen
-/// asks where to move them.
- Category? get moveFrom;/// Just deleted; shown once as a snackbar.
- Category? get deleted;/// Why a hide or delete failed; shown once as a snackbar.
- CategoryFailure? get actionFailure;
+ CategoryType get type; UiStatus get status; List<Category> get categories; Set<String> get busyIds; CategoryFailure? get loadFailure; Category? get moveFrom; Category? get deleted; CategoryFailure? get actionFailure;
 /// Create a copy of CategoriesState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -784,35 +775,24 @@ class _CategoriesState implements CategoriesState {
   
 
 @override@JsonKey() final  CategoryType type;
-/// [UiStatus.loading] while nothing is saved and the first load runs,
-/// [UiStatus.failure] when it failed, otherwise [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// Every category, hidden ones included.
  final  List<Category> _categories;
-/// Every category, hidden ones included.
 @override@JsonKey() List<Category> get categories {
   if (_categories is EqualUnmodifiableListView) return _categories;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_categories);
 }
 
-/// Categories with a hide or delete running.
  final  Set<String> _busyIds;
-/// Categories with a hide or delete running.
 @override@JsonKey() Set<String> get busyIds {
   if (_busyIds is EqualUnmodifiableSetView) return _busyIds;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableSetView(_busyIds);
 }
 
-/// Why the categories couldn't be loaded.
 @override final  CategoryFailure? loadFailure;
-/// A delete was refused for this category's transactions: the screen
-/// asks where to move them.
 @override final  Category? moveFrom;
-/// Just deleted; shown once as a snackbar.
 @override final  Category? deleted;
-/// Why a hide or delete failed; shown once as a snackbar.
 @override final  CategoryFailure? actionFailure;
 
 /// Create a copy of CategoriesState

@@ -7,7 +7,6 @@ import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/bloc/quick_add_review_bloc.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// One reviewed draft in the summary.
 @immutable
 class _SummaryRow {
   const _SummaryRow({
@@ -71,7 +70,6 @@ List<_SummaryRow> _rowsOf(
   };
 });
 
-/// What happened to each draft once all were reviewed.
 class QuickAddReviewSummary extends StatelessWidget {
   const QuickAddReviewSummary({super.key});
 

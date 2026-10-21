@@ -25,12 +25,8 @@ class WalletsPage extends StatelessWidget {
   }
 }
 
-/// Every wallet with the total across them. Tablet landscape shows the
-/// picked wallet beside the list.
 class WalletsUI extends StatelessWidget {
   const WalletsUI({super.key});
-
-  /// The list's width beside the detail pane.
   static const _listPaneWidth = 420.0;
 
   void _addWallet(BuildContext context) => context.push(AppRoutes.walletNew);
@@ -49,7 +45,6 @@ class WalletsUI extends StatelessWidget {
   void _retry(BuildContext context) =>
       context.read<WalletsBloc>().add(const WalletsEvent.refreshed());
 
-  /// Pull-to-refresh keeps its spinner until the refresh finishes.
   Future<void> _pullToRefresh(BuildContext context) async {
     final bloc = context.read<WalletsBloc>()
       ..add(const WalletsEvent.refreshed());

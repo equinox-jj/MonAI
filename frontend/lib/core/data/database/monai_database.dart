@@ -57,10 +57,8 @@ part 'monai_database.g.dart';
   include: {'tables/transactions_fts.drift'},
 )
 class MonAIDatabase extends _$MonAIDatabase {
-  /// Opens the database on [executor]; tests pass an in-memory one.
   MonAIDatabase(super.executor);
 
-  /// Opens the app's database file, `monai.sqlite`.
   factory MonAIDatabase.open() => MonAIDatabase(driftDatabase(name: 'monai'));
 
   @override

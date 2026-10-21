@@ -1318,25 +1318,9 @@ as Map<DateTime, int>,
 /// @nodoc
 mixin _$TransactionsState {
 
-/// The first of the month shown.
- DateTime get month;/// The user's current date; months after its own can't be shown.
- DateTime get today;/// [UiStatus.loading] while the first page loads with nothing cached
-/// (the skeleton), [UiStatus.failure] when that load failed,
-/// [UiStatus.empty] when the month has nothing that matches, otherwise
-/// [UiStatus.success].
- UiStatus get status; TransactionFilter get filter;/// The loaded rows, newest first.
- List<Transaction> get transactions;/// Swiped away and being deleted; hidden until the cache drops them.
- Set<String> get deletingIds;/// Each cached day's income minus expenses, for the day headers.
- Map<DateTime, int> get dailyNets;/// How many rows the list shows; grows a page at a time.
- int get limit;/// The server has more pages.
- bool get hasMore; bool get isLoadingMore; bool get isRefreshing;/// The first page was fetched, so no rows means none match.
- bool get listLoaded; TransactionLookups get lookups;/// The month's report, for the income and expense totals; null until
-/// cached.
- MonthlyReport? get report;/// Spent per cached month of the year the month picker shows.
- Map<DateTime, int> get monthPickerTotals;/// The transaction in the detail pane on a wide screen.
- String? get selectedId;/// Why the first load failed, with nothing cached.
- TransactionFailure? get loadFailure;/// Why a refresh or a delete failed; shown once as a snackbar.
- TransactionFailure? get actionFailure;
+ DateTime get month; DateTime get today; UiStatus get status; TransactionFilter get filter; List<Transaction> get transactions;/// Hidden until the cache drops them.
+ Set<String> get deletingIds; Map<DateTime, int> get dailyNets; int get limit; bool get hasMore; bool get isLoadingMore; bool get isRefreshing;/// The first page was fetched, so no rows means none match.
+ bool get listLoaded; TransactionLookups get lookups; MonthlyReport? get report; Map<DateTime, int> get monthPickerTotals; String? get selectedId; TransactionFailure? get loadFailure; TransactionFailure? get actionFailure;
 /// Create a copy of TransactionsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1583,69 +1567,50 @@ class _TransactionsState implements TransactionsState {
   const _TransactionsState({required this.month, required this.today, this.status = UiStatus.initial, this.filter = const TransactionFilter(),  List<Transaction> transactions = const [],  Set<String> deletingIds = const {},  Map<DateTime, int> dailyNets = const {}, this.limit = TransactionRepository.pageSize, this.hasMore = false, this.isLoadingMore = false, this.isRefreshing = false, this.listLoaded = false, this.lookups = const TransactionLookups(), this.report,  Map<DateTime, int> monthPickerTotals = const {}, this.selectedId, this.loadFailure, this.actionFailure}): _transactions = transactions,_deletingIds = deletingIds,_dailyNets = dailyNets,_monthPickerTotals = monthPickerTotals;
   
 
-/// The first of the month shown.
 @override final  DateTime month;
-/// The user's current date; months after its own can't be shown.
 @override final  DateTime today;
-/// [UiStatus.loading] while the first page loads with nothing cached
-/// (the skeleton), [UiStatus.failure] when that load failed,
-/// [UiStatus.empty] when the month has nothing that matches, otherwise
-/// [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
 @override@JsonKey() final  TransactionFilter filter;
-/// The loaded rows, newest first.
  final  List<Transaction> _transactions;
-/// The loaded rows, newest first.
 @override@JsonKey() List<Transaction> get transactions {
   if (_transactions is EqualUnmodifiableListView) return _transactions;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_transactions);
 }
 
-/// Swiped away and being deleted; hidden until the cache drops them.
+/// Hidden until the cache drops them.
  final  Set<String> _deletingIds;
-/// Swiped away and being deleted; hidden until the cache drops them.
+/// Hidden until the cache drops them.
 @override@JsonKey() Set<String> get deletingIds {
   if (_deletingIds is EqualUnmodifiableSetView) return _deletingIds;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableSetView(_deletingIds);
 }
 
-/// Each cached day's income minus expenses, for the day headers.
  final  Map<DateTime, int> _dailyNets;
-/// Each cached day's income minus expenses, for the day headers.
 @override@JsonKey() Map<DateTime, int> get dailyNets {
   if (_dailyNets is EqualUnmodifiableMapView) return _dailyNets;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_dailyNets);
 }
 
-/// How many rows the list shows; grows a page at a time.
 @override@JsonKey() final  int limit;
-/// The server has more pages.
 @override@JsonKey() final  bool hasMore;
 @override@JsonKey() final  bool isLoadingMore;
 @override@JsonKey() final  bool isRefreshing;
 /// The first page was fetched, so no rows means none match.
 @override@JsonKey() final  bool listLoaded;
 @override@JsonKey() final  TransactionLookups lookups;
-/// The month's report, for the income and expense totals; null until
-/// cached.
 @override final  MonthlyReport? report;
-/// Spent per cached month of the year the month picker shows.
  final  Map<DateTime, int> _monthPickerTotals;
-/// Spent per cached month of the year the month picker shows.
 @override@JsonKey() Map<DateTime, int> get monthPickerTotals {
   if (_monthPickerTotals is EqualUnmodifiableMapView) return _monthPickerTotals;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_monthPickerTotals);
 }
 
-/// The transaction in the detail pane on a wide screen.
 @override final  String? selectedId;
-/// Why the first load failed, with nothing cached.
 @override final  TransactionFailure? loadFailure;
-/// Why a refresh or a delete failed; shown once as a snackbar.
 @override final  TransactionFailure? actionFailure;
 
 /// Create a copy of TransactionsState

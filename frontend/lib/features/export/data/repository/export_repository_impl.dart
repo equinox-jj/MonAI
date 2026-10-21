@@ -12,7 +12,6 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 class ExportRepositoryImpl extends ExportRepository with BaseRepository {
   ExportRepositoryImpl({required this._remote, required this._local});
 
-  /// The API's largest page.
   static const pageSize = 100;
 
   final TransactionRemoteDataSource _remote;

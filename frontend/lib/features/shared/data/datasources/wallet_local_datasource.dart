@@ -3,21 +3,16 @@ import 'package:monai/core/data/database/daos/wallet_dao.dart';
 import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class WalletLocalDataSource {
-  /// Every cached wallet, archived ones included; default first, then by
-  /// name.
   Stream<List<WalletRow>> watchAll();
 
-  /// The wallet with [id], or null when it isn't cached.
   Stream<WalletRow?> watch(String id);
 
-  /// The cached wallet with [id] now, or null when it isn't cached.
   Future<WalletRow?> find(String id);
 
-  /// Replaces the whole cache with the server's list.
   Future<void> replaceAll(List<WalletRow> rows);
 
-  /// Caches one wallet. When it is the default, the other cached wallets stop
-  /// being the default, as the server does.
+  /// When it is the default, the other cached wallets stop being the default,
+  /// as the server does.
   Future<void> save(WalletRow row);
 
   Future<void> deleteById(String id);

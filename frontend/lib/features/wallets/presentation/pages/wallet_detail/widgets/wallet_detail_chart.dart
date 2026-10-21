@@ -7,8 +7,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
 
-/// "Money out · October" with the month's total and a bar per day up to
-/// today; the last day's bar stands out.
 class WalletDetailChart extends StatelessWidget {
   const WalletDetailChart({super.key});
 
@@ -94,7 +92,6 @@ class WalletDetailChart extends StatelessWidget {
   }
 }
 
-/// `1 Oct` under the chart.
 class _DayLabel extends StatelessWidget {
   const _DayLabel({required this.month, required this.day});
 
@@ -110,7 +107,6 @@ class _DayLabel extends StatelessWidget {
   );
 }
 
-/// A rounded bar per day, scaled to the biggest; empty days are a sliver.
 class _BarsPainter extends CustomPainter {
   _BarsPainter({
     required this.days,

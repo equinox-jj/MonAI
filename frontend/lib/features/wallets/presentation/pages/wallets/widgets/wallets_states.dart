@@ -7,7 +7,6 @@ import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_b
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_actions.dart';
 import 'package:monai/features/wallets/presentation/widgets/wallet_card.dart';
 
-/// Placeholder cards while nothing is cached. Read out as one label.
 class WalletsSkeleton extends StatelessWidget {
   const WalletsSkeleton({super.key});
 
@@ -33,7 +32,6 @@ class WalletsSkeleton extends StatelessWidget {
   }
 }
 
-/// Replaces the list when the first load failed with nothing cached.
 class WalletsLoadError extends StatelessWidget {
   const WalletsLoadError({required this.actions, super.key});
 
@@ -63,7 +61,6 @@ class WalletsLoadError extends StatelessWidget {
   }
 }
 
-/// No wallets at all.
 class WalletsEmpty extends StatelessWidget {
   const WalletsEmpty({required this.actions, super.key});
 

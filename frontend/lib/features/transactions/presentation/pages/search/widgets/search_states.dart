@@ -14,7 +14,6 @@ typedef _Empty = ({
   DateTime month,
 });
 
-/// Nothing matches: clear the filters or search every month.
 class SearchEmpty extends StatelessWidget {
   const SearchEmpty({
     required this.onClearFilters,
@@ -59,7 +58,6 @@ class SearchEmpty extends StatelessWidget {
   }
 }
 
-/// The search failed.
 class SearchError extends StatelessWidget {
   const SearchError({required this.onRetry, super.key});
 

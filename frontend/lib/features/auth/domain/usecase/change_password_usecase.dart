@@ -5,9 +5,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/auth/domain/repository/auth_repository.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 
-/// Changes the password and signs out, so the user signs in with the new
-/// one. Invalid input fails as [ValidationFailure] without calling the
-/// server. Passwords are sent as typed.
 class ChangePasswordUseCase
     implements UseCase<SessionStatus, ChangePasswordParams> {
   ChangePasswordUseCase(this._repository);
@@ -30,7 +27,6 @@ class ChangePasswordUseCase
   }
 }
 
-/// The change-password form as typed.
 class ChangePasswordParams {
   const ChangePasswordParams({
     required this.currentPassword,

@@ -22,9 +22,6 @@ part 'budget_bloc.freezed.dart';
 part 'budget_event.dart';
 part 'budget_state.dart';
 
-/// A month's budget: set, change or remove its limit, previewed against the
-/// month's spending. The limit lives in the screen's text field and arrives
-/// with each edit and with save.
 class BudgetBloc extends Bloc<BudgetEvent, BudgetState> {
   BudgetBloc({
     required DateTime month,

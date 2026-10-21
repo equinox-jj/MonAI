@@ -1,14 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:monai/core/data/database/monai_database.dart';
 
-/// The offline copy of the user's data. Cleared on logout and when the
-/// session expires, so the next user never sees it.
+/// Cleared on logout and when the session expires, so the next user never
+/// sees it.
 abstract interface class LocalCache {
-  /// Deletes every cached row.
   Future<void> clear();
 }
 
-/// [LocalCache] backed by [MonAIDatabase].
 class DriftLocalCache implements LocalCache {
   const DriftLocalCache(this._database);
 

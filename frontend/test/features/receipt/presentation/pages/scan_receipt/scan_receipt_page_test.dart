@@ -23,7 +23,6 @@ class _MockReadText extends Mock implements ReadReceiptTextUseCase {}
 
 class _MockParse extends Mock implements ParseReceiptUseCase {}
 
-/// A camera that opens as [status] and "takes" [photo].
 class _FakeCamera implements ReceiptCamera {
   _FakeCamera({this.status = CameraStatus.ready});
 
@@ -64,7 +63,6 @@ void main() {
     parse = _MockParse();
   });
 
-  /// Opens the scanner from a launcher, with routes for where it can go.
   Future<void> openScanner(
     WidgetTester tester, {
     required _FakeCamera camera,

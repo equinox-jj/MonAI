@@ -8,23 +8,19 @@ import 'package:monai/core/data/storage/app_preferences.dart';
 import 'package:path_provider/path_provider.dart';
 
 abstract class ExportLocalDataSource {
-  /// Caches [rows] of a fetched page.
   Future<void> cache(List<TransactionRow> rows);
 
-  /// Every cached transaction dated from [from] to [to], both included.
   Future<List<TransactionRow>> between(DateTime from, DateTime to);
 
-  /// Writes [content] as UTF-8 to `exports/[name]` in the temporary
-  /// directory, after deleting earlier exports; gives the file's path.
+  /// UTF-8, in `exports/` of the temporary directory, after deleting earlier
+  /// exports.
   Future<String> writeExport(String name, String content);
 
-  /// The name of the separator last exported with, or null.
   Future<String?> delimiter();
 
   Future<void> saveDelimiter(String name);
 }
 
-/// The directory exports are written to.
 typedef ExportDirectory = Future<Directory> Function();
 
 class ExportLocalDataSourceImpl extends ExportLocalDataSource

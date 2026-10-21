@@ -3,37 +3,18 @@ import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/domain/validation/provider_input_validator.dart';
 
-/// Why a provider action failed, as the admin screens say it. Branches on
-/// the backend's stable error codes, never on the message.
+/// Branches on the backend's stable error codes, never on the message.
 enum ProviderFailure {
-  /// No connection or a timeout.
   network,
-
-  /// Another provider already uses the name's slug, or one of the aliases.
   conflict,
-
-  /// System providers can't be deactivated or deleted.
   locked,
-
-  /// The user's role no longer allows this.
   forbidden,
-
-  /// The provider was already deleted.
   notFound,
-
-  /// The logo stays over 512 KB even shrunk.
   logoTooLarge,
-
-  /// The logo couldn't be read, or the server refused its type.
   logoUnsupported,
-
-  /// The input broke a rule no field shows.
   invalid,
-
-  /// Anything else.
   unexpected;
 
-  /// The kind of [failure].
   static ProviderFailure of(Failure failure) => switch (failure) {
     NetworkFailure() || TimeoutFailure() => network,
     _ when failure.code == 'system_provider_locked' => locked,
@@ -67,8 +48,6 @@ enum ProviderFailure {
 }
 
 extension ProviderFieldErrorText on FieldError {
-  /// The message under the name or alias field, from the device's checks or
-  /// the server's.
   String text(AppLocalizations l10n) {
     final max = (params['max'] as num?)?.toInt();
     return switch ((field, code)) {

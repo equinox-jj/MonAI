@@ -5,8 +5,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/bloc/edit_profile_bloc.dart';
 
-/// The profile photo (or initials) with the upload progress around it, and
-/// the Change photo and Remove buttons under it.
 class EditProfileAvatar extends StatelessWidget {
   const EditProfileAvatar({
     required this.onChangePhoto,

@@ -5,8 +5,8 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/entity/wallet_changes.dart';
 import 'package:monai/features/shared/domain/repository/wallet_repository.dart';
 
-/// Makes a wallet the default; the previous default stops being one. Fails
-/// with code `wallet_archived` for an archived wallet.
+/// The previous default stops being one. Fails with `wallet_archived` for an
+/// archived wallet.
 class SetDefaultWalletUseCase implements UseCase<Wallet, String> {
   SetDefaultWalletUseCase(this._repository);
 

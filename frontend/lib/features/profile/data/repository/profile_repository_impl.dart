@@ -65,7 +65,6 @@ class ProfileRepositoryImpl extends ProfileRepository with BaseRepository {
         return unit;
       });
 
-  /// The user in [response], cached.
   Future<User> _cached(MeResponse response) async {
     final row = requireField(response.data).toRow();
     await _local.saveUser(row);

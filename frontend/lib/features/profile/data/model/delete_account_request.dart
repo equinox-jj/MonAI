@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'delete_account_request.freezed.dart';
 part 'delete_account_request.g.dart';
 
-/// `DELETE /me`.
 @freezed
 abstract class DeleteAccountRequest with _$DeleteAccountRequest {
   const factory DeleteAccountRequest({

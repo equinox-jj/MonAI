@@ -6,8 +6,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
 
-/// The aliases as removable chips, with a field that adds one on Enter or a
-/// comma.
 class ProviderFormAliases extends StatelessWidget {
   const ProviderFormAliases({
     required this.controller,

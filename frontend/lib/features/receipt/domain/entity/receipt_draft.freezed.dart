@@ -15,8 +15,7 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$ReceiptDraft {
 
- TransactionType? get type;/// Rupiah.
- int? get amount; String? get walletId; String? get categoryId;/// Local midnight.
+ TransactionType? get type; int? get amount; String? get walletId; String? get categoryId;/// Local midnight.
  DateTime? get date; String? get note; String? get merchant; DraftConfidence get confidence; List<ReceiptItem> get items;
 /// Create a copy of ReceiptDraft
 /// with the given fields replaced by the non-null parameter values.
@@ -235,7 +234,6 @@ class _ReceiptDraft implements ReceiptDraft {
   
 
 @override final  TransactionType? type;
-/// Rupiah.
 @override final  int? amount;
 @override final  String? walletId;
 @override final  String? categoryId;
@@ -331,8 +329,7 @@ $DraftConfidenceCopyWith<$Res> get confidence {
 /// @nodoc
 mixin _$ReceiptItem {
 
- String get name; double? get quantity;/// Rupiah.
- int? get amount;
+ String get name; double? get quantity; int? get amount;
 /// Create a copy of ReceiptItem
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -536,7 +533,6 @@ class _ReceiptItem implements ReceiptItem {
 
 @override final  String name;
 @override final  double? quantity;
-/// Rupiah.
 @override final  int? amount;
 
 /// Create a copy of ReceiptItem

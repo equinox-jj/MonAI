@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 
-/// Example phrases; tapping one puts it in the input.
 class QuickAddExamples extends StatelessWidget {
   const QuickAddExamples({
     required this.controller,
@@ -10,7 +9,6 @@ class QuickAddExamples extends StatelessWidget {
     super.key,
   });
 
-  /// The input, to mark the example it holds.
   final TextEditingController controller;
   final ValueChanged<String> onPick;
 

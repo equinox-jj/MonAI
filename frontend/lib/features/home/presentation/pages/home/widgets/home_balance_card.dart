@@ -18,10 +18,6 @@ typedef _Balance = ({
   bool promptAddWallets,
 });
 
-/// The total-balance hero: total, the month's income and expense, and the
-/// change from last month. With at most one wallet it prompts to add more.
-///
-/// Phones stack everything; tablets put the totals beside the balance.
 class HomeBalanceCard extends StatelessWidget {
   const HomeBalanceCard({
     required this.actions,
@@ -135,14 +131,11 @@ class HomeBalanceCard extends StatelessWidget {
   };
 }
 
-/// The income and expense tiles' column on tablets.
 const _tabletTotalsWidth = 240.0;
 
 /// How far the eye button reaches past the label row's line height on each
 /// side: (44 − 20) / 2.
 const _toggleInset = (MonAISizes.touchTarget - 20) / 2;
-
-/// How far the eye button reaches into the card's right padding.
 const _toggleOverhang = MonAISpacing.x2_5;
 
 class _BalanceHeader extends StatelessWidget {
@@ -199,8 +192,6 @@ class _MonthTotals extends StatelessWidget {
   final MonthSummary summary;
   final DateTime month;
   final bool isHidden;
-
-  /// Tablets stack the tiles and show full amounts.
   final bool stacked;
 
   @override

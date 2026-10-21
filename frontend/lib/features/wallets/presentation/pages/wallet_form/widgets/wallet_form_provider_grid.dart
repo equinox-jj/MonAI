@@ -6,11 +6,8 @@ import 'package:monai/features/shared/domain/entity/payment_provider.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
 import 'package:monai/features/wallets/presentation/widgets/wallet_logo.dart';
 
-/// "Pick where your money is": a tile per provider, then "Custom".
 class WalletFormProviderGrid extends StatelessWidget {
   const WalletFormProviderGrid({required this.onPicked, super.key});
-
-  /// A provider's slug; null for "Custom".
   final ValueChanged<String?> onPicked;
 
   static const _columns = 5;
@@ -47,7 +44,6 @@ class WalletFormProviderGrid extends StatelessWidget {
                 mainAxisSpacing: MonAISpacing.x2,
                 crossAxisSpacing: MonAISpacing.x1,
               ),
-              // The providers, then "Custom".
               itemCount: providers.length + 1,
               itemBuilder: (context, index) {
                 if (index == providers.length) {
@@ -90,8 +86,6 @@ class _Tile extends StatelessWidget {
   final String? logoUrl;
   final bool selected;
   final VoidCallback onTap;
-
-  /// "Custom": a plus in place of a logo.
   final bool custom;
 
   @override

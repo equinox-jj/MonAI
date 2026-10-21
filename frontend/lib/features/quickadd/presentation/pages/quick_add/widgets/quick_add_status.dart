@@ -6,7 +6,6 @@ import 'package:monai/features/quickadd/domain/entity/quick_add_reading.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/bloc/quick_add_bloc.dart';
 
-/// Who read the phrase, or the banner when the AI couldn't help.
 class QuickAddStatus extends StatelessWidget {
   const QuickAddStatus({super.key});
 

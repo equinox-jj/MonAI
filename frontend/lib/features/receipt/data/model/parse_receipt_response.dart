@@ -6,7 +6,6 @@ export 'package:monai/features/shared/data/model/draft_confidence_data.dart';
 part 'parse_receipt_response.freezed.dart';
 part 'parse_receipt_response.g.dart';
 
-/// `POST /ai/parse-receipt`.
 @freezed
 abstract class ParseReceiptResponse with _$ParseReceiptResponse {
   const factory ParseReceiptResponse({

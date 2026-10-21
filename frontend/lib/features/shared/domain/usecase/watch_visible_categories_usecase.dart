@@ -5,7 +5,6 @@ import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';
 
-/// The categories of one type a picker offers.
 class WatchVisibleCategoriesUseCase
     implements StreamUseCase<List<Category>, CategoryType> {
   WatchVisibleCategoriesUseCase(this._repository);

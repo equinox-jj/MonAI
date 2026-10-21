@@ -4,8 +4,6 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
 import 'package:monai/features/wallets/presentation/widgets/wallet_card.dart';
 
-/// The edited wallet's card in the picked color, with the balance it will
-/// have.
 class WalletFormPreviewCard extends StatelessWidget {
   const WalletFormPreviewCard({super.key});
 

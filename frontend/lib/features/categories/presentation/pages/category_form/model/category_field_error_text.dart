@@ -3,7 +3,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/categories/domain/validation/category_input_validator.dart';
 
 extension CategoryFieldErrorText on FieldError {
-  /// The message under the name, from the device's checks or the server's.
   String text(AppLocalizations l10n) => switch ((field, code)) {
     (CategoryInputValidator.nameField, 'max') => l10n.categoryFormNameTooLong(
       CategoryInputValidator.nameMax,

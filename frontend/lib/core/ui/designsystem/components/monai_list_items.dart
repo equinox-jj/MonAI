@@ -11,12 +11,7 @@ import 'package:monai/core/ui/designsystem/theme/monai_spacing.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme_x.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_typography.dart';
 
-/// Two-line row: leading, title + supporting line, trailing.
-///
-/// 12/16 padding and an optional bottom divider, for rows stacked inside a
-/// [MonAICard] with zero padding.
 class MonAIListItem extends StatelessWidget {
-  /// Creates a list row.
   const MonAIListItem({
     required this.title,
     super.key,
@@ -27,22 +22,11 @@ class MonAIListItem extends StatelessWidget {
     this.showDivider = false,
   });
 
-  /// The first line.
   final String title;
-
-  /// The second, smaller line.
   final String? supporting;
-
-  /// A widget at the start, e.g. a category icon.
   final Widget? leading;
-
-  /// A widget at the end, e.g. an amount.
   final Widget? trailing;
-
-  /// Makes the row tappable.
   final VoidCallback? onTap;
-
-  /// Draws a divider under the row.
   final bool showDivider;
 
   @override
@@ -94,25 +78,17 @@ class MonAIListItem extends StatelessWidget {
   }
 }
 
-/// Which way money moves, which colors an amount and picks its arrow.
 enum MoneyDirection {
-  /// Money out: red with a north-east arrow.
   expense,
-
-  /// Money in: green with a south-west arrow.
   income,
-
-  /// Between the user's wallets: neutral with a two-way arrow.
   transfer;
 
-  /// The amount and arrow color.
   Color color(MonAIColors c) => switch (this) {
     expense => c.expense,
     income => c.income,
     transfer => c.transfer,
   };
 
-  /// The arrow under the amount.
   MonAIIconData get arrow => switch (this) {
     expense => MonAIIcons.northEast,
     income => MonAIIcons.southWest,
@@ -120,12 +96,7 @@ enum MoneyDirection {
   };
 }
 
-/// A transaction in a list: category icon, title, meta line, and the signed
-/// amount with its direction arrow.
-///
-/// [amount] is already formatted with its sign (`−Rp 35.000`).
 class MonAITransactionRow extends StatelessWidget {
-  /// Creates a transaction row.
   const MonAITransactionRow({
     required this.title,
     required this.meta,
@@ -138,28 +109,13 @@ class MonAITransactionRow extends StatelessWidget {
     this.showDivider = false,
   });
 
-  /// The note, merchant or category.
   final String title;
-
-  /// `Food · GoPay · 12:40`.
   final String meta;
-
-  /// The signed, formatted amount.
   final String amount;
-
-  /// Colors the amount and picks the arrow.
   final MoneyDirection direction;
-
-  /// The category's icon, or the transfer icon.
   final MonAIIconData categoryIcon;
-
-  /// The category's light color.
   final Color categoryColor;
-
-  /// Opens the transaction.
   final VoidCallback? onTap;
-
-  /// Draws a divider under the row.
   final bool showDivider;
 
   @override
@@ -186,10 +142,7 @@ class MonAITransactionRow extends StatelessWidget {
   }
 }
 
-/// Uppercase group header, a card of rows, and an optional footnote
-/// (Settings).
 class MonAISettingsGroup extends StatelessWidget {
-  /// Creates a settings group. [children] are usually [MonAISettingsRow]s.
   const MonAISettingsGroup({
     required this.title,
     required this.children,
@@ -197,13 +150,8 @@ class MonAISettingsGroup extends StatelessWidget {
     this.footer,
   });
 
-  /// The header; shown uppercase.
   final String title;
-
-  /// The rows.
   final List<Widget> children;
-
-  /// A note under the card.
   final String? footer;
 
   @override
@@ -240,11 +188,7 @@ class MonAISettingsGroup extends StatelessWidget {
   }
 }
 
-/// 56 settings row: icon, label, value, chevron.
-///
-/// [destructive] makes the label and icon red, e.g. "Delete account".
 class MonAISettingsRow extends StatelessWidget {
-  /// Creates a settings row.
   const MonAISettingsRow({
     required this.label,
     required this.icon,
@@ -257,28 +201,13 @@ class MonAISettingsRow extends StatelessWidget {
     this.showDivider = true,
   });
 
-  /// The setting's name.
   final String label;
-
-  /// The leading icon.
   final MonAIIconData icon;
-
-  /// Opens the setting.
   final VoidCallback onTap;
-
-  /// The current value, e.g. "Bahasa Indonesia".
   final String? value;
-
-  /// Shows a chevron at the end.
   final bool showChevron;
-
-  /// Red label and icon.
   final bool destructive;
-
-  /// Overrides the icon color (accent, or red when [destructive]).
   final Color? iconColor;
-
-  /// Draws a divider under the row; turn off for the last row.
   final bool showDivider;
 
   @override
@@ -335,10 +264,7 @@ class MonAISettingsRow extends StatelessWidget {
   }
 }
 
-/// Selectable card used in picker sheets (wallet, theme, language): leading,
-/// title with optional tag, subtitle, radio indicator.
 class MonAIRadioOption extends StatelessWidget {
-  /// Creates a radio option.
   const MonAIRadioOption({
     required this.title,
     required this.selected,
@@ -349,22 +275,11 @@ class MonAIRadioOption extends StatelessWidget {
     this.leading,
   });
 
-  /// The option's name.
   final String title;
-
-  /// Whether this option is chosen.
   final bool selected;
-
-  /// Chooses this option.
   final VoidCallback onTap;
-
-  /// A second line.
   final String? subtitle;
-
-  /// A [MonAITag] after the title, e.g. "DEFAULT".
   final String? tag;
-
-  /// A widget at the start, e.g. a monogram.
   final Widget? leading;
 
   @override

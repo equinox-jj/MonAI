@@ -3,7 +3,6 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/domain/logic/provider_rules.dart';
 
-/// The System, Active or Inactive badge of a provider.
 class ProviderStatusTag extends StatelessWidget {
   const ProviderStatusTag({required this.status, super.key});
 

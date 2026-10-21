@@ -14,9 +14,6 @@ typedef _BudgetSection = ({
   int daysLeft,
 });
 
-/// The month's budget progress, or the prompt to set one. Opens Budget.
-///
-/// Tablets give it a taller card with a "Change budget" link.
 class HomeBudgetCard extends StatelessWidget {
   const HomeBudgetCard({
     required this.onOpenBudget,

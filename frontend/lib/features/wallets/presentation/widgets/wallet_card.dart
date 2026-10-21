@@ -6,12 +6,8 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 
-/// The wallets tab's card height.
 const walletListCardHeight = 124.0;
 
-/// [wallet] on its card: monogram, name, "Default" pill and balance, with
-/// its type above the balance unless [showType] is off. [colorHex] previews
-/// another card color.
 class WalletCard extends StatelessWidget {
   const WalletCard({
     required this.wallet,
@@ -23,14 +19,8 @@ class WalletCard extends StatelessWidget {
   });
 
   final Wallet wallet;
-
-  /// Overrides the wallet's own color, `#RRGGBB`.
   final String? colorHex;
-
-  /// Overrides the wallet's current balance, e.g. while it's edited.
   final int? balance;
-
-  /// The type line above the balance; off on the short preview card.
   final bool showType;
 
   final VoidCallback? onTap;

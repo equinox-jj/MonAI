@@ -463,15 +463,7 @@ as String,
 /// @nodoc
 mixin _$RegisterState {
 
-/// [UiStatus.loading] while registering. [UiStatus.success] stays until
-/// the app leaves for Home; [UiStatus.failure] after a rejected attempt.
- UiStatus get status; FieldError? get nameError; FieldError? get emailError;/// The email already has an account; the field offers "Sign in instead".
- bool get emailTaken; FieldError? get passwordError;/// Drives the live "At least 8 characters" hint.
- bool get passwordLongEnough;/// A problem with the whole attempt, shown as a banner.
- AuthFormError? get formError;/// A submit failed on the input, so each edit re-checks its field.
- bool get autovalidate;/// The first field with an error after a failed submit; the screen
-/// focuses it so the keyboard and screen reader land on the error.
- AuthField? get focusField;
+ UiStatus get status; FieldError? get nameError; FieldError? get emailError; bool get emailTaken; FieldError? get passwordError; bool get passwordLongEnough; AuthFormError? get formError; bool get autovalidate; AuthField? get focusField;
 /// Create a copy of RegisterState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -691,22 +683,14 @@ class _RegisterState implements RegisterState {
   const _RegisterState({this.status = UiStatus.initial, this.nameError, this.emailError, this.emailTaken = false, this.passwordError, this.passwordLongEnough = false, this.formError, this.autovalidate = false, this.focusField});
   
 
-/// [UiStatus.loading] while registering. [UiStatus.success] stays until
-/// the app leaves for Home; [UiStatus.failure] after a rejected attempt.
 @override@JsonKey() final  UiStatus status;
 @override final  FieldError? nameError;
 @override final  FieldError? emailError;
-/// The email already has an account; the field offers "Sign in instead".
 @override@JsonKey() final  bool emailTaken;
 @override final  FieldError? passwordError;
-/// Drives the live "At least 8 characters" hint.
 @override@JsonKey() final  bool passwordLongEnough;
-/// A problem with the whole attempt, shown as a banner.
 @override final  AuthFormError? formError;
-/// A submit failed on the input, so each edit re-checks its field.
 @override@JsonKey() final  bool autovalidate;
-/// The first field with an error after a failed submit; the screen
-/// focuses it so the keyboard and screen reader land on the error.
 @override final  AuthField? focusField;
 
 /// Create a copy of RegisterState

@@ -43,12 +43,10 @@ extension TransactionRowMapper on TransactionRow {
 }
 
 extension TransactionInputMapper on TransactionInput {
-  /// `POST /transactions`.
   TransactionRequest toCreateRequest() =>
       _request(source: source.apiValue, receiptKey: receiptKey);
 
-  /// `PATCH /transactions/{id}`: the whole form, keeping the source and the
-  /// receipt.
+  /// The whole form, keeping the source and the receipt.
   TransactionRequest toUpdateRequest() => _request();
 
   TransactionRequest _request({String? source, String? receiptKey}) =>

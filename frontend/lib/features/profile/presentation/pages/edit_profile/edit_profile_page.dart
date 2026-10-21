@@ -15,8 +15,6 @@ import 'package:monai/features/profile/presentation/pages/edit_profile/widgets/e
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({this.focusDelete = false, super.key});
-
-  /// Opens scrolled to the delete-account card.
   final bool focusDelete;
 
   @override
@@ -29,7 +27,6 @@ class EditProfilePage extends StatelessWidget {
   }
 }
 
-/// The display name, the profile photo and deleting the account.
 class EditProfileUI extends StatefulWidget {
   const EditProfileUI({this.focusDelete = false, super.key});
 
@@ -71,7 +68,6 @@ class _EditProfileUIState extends State<EditProfileUI> {
     if (target != null) Scrollable.ensureVisible(target);
   }
 
-  /// The fields start with the saved name and email, once they are known.
   void _fillName(BuildContext context, EditProfileState state) {
     if (state.user case final user?) {
       if (_name.text.isEmpty) _name.text = user.name;

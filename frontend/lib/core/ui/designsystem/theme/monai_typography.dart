@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-/// The bundled variable font family (Plus Jakarta Sans, wght 200–800).
 const kMonAIFontFamily = 'PlusJakartaSans';
 
-/// Builds a design text style. The font is variable, so the weight is set
-/// both as [FontWeight] and as the `wght` axis.
+/// The font is variable, so the weight is set both as [FontWeight] and as the
+/// `wght` axis.
 TextStyle _style(
   double size,
   double height,
@@ -22,18 +21,14 @@ TextStyle _style(
   );
 }
 
-/// Helpers for MonAI text styles.
 extension MonAITextStyleX on TextStyle {
-  /// Changes the weight, keeping the variable font's `wght` axis in sync.
-  ///
-  /// Use this instead of `copyWith(fontWeight: ...)`, which leaves the axis at
-  /// the old weight.
+  /// Use this instead of `copyWith(fontWeight: ...)`, which leaves the variable
+  /// font's `wght` axis at the old weight.
   TextStyle withWeight(FontWeight weight) => copyWith(
     fontWeight: weight,
     fontVariations: [FontVariation.weight(weight.value.toDouble())],
   );
 
-  /// Tabular figures, so digits line up in amounts.
   TextStyle get tabular =>
       copyWith(fontFeatures: const [FontFeature.tabularFigures()]);
 }
@@ -75,12 +70,9 @@ final monAITextTheme = TextTheme(
   labelSmall: _style(11, 16, .w600),
 );
 
-/// Styles the design uses that have no Material slot.
-///
-/// Read them with `context.textStyles`.
 @immutable
 class MonAITextStyles extends ThemeExtension<MonAITextStyles> {
-  /// Creates the extended styles. Use [standard] instead of calling this.
+  /// Use [standard] instead of calling this.
   const MonAITextStyles({
     required this.amountLarge,
     required this.amountMedium,
@@ -89,7 +81,6 @@ class MonAITextStyles extends ThemeExtension<MonAITextStyles> {
     required this.overline,
   });
 
-  /// The design's extended styles.
   static final standard = MonAITextStyles(
     amountLarge: _style(28, 36, .w700).tabular,
     amountMedium: _style(20, 28, .w700).tabular,
@@ -98,20 +89,12 @@ class MonAITextStyles extends ThemeExtension<MonAITextStyles> {
     overline: _style(12, 16, .w600, letterSpacing: 0.4),
   );
 
-  /// 28/36 bold, wallet card balances.
   final TextStyle amountLarge;
-
-  /// 20/28 bold, budget percentage.
   final TextStyle amountMedium;
-
-  /// 16/24 semibold, list-row amounts.
   final TextStyle amount;
-
-  /// 13/18 regular, banners and dense rows.
   final TextStyle bodyCompact;
 
-  /// 12/16 semibold with tracking; settings group headers. Uppercase the text
-  /// yourself.
+  /// Uppercase the text yourself.
   final TextStyle overline;
 
   @override

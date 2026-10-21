@@ -1,6 +1,3 @@
-/// The MonAI design system: tokens, theme, icons and reusable widgets.
-library;
-
 export 'package:monai/core/ui/designsystem/components/monai_badges.dart';
 export 'package:monai/core/ui/designsystem/components/monai_budget.dart';
 export 'package:monai/core/ui/designsystem/components/monai_button.dart';

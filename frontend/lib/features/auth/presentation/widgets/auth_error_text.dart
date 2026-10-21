@@ -3,10 +3,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 
-/// The localized text for auth errors.
 extension AuthErrorText on AppLocalizations {
-  /// The message under a field. Unknown codes, or a length code missing its
-  /// limit, still mark the field as invalid.
   String fieldError(FieldError error) {
     final min = _intParam(error.params['min']);
     final max = _intParam(error.params['max']);
@@ -25,7 +22,6 @@ extension AuthErrorText on AppLocalizations {
     };
   }
 
-  /// The banner text for [error].
   String formError(AuthFormError error) => switch (error) {
     InvalidCredentialsError() => authErrorInvalidCredentials,
     RateLimitedError(:final minutes?) => authErrorRateLimitedWait(minutes),

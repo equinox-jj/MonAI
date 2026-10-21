@@ -22,8 +22,6 @@ class WalletDetailPage extends StatelessWidget {
   });
 
   final String id;
-
-  /// [ScreenPlacement.pane] beside the wallets list on a wide screen.
   final ScreenPlacement placement;
 
   @override
@@ -38,8 +36,6 @@ class WalletDetailPage extends StatelessWidget {
   }
 }
 
-/// One wallet: its card, Edit / Transfer / Archive, this month's money out
-/// by day and this month's transactions.
 class WalletDetailUI extends StatelessWidget {
   const WalletDetailUI({
     super.key,
@@ -71,14 +67,12 @@ class WalletDetailUI extends StatelessWidget {
   void _retry(BuildContext context) =>
       context.read<WalletDetailBloc>().add(const WalletDetailEvent.refreshed());
 
-  /// Pull-to-refresh keeps its spinner until the refresh finishes.
   Future<void> _pullToRefresh(BuildContext context) async {
     final bloc = context.read<WalletDetailBloc>()
       ..add(const WalletDetailEvent.refreshed());
     await bloc.stream.firstWhere((state) => !state.isRefreshing);
   }
 
-  /// Beside the list, the list moves on by itself once the wallet leaves it.
   void _leave(BuildContext context) {
     if (placement != .pane) context.pop();
   }
@@ -166,7 +160,6 @@ class WalletDetailUI extends StatelessWidget {
 
 enum _MenuItem { setDefault }
 
-/// "More options": Make default, for a wallet that isn't one yet.
 class _MoreMenu extends StatelessWidget {
   const _MoreMenu({required this.onSetDefault});
 

@@ -473,15 +473,8 @@ as List<Wallet>,
 /// @nodoc
 mixin _$WalletsState {
 
-/// [UiStatus.loading] while nothing is cached yet (the skeleton),
-/// [UiStatus.failure] when that first load failed, [UiStatus.empty]
-/// when the user has no wallet, otherwise [UiStatus.success].
- UiStatus get status;/// The wallets that aren't archived, default first, then by name.
- List<Wallet> get wallets; int get archivedCount;/// The server answered once, so no wallets means there are none.
- bool get loaded; bool get isRefreshing;/// The wallet beside the list on a wide screen.
- String? get selectedId;/// Why the first load failed, with nothing cached.
- WalletFailure? get loadFailure;/// Why a refresh failed; shown once as a snackbar.
- WalletFailure? get actionFailure;
+ UiStatus get status; List<Wallet> get wallets; int get archivedCount;/// The server answered once, so no wallets means there are none.
+ bool get loaded; bool get isRefreshing; String? get selectedId; WalletFailure? get loadFailure; WalletFailure? get actionFailure;
 /// Create a copy of WalletsState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -688,13 +681,8 @@ class _WalletsState implements WalletsState {
   const _WalletsState({this.status = UiStatus.initial,  List<Wallet> wallets = const [], this.archivedCount = 0, this.loaded = false, this.isRefreshing = false, this.selectedId, this.loadFailure, this.actionFailure}): _wallets = wallets;
   
 
-/// [UiStatus.loading] while nothing is cached yet (the skeleton),
-/// [UiStatus.failure] when that first load failed, [UiStatus.empty]
-/// when the user has no wallet, otherwise [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// The wallets that aren't archived, default first, then by name.
  final  List<Wallet> _wallets;
-/// The wallets that aren't archived, default first, then by name.
 @override@JsonKey() List<Wallet> get wallets {
   if (_wallets is EqualUnmodifiableListView) return _wallets;
   // ignore: implicit_dynamic_type
@@ -705,11 +693,8 @@ class _WalletsState implements WalletsState {
 /// The server answered once, so no wallets means there are none.
 @override@JsonKey() final  bool loaded;
 @override@JsonKey() final  bool isRefreshing;
-/// The wallet beside the list on a wide screen.
 @override final  String? selectedId;
-/// Why the first load failed, with nothing cached.
 @override final  WalletFailure? loadFailure;
-/// Why a refresh failed; shown once as a snackbar.
 @override final  WalletFailure? actionFailure;
 
 /// Create a copy of WalletsState

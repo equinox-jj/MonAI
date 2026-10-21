@@ -7,20 +7,15 @@ import 'package:monai/features/shared/data/model/create_category_request.dart';
 import 'package:monai/features/shared/data/model/update_category_request.dart';
 
 abstract class CategoryRemoteDataSource {
-  /// `GET /categories?include_hidden=true`.
   Future<CategoryListResponse> getCategories();
 
-  /// `POST /categories`.
   Future<CategoryResponse> createCategory(CreateCategoryRequest request);
 
-  /// `PATCH /categories/{id}`.
   Future<CategoryResponse> updateCategory(
     String id,
     UpdateCategoryRequest request,
   );
 
-  /// `DELETE /categories/{id}`, moving its transactions to [moveTo] when
-  /// given.
   Future<void> deleteCategory(String id, {String? moveTo});
 }
 

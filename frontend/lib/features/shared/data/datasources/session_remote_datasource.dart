@@ -3,7 +3,6 @@ import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/session_endpoint.dart';
 
 abstract class SessionRemoteDataSource {
-  /// `POST /auth/logout-all`.
   Future<void> logoutAll();
 }
 

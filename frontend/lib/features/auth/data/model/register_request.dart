@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'register_request.freezed.dart';
 part 'register_request.g.dart';
 
-/// The body of `POST /auth/register`.
 @freezed
 abstract class RegisterRequest with _$RegisterRequest {
   const factory RegisterRequest({

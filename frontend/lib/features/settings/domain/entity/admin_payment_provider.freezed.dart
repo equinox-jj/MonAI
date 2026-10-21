@@ -16,9 +16,7 @@ T _$identity<T>(T value) => value;
 mixin _$AdminPaymentProvider {
 
  String get id; String get slug; String get name; WalletType get type;/// Lowercase words quick add matches, e.g. `gpay` for GoPay.
- List<String> get aliases;/// Lower appears first.
- int get sortOrder;/// Inactive providers are hidden from users adding a wallet.
- bool get isActive;/// Cash and the like: can't be deactivated, deleted or renamed to
+ List<String> get aliases; int get sortOrder; bool get isActive;/// Cash and the like: can't be deactivated, deleted or renamed to
 /// another slug.
  bool get isSystem; DateTime get updatedAt; String? get logoUrl;
 /// Create a copy of AdminPaymentProvider
@@ -242,9 +240,7 @@ class _AdminPaymentProvider implements AdminPaymentProvider {
   return EqualUnmodifiableListView(_aliases);
 }
 
-/// Lower appears first.
 @override final  int sortOrder;
-/// Inactive providers are hidden from users adding a wallet.
 @override final  bool isActive;
 /// Cash and the like: can't be deactivated, deleted or renamed to
 /// another slug.

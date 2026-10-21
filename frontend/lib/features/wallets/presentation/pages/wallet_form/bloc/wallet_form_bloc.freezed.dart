@@ -995,26 +995,9 @@ as List<Wallet>,
 /// @nodoc
 mixin _$WalletFormState {
 
- WalletFormMode get mode;/// [UiStatus.loading] while the edited wallet loads,
-/// [UiStatus.failure] when it couldn't be, otherwise
-/// [UiStatus.success].
- UiStatus get status;/// The catalog to pick from; adding only.
- List<PaymentProvider> get providers;/// The picked provider's slug; null for a custom wallet. A slug, not an
-/// id, so the pick survives the bundled catalog being replaced.
- String? get providerSlug;/// A custom wallet's type, or the provider's or edited wallet's.
- WalletType? get type;/// The card color, `#RRGGBB`; null for the type's own.
- String? get color; bool get isDefault;/// The starting balance as typed, for the balance-shift note.
- int get initialBalance;/// The wallet being edited.
- Wallet? get original;/// The current default wallet's name.
- String? get defaultWalletName;/// One error per invalid field, keyed by the API's field name.
- Map<String, FieldError> get errors;/// A save failed on the input, so errors update as the user edits.
- bool get autovalidate; bool get isSaving; bool get isArchiving; bool get isDeleting;/// A provider was picked: the name field takes this text once.
- String? get nameFill;/// Delete was refused for the wallet's transactions: the archive-instead
-/// dialog shows once.
- bool get offerArchive;/// Set once the form is done; the screen closes.
- WalletFormOutcome? get outcome;/// Why the edited wallet couldn't be loaded.
- WalletFailure? get loadFailure;/// Why a save, archive or delete failed; shown once as a snackbar.
- WalletFailure? get actionFailure;
+ WalletFormMode get mode; UiStatus get status; List<PaymentProvider> get providers;/// Null for a custom wallet. A slug, not an id, so the pick survives the
+/// bundled catalog being replaced.
+ String? get providerSlug; WalletType? get type; String? get color; bool get isDefault; int get initialBalance; Wallet? get original; String? get defaultWalletName; Map<String, FieldError> get errors; bool get autovalidate; bool get isSaving; bool get isArchiving; bool get isDeleting; String? get nameFill; bool get offerArchive; WalletFormOutcome? get outcome; WalletFailure? get loadFailure; WalletFailure? get actionFailure;
 /// Create a copy of WalletFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -1267,57 +1250,38 @@ class _WalletFormState implements WalletFormState {
   
 
 @override final  WalletFormMode mode;
-/// [UiStatus.loading] while the edited wallet loads,
-/// [UiStatus.failure] when it couldn't be, otherwise
-/// [UiStatus.success].
 @override@JsonKey() final  UiStatus status;
-/// The catalog to pick from; adding only.
  final  List<PaymentProvider> _providers;
-/// The catalog to pick from; adding only.
 @override@JsonKey() List<PaymentProvider> get providers {
   if (_providers is EqualUnmodifiableListView) return _providers;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableListView(_providers);
 }
 
-/// The picked provider's slug; null for a custom wallet. A slug, not an
-/// id, so the pick survives the bundled catalog being replaced.
+/// Null for a custom wallet. A slug, not an id, so the pick survives the
+/// bundled catalog being replaced.
 @override final  String? providerSlug;
-/// A custom wallet's type, or the provider's or edited wallet's.
 @override final  WalletType? type;
-/// The card color, `#RRGGBB`; null for the type's own.
 @override final  String? color;
 @override@JsonKey() final  bool isDefault;
-/// The starting balance as typed, for the balance-shift note.
 @override@JsonKey() final  int initialBalance;
-/// The wallet being edited.
 @override final  Wallet? original;
-/// The current default wallet's name.
 @override final  String? defaultWalletName;
-/// One error per invalid field, keyed by the API's field name.
  final  Map<String, FieldError> _errors;
-/// One error per invalid field, keyed by the API's field name.
 @override@JsonKey() Map<String, FieldError> get errors {
   if (_errors is EqualUnmodifiableMapView) return _errors;
   // ignore: implicit_dynamic_type
   return EqualUnmodifiableMapView(_errors);
 }
 
-/// A save failed on the input, so errors update as the user edits.
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
 @override@JsonKey() final  bool isArchiving;
 @override@JsonKey() final  bool isDeleting;
-/// A provider was picked: the name field takes this text once.
 @override final  String? nameFill;
-/// Delete was refused for the wallet's transactions: the archive-instead
-/// dialog shows once.
 @override@JsonKey() final  bool offerArchive;
-/// Set once the form is done; the screen closes.
 @override final  WalletFormOutcome? outcome;
-/// Why the edited wallet couldn't be loaded.
 @override final  WalletFailure? loadFailure;
-/// Why a save, archive or delete failed; shown once as a snackbar.
 @override final  WalletFailure? actionFailure;
 
 /// Create a copy of WalletFormState

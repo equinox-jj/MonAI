@@ -4,7 +4,6 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 
 extension TransactionFieldErrorText on FieldError {
-  /// The message under the field, from the device's checks or the server's.
   String text(AppLocalizations l10n) => switch ((field, code)) {
     (TransactionInputValidator.amountField, 'max') =>
       l10n.transactionErrorAmountMax(

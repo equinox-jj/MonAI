@@ -4,8 +4,6 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/categories/domain/logic/category_rules.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
-/// One category: icon, name, tag and what it is, with its one action.
-/// Hidden categories are faded.
 class CategoryListRow extends StatelessWidget {
   const CategoryListRow({
     required this.category,
@@ -17,8 +15,6 @@ class CategoryListRow extends StatelessWidget {
   });
 
   final Category category;
-
-  /// A hide or delete is running.
   final bool busy;
   final VoidCallback onTap;
   final VoidCallback onToggleHidden;

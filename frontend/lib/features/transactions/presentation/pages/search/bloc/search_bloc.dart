@@ -24,12 +24,10 @@ part 'search_bloc.freezed.dart';
 part 'search_event.dart';
 part 'search_state.dart';
 
-/// Search over notes and merchants: one month on the server, page by page,
-/// or every cached month on the device. Typing searches once it pauses; a
-/// newer search replaces an older one still running.
+/// One month on the server, page by page, or every cached month on the
+/// device. Typing searches once it pauses; a newer search replaces an older
+/// one still running.
 class SearchBloc extends Bloc<SearchEvent, SearchState> {
-  /// [initialMonth] is any day of the month to search first; [now] is the
-  /// clock and [debounce] the typing pause; tests pass their own.
   SearchBloc({
     required this._search,
     required this._watchCachedSearch,
@@ -178,7 +176,6 @@ class SearchBloc extends Bloc<SearchEvent, SearchState> {
   Future<void> _onRetried(_Retried event, Emitter<SearchState> emit) =>
       _run(emit, state);
 
-  /// Shows [next] and searches it from the first page.
   Future<void> _run(Emitter<SearchState> emit, SearchState next) async {
     final id = ++_searchId;
     unawaited(_cached?.cancel());

@@ -1,7 +1,5 @@
 import 'package:flutter/foundation.dart';
 
-/// Where Settings' rows lead. The screen fills these in; the sections only
-/// call them.
 @immutable
 class SettingsActions {
   const SettingsActions({

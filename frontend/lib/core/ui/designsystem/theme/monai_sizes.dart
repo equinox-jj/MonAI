@@ -1,6 +1,4 @@
-/// Fixed component sizes from the design.
 abstract final class MonAISizes {
-  /// Minimum touch target and icon-button size.
   static const double touchTarget = 44;
   static const double buttonLarge = 56;
   static const double buttonMedium = 48;
@@ -16,16 +14,11 @@ abstract final class MonAISizes {
   static const double settingsRow = 56;
   static const double pickerOption = 64;
   static const double topBar = 56;
-  static const double statusStrip = 40;
   static const double navBar = 80;
   static const double navIndicatorWidth = 64;
   static const double navIndicatorHeight = 32;
-
-  /// Medium-width (tablet portrait) navigation rail.
   static const double navRail = 80;
   static const double navRailIndicatorWidth = 56;
-
-  /// Expanded-width (tablet landscape) permanent drawer.
   static const double navDrawer = 240;
   static const double navDrawerItem = 48;
   static const double navDrawerLogo = 32;

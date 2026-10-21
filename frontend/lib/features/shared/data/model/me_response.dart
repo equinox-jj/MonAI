@@ -3,7 +3,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'me_response.freezed.dart';
 part 'me_response.g.dart';
 
-/// `GET /me`.
 @freezed
 abstract class MeResponse with _$MeResponse {
   const factory MeResponse({

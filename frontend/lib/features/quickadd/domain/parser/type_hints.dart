@@ -1,7 +1,5 @@
 import 'package:monai/core/model/transaction_type.dart';
 
-/// Words that turn a phrase into income (`gajian`, `dapat`) or a transfer
-/// (`topup`, `pindah`); an expense otherwise.
 abstract final class TypeHints {
   static const _hinted = 0.85;
   static const _expense = 0.9;
@@ -17,7 +15,6 @@ abstract final class TypeHints {
     'nabung',
   ]);
 
-  /// The type [text] suggests, and how sure that guess is.
   static (TransactionType, double) detect(String text) {
     if (_transfer.hasMatch(text)) return (TransactionType.transfer, _hinted);
     if (_income.hasMatch(text)) return (TransactionType.income, _hinted);
