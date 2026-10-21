@@ -1,0 +1,13 @@
+# Regenerate with: dart run flutter_launcher_icons
+# Sources are rendered from assets/branding/src/*.svg (ported from the native
+# Android app's ic_launcher_* vector drawables).
+flutter_launcher_icons:
+  image_path: assets/branding/icon.png
+  android: ic_launcher
+  adaptive_icon_background: assets/branding/icon_background.png
+  adaptive_icon_foreground: assets/branding/icon_foreground.png
+  # The foreground/monochrome art already sits inside the 66dp safe zone.
+  adaptive_icon_foreground_inset: 0
+  adaptive_icon_monochrome: assets/branding/icon_monochrome.png
+  ios: true
+  remove_alpha_ios: true

@@ -10,7 +10,7 @@
         android:name="android.hardware.camera"
         android:required="false" />
     <application
-        android:label="monai"
+        android:label="MonAI"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

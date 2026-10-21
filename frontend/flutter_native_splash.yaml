@@ -1,0 +1,10 @@
+# Regenerate with: dart run flutter_native_splash:create
+# splash.png is a 1152px (288dp @4x) canvas with the logo inside the central
+# 768px circle, so the same file fits Android 12's masked splash icon.
+flutter_native_splash:
+  color: "#4A45D6"
+  image: assets/branding/splash.png
+  android_12:
+    color: "#4A45D6"
+    image: assets/branding/splash.png
+  fullscreen: false
