@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/designsystem/components/monai_marked_field.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/ui/designsystem/components/monai_marked_field.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/model/transaction_type.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/quickadd/domain/usecase/save_quick_add_draft_usecase.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_field.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';

@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/auth/domain/repository/auth_repository.dart';
 
 /// Resumes the stored session at launch. True when the user is signed in,

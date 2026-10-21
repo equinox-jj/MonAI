@@ -1,5 +1,5 @@
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/domain/validation/default_wallet_rule.dart';
 
 /// Why a wallets screen couldn't load or change something, as the user is

@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/receipt/data/datasources/endpoint/receipt_endpoint.dart';
 import 'package:monai/features/receipt/data/model/parse_receipt_request.dart';
 import 'package:monai/features/receipt/data/model/parse_receipt_response.dart';

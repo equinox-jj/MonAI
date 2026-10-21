@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 

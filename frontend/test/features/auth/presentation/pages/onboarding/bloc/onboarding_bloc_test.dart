@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';

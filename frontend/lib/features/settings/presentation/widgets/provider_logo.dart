@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/utils/monograms.dart';
 
 /// A provider's logo: a newly picked image, the saved one, or its monogram

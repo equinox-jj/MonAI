@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/settings/domain/logic/settings_rules.dart';

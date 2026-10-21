@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 
 /// The transaction searches made on this device, newest first.
 abstract class SearchHistoryRepository {

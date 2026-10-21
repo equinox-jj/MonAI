@@ -1,4 +1,4 @@
-import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/core/data/database/monai_database.dart';
 import 'package:monai/features/shared/data/mapper/api_values.dart';
 import 'package:monai/features/shared/data/model/create_wallet_request.dart';
 import 'package:monai/features/shared/data/model/update_wallet_request.dart';

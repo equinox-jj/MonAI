@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/export/data/datasources/export_local_datasource.dart';
 import 'package:monai/features/export/data/repository/export_repository_impl.dart';
 import 'package:monai/features/export/domain/repository/export_repository.dart';

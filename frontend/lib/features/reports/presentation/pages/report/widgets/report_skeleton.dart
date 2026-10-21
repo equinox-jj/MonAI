@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 
 /// The report's shape while a month without a saved report loads.
 class ReportSkeleton extends StatelessWidget {

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:monai/core/l10n/gen/app_localizations_en.dart';
+import 'package:monai/core/ui/l10n/gen/app_localizations_en.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';

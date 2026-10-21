@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/data/base_repository.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/base_repository.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/transactions/data/datasources/search_history_local_datasource.dart';
 import 'package:monai/features/transactions/domain/repository/search_history_repository.dart';
 

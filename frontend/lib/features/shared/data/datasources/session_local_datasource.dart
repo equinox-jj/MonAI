@@ -1,7 +1,7 @@
-import 'package:monai/core/data/base_local_data_source.dart';
-import 'package:monai/core/database/local_cache.dart';
-import 'package:monai/core/network/session_manager.dart';
-import 'package:monai/core/storage/token_storage.dart';
+import 'package:monai/core/base/base_local_data_source.dart';
+import 'package:monai/core/data/database/local_cache.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/data/storage/token_storage.dart';
 
 abstract class SessionLocalDataSource {
   /// Removes the token, clears the cache and marks the session signed out.

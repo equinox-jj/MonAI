@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/transactions/domain/repository/search_history_repository.dart';
 import 'package:monai/features/transactions/domain/usecase/recent_searches_usecase.dart';
 

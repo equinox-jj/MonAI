@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/home/domain/usecase/refresh_home_usecase.dart';
 import 'package:monai/features/home/domain/usecase/watch_home_dashboard_usecase.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/quickadd/domain/entity/quick_add_reading.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/bloc/quick_add_bloc.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_transaction_dependents_usecase.dart';
 import 'package:monai/features/transactions/domain/usecase/restore_transaction_usecase.dart';

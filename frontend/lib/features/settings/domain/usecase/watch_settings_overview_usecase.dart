@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
 import 'package:monai/features/settings/domain/logic/settings_rules.dart';
 import 'package:monai/features/shared/domain/usecase/watch_budget_usecase.dart';

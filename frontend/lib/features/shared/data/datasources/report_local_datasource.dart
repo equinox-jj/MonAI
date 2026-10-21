@@ -1,7 +1,7 @@
-import 'package:monai/core/data/base_local_data_source.dart';
-import 'package:monai/core/database/daos/monthly_report_dao.dart';
-import 'package:monai/core/database/daos/monthly_report_with_categories.dart';
-import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/core/base/base_local_data_source.dart';
+import 'package:monai/core/data/database/daos/monthly_report_dao.dart';
+import 'package:monai/core/data/database/daos/monthly_report_with_categories.dart';
+import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class ReportLocalDataSource {
   /// The report for [month] with its breakdown, or null when none is cached.

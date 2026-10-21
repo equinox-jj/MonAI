@@ -1,6 +1,6 @@
-import 'package:monai/core/data/base_local_data_source.dart';
-import 'package:monai/core/database/daos/user_dao.dart';
-import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/core/base/base_local_data_source.dart';
+import 'package:monai/core/data/database/daos/user_dao.dart';
+import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class UserLocalDataSource {
   /// The signed-in user, or null before it has been cached.

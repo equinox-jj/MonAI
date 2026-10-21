@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/event/provider_change_events.dart';
 
 /// The id of each provider as it changes from now on, so the admin list can

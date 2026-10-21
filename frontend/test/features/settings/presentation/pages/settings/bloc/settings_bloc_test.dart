@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/network/session_manager.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
 import 'package:monai/features/settings/presentation/pages/settings/bloc/settings_bloc.dart';
 

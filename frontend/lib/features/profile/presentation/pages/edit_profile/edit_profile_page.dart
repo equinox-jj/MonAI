@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/l10n/l10n.dart';
-import 'package:monai/core/services/avatar_photo_service.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
+import 'package:monai/core/data/services/avatar_photo_service.dart';
 import 'package:monai/features/profile/domain/validation/profile_input_validator.dart';
 import 'package:monai/features/profile/presentation/model/profile_failure.dart';
 import 'package:monai/features/profile/presentation/model/profile_field_error_text.dart';

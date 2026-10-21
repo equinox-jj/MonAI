@@ -51,4 +51,4 @@ docs/
 CLAUDE.md
 .mason/
 # Generated localizations (flutter gen-l10n)
-/lib/core/l10n/gen/
+/lib/core/ui/l10n/gen/

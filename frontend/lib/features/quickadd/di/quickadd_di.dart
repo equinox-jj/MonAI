@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/quickadd/data/datasources/quickadd_local_datasource.dart';
 import 'package:monai/features/quickadd/data/datasources/quickadd_remote_datasource.dart';
 import 'package:monai/features/quickadd/data/repository/quickadd_repository_impl.dart';

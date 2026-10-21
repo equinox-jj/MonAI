@@ -1,13 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/draft_confidence.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';

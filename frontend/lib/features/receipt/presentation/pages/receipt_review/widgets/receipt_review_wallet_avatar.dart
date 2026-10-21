@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 

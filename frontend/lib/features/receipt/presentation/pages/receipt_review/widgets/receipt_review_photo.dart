@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 
 /// The whole receipt photo, pinch to zoom; the tablet review's left pane.
 class ReceiptReviewPhoto extends StatelessWidget {

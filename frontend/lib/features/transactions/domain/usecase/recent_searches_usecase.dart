@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/transactions/domain/repository/search_history_repository.dart';
 import 'package:monai/features/transactions/domain/validation/search_query.dart';
 

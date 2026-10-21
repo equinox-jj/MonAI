@@ -1,8 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/exceptions.dart';
-import 'package:monai/core/network/api_endpoints.dart';
+import 'package:monai/core/base/error/exceptions.dart';
+import 'package:monai/core/data/network/api_endpoints.dart';
 import 'package:monai/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:monai/features/auth/data/datasources/endpoint/auth_endpoint.dart';
 import 'package:monai/features/auth/data/model/change_password_request.dart';

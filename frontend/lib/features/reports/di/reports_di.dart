@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
 
 class ReportsDI {

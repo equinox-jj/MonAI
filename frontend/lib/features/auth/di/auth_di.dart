@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:monai/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:monai/features/auth/data/repository/auth_repository_impl.dart';

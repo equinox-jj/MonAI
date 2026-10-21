@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/budget_endpoint.dart';
 import 'package:monai/features/shared/data/model/budget_response.dart';
 import 'package:monai/features/shared/data/model/set_budget_request.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/error/field_error.dart';
-import 'package:monai/core/services/avatar_photo_service.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/data/services/avatar_photo_service.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/profile/domain/usecase/change_avatar_usecase.dart';
 import 'package:monai/features/profile/domain/usecase/delete_account_usecase.dart';
 import 'package:monai/features/profile/domain/usecase/remove_avatar_usecase.dart';

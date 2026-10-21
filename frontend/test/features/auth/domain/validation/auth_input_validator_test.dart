@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/features/auth/domain/validation/auth_input.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 

@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/local_cache.dart';
-import 'package:monai/core/error/exceptions.dart';
-import 'package:monai/core/network/session_manager.dart';
-import 'package:monai/core/storage/app_preferences.dart';
-import 'package:monai/core/storage/token_storage.dart';
+import 'package:monai/core/data/database/local_cache.dart';
+import 'package:monai/core/base/error/exceptions.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/data/storage/app_preferences.dart';
+import 'package:monai/core/data/storage/token_storage.dart';
 import 'package:monai/features/auth/data/datasources/auth_local_datasource.dart';
 
 class _MockAppPreferences extends Mock implements AppPreferences {}

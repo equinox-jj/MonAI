@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_field.dart';
 
 /// A labelled field of the review, tinted by how it was filled: indigo

@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/data/base_repository.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/base/base_repository.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/features/shared/data/datasources/session_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/session_remote_datasource.dart';
 import 'package:monai/features/shared/domain/repository/session_repository.dart';

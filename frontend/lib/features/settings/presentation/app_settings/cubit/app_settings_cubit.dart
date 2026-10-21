@@ -2,7 +2,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/usecase/get_language_usecase.dart';
 import 'package:monai/features/settings/domain/usecase/get_theme_mode_usecase.dart';
 import 'package:monai/features/settings/domain/usecase/set_language_usecase.dart';

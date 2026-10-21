@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_wallets_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_all_wallets_usecase.dart';

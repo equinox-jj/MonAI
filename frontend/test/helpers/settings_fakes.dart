@@ -1,11 +1,11 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/core/network/session_manager.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
 import 'package:monai/features/settings/domain/usecase/get_app_version_usecase.dart';
 import 'package:monai/features/settings/domain/usecase/get_language_usecase.dart';

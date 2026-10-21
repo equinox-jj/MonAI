@@ -1,5 +1,5 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/wallet_type.dart';
 
 part 'admin_payment_provider.freezed.dart';

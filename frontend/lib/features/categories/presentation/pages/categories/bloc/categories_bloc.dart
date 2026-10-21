@@ -5,7 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/categories/domain/logic/category_rules.dart';
 import 'package:monai/features/categories/domain/usecase/delete_category_usecase.dart';
 import 'package:monai/features/categories/domain/usecase/set_category_hidden_usecase.dart';

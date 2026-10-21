@@ -1,5 +1,5 @@
 import 'package:flutter/services.dart';
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/shared/data/datasources/budget_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/budget_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/category_local_datasource.dart';

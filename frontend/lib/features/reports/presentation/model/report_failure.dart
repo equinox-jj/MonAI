@@ -1,5 +1,5 @@
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 
 /// Why the report couldn't be loaded or refreshed, as the user is told.
 enum ReportFailure {

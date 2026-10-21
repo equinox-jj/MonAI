@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 
 part 'session_expired_cubit.freezed.dart';
 part 'session_expired_state.dart';

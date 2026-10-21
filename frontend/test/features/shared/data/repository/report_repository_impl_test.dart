@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/daos/monthly_report_with_categories.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/data/database/daos/monthly_report_with_categories.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/shared/data/datasources/report_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/report_remote_datasource.dart';
 import 'package:monai/features/shared/data/mapper/monthly_report_mapper.dart';

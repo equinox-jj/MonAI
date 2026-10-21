@@ -1,4 +1,4 @@
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/features/settings/domain/entity/admin_payment_provider.dart';
 
 /// The backend's rules for payment providers, checked on the device first,

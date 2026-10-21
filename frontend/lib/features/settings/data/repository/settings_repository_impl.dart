@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/data/base_repository.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/base_repository.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:monai/features/settings/data/datasources/settings_local_datasource.dart';

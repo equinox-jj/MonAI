@@ -3,13 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
 import 'package:monai/features/settings/presentation/pages/settings/settings_page.dart';
 

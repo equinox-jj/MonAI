@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/network/session_manager.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/auth/domain/repository/auth_repository.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 

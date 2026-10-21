@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 
 /// The signed-in user's own profile. Every change is cached, so screens

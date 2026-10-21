@@ -1,8 +1,8 @@
 import 'dart:async';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/quickadd/domain/entity/ai_draft.dart';
 import 'package:monai/features/quickadd/domain/entity/quick_add_reading.dart';
 import 'package:monai/features/quickadd/domain/parser/quick_add_parser.dart';

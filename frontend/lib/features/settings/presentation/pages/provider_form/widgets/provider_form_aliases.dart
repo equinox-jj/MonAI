@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/error/field_error.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
 

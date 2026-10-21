@@ -1,7 +1,7 @@
 import 'package:flutter/painting.dart';
 import 'package:intl/intl.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/utils/money_format.dart';

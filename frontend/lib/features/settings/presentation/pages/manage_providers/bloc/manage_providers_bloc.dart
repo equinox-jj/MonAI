@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/entity/admin_payment_provider.dart';
 import 'package:monai/features/settings/domain/logic/provider_rules.dart';
 import 'package:monai/features/settings/domain/usecase/get_admin_providers_usecase.dart';

@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/quickadd/domain/entity/quick_add_reading.dart';
 import 'package:monai/features/quickadd/domain/parser/quick_add_parser.dart';
 import 'package:monai/features/quickadd/domain/usecase/complete_drafts_with_ai_usecase.dart';

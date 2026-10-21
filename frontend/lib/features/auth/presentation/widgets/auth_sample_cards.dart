@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 
 // Cards drawn on the auth illustrations: the onboarding pages and, later,

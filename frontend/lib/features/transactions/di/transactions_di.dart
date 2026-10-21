@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/transactions/data/datasources/search_history_local_datasource.dart';
 import 'package:monai/features/transactions/data/repository/search_history_repository_impl.dart';
 import 'package:monai/features/transactions/domain/repository/search_history_repository.dart';

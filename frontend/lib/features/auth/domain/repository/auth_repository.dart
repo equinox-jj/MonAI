@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/features/auth/domain/entity/auth_session.dart';
 
 /// Onboarding and the user's session. A successful login or register stores

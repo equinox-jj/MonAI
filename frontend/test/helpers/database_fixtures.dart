@@ -1,6 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/core/data/database/monai_database.dart';
 import 'package:monai/core/model/budget_status.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_source.dart';

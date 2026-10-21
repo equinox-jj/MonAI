@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/event/transaction_deletion_events.dart';
 import 'package:monai/features/shared/domain/repository/transaction_repository.dart';

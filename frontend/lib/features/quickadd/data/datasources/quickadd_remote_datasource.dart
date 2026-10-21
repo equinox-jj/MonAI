@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/quickadd/data/datasources/endpoint/quickadd_endpoint.dart';
 import 'package:monai/features/quickadd/data/model/parse_transaction_request.dart';
 import 'package:monai/features/quickadd/data/model/parse_transaction_response.dart';

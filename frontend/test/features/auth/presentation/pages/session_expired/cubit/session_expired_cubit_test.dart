@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/features/auth/presentation/pages/session_expired/cubit/session_expired_cubit.dart';
 
 void main() {

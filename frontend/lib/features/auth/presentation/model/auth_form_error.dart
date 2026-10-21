@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 
 part 'auth_form_error.freezed.dart';
 

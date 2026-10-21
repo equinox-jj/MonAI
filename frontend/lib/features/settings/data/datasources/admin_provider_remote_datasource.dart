@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/settings/data/datasources/endpoint/admin_provider_endpoint.dart';
 import 'package:monai/features/settings/data/model/admin_provider_list_response.dart';
 import 'package:monai/features/settings/data/model/admin_provider_response.dart';

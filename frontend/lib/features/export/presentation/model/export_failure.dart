@@ -1,5 +1,5 @@
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/export/domain/usecase/export_transactions_csv_usecase.dart';
 
 /// Why an export failed, as the sheet tells the user.

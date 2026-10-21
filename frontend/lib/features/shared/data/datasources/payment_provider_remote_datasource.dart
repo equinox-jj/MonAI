@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/payment_provider_endpoint.dart';
 import 'package:monai/features/shared/data/model/payment_provider_catalog_response.dart';
 

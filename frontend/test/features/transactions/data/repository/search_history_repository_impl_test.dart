@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/exceptions.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/exceptions.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/transactions/data/datasources/search_history_local_datasource.dart';
 import 'package:monai/features/transactions/data/repository/search_history_repository_impl.dart';
 

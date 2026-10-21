@@ -1,5 +1,5 @@
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 
 /// Why a categories screen couldn't load or change something, as the user
 /// is told.

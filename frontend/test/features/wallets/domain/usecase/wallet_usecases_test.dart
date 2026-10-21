@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/entity/wallet_changes.dart';

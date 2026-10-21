@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/exceptions.dart';
+import 'package:monai/core/base/error/exceptions.dart';
 import 'package:monai/features/settings/data/datasources/admin_provider_remote_datasource.dart';
 import 'package:monai/features/settings/data/datasources/endpoint/admin_provider_endpoint.dart';
 import 'package:monai/features/settings/data/model/create_provider_request.dart';

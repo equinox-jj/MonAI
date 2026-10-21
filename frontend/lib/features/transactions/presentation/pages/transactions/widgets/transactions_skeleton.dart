@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 
 /// Placeholder day groups while the first page loads. Read out as one
 /// label.

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/monai_database.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/data/database/monai_database.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/shared/data/datasources/user_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/user_remote_datasource.dart';
 import 'package:monai/features/shared/data/mapper/user_mapper.dart';

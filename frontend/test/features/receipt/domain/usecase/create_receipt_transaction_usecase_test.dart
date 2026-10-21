@@ -3,7 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/features/receipt/domain/repository/receipt_repository.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/monai_database.dart';
-import 'package:monai/core/error/exceptions.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/data/database/monai_database.dart';
+import 'package:monai/core/base/error/exceptions.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/features/shared/data/datasources/wallet_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/wallet_remote_datasource.dart';

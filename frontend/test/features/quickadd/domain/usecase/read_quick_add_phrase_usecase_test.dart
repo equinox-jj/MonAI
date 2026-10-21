@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/features/quickadd/domain/parser/quick_add_parser.dart';
 import 'package:monai/features/quickadd/domain/repository/quickadd_repository.dart';

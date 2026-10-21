@@ -1,4 +1,4 @@
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/field_error.dart';
 
 /// The backend's rule for a monthly limit, checked before saving.
 abstract final class BudgetLimitRule {

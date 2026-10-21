@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/monai_database.dart';
-import 'package:monai/core/error/exceptions.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/data/database/monai_database.dart';
+import 'package:monai/core/base/error/exceptions.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/features/auth/data/datasources/auth_local_datasource.dart';
 import 'package:monai/features/auth/data/datasources/auth_remote_datasource.dart';
 import 'package:monai/features/auth/data/model/auth_response.dart';

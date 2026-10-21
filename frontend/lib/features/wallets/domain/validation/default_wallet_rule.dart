@@ -1,4 +1,4 @@
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 
 /// The default wallet can't be archived or deleted: the user must make
 /// another wallet the default first. Fails the same way as the server's 422.

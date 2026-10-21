@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/budgets/domain/usecase/delete_budget_usecase.dart';
 import 'package:monai/features/budgets/domain/usecase/set_budget_usecase.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_bloc.dart';

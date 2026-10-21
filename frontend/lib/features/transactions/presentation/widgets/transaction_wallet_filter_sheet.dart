@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_wallet_avatar.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/router/app_router.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/app_router.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/widgets/onboarding_footer.dart';

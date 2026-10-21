@@ -1,4 +1,4 @@
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/field_error.dart';
 
 /// The backend's rules for the profile, checked on the device first, in the
 /// shape of the server's own 422.

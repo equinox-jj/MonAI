@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:monai/core/designsystem/theme/monai_theme.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/widgets/transaction_detail_receipt.dart';
 
 void main() {

@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/wallets/domain/usecase/archive_wallet_usecase.dart';
 import 'package:monai/features/wallets/domain/usecase/create_wallet_usecase.dart';
 import 'package:monai/features/wallets/domain/usecase/delete_wallet_usecase.dart';

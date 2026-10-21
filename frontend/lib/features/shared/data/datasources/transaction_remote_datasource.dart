@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/transaction_endpoint.dart';
 import 'package:monai/features/shared/data/model/attach_receipt_request.dart';
 import 'package:monai/features/shared/data/model/receipt_upload_response.dart';

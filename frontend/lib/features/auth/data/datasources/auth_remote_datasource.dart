@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
-import 'package:monai/core/network/api_endpoints.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
+import 'package:monai/core/data/network/api_endpoints.dart';
 import 'package:monai/features/auth/data/datasources/endpoint/auth_endpoint.dart';
 import 'package:monai/features/auth/data/model/auth_response.dart';
 import 'package:monai/features/auth/data/model/change_password_request.dart';

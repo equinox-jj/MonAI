@@ -1,4 +1,4 @@
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 

@@ -1,4 +1,4 @@
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 
 /// Spoken names of the form's icons and colors.
 extension CategoryChoiceText on AppLocalizations {

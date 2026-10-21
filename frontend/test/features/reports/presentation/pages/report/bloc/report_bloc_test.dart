@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/reports/domain/logic/report_change.dart';
 import 'package:monai/features/reports/presentation/model/report_failure.dart';

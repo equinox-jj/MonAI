@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/receipt/domain/repository/receipt_repository.dart';
 import 'package:monai/features/receipt/domain/usecase/read_receipt_text_usecase.dart';
 

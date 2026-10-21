@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/error/field_error.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_field_error_text.dart';
 

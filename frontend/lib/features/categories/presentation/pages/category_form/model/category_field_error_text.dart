@@ -1,5 +1,5 @@
-import 'package:monai/core/error/field_error.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/categories/domain/validation/category_input_validator.dart';
 
 extension CategoryFieldErrorText on FieldError {

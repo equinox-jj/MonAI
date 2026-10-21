@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:monai/core/designsystem/designsystem.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/features/auth/presentation/widgets/auth_hero_panel.dart';
 
 /// The phone form's width cap (tablet portrait) and the tablet card's width.

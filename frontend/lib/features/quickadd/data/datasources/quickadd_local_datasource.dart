@@ -1,5 +1,5 @@
-import 'package:monai/core/data/base_local_data_source.dart';
-import 'package:monai/core/database/daos/transaction_dao.dart';
+import 'package:monai/core/base/base_local_data_source.dart';
+import 'package:monai/core/data/database/daos/transaction_dao.dart';
 import 'package:monai/core/model/transaction_type.dart';
 
 abstract class QuickaddLocalDataSource {

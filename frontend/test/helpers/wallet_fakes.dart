@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_wallets_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_all_wallets_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_wallets_usecase.dart';

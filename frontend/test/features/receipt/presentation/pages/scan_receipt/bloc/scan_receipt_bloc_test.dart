@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
 import 'package:monai/features/receipt/domain/usecase/parse_receipt_usecase.dart';
 import 'package:monai/features/receipt/domain/usecase/read_receipt_text_usecase.dart';

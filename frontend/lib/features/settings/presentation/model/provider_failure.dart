@@ -1,6 +1,6 @@
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/error/field_error.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/domain/validation/provider_input_validator.dart';
 
 /// Why a provider action failed, as the admin screens say it. Branches on

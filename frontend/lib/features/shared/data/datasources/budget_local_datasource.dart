@@ -1,6 +1,6 @@
-import 'package:monai/core/data/base_local_data_source.dart';
-import 'package:monai/core/database/daos/budget_dao.dart';
-import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/core/base/base_local_data_source.dart';
+import 'package:monai/core/data/database/daos/budget_dao.dart';
+import 'package:monai/core/data/database/monai_database.dart';
 
 abstract class BudgetLocalDataSource {
   /// The budget for [month], or null when none is cached.

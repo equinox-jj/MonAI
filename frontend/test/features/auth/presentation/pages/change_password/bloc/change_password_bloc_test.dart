@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/network/session_manager.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/features/auth/domain/usecase/change_password_usecase.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 import 'package:monai/features/auth/presentation/pages/change_password/bloc/change_password_bloc.dart';

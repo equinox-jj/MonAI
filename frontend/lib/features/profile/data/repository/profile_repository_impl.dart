@@ -1,9 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/data/base_repository.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/services/image_compressor_service.dart';
+import 'package:monai/core/base/base_repository.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/services/image_compressor_service.dart';
 import 'package:monai/features/profile/data/datasources/profile_local_datasource.dart';
 import 'package:monai/features/profile/data/datasources/profile_remote_datasource.dart';
 import 'package:monai/features/profile/data/model/delete_account_request.dart';

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/designsystem/theme/monai_theme.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/extension/app_language_extension.dart';
 import 'package:monai/core/utils/extension/app_theme_mode_extension.dart';
-import 'package:monai/core/utils/helper/session_helper.dart';
+import 'package:monai/core/app/session_helper.dart';
 import 'package:monai/features/auth/presentation/pages/session_expired/session_expired_gate.dart';
 import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
 

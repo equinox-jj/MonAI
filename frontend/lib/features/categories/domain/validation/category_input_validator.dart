@@ -1,4 +1,4 @@
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/features/shared/domain/entity/category_input.dart';
 
 /// The backend's rules for a category name, checked before saving.

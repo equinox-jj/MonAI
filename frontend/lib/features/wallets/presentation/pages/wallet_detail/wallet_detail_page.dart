@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
-import 'package:monai/core/di/injector.dart';
-import 'package:monai/core/l10n/l10n.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/router/app_router.dart';
+import 'package:monai/app_router.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/wallet_detail_actions.dart';

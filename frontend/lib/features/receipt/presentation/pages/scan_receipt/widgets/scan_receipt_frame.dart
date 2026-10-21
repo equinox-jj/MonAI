@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:monai/core/designsystem/designsystem.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 
 /// The lime corners the receipt goes between, with a scan line across.
 class ScanReceiptFrame extends StatelessWidget {

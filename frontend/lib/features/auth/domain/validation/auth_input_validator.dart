@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/field_error.dart';
 
 /// Checks auth forms on the device with the backend's rules
 /// (`backend/internal/auth/dto.go`), so a form shows the same errors offline

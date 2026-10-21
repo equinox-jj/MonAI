@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:monai/core/data/base_remote_data_source.dart';
+import 'package:monai/core/base/base_remote_data_source.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/wallet_endpoint.dart';
 import 'package:monai/features/shared/data/model/create_wallet_request.dart';
 import 'package:monai/features/shared/data/model/update_wallet_request.dart';

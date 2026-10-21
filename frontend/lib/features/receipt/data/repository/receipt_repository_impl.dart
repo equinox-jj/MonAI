@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/data/base_repository.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/services/image_compressor_service.dart';
-import 'package:monai/core/services/receipt_scanner_service.dart';
+import 'package:monai/core/base/base_repository.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/data/services/image_compressor_service.dart';
+import 'package:monai/core/data/services/receipt_scanner_service.dart';
 import 'package:monai/features/receipt/data/datasources/receipt_remote_datasource.dart';
 import 'package:monai/features/receipt/data/mapper/receipt_mapper.dart';
 import 'package:monai/features/receipt/data/model/parse_receipt_request.dart';

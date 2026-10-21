@@ -1,4 +1,4 @@
-import 'package:monai/core/di/injector.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/features/categories/domain/usecase/create_category_usecase.dart';
 import 'package:monai/features/categories/domain/usecase/delete_category_usecase.dart';
 import 'package:monai/features/categories/domain/usecase/find_category_usecase.dart';

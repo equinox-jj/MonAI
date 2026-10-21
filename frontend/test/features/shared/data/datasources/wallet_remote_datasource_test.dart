@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/exceptions.dart';
+import 'package:monai/core/base/error/exceptions.dart';
 import 'package:monai/features/shared/data/datasources/endpoint/wallet_endpoint.dart';
 import 'package:monai/features/shared/data/datasources/wallet_remote_datasource.dart';
 import 'package:monai/features/shared/data/model/create_wallet_request.dart';

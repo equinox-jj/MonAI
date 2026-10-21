@@ -1,8 +1,8 @@
-import 'package:monai/core/data/base_local_data_source.dart';
+import 'package:monai/core/base/base_local_data_source.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/core/services/app_info_service.dart';
-import 'package:monai/core/storage/app_preferences.dart';
+import 'package:monai/core/data/services/app_info_service.dart';
+import 'package:monai/core/data/storage/app_preferences.dart';
 
 abstract class SettingsLocalDataSource {
   Future<AppThemeMode> themeMode();

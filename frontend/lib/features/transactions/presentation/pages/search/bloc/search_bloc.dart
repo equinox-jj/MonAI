@@ -5,7 +5,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/transaction_filter.dart';

@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/categories/domain/usecase/create_category_usecase.dart';

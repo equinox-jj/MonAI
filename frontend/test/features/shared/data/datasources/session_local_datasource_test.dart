@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/local_cache.dart';
-import 'package:monai/core/error/exceptions.dart';
-import 'package:monai/core/network/session_manager.dart';
-import 'package:monai/core/storage/token_storage.dart';
+import 'package:monai/core/data/database/local_cache.dart';
+import 'package:monai/core/base/error/exceptions.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/data/storage/token_storage.dart';
 import 'package:monai/features/shared/data/datasources/session_local_datasource.dart';
 
 class _MockTokenStorage extends Mock implements TokenStorage {}

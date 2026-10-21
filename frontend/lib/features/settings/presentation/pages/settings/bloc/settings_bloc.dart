@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/utils/month_format.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
 import 'package:monai/features/settings/domain/logic/settings_rules.dart';
 import 'package:monai/features/settings/domain/usecase/get_app_version_usecase.dart';

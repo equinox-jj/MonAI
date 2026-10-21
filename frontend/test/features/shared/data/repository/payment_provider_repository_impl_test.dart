@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/database/monai_database.dart';
+import 'package:monai/core/data/database/monai_database.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_local_datasource.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_remote_datasource.dart';
 import 'package:monai/features/shared/data/datasources/payment_provider_seed_datasource.dart';

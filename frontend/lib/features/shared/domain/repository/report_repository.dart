@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
+import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 
 /// Monthly income and expense reports.

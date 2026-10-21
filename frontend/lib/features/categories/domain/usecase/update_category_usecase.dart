@@ -1,6 +1,6 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/usecase/usecase.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/usecase.dart';
 import 'package:monai/features/categories/domain/validation/category_input_validator.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/category_changes.dart';

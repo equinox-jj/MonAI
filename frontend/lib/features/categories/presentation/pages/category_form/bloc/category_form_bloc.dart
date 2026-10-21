@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
-import 'package:monai/core/error/failure.dart';
-import 'package:monai/core/error/field_error.dart';
+import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/categories/domain/logic/category_choices.dart';
