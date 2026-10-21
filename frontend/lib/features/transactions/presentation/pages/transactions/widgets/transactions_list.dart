@@ -5,6 +5,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_list_item.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transactions/model/transactions_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/widgets/transactions_actions.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_day_header.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_list_row.dart';

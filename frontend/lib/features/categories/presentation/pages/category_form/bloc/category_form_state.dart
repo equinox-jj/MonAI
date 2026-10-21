@@ -16,9 +16,3 @@ abstract class CategoryFormState with _$CategoryFormState {
     CategoryFailure? actionFailure,
   }) = _CategoryFormState;
 }
-
-extension CategoryFormStateX on CategoryFormState {
-  bool get isEdit => mode is EditCategoryMode;
-
-  bool get canDelete => original?.canDelete ?? false;
-}

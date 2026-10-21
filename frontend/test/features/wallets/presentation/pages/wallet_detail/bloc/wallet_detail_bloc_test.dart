@@ -19,6 +19,7 @@ import 'package:monai/features/wallets/domain/usecase/refresh_wallet_usecase.dar
 import 'package:monai/features/wallets/domain/usecase/set_default_wallet_usecase.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_detail/model/wallet_detail_state_extension.dart';
 
 import '../../../../../../helpers/entity_fixtures.dart';
 

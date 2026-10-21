@@ -17,6 +17,7 @@ import 'package:monai/features/transactions/domain/usecase/watch_cached_search_u
 import 'package:monai/features/transactions/domain/usecase/watch_transaction_lookups_usecase.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/search/bloc/search_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/search/model/search_state_extension.dart';
 
 import '../../../../../../helpers/entity_fixtures.dart';
 

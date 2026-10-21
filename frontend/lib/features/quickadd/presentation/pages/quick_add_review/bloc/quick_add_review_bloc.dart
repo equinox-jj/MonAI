@@ -6,7 +6,6 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/ui/designsystem/components/monai_marked_field.dart';
 import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/base/error/field_error.dart';
-import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/base/usecase.dart';
 import 'package:monai/core/utils/money_format.dart';
@@ -23,6 +22,7 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_wallets_usecase.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add_review/model/quick_add_review_state_extension.dart';
 
 part 'quick_add_review_bloc.freezed.dart';
 part 'quick_add_review_event.dart';

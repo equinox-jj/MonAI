@@ -11,6 +11,7 @@ import 'package:monai/features/shared/domain/entity/transaction_filter.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/search/bloc/search_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/search/model/search_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/search/widgets/search_recent.dart';
 import 'package:monai/features/transactions/presentation/pages/search/widgets/search_results.dart';
 import 'package:monai/features/transactions/presentation/pages/search/widgets/search_states.dart';

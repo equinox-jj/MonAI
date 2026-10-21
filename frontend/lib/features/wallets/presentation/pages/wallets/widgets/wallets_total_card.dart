@@ -7,6 +7,7 @@ import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/wallets/domain/logic/wallet_totals.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallets/model/wallets_state_extension.dart';
 
 class WalletsTotalCard extends StatelessWidget {
   const WalletsTotalCard({super.key});

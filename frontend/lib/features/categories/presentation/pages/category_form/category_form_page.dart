@@ -5,6 +5,7 @@ import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
+import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_state_extension.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/widgets/category_form_color_grid.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/widgets/category_form_icon_grid.dart';

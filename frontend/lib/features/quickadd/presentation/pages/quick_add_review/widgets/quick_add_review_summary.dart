@@ -5,6 +5,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/bloc/quick_add_review_bloc.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add_review/model/quick_add_review_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 
 @immutable

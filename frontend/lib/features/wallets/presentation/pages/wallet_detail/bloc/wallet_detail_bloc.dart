@@ -19,11 +19,11 @@ import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.da
 import 'package:monai/features/shared/domain/usecase/watch_transactions_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_wallet_daily_outflows_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_wallet_usecase.dart';
-import 'package:monai/features/wallets/domain/logic/wallet_form_rules.dart';
 import 'package:monai/features/wallets/domain/usecase/archive_wallet_usecase.dart';
 import 'package:monai/features/wallets/domain/usecase/refresh_wallet_usecase.dart';
 import 'package:monai/features/wallets/domain/usecase/set_default_wallet_usecase.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_detail/model/wallet_detail_state_extension.dart';
 
 part 'wallet_detail_bloc.freezed.dart';
 part 'wallet_detail_event.dart';

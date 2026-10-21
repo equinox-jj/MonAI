@@ -27,18 +27,3 @@ abstract class TransactionsState with _$TransactionsState {
     TransactionFailure? actionFailure,
   }) = _TransactionsState;
 }
-
-extension TransactionsStateX on TransactionsState {
-  DateTime get currentMonth => monthOf(today);
-
-  bool get canShowNextMonth => month.isBefore(currentMonth);
-
-  bool get hasFilter => filter != const TransactionFilter();
-
-  List<Transaction> get visibleTransactions => deletingIds.isEmpty
-      ? transactions
-      : transactions.where((t) => !deletingIds.contains(t.id)).toList();
-
-  List<TransactionListItem> get items =>
-      groupByDay(visibleTransactions, dailyNets: dailyNets);
-}

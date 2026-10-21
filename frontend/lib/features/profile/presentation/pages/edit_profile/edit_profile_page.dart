@@ -9,6 +9,7 @@ import 'package:monai/features/profile/domain/validation/profile_input_validator
 import 'package:monai/features/profile/presentation/model/profile_failure.dart';
 import 'package:monai/features/profile/presentation/model/profile_field_error_text.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/bloc/edit_profile_bloc.dart';
+import 'package:monai/features/profile/presentation/pages/edit_profile/model/edit_profile_state_extension.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/widgets/edit_profile_avatar.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/widgets/edit_profile_delete_card.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/widgets/edit_profile_photo_sheet.dart';

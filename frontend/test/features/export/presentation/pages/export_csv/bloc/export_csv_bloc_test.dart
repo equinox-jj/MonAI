@@ -9,6 +9,7 @@ import 'package:monai/features/export/domain/usecase/export_transactions_csv_use
 import 'package:monai/features/export/domain/usecase/get_csv_delimiter_usecase.dart';
 import 'package:monai/features/export/presentation/model/export_failure.dart';
 import 'package:monai/features/export/presentation/pages/export_csv/bloc/export_csv_bloc.dart';
+import 'package:monai/features/export/presentation/pages/export_csv/model/export_csv_state_extension.dart';
 
 class _MockExport extends Mock implements ExportTransactionsCsvUseCase {}
 

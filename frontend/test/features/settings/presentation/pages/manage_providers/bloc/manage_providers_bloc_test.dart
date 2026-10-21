@@ -13,6 +13,7 @@ import 'package:monai/features/settings/domain/usecase/get_admin_providers_useca
 import 'package:monai/features/settings/domain/usecase/watch_provider_changes_usecase.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/manage_providers/bloc/manage_providers_bloc.dart';
+import 'package:monai/features/settings/presentation/pages/manage_providers/model/manage_providers_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 

@@ -19,22 +19,3 @@ abstract class SearchState with _$SearchState {
     TransactionFailure? failure,
   }) = _SearchState;
 }
-
-extension SearchStateX on SearchState {
-  DateTime get currentMonth => monthOf(today);
-
-  bool get hasQuery => query.normalizedSearch.isNotEmpty;
-
-  bool get hasFilter => filter != const TransactionFilter();
-
-  bool get hasMore => allMonths ? results.length >= limit : nextCursor != null;
-
-  int get net => results.fold(
-    0,
-    (sum, t) => switch (t.type) {
-      .income => sum + t.amount,
-      .expense => sum - t.amount,
-      .transfer => sum,
-    },
-  );
-}

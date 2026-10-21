@@ -7,6 +7,7 @@ import 'package:monai/features/receipt/domain/usecase/read_receipt_text_usecase.
 import 'package:monai/features/receipt/presentation/model/receipt_ai_failure.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_phase.dart';
+import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_receipt_state_extension.dart';
 
 part 'scan_receipt_bloc.freezed.dart';
 part 'scan_receipt_event.dart';

@@ -6,7 +6,6 @@ import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/categories/domain/logic/category_choices.dart';
-import 'package:monai/features/categories/domain/logic/category_rules.dart';
 import 'package:monai/features/categories/domain/usecase/create_category_usecase.dart';
 import 'package:monai/features/categories/domain/usecase/find_category_usecase.dart';
 import 'package:monai/features/categories/domain/usecase/update_category_usecase.dart';

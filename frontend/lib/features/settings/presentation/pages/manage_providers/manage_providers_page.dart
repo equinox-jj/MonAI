@@ -9,6 +9,7 @@ import 'package:monai/app_router.dart';
 import 'package:monai/features/settings/domain/entity/admin_payment_provider.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/manage_providers/bloc/manage_providers_bloc.dart';
+import 'package:monai/features/settings/presentation/pages/manage_providers/model/manage_providers_state_extension.dart';
 import 'package:monai/features/settings/presentation/pages/manage_providers/widgets/provider_list_row.dart';
 
 class ManageProvidersPage extends StatelessWidget {

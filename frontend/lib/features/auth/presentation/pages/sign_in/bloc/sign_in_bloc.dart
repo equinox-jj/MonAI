@@ -49,7 +49,7 @@ class SignInBloc extends Bloc<SignInEvent, SignInState> {
   /// On success the saved session moves the app to Home, so the form stays
   /// busy instead of briefly becoming submittable again.
   Future<void> _onSubmitted(_Submitted event, Emitter<SignInState> emit) async {
-    if (state.isSubmitting) return;
+    if (state.status.isSubmitting) return;
     emit(state.copyWith(status: .loading, formError: null, focusField: null));
 
     final result = await _login(

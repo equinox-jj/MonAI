@@ -8,6 +8,7 @@ import 'package:monai/features/shared/domain/validation/transaction_input_valida
 import 'package:monai/features/transactions/presentation/model/transaction_picker_options.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_field_error.dart';
 
 enum _WalletTarget { source, destination }

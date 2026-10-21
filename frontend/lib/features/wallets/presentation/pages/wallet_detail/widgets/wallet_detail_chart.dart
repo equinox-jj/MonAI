@@ -6,6 +6,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_detail/model/wallet_detail_state_extension.dart';
 
 class WalletDetailChart extends StatelessWidget {
   const WalletDetailChart({super.key});

@@ -13,6 +13,7 @@ import 'package:monai/features/categories/presentation/model/category_failure.da
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/usecase/refresh_categories_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.dart';
+import 'package:monai/features/categories/presentation/pages/categories/model/categories_state_extension.dart';
 
 part 'categories_bloc.freezed.dart';
 part 'categories_event.dart';

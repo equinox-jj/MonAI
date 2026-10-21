@@ -12,6 +12,7 @@ import 'package:monai/features/shared/domain/usecase/watch_all_wallets_usecase.d
 import 'package:monai/features/shared/domain/usecase/watch_wallets_usecase.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallets/model/wallets_state_extension.dart';
 
 import '../../../../../../helpers/entity_fixtures.dart';
 

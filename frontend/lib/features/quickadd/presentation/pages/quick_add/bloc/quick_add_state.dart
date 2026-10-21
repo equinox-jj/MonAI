@@ -13,14 +13,6 @@ abstract class QuickAddState with _$QuickAddState {
   }) = _QuickAddState;
 }
 
-extension QuickAddStateX on QuickAddState {
-  bool get willAskAi => engine == DraftEngine.local && needsAi(drafts);
-
-  bool get hasMissingAmount => drafts.any((d) => d.amount == null);
-
-  bool get canContinue => drafts.isNotEmpty && !isAsking;
-}
-
 @freezed
 sealed class QuickAddNavigation with _$QuickAddNavigation {
   const factory QuickAddNavigation.form(QuickAddDraft draft) =

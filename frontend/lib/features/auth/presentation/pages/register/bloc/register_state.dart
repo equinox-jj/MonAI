@@ -14,7 +14,3 @@ abstract class RegisterState with _$RegisterState {
     AuthField? focusField,
   }) = _RegisterState;
 }
-
-extension RegisterStateX on RegisterState {
-  bool get isSubmitting => status == .loading || status == .success;
-}

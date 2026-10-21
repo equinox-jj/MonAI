@@ -9,6 +9,7 @@ import 'package:monai/app_router.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/reports/presentation/model/report_failure.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
+import 'package:monai/features/reports/presentation/pages/report/model/report_state_extension.dart';
 import 'package:monai/features/reports/presentation/pages/report/widgets/report_breakdown_card.dart';
 import 'package:monai/features/reports/presentation/pages/report/widgets/report_budget_card.dart';
 import 'package:monai/features/reports/presentation/pages/report/widgets/report_skeleton.dart';

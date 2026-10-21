@@ -25,31 +25,3 @@ sealed class QuickAddReviewResult with _$QuickAddReviewResult {
 
   const factory QuickAddReviewResult.skipped() = SkippedQuickAddResult;
 }
-
-extension QuickAddReviewStateX on QuickAddReviewState {
-  List<QuickAddDraft> get drafts => args.drafts;
-
-  bool get isDone => index >= drafts.length;
-
-  bool get isLast => index == drafts.length - 1;
-
-  QuickAddDraft? get original => isDone ? null : drafts[index];
-
-  int get savedCount => results.whereType<SavedQuickAddResult>().length;
-
-  List<Category> get categories {
-    final type = current.type == TransactionType.income
-        ? CategoryType.income
-        : CategoryType.expense;
-    return allCategories.where((c) => c.type == type && !c.isHidden).toList();
-  }
-
-  Category? categoryOf(String? id) =>
-      allCategories.where((c) => c.id == id).firstOrNull;
-
-  Wallet? walletOf(String? id) => wallets.where((w) => w.id == id).firstOrNull;
-
-  MonAIFieldMark? markOf(QuickAddField field) => marks[field];
-
-  FieldError? errorOf(QuickAddField field) => errors[field.apiField];
-}

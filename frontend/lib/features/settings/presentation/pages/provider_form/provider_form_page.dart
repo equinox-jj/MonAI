@@ -12,6 +12,7 @@ import 'package:monai/features/settings/domain/logic/provider_rules.dart';
 import 'package:monai/features/settings/domain/validation/provider_input_validator.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
+import 'package:monai/features/settings/presentation/pages/provider_form/model/provider_form_state_extension.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/widgets/provider_form_active_row.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/widgets/provider_form_aliases.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/widgets/provider_form_dialogs.dart';

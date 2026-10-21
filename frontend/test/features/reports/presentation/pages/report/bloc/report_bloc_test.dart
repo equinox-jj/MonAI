@@ -8,6 +8,7 @@ import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/features/reports/domain/logic/report_change.dart';
 import 'package:monai/features/reports/presentation/model/report_failure.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
+import 'package:monai/features/reports/presentation/pages/report/model/report_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 import 'package:monai/features/shared/domain/repository/budget_repository.dart';

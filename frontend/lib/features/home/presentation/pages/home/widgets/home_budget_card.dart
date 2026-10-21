@@ -5,6 +5,8 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
+import 'package:monai/features/home/presentation/pages/home/model/home_budget_display.dart';
+import 'package:monai/features/home/presentation/pages/home/model/home_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 
 typedef _BudgetSection = ({

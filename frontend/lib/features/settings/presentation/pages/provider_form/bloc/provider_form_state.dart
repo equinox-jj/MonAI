@@ -34,17 +34,3 @@ abstract class ProviderFormState with _$ProviderFormState {
     @Default(false) bool done,
   }) = _ProviderFormState;
 }
-
-extension ProviderFormStateX on ProviderFormState {
-  bool get isWorking => isSaving || isDeleting || isChangingStatus;
-
-  bool get isSystem => original?.isSystem ?? false;
-
-  bool get isReady =>
-      canSave &&
-      status == .success &&
-      !isWorking &&
-      hasName &&
-      type != null &&
-      sortOrderValid;
-}

@@ -26,7 +26,7 @@ import 'package:monai/features/transactions/domain/entity/transaction_lookups.da
 import 'package:monai/features/transactions/domain/usecase/watch_daily_nets_usecase.dart';
 import 'package:monai/features/transactions/domain/usecase/watch_transaction_lookups_usecase.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
-import 'package:monai/features/transactions/presentation/model/transaction_list_item.dart';
+import 'package:monai/features/transactions/presentation/pages/transactions/model/transactions_state_extension.dart';
 
 part 'transactions_bloc.freezed.dart';
 part 'transactions_event.dart';

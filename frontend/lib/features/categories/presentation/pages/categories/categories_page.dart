@@ -10,6 +10,7 @@ import 'package:monai/app_router.dart';
 import 'package:monai/features/categories/domain/logic/category_rules.dart';
 import 'package:monai/features/categories/presentation/model/category_failure.dart';
 import 'package:monai/features/categories/presentation/pages/categories/bloc/categories_bloc.dart';
+import 'package:monai/features/categories/presentation/pages/categories/model/categories_state_extension.dart';
 import 'package:monai/features/categories/presentation/pages/categories/widgets/category_list_row.dart';
 import 'package:monai/features/categories/presentation/pages/categories/widgets/category_move_sheet.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';

@@ -11,6 +11,7 @@ import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/bloc/receipt_review_bloc.dart';
+import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_review_state_extension.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_review_text.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_banner.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_fields.dart';

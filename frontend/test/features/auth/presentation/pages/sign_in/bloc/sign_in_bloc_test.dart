@@ -69,7 +69,7 @@ void main() {
       ),
     ).called(1);
     expect(state.status, UiStatus.success);
-    expect(state.isSubmitting, isTrue);
+    expect(state.status.isSubmitting, isTrue);
   });
 
   test('field errors land on their fields and focus the first one', () async {
@@ -118,7 +118,7 @@ void main() {
     // Assert
     expect(state.status, UiStatus.failure);
     expect(state.formError, const AuthFormError.invalidCredentials());
-    expect(state.isSubmitting, isFalse);
+    expect(state.status.isSubmitting, isFalse);
   });
 
   test('rate limiting rounds the wait up to whole minutes', () async {

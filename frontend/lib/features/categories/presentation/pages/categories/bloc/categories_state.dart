@@ -13,10 +13,3 @@ abstract class CategoriesState with _$CategoriesState {
     CategoryFailure? actionFailure,
   }) = _CategoriesState;
 }
-
-extension CategoriesStateX on CategoriesState {
-  List<Category> get shown =>
-      sortCategories(categories.where((c) => c.type == type));
-
-  Category? byId(String id) => categories.where((c) => c.id == id).firstOrNull;
-}

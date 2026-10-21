@@ -9,11 +9,9 @@ import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/core/base/usecase.dart';
-import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/transaction_input.dart';
-import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/shared/domain/usecase/create_transaction_usecase.dart';
 import 'package:monai/features/shared/domain/usecase/delete_transaction_usecase.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
@@ -24,6 +22,7 @@ import 'package:monai/features/transactions/domain/usecase/watch_transaction_loo
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_draft.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_mode.dart';
+import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 
 part 'transaction_form_bloc.freezed.dart';
 part 'transaction_form_event.dart';

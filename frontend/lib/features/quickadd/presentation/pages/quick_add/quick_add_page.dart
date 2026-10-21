@@ -7,6 +7,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/app_router.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/bloc/quick_add_bloc.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add/model/quick_add_state_extension.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/quick_add_drafts.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/quick_add_examples.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/quick_add_phrase.dart';

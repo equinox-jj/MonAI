@@ -75,7 +75,7 @@ void main() {
       ),
     ).called(1);
     expect(state.status, UiStatus.success);
-    expect(state.isSubmitting, isTrue);
+    expect(state.status.isSubmitting, isTrue);
   });
 
   test('a second submit while saving is ignored', () async {
@@ -139,7 +139,7 @@ void main() {
     expect(state.status, UiStatus.failure);
     expect(state.formError, const AuthFormError.network());
     expect(state.focusField, isNull);
-    expect(state.isSubmitting, isFalse);
+    expect(state.status.isSubmitting, isFalse);
   });
 
   test('a rate limit shows its wait in minutes', () async {

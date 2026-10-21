@@ -25,6 +25,7 @@ import 'package:monai/features/transactions/domain/usecase/watch_daily_nets_usec
 import 'package:monai/features/transactions/domain/usecase/watch_transaction_lookups_usecase.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transactions/model/transactions_state_extension.dart';
 
 import '../../../../../../helpers/entity_fixtures.dart';
 

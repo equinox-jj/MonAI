@@ -13,7 +13,3 @@ abstract class ManageProvidersState with _$ManageProvidersState {
     @Default(false) bool canEdit,
   }) = _ManageProvidersState;
 }
-
-extension ManageProvidersStateX on ManageProvidersState {
-  List<AdminPaymentProvider> get shown => filterProviders(providers, query);
-}

@@ -4,6 +4,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/bloc/edit_profile_bloc.dart';
+import 'package:monai/features/profile/presentation/pages/edit_profile/model/edit_profile_state_extension.dart';
 
 class EditProfileAvatar extends StatelessWidget {
   const EditProfileAvatar({

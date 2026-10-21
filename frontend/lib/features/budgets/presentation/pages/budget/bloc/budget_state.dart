@@ -20,15 +20,3 @@ abstract class BudgetState with _$BudgetState {
     BudgetFailure? actionFailure,
   }) = _BudgetState;
 }
-
-extension BudgetStateX on BudgetState {
-  bool get hasBudget => budget != null;
-
-  bool get isBusy => isSaving || isDeleting;
-
-  int get spent => budget?.spent ?? reportSpent ?? 0;
-
-  BudgetPreview? get preview => BudgetPreview.of(limit: limit, spent: spent);
-
-  bool get canSave => limit > 0 && !isBusy;
-}

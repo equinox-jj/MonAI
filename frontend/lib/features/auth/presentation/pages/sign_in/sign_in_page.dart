@@ -172,7 +172,7 @@ class _EmailField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocSelector<SignInBloc, SignInState, (FieldError?, bool)>(
-      selector: (state) => (state.emailError, state.isSubmitting),
+      selector: (state) => (state.emailError, state.status.isSubmitting),
       builder: (context, field) {
         final (error, submitting) = field;
         return MonAITextField(
@@ -214,7 +214,7 @@ class _PasswordField extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocSelector<SignInBloc, SignInState, (FieldError?, bool)>(
-      selector: (state) => (state.passwordError, state.isSubmitting),
+      selector: (state) => (state.passwordError, state.status.isSubmitting),
       builder: (context, field) {
         final (error, submitting) = field;
         return MonAIPasswordField(
@@ -250,7 +250,7 @@ class _Actions extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = context.l10n;
     return BlocSelector<SignInBloc, SignInState, bool>(
-      selector: (state) => state.isSubmitting,
+      selector: (state) => state.status.isSubmitting,
       builder: (context, submitting) => AuthActions(
         submitLabel: l10n.signInSubmit,
         onSubmit: onSubmit,

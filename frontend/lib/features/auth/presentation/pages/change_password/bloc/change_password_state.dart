@@ -12,7 +12,3 @@ abstract class ChangePasswordState with _$ChangePasswordState {
     AuthField? focusField,
   }) = _ChangePasswordState;
 }
-
-extension ChangePasswordStateX on ChangePasswordState {
-  bool get isSubmitting => status == .loading || status == .success;
-}

@@ -10,6 +10,7 @@ import 'package:monai/features/quickadd/presentation/model/quick_add_field.dart'
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/bloc/quick_add_review_bloc.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add_review/model/quick_add_review_state_extension.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/widgets/quick_add_review_fields.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/widgets/quick_add_review_summary.dart';
 import 'package:monai/features/quickadd/presentation/widgets/quick_add_pickers.dart';

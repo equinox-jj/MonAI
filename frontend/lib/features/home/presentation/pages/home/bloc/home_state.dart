@@ -17,21 +17,3 @@ abstract class HomeState with _$HomeState {
     HomeLoadFailure? refreshFailure,
   }) = _HomeState;
 }
-
-enum HomeBudgetDisplay { progress, prompt, hidden }
-
-extension HomeStateX on HomeState {
-  bool get hasCache => dashboard?.hasCache ?? false;
-
-  bool get isFirstRun => recentLoaded && (dashboard?.recent.isEmpty ?? false);
-
-  HomeBudgetDisplay get budgetDisplay => dashboard?.budget != null
-      ? .progress
-      : budgetLoaded
-      ? .prompt
-      : .hidden;
-
-  bool get showWallets => (dashboard?.wallets.length ?? 0) > 1;
-
-  bool get promptAddWallets => (dashboard?.wallets.length ?? 0) <= 1;
-}

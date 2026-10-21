@@ -8,6 +8,7 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/search/bloc/search_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/search/model/search_state_extension.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_list_row.dart';
 
 typedef _Results = ({

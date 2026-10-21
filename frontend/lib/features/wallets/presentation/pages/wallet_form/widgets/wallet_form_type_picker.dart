@@ -7,6 +7,7 @@ import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/features/wallets/domain/validation/wallet_input_validator.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_state_extension.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_field_error_text.dart';
 
 class WalletFormTypePicker extends StatelessWidget {

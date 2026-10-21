@@ -4,6 +4,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/home/domain/entity/home_dashboard.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
+import 'package:monai/features/home/presentation/pages/home/model/home_state_extension.dart';
 import 'package:monai/features/home/presentation/pages/home/model/home_text.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_actions.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_quick_add.dart';

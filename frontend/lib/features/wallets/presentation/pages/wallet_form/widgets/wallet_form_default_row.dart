@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_state_extension.dart';
 
 class WalletFormDefaultRow extends StatelessWidget {
   const WalletFormDefaultRow({required this.onToggled, super.key});

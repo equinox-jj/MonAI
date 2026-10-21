@@ -91,7 +91,7 @@ void main() {
       ),
     ).called(1);
     expect(state.status, UiStatus.success);
-    expect(state.isSubmitting, isTrue);
+    expect(state.status.isSubmitting, isTrue);
   });
 
   test('field errors focus the first field in layout order', () async {
@@ -181,6 +181,6 @@ void main() {
 
     // Assert
     expect(state.formError, const AuthFormError.unexpected());
-    expect(state.isSubmitting, isFalse);
+    expect(state.status.isSubmitting, isFalse);
   });
 }

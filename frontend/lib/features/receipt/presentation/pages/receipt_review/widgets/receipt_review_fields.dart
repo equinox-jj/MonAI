@@ -9,6 +9,7 @@ import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/core/utils/rupiah_input_formatter.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_field_error_text.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/bloc/receipt_review_bloc.dart';
+import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_review_state_extension.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_field.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_review_text.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_field_box.dart';

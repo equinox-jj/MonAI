@@ -10,6 +10,7 @@ import 'package:monai/features/budgets/domain/usecase/set_budget_usecase.dart';
 import 'package:monai/features/budgets/domain/validation/budget_limit_rule.dart';
 import 'package:monai/features/budgets/presentation/model/budget_failure.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_bloc.dart';
+import 'package:monai/features/budgets/presentation/pages/budget/model/budget_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 import 'package:monai/features/shared/domain/repository/budget_repository.dart';

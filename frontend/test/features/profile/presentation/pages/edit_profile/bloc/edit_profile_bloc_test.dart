@@ -11,6 +11,7 @@ import 'package:monai/features/profile/domain/usecase/remove_avatar_usecase.dart
 import 'package:monai/features/profile/domain/usecase/update_profile_name_usecase.dart';
 import 'package:monai/features/profile/presentation/model/profile_failure.dart';
 import 'package:monai/features/profile/presentation/pages/edit_profile/bloc/edit_profile_bloc.dart';
+import 'package:monai/features/profile/presentation/pages/edit_profile/model/edit_profile_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 

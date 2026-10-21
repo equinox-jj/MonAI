@@ -6,6 +6,7 @@ import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transactions/model/transactions_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/widgets/transactions_actions.dart';
 
 class TransactionsLoadError extends StatelessWidget {

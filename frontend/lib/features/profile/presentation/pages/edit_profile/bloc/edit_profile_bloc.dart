@@ -16,6 +16,7 @@ import 'package:monai/features/profile/domain/validation/profile_input_validator
 import 'package:monai/features/profile/presentation/model/profile_failure.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
+import 'package:monai/features/profile/presentation/pages/edit_profile/model/edit_profile_state_extension.dart';
 
 part 'edit_profile_bloc.freezed.dart';
 part 'edit_profile_event.dart';

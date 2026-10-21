@@ -6,6 +6,7 @@ import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/reports/domain/logic/report_change.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
+import 'package:monai/features/reports/presentation/pages/report/model/report_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
 
 typedef _Totals = ({MonthlyReport report, ReportChange? change});

@@ -5,6 +5,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/features/budgets/domain/logic/budget_preview.dart';
 import 'package:monai/features/budgets/presentation/pages/budget/bloc/budget_bloc.dart';
+import 'package:monai/features/budgets/presentation/pages/budget/model/budget_state_extension.dart';
 
 class BudgetPreviewCard extends StatelessWidget {
   const BudgetPreviewCard({super.key});

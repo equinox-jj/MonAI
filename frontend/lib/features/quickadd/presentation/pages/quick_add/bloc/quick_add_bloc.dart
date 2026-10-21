@@ -9,6 +9,7 @@ import 'package:monai/features/quickadd/domain/usecase/complete_drafts_with_ai_u
 import 'package:monai/features/quickadd/domain/usecase/read_quick_add_phrase_usecase.dart';
 import 'package:monai/features/quickadd/domain/usecase/watch_quick_add_context_usecase.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add/model/quick_add_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:rxdart/rxdart.dart';
 

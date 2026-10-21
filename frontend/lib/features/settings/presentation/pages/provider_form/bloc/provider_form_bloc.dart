@@ -20,6 +20,7 @@ import 'package:monai/features/settings/domain/validation/provider_input_validat
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
+import 'package:monai/features/settings/presentation/pages/provider_form/model/provider_form_state_extension.dart';
 
 part 'provider_form_bloc.freezed.dart';
 part 'provider_form_event.dart';

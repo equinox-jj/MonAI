@@ -5,7 +5,6 @@ import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/base/error/field_error.dart';
-import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/base/usecase.dart';

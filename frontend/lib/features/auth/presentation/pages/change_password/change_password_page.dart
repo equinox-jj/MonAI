@@ -145,7 +145,7 @@ class _SaveAction extends StatelessWidget {
     return Padding(
       padding: const .only(right: MonAISpacing.x2),
       child: BlocSelector<ChangePasswordBloc, ChangePasswordState, bool>(
-        selector: (state) => state.isSubmitting,
+        selector: (state) => state.status.isSubmitting,
         builder: (context, submitting) => MonAIButton(
           label: context.l10n.changePasswordSave,
           size: .small,
@@ -200,7 +200,8 @@ class _CurrentPasswordField extends StatelessWidget {
       ChangePasswordState,
       (FieldError?, bool)
     >(
-      selector: (state) => (state.currentPasswordError, state.isSubmitting),
+      selector: (state) =>
+          (state.currentPasswordError, state.status.isSubmitting),
       builder: (context, field) {
         final (error, submitting) = field;
         return MonAIPasswordField(
@@ -249,7 +250,7 @@ class _NewPasswordField extends StatelessWidget {
       selector: (state) => (
         state.newPasswordError,
         state.newPasswordLongEnough,
-        state.isSubmitting,
+        state.status.isSubmitting,
       ),
       builder: (context, field) {
         final (error, longEnough, submitting) = field;

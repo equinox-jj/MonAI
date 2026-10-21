@@ -11,7 +11,3 @@ abstract class SignInState with _$SignInState {
     AuthField? focusField,
   }) = _SignInState;
 }
-
-extension SignInStateX on SignInState {
-  bool get isSubmitting => status == .loading || status == .success;
-}

@@ -9,6 +9,7 @@ import 'package:monai/features/shared/domain/entity/transaction_filter.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transactions/model/transactions_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/widgets/transactions_actions.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_filter_chips.dart';
 

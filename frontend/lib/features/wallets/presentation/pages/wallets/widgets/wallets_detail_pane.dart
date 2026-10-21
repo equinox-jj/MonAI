@@ -4,6 +4,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/wallet_detail_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallets/model/wallets_state_extension.dart';
 
 class WalletsDetailPane extends StatelessWidget {
   const WalletsDetailPane({super.key});

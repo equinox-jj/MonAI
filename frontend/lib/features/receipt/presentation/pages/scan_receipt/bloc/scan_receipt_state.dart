@@ -11,8 +11,3 @@ abstract class ScanReceiptState with _$ScanReceiptState {
     ReceiptReviewArgs? review,
   }) = _ScanReceiptState;
 }
-
-extension ScanReceiptStateX on ScanReceiptState {
-  bool get canCapture =>
-      camera == CameraStatus.ready && phase is CameraScanPhase && !isCapturing;
-}

@@ -10,6 +10,7 @@ import 'package:monai/features/categories/domain/usecase/delete_category_usecase
 import 'package:monai/features/categories/domain/usecase/set_category_hidden_usecase.dart';
 import 'package:monai/features/categories/presentation/model/category_failure.dart';
 import 'package:monai/features/categories/presentation/pages/categories/bloc/categories_bloc.dart';
+import 'package:monai/features/categories/presentation/pages/categories/model/categories_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/category_changes.dart';
 import 'package:monai/features/shared/domain/repository/category_repository.dart';

@@ -22,19 +22,3 @@ abstract class WalletDetailState with _$WalletDetailState {
     WalletFailure? actionFailure,
   }) = _WalletDetailState;
 }
-
-extension WalletDetailStateX on WalletDetailState {
-  bool get isBusy => isArchiving || isSettingDefault;
-
-  bool get canArchive => wallet != null && !wallet!.isDefault;
-
-  List<int> get dailyOutflows => dailyOutflowSeries(
-    outflows,
-    month,
-    month == monthOf(today)
-        ? today.day
-        : DateTime(month.year, month.month + 1, 0).day,
-  );
-
-  int get monthOutflow => outflows.values.fold<int>(0, (sum, v) => sum + v);
-}

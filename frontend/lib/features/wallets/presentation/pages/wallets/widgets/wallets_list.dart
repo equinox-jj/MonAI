@@ -4,6 +4,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallets/model/wallets_state_extension.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_actions.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_total_card.dart';
 import 'package:monai/features/wallets/presentation/widgets/wallet_card.dart';

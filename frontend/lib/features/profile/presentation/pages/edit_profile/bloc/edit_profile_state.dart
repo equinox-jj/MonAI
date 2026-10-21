@@ -19,15 +19,6 @@ abstract class EditProfileState with _$EditProfileState {
   }) = _EditProfileState;
 }
 
-extension EditProfileStateX on EditProfileState {
-  bool get canSave => nameChanged && !isSavingName;
-
-  bool get isChangingPhoto =>
-      isPreparingPhoto || uploadProgress != null || isRemovingPhoto;
-
-  bool get hasPhoto => user?.avatarUrl != null;
-}
-
 @immutable
 class AvatarCropLabels {
   const AvatarCropLabels({

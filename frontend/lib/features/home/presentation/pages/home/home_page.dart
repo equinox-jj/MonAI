@@ -7,6 +7,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/app_router.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
+import 'package:monai/features/home/presentation/pages/home/model/home_state_extension.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_actions.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_balance_card.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_budget_card.dart';

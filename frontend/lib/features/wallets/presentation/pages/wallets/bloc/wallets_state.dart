@@ -15,13 +15,3 @@ abstract class WalletsState with _$WalletsState {
     WalletFailure? actionFailure,
   }) = _WalletsState;
 }
-
-extension WalletsStateX on WalletsState {
-  ({int total, List<WalletTypeShare> shares}) get totals =>
-      walletTotalsOf(wallets);
-
-  String? get shownId => switch (selectedId) {
-    final id? when wallets.any((w) => w.id == id) => id,
-    _ => wallets.firstOrNull?.id,
-  };
-}

@@ -18,6 +18,7 @@ import 'package:monai/features/settings/domain/usecase/set_provider_active_useca
 import 'package:monai/features/settings/domain/usecase/update_provider_usecase.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
+import 'package:monai/features/settings/presentation/pages/provider_form/model/provider_form_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
 import 'package:monai/features/shared/domain/usecase/watch_user_usecase.dart';
 

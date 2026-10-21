@@ -24,6 +24,7 @@ import 'package:monai/features/wallets/domain/usecase/update_wallet_usecase.dart
 import 'package:monai/features/wallets/domain/validation/wallet_input_validator.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_mode.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_state_extension.dart';
 
 part 'wallet_form_bloc.freezed.dart';
 part 'wallet_form_event.dart';

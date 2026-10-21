@@ -6,6 +6,7 @@ import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_text.dart';
 import 'package:monai/features/transactions/presentation/pages/search/bloc/search_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/search/model/search_state_extension.dart';
 
 typedef _Empty = ({
   String query,

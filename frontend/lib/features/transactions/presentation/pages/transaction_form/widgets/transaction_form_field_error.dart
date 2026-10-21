@@ -4,6 +4,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_field_error_text.dart';
 
 class TransactionFormFieldError extends StatelessWidget {

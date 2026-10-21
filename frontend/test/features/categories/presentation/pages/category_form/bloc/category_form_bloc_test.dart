@@ -9,6 +9,7 @@ import 'package:monai/features/categories/domain/usecase/find_category_usecase.d
 import 'package:monai/features/categories/domain/usecase/update_category_usecase.dart';
 import 'package:monai/features/categories/presentation/model/category_failure.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
+import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_state_extension.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';
 import 'package:monai/features/shared/domain/entity/category_changes.dart';
 import 'package:monai/features/shared/domain/entity/category_input.dart';

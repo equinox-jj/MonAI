@@ -16,6 +16,7 @@ import 'package:monai/features/receipt/presentation/model/receipt_ai_failure.dar
 import 'package:monai/features/receipt/presentation/model/receipt_failure.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/bloc/receipt_review_bloc.dart';
+import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_review_state_extension.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/model/receipt_field.dart';
 import 'package:monai/features/shared/domain/entity/transaction_input.dart';
 import 'package:monai/features/shared/domain/usecase/watch_categories_usecase.dart';

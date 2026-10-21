@@ -16,6 +16,7 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/domain/validation/wallet_input_validator.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_state_extension.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_field_error_text.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_mode.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_balance_shift.dart';

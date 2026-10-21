@@ -28,24 +28,3 @@ abstract class WalletFormState with _$WalletFormState {
     WalletFailure? actionFailure,
   }) = _WalletFormState;
 }
-
-extension WalletFormStateX on WalletFormState {
-  bool get isEdit => mode is EditWalletMode;
-
-  bool get isBusy => isSaving || isArchiving || isDeleting;
-
-  PaymentProvider? get selectedProvider =>
-      providers.where((p) => p.slug == providerSlug).firstOrNull;
-
-  bool get isTypeLocked => isEdit || providerSlug != null;
-
-  ({int from, int to})? get balanceShift => switch (original) {
-    final wallet? when wallet.initialBalance != initialBalance => (
-      from: wallet.currentBalance,
-      to: shiftedBalance(wallet, initialBalance),
-    ),
-    _ => null,
-  };
-
-  FieldError? errorOf(String field) => errors[field];
-}

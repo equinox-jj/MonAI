@@ -66,7 +66,7 @@ class ChangePasswordBloc
     _Submitted event,
     Emitter<ChangePasswordState> emit,
   ) async {
-    if (state.isSubmitting) return;
+    if (state.status.isSubmitting) return;
     emit(state.copyWith(status: .loading, formError: null, focusField: null));
     final result = await _changePassword(
       ChangePasswordParams(

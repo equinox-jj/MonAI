@@ -11,6 +11,7 @@ import 'package:monai/app_router.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_field_error_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_mode.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_amount.dart';

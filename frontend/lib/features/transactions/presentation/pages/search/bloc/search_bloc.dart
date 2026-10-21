@@ -16,9 +16,9 @@ import 'package:monai/features/transactions/domain/usecase/recent_searches_useca
 import 'package:monai/features/transactions/domain/usecase/search_transactions_usecase.dart';
 import 'package:monai/features/transactions/domain/usecase/watch_cached_search_usecase.dart';
 import 'package:monai/features/transactions/domain/usecase/watch_transaction_lookups_usecase.dart';
-import 'package:monai/features/transactions/domain/validation/search_query.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:monai/features/transactions/presentation/pages/search/model/search_state_extension.dart';
 
 part 'search_bloc.freezed.dart';
 part 'search_event.dart';

@@ -11,6 +11,7 @@ import 'package:monai/features/quickadd/presentation/model/quick_add_field.dart'
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_save_failure.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/bloc/quick_add_review_bloc.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add_review/model/quick_add_review_state_extension.dart';
 import 'package:monai/features/shared/domain/entity/draft_confidence.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/shared/domain/entity/transaction_input.dart';

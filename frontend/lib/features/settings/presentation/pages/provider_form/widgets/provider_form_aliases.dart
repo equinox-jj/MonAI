@@ -5,6 +5,7 @@ import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/bloc/provider_form_bloc.dart';
+import 'package:monai/features/settings/presentation/pages/provider_form/model/provider_form_state_extension.dart';
 
 class ProviderFormAliases extends StatelessWidget {
   const ProviderFormAliases({

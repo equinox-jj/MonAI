@@ -21,6 +21,7 @@ import 'package:monai/features/transactions/domain/usecase/update_transaction_us
 import 'package:monai/features/transactions/domain/usecase/watch_transaction_lookups_usecase.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
+import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_mode.dart';
 
 import '../../../../../../helpers/entity_fixtures.dart';

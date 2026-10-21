@@ -8,9 +8,3 @@ abstract class OnboardingState with _$OnboardingState {
     OnboardingExit? exit,
   }) = _OnboardingState;
 }
-
-extension OnboardingStateX on OnboardingState {
-  int get pageCount => OnboardingStep.values.length;
-
-  OnboardingStep get step => OnboardingStep.values[page];
-}

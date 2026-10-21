@@ -11,6 +11,7 @@ import 'package:monai/features/receipt/presentation/model/receipt_ai_failure.dar
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/bloc/scan_receipt_bloc.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_phase.dart';
+import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_receipt_state_extension.dart';
 
 class _MockReadText extends Mock implements ReadReceiptTextUseCase {}
 

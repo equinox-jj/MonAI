@@ -5,6 +5,7 @@ import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_text.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/bloc/quick_add_bloc.dart';
+import 'package:monai/features/quickadd/presentation/pages/quick_add/model/quick_add_state_extension.dart';
 
 class QuickAddDrafts extends StatelessWidget {
   const QuickAddDrafts({super.key});
