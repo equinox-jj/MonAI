@@ -92,9 +92,7 @@ void main() {
     expect(find.text('Manage payment providers'), findsOneWidget);
   });
 
-  testWidgets('picking a theme switches the app and closes the sheet', (
-    tester,
-  ) async {
+  testWidgets('picking a theme waits for Done', (tester) async {
     // Arrange
     await pumpSettings(tester);
     await tester.tap(find.text('Theme'));
@@ -105,13 +103,31 @@ void main() {
     await tester.pumpAndSettle();
 
     // Assert
+    expect(fakes.appSettings.state.themeMode, AppThemeMode.system);
+    expect(find.text('Done'), findsOneWidget);
+    verifyNever(() => fakes.setThemeMode(any()));
+  });
+
+  testWidgets('Done switches the theme and closes the sheet', (tester) async {
+    // Arrange
+    await pumpSettings(tester);
+    await tester.tap(find.text('Theme'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Dark'));
+    await tester.pumpAndSettle();
+
+    // Act
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+
+    // Assert
     expect(fakes.appSettings.state.themeMode, AppThemeMode.dark);
     expect(find.text('Dark'), findsOneWidget);
     expect(find.text('Done'), findsNothing);
     verify(() => fakes.setThemeMode(AppThemeMode.dark)).called(1);
   });
 
-  testWidgets('picking a language switches the app', (tester) async {
+  testWidgets('picking a language waits for Done', (tester) async {
     // Arrange
     await pumpSettings(tester);
     await tester.tap(find.text('Language'));
@@ -119,6 +135,23 @@ void main() {
 
     // Act
     await tester.tap(find.text('Bahasa Indonesia'));
+    await tester.pumpAndSettle();
+
+    // Assert
+    expect(fakes.appSettings.state.language, AppLanguage.system);
+    verifyNever(() => fakes.setLanguage(any()));
+  });
+
+  testWidgets('Done switches the language', (tester) async {
+    // Arrange
+    await pumpSettings(tester);
+    await tester.tap(find.text('Language'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Bahasa Indonesia'));
+    await tester.pumpAndSettle();
+
+    // Act
+    await tester.tap(find.text('Done'));
     await tester.pumpAndSettle();
 
     // Assert

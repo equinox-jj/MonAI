@@ -64,18 +64,22 @@ GoRouter createAppRouter({
       ),
       GoRoute(
         path: AppRoutes.onboarding,
-        builder: (_, _) => const OnboardingPage(),
+        pageBuilder: _page((_, _) => const OnboardingPage()),
       ),
       GoRoute(
         path: AppRoutes.signIn,
-        builder: (_, state) => SignInPage(
-          initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+        pageBuilder: _page(
+          (_, state) => SignInPage(
+            initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+          ),
         ),
       ),
       GoRoute(
         path: AppRoutes.register,
-        builder: (_, state) => RegisterPage(
-          initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+        pageBuilder: _page(
+          (_, state) => RegisterPage(
+            initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+          ),
         ),
       ),
       GoRoute(
@@ -91,8 +95,10 @@ GoRouter createAppRouter({
             // The drafts only live in memory: without them, start over.
             redirect: (_, state) =>
                 state.extra is QuickAddReviewArgs ? null : AppRoutes.quickAdd,
-            builder: (_, state) =>
-                QuickAddReviewPage(args: state.extra! as QuickAddReviewArgs),
+            pageBuilder: _page(
+              (_, state) =>
+                  QuickAddReviewPage(args: state.extra! as QuickAddReviewArgs),
+            ),
           ),
         ],
       ),
@@ -109,40 +115,54 @@ GoRouter createAppRouter({
         // The draft only lives in memory: without it, scan again.
         redirect: (_, state) =>
             state.extra is ReceiptReviewArgs ? null : AppRoutes.receiptScan,
-        builder: (_, state) =>
-            ReceiptReviewPage(args: state.extra! as ReceiptReviewArgs),
+        pageBuilder: _page(
+          (_, state) =>
+              ReceiptReviewPage(args: state.extra! as ReceiptReviewArgs),
+        ),
       ),
       GoRoute(
         path: AppRoutes.budget,
-        builder: (_, state) => BudgetPage(
-          month:
-              parseMonthParam(
-                state.uri.queryParameters[AppRoutes.monthParam],
-              ) ??
-              monthOf(DateTime.now()),
+        pageBuilder: _page(
+          (_, state) => BudgetPage(
+            month:
+                parseMonthParam(
+                  state.uri.queryParameters[AppRoutes.monthParam],
+                ) ??
+                monthOf(DateTime.now()),
+          ),
         ),
       ),
       GoRoute(
         path: AppRoutes.report,
-        builder: (_, state) => ReportPage(
-          month:
-              parseMonthParam(
-                state.uri.queryParameters[AppRoutes.monthParam],
-              ) ??
-              monthOf(DateTime.now()),
+        pageBuilder: _page(
+          (_, state) => ReportPage(
+            month:
+                parseMonthParam(
+                  state.uri.queryParameters[AppRoutes.monthParam],
+                ) ??
+                monthOf(DateTime.now()),
+          ),
         ),
       ),
-      StatefulShellRoute.indexedStack(
-        builder: (_, _, navigationShell) => UndoDeleteHost(
-          child: DashboardPage(navigationShell: navigationShell),
+      StatefulShellRoute(
+        pageBuilder: (_, state, navigationShell) => _materialPage(
+          state,
+          UndoDeleteHost(
+            child: DashboardPage(navigationShell: navigationShell),
+          ),
         ),
+        navigatorContainerBuilder: (_, navigationShell, children) =>
+            MonAIFadeThroughStack(
+              index: navigationShell.currentIndex,
+              children: children,
+            ),
         // In bar order: MonAINavItem.main.
         branches: [
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: AppRoutes.home,
-                builder: (_, _) => const HomePage(),
+                pageBuilder: _page((_, _) => const HomePage()),
               ),
             ],
           ),
@@ -150,14 +170,16 @@ GoRouter createAppRouter({
             routes: [
               GoRoute(
                 path: AppRoutes.transactions,
-                builder: (_, _) => const TransactionsPage(),
+                pageBuilder: _page((_, _) => const TransactionsPage()),
                 routes: [
                   GoRoute(
                     path: 'search',
                     parentNavigatorKey: rootKey,
-                    builder: (_, state) => SearchPage(
-                      initialMonth: parseMonthParam(
-                        state.uri.queryParameters[AppRoutes.monthParam],
+                    pageBuilder: _page(
+                      (_, state) => SearchPage(
+                        initialMonth: parseMonthParam(
+                          state.uri.queryParameters[AppRoutes.monthParam],
+                        ),
                       ),
                     ),
                   ),
@@ -189,8 +211,11 @@ GoRouter createAppRouter({
                   GoRoute(
                     path: ':id',
                     parentNavigatorKey: rootKey,
-                    builder: (_, state) =>
-                        TransactionDetailPage(id: state.pathParameters['id']!),
+                    pageBuilder: _page(
+                      (_, state) => TransactionDetailPage(
+                        id: state.pathParameters['id']!,
+                      ),
+                    ),
                     routes: [
                       GoRoute(
                         path: 'edit',
@@ -216,7 +241,7 @@ GoRouter createAppRouter({
             routes: [
               GoRoute(
                 path: AppRoutes.wallets,
-                builder: (_, _) => const WalletsPage(),
+                pageBuilder: _page((_, _) => const WalletsPage()),
                 routes: [
                   GoRoute(
                     path: 'new',
@@ -233,13 +258,15 @@ GoRouter createAppRouter({
                   GoRoute(
                     path: 'archived',
                     parentNavigatorKey: rootKey,
-                    builder: (_, _) => const ArchivedWalletsPage(),
+                    pageBuilder: _page((_, _) => const ArchivedWalletsPage()),
                   ),
                   GoRoute(
                     path: ':id',
                     parentNavigatorKey: rootKey,
-                    builder: (_, state) =>
-                        WalletDetailPage(id: state.pathParameters['id']!),
+                    pageBuilder: _page(
+                      (_, state) =>
+                          WalletDetailPage(id: state.pathParameters['id']!),
+                    ),
                     routes: [
                       GoRoute(
                         path: 'edit',
@@ -265,26 +292,28 @@ GoRouter createAppRouter({
             routes: [
               GoRoute(
                 path: AppRoutes.settings,
-                builder: (_, _) => const SettingsPage(),
+                pageBuilder: _page((_, _) => const SettingsPage()),
                 routes: [
                   GoRoute(
                     path: 'profile',
                     parentNavigatorKey: rootKey,
-                    builder: (_, state) => EditProfilePage(
-                      focusDelete:
-                          state.uri.queryParameters[AppRoutes.focusParam] ==
-                          'delete',
+                    pageBuilder: _page(
+                      (_, state) => EditProfilePage(
+                        focusDelete:
+                            state.uri.queryParameters[AppRoutes.focusParam] ==
+                            'delete',
+                      ),
                     ),
                   ),
                   GoRoute(
                     path: 'password',
                     parentNavigatorKey: rootKey,
-                    builder: (_, _) => const ChangePasswordPage(),
+                    pageBuilder: _page((_, _) => const ChangePasswordPage()),
                   ),
                   GoRoute(
                     path: 'providers',
                     parentNavigatorKey: rootKey,
-                    builder: (_, _) => const ManageProvidersPage(),
+                    pageBuilder: _page((_, _) => const ManageProvidersPage()),
                     routes: [
                       GoRoute(
                         path: 'new',
@@ -312,7 +341,7 @@ GoRouter createAppRouter({
                   GoRoute(
                     path: 'categories',
                     parentNavigatorKey: rootKey,
-                    builder: (_, _) => const CategoriesPage(),
+                    pageBuilder: _page((_, _) => const CategoriesPage()),
                     routes: [
                       GoRoute(
                         path: 'new',
@@ -365,6 +394,19 @@ Future<bool> pushQuickAddForm(
   AppRoutes.transactionNew,
   extra: draft,
 ) is SavedFormOutcome;
+
+/// Use instead of `builder:`. go_router only recognizes material_ui's
+/// MaterialApp, so for this app's MaterialApp it wraps `builder:` routes in a
+/// NoTransitionPage and navigation has no animation.
+GoRouterPageBuilder _page(GoRouterWidgetBuilder builder) =>
+    (context, state) => _materialPage(state, builder(context, state));
+
+Page<void> _materialPage(GoRouterState state, Widget child) => MaterialPage(
+  key: state.pageKey,
+  name: state.name ?? state.path,
+  restorationId: state.pageKey.value,
+  child: child,
+);
 
 Page<void> _formPage(
   BuildContext context,

@@ -12,6 +12,7 @@ import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.d
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
+import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
 
 import '../../helpers/transaction_fakes.dart';
 import '../../helpers/wallet_fakes.dart';
@@ -205,6 +206,21 @@ void main() {
       expect(
         router.routerDelegate.currentConfiguration.uri.path,
         AppRoutes.signIn,
+      );
+    });
+
+    testWidgets('screens animate in and out', (tester) async {
+      // Arrange
+      await pumpLaunch(tester, onboardingCompleted: true);
+
+      // Act
+      final route = ModalRoute.of(tester.element(find.byType(SignInPage)));
+
+      // Assert
+      expect(route, isA<PageRoute<void>>());
+      expect(
+        (route! as PageRoute<void>).transitionDuration,
+        greaterThan(Duration.zero),
       );
     });
   });

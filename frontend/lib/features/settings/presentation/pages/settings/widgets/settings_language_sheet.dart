@@ -3,45 +3,83 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/utils/money_format.dart';
-import 'package:monai/features/settings/domain/logic/settings_rules.dart';
 
-class SettingsLanguageSheet extends StatelessWidget {
-  const SettingsLanguageSheet({required this.onPick, super.key});
-  final ValueChanged<AppLanguage> onPick;
+/// Holds the pick until Done; [onDone] fires only when it changed.
+class SettingsLanguageSheet extends StatefulWidget {
+  const SettingsLanguageSheet({
+    required this.initial,
+    required this.onDone,
+    super.key,
+  });
+
+  final AppLanguage initial;
+  final ValueChanged<AppLanguage> onDone;
+
+  @override
+  State<SettingsLanguageSheet> createState() => _SettingsLanguageSheetState();
+}
+
+class _SettingsLanguageSheetState extends State<SettingsLanguageSheet> {
+  late final _selected = ValueNotifier(widget.initial);
+
+  @override
+  void dispose() {
+    _selected.dispose();
+    super.dispose();
+  }
+
+  void _pickIndonesian() => _selected.value = .indonesian;
+
+  void _pickEnglish() => _selected.value = .english;
+
+  void _done() {
+    final language = _selected.value;
+    if (language == widget.initial) {
+      Navigator.pop(context);
+    } else {
+      widget.onDone(language);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    // Following the phone shows its language as picked.
-    final selected = shownLanguage(
-      Localizations.localeOf(context).languageCode,
-    );
     return Column(
       mainAxisSize: .min,
       crossAxisAlignment: .stretch,
       spacing: MonAISpacing.x3,
       children: [
-        Column(
-          crossAxisAlignment: .stretch,
-          spacing: MonAISpacing.x2,
-          children: [
-            MonAIRadioOption(
-              title: l10n.settingsLanguageIndonesian,
-              subtitle: l10n.settingsLanguageIndonesianNative,
-              selected: selected == .indonesian,
-              onTap: () => onPick(.indonesian),
-              leading: const _LanguageCode(code: 'ID'),
-            ),
-            MonAIRadioOption(
-              title: l10n.settingsLanguageEnglish,
-              subtitle: l10n.settingsLanguageEnglishNative,
-              selected: selected == .english,
-              onTap: () => onPick(.english),
-              leading: const _LanguageCode(code: 'EN'),
-            ),
-          ],
+        ValueListenableBuilder(
+          valueListenable: _selected,
+          builder: (context, selected, _) => Column(
+            crossAxisAlignment: .stretch,
+            spacing: MonAISpacing.x2,
+            children: [
+              MonAIRadioOption(
+                title: l10n.settingsLanguageIndonesian,
+                subtitle: l10n.settingsLanguageIndonesianNative,
+                selected: selected == .indonesian,
+                onTap: _pickIndonesian,
+                leading: const _LanguageCode(code: 'ID'),
+              ),
+              MonAIRadioOption(
+                title: l10n.settingsLanguageEnglish,
+                subtitle: l10n.settingsLanguageEnglishNative,
+                selected: selected == .english,
+                onTap: _pickEnglish,
+                leading: const _LanguageCode(code: 'EN'),
+              ),
+            ],
+          ),
         ),
-        const _LanguagePreview(),
+        ValueListenableBuilder(
+          valueListenable: _selected,
+          builder: (context, selected, _) => Localizations.override(
+            context: context,
+            locale: Locale(selected.tag!),
+            child: const _LanguagePreview(),
+          ),
+        ),
         Text(
           l10n.settingsLanguageNote,
           style: context.textTheme.bodySmall?.copyWith(
@@ -50,7 +88,7 @@ class SettingsLanguageSheet extends StatelessWidget {
         ),
         MonAIButton(
           label: l10n.settingsDone,
-          onPressed: () => Navigator.pop(context),
+          onPressed: _done,
           variant: .tonal,
           size: .medium,
           expand: true,

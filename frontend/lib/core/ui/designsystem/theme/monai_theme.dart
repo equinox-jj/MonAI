@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:monai/core/ui/designsystem/theme/monai_colors.dart';
@@ -34,6 +35,17 @@ abstract final class MonAITheme {
       textTheme: textTheme,
       extensions: [c, MonAITextStyles.standard],
       splashFactory: InkSparkle.splashFactory,
+      // Platforms without a native style get Android's, not the old zoom.
+      pageTransitionsTheme: const PageTransitionsTheme(
+        builders: {
+          .android: PredictiveBackPageTransitionsBuilder(),
+          .iOS: CupertinoPageTransitionsBuilder(),
+          .macOS: CupertinoPageTransitionsBuilder(),
+          .linux: FadeForwardsPageTransitionsBuilder(),
+          .windows: FadeForwardsPageTransitionsBuilder(),
+          .fuchsia: FadeForwardsPageTransitionsBuilder(),
+        },
+      ),
       iconTheme: IconThemeData(color: c.iconStrong, size: MonAISizes.icon),
       dividerTheme: DividerThemeData(
         color: c.divider,

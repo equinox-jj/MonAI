@@ -3,6 +3,7 @@ export 'package:monai/core/ui/designsystem/components/monai_budget.dart';
 export 'package:monai/core/ui/designsystem/components/monai_button.dart';
 export 'package:monai/core/ui/designsystem/components/monai_calendar.dart';
 export 'package:monai/core/ui/designsystem/components/monai_donut.dart';
+export 'package:monai/core/ui/designsystem/components/monai_fade_through_stack.dart';
 export 'package:monai/core/ui/designsystem/components/monai_feedback.dart';
 export 'package:monai/core/ui/designsystem/components/monai_list_items.dart';
 export 'package:monai/core/ui/designsystem/components/monai_marked_field.dart';

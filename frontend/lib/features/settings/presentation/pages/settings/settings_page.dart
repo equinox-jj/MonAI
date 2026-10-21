@@ -8,6 +8,7 @@ import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
 import 'package:monai/route_path.dart';
 import 'package:monai/features/export/presentation/pages/export_csv/export_csv_sheet.dart';
+import 'package:monai/features/settings/domain/logic/settings_rules.dart';
 import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
 import 'package:monai/features/settings/presentation/pages/settings/bloc/settings_bloc.dart';
 import 'package:monai/features/settings/presentation/pages/settings/widgets/settings_actions.dart';
@@ -59,7 +60,8 @@ class SettingsUI extends StatelessWidget {
       context,
       title: context.l10n.settingsTheme,
       builder: (sheetContext) => SettingsThemeSheet(
-        onPick: (mode) => _themePicked(sheetContext, appSettings, mode),
+        initial: appSettings.state.themeMode,
+        onDone: (mode) => _themePicked(sheetContext, appSettings, mode),
       ),
     );
   }
@@ -80,7 +82,9 @@ class SettingsUI extends StatelessWidget {
       context,
       title: context.l10n.settingsLanguage,
       builder: (sheetContext) => SettingsLanguageSheet(
-        onPick: (language) =>
+        // Following the phone shows its language as picked.
+        initial: shownLanguage(Localizations.localeOf(context).languageCode),
+        onDone: (language) =>
             _languagePicked(sheetContext, appSettings, language),
       ),
     );

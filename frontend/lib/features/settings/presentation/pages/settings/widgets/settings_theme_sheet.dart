@@ -1,14 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
 import 'package:monai/features/settings/presentation/pages/settings/model/settings_text.dart';
 
-class SettingsThemeSheet extends StatelessWidget {
-  const SettingsThemeSheet({required this.onPick, super.key});
-  final ValueChanged<AppThemeMode> onPick;
+/// Holds the pick until Done; [onDone] fires only when it changed.
+class SettingsThemeSheet extends StatefulWidget {
+  const SettingsThemeSheet({
+    required this.initial,
+    required this.onDone,
+    super.key,
+  });
+
+  final AppThemeMode initial;
+  final ValueChanged<AppThemeMode> onDone;
+
+  @override
+  State<SettingsThemeSheet> createState() => _SettingsThemeSheetState();
+}
+
+class _SettingsThemeSheetState extends State<SettingsThemeSheet> {
+  late final _selected = ValueNotifier(widget.initial);
+
+  @override
+  void dispose() {
+    _selected.dispose();
+    super.dispose();
+  }
+
+  void _pick(AppThemeMode mode) => _selected.value = mode;
+
+  void _done() {
+    final mode = _selected.value;
+    if (mode == widget.initial) {
+      Navigator.pop(context);
+    } else {
+      widget.onDone(mode);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +47,9 @@ class SettingsThemeSheet extends StatelessWidget {
       crossAxisAlignment: .stretch,
       spacing: MonAISpacing.x3_5,
       children: [
-        BlocSelector<AppSettingsCubit, AppSettingsState, AppThemeMode>(
-          selector: (state) => state.themeMode,
-          builder: (context, selected) => Row(
+        ValueListenableBuilder(
+          valueListenable: _selected,
+          builder: (context, selected, _) => Row(
             crossAxisAlignment: .start,
             spacing: MonAISpacing.x3,
             children: [
@@ -28,21 +57,21 @@ class SettingsThemeSheet extends StatelessWidget {
                 child: _ThemeOption(
                   mode: .system,
                   selected: selected == .system,
-                  onPick: onPick,
+                  onPick: _pick,
                 ),
               ),
               Expanded(
                 child: _ThemeOption(
                   mode: .light,
                   selected: selected == .light,
-                  onPick: onPick,
+                  onPick: _pick,
                 ),
               ),
               Expanded(
                 child: _ThemeOption(
                   mode: .dark,
                   selected: selected == .dark,
-                  onPick: onPick,
+                  onPick: _pick,
                 ),
               ),
             ],
@@ -56,7 +85,7 @@ class SettingsThemeSheet extends StatelessWidget {
         ),
         MonAIButton(
           label: l10n.settingsDone,
-          onPressed: () => Navigator.pop(context),
+          onPressed: _done,
           variant: .tonal,
           size: .medium,
           expand: true,
