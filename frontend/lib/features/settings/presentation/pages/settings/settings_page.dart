@@ -6,7 +6,7 @@ import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/export/presentation/pages/export_csv/export_csv_sheet.dart';
 import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
 import 'package:monai/features/settings/presentation/pages/settings/bloc/settings_bloc.dart';

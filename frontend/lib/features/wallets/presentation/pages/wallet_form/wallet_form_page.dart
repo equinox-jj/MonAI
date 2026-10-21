@@ -7,7 +7,7 @@ import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/core/model/wallet_type.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/rupiah_input_formatter.dart';

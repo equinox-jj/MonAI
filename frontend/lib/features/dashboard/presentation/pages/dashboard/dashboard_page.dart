@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 
 /// Each tab is a branch of [navigationShell], which keeps its own stack and
 /// state while another tab is shown.

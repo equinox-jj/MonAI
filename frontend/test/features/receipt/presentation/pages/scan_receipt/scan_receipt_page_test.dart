@@ -9,7 +9,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
 import 'package:monai/core/base/error/failure.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
 import 'package:monai/features/receipt/domain/usecase/parse_receipt_usecase.dart';
 import 'package:monai/features/receipt/domain/usecase/read_receipt_text_usecase.dart';

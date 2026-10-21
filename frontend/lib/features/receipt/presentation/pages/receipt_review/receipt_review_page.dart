@@ -5,7 +5,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_type.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';

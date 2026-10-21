@@ -5,7 +5,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/reports/presentation/model/report_failure.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';

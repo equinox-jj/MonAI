@@ -10,10 +10,8 @@ sealed class TransactionFormMode with _$TransactionFormMode {
     @Default(TransactionType.expense) TransactionType type,
     String? walletId,
   }) = AddTransactionMode;
-
   const factory TransactionFormMode.prefill(QuickAddDraft draft) =
       PrefillTransactionMode;
-
   const factory TransactionFormMode.edit(String id) = EditTransactionMode;
 }
 

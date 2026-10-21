@@ -7,7 +7,7 @@ import 'package:monai/core/base/error/field_error.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';

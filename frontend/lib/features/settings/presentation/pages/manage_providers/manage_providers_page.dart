@@ -5,7 +5,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/settings/domain/entity/admin_payment_provider.dart';
 import 'package:monai/features/settings/presentation/model/provider_failure.dart';
 import 'package:monai/features/settings/presentation/pages/manage_providers/bloc/manage_providers_bloc.dart';

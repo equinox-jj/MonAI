@@ -5,7 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/bloc/scan_receipt_bloc.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_receipt_state_extension.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/camera/receipt_camera.dart';

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
-import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/auth/presentation/pages/change_password/change_password_page.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/onboarding_page.dart';
@@ -19,10 +19,10 @@ import 'package:monai/features/profile/presentation/pages/edit_profile/edit_prof
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/quick_add_page.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/quick_add_review_page.dart';
-import 'package:monai/features/reports/presentation/pages/report/report_page.dart';
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/receipt_review_page.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/scan_receipt_page.dart';
+import 'package:monai/features/reports/presentation/pages/report/report_page.dart';
 import 'package:monai/features/settings/presentation/pages/manage_providers/manage_providers_page.dart';
 import 'package:monai/features/settings/presentation/pages/provider_form/provider_form_page.dart';
 import 'package:monai/features/settings/presentation/pages/settings/settings_page.dart';
@@ -38,106 +38,7 @@ import 'package:monai/features/wallets/presentation/pages/wallet_detail/wallet_d
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_mode.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/wallet_form_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
-
-abstract final class AppRoutes {
-  static const launch = '/';
-  static const onboarding = '/onboarding';
-  static const signIn = '/sign-in';
-  static const register = '/register';
-  static const home = '/home';
-  static const transactions = '/transactions';
-  static const wallets = '/wallets';
-  static const settings = '/settings';
-  static const categories = '/settings/categories';
-  static const profile = '/settings/profile';
-  static const changePassword = '/settings/password';
-  static const providers = '/settings/providers';
-  static const providerNew = '$providers/new';
-
-  static String providerEdit(String id) => '$providers/$id/edit';
-
-  static const focusParam = 'focus';
-
-  static final profileDeleteAccount = Uri(
-    path: profile,
-    queryParameters: {focusParam: 'delete'},
-  ).toString();
-
-  static String categoryNew(CategoryType type) => Uri(
-    path: '$categories/new',
-    queryParameters: {typeParam: type.name},
-  ).toString();
-
-  static String categoryEdit(String id) => '$categories/$id/edit';
-
-  static const walletNew = '/wallets/new';
-  static const walletsArchived = '/wallets/archived';
-
-  static String walletDetail(String id) => '$wallets/$id';
-
-  static String walletEdit(String id) => '$wallets/$id/edit';
-
-  static const transactionSearch = '/transactions/search';
-
-  /// Pass a `QuickAddDraft` as `extra` to start from it; see [pushQuickAddForm].
-  static const transactionNew = '/transactions/new';
-
-  /// Search's starting month, as `yyyy-MM`.
-  static const monthParam = 'month';
-  static const typeParam = 'type';
-  static const walletParam = 'wallet';
-
-  static String transactionSearchIn([DateTime? month]) =>
-      _inMonth(transactionSearch, month);
-
-  static String newTransaction({String? type, String? walletId}) => Uri(
-    path: transactionNew,
-    queryParameters: {typeParam: ?type, walletParam: ?walletId},
-  ).toString().replaceFirst(RegExp(r'\?$'), '');
-
-  static String transactionDetail(String id) => '$transactions/$id';
-
-  static String transactionEdit(String id) => '$transactions/$id/edit';
-
-  static const quickAdd = '/quick-add';
-
-  /// Takes `QuickAddReviewArgs` as `extra`; pops with a `QuickAddReviewExit`.
-  static const quickAddReview = '/quick-add/review';
-  static const receiptScan = '/receipt/scan';
-
-  /// Takes `ReceiptReviewArgs` as `extra`.
-  static const receiptReview = '/receipt/review';
-  static const budget = '/budget';
-
-  static String budgetFor([DateTime? month]) => _inMonth(budget, month);
-
-  static const report = '/report';
-
-  static String reportFor([DateTime? month]) => _inMonth(report, month);
-
-  static const emailParam = 'email';
-  static const signedOutRoutes = {onboarding, signIn, register};
-
-  static String signInWith({String email = ''}) => _withEmail(signIn, email);
-
-  static String registerWith({String email = ''}) =>
-      _withEmail(register, email);
-
-  static String _inMonth(String path, DateTime? month) => Uri(
-    path: path,
-    queryParameters: month == null
-        ? null
-        : {
-            monthParam:
-                '${month.year}-${month.month.toString().padLeft(2, '0')}',
-          },
-  ).toString();
-
-  static String _withEmail(String path, String email) => Uri(
-    path: path,
-    queryParameters: email.isEmpty ? null : {emailParam: email},
-  ).toString();
-}
+import 'package:monai/route_path.dart';
 
 /// Navigation follows [sessionManager]: a sign-in leaves the auth screens for
 /// Home, a sign-out returns to Sign in. An expired session stays put under the

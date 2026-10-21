@@ -6,7 +6,7 @@ import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/categories/domain/logic/category_rules.dart';
 import 'package:monai/features/categories/presentation/model/category_failure.dart';
 import 'package:monai/features/categories/presentation/pages/categories/bloc/categories_bloc.dart';

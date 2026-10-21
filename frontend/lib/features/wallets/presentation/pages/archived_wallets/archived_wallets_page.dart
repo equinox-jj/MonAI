@@ -5,7 +5,7 @@ import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/app_router.dart';
+import 'package:monai/route_path.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/presentation/pages/archived_wallets/bloc/archived_wallets_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/archived_wallets/widgets/archived_wallet_row.dart';
