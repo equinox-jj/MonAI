@@ -3,16 +3,6 @@ import 'dart:typed_data';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:monai/core/base/error/exceptions.dart';
 
-abstract class ImageCompressorService {
-  /// A JPEG under the upload limit, turned upright, without EXIF data. Throws an
-  /// [UnknownException] coded `unreadable_image` or `photo_too_large`.
-  Future<Uint8List> compressForUpload(String path);
-
-  Future<Uint8List> compressAvatar(String path);
-
-  Future<Uint8List> compressLogo(String path);
-}
-
 typedef CompressImage = Future<Uint8List?> Function(
   String path, {
   required int quality,
@@ -24,6 +14,14 @@ typedef CompressAvatar = Future<Uint8List?> Function(
   required int quality,
   required int side,
 });
+
+abstract class ImageCompressorService {
+  /// A JPEG under the upload limit, turned upright, without EXIF data. Throws an
+  /// [UnknownException] coded `unreadable_image` or `photo_too_large`.
+  Future<Uint8List> compressForUpload(String path);
+  Future<Uint8List> compressAvatar(String path);
+  Future<Uint8List> compressLogo(String path);
+}
 
 class ImageCompressorServiceImpl implements ImageCompressorService {
   /// [compress] and [compressAvatar] replace the platform compressor in
