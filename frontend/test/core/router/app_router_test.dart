@@ -82,6 +82,17 @@ void main() {
       // Assert
       expect(target, isNull);
     });
+
+    test('a changed password stays put under the dialog', () {
+      // Arrange
+      const location = AppRoutes.changePassword;
+
+      // Act
+      final target = sessionRedirect(SessionStatus.passwordChanged, location);
+
+      // Assert
+      expect(target, isNull);
+    });
   });
 
   group('launchRedirect', () {

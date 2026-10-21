@@ -12,6 +12,12 @@ enum SessionStatus {
   /// the current screen behind the session-expired dialog until the user
   /// chooses to sign in again.
   expired,
+
+  /// The password was changed, which signed out every device. Like
+  /// [expired], the token is already cleared and the app stays on the
+  /// current screen behind the password-changed dialog until the user signs
+  /// in again.
+  passwordChanged,
 }
 
 /// Holds the session's [SessionStatus], so the router can follow sign-in,
@@ -25,13 +31,20 @@ class SessionManager {
   /// A token was stored.
   void signedIn() => _status.value = .signedIn;
 
-  /// The token was removed, or the user acknowledged an expired session.
+  /// The token was removed, or the user acknowledged an expired session or
+  /// a password change.
   void signedOut() => _status.value = .signedOut;
 
   /// The server rejected the token. Only a signed-in session can expire, so
   /// several requests failing at once show one dialog.
   void notifyExpired() {
     if (_status.value == .signedIn) _status.value = .expired;
+  }
+
+  /// The password was changed and the token cleared; shows the
+  /// password-changed dialog. Only a signed-in session can end this way.
+  void notifyPasswordChanged() {
+    if (_status.value == .signedIn) _status.value = .passwordChanged;
   }
 
   /// Releases the listenable.

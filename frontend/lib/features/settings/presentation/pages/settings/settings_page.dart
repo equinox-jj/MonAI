@@ -47,11 +47,11 @@ class SettingsUI extends StatelessWidget {
 
   void _export(BuildContext context) => showExportCsvSheet(context);
 
-  // TODO(settings): open Manage payment providers once it exists.
-  void _manageProviders() {}
+  void _manageProviders(BuildContext context) =>
+      context.push(AppRoutes.providers);
 
-  // TODO(settings): open Change password once it exists.
-  void _changePassword() {}
+  void _changePassword(BuildContext context) =>
+      context.push(AppRoutes.changePassword);
 
   void _deleteAccount(BuildContext context) =>
       context.push(AppRoutes.profileDeleteAccount);
@@ -137,8 +137,8 @@ class SettingsUI extends StatelessWidget {
       onExport: () => _export(context),
       onPickTheme: () => _pickTheme(context),
       onPickLanguage: () => _pickLanguage(context),
-      onManageProviders: _manageProviders,
-      onChangePassword: _changePassword,
+      onManageProviders: () => _manageProviders(context),
+      onChangePassword: () => _changePassword(context),
       onSignOut: () => _signOut(context, allDevices: false),
       onSignOutAllDevices: () => _signOut(context, allDevices: true),
       onDeleteAccount: () => _deleteAccount(context),

@@ -306,7 +306,8 @@ class MonAINavigationRail extends StatelessWidget {
       ),
       child: SafeArea(
         right: false,
-        child: Padding(
+        // Scrolls when the window is short, e.g. with the keyboard up.
+        child: SingleChildScrollView(
           padding: const .symmetric(vertical: MonAISpacing.x6),
           child: Column(
             spacing: MonAISpacing.x4,
@@ -435,7 +436,8 @@ class MonAINavigationDrawer extends StatelessWidget {
       ),
       child: SafeArea(
         right: false,
-        child: Padding(
+        // Scrolls when the window is short, e.g. with the keyboard up.
+        child: SingleChildScrollView(
           padding: const .symmetric(
             vertical: MonAISpacing.x6,
             horizontal: MonAISpacing.x4,

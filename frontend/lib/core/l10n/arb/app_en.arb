@@ -1000,5 +1000,124 @@
   "exportErrorRange": "Pick a range of up to 12 months, ending this month or earlier.",
   "exportErrorEmpty": "No transactions in these months.",
   "exportErrorNetwork": "You're offline and none of these transactions are on this phone yet.",
-  "exportErrorUnexpected": "Couldn't export. Try again."
+  "exportErrorUnexpected": "Couldn't export. Try again.",
+  "authFieldSameAsCurrent": "Choose a password different from your current one",
+  "passwordChangedTitle": "Password changed",
+  "passwordChangedBody": "You've been signed out on every device. Sign in again with your new password.",
+  "passwordChangedSignIn": "Sign in",
+  "changePasswordTitle": "Change password",
+  "changePasswordSave": "Save",
+  "changePasswordCurrentLabel": "Current password",
+  "changePasswordCurrentPlaceholder": "Enter your current password",
+  "changePasswordNewLabel": "New password",
+  "changePasswordWrongCurrent": "Your current password is incorrect",
+  "changePasswordSignOutNote": "You'll be signed out on every device, this one included. Then sign in with your new password.",
+  "providersTitle": "Payment providers",
+  "providersBack": "Back",
+  "providersAdmin": "Admin",
+  "providersSearch": "Search name or alias",
+  "providersSearchClear": "Clear search",
+  "providersAdd": "Add provider",
+  "providersBadgeSystem": "System",
+  "providersBadgeActive": "Active",
+  "providersBadgeInactive": "Inactive",
+  "providersLocked": "System provider, can't be deactivated or deleted",
+  "providersEdit": "Edit {name}",
+  "@providersEdit": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "providersEmptySearch": "No provider matches \"{query}\".",
+  "@providersEmptySearch": {
+    "placeholders": {"query": {"type": "String"}}
+  },
+  "providersEmpty": "No providers yet.",
+  "providersLoadErrorTitle": "Couldn't load providers",
+  "providersRetry": "Try again",
+  "providerFormNewTitle": "New provider",
+  "providerFormEditTitle": "Edit provider",
+  "providerFormClose": "Close",
+  "providerFormCreate": "Create provider",
+  "providerFormSave": "Save",
+  "providerFormLogo": "Logo",
+  "providerFormUploadLogo": "Upload logo",
+  "providerFormReplaceLogo": "Replace",
+  "providerFormLogoNote": "PNG or WebP · up to 512 KB · optional",
+  "providerFormName": "Name",
+  "providerFormNamePlaceholder": "e.g. LinkAja",
+  "providerFormId": "ID: {slug}",
+  "@providerFormId": {
+    "placeholders": {"slug": {"type": "String"}}
+  },
+  "providerFormIdPending": "ID: made from the name",
+  "providerFormType": "Type",
+  "providerFormAliases": "Aliases (used by quick add)",
+  "providerFormAliasPlaceholder": "Type an alias and press Enter",
+  "providerFormAliasAdd": "Add alias",
+  "providerFormAliasRemove": "Remove {alias}",
+  "@providerFormAliasRemove": {
+    "placeholders": {"alias": {"type": "String"}}
+  },
+  "providerFormAliasesNote": "Words people type, like “linkaja” or “link aja”. Each alias can belong to only one provider.",
+  "providerFormSortOrder": "Sort order",
+  "providerFormSortOrderNote": "Lower numbers appear first in the wallet picker.",
+  "providerFormActive": "Active",
+  "providerFormActiveNoteNew": "Users see it in the wallet picker right away",
+  "providerFormActiveNoteEdit": "Inactive providers are hidden from users. Existing wallets keep working.",
+  "providerFormSystemNote": "System providers are always active.",
+  "providerFormDelete": "Delete {name}",
+  "@providerFormDelete": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "providerFormLastEdited": "Last edited {date}",
+  "@providerFormLastEdited": {
+    "placeholders": {"date": {"type": "String"}}
+  },
+  "providerFormHint": "Add a name and type to continue.",
+  "providerFormHintReady": "Users get the updated list next time they open the app.",
+  "providerFormSavedLogoFailed": "Provider saved, but the logo couldn't be uploaded.",
+  "providerDeactivateTitle": "Deactivate {name}?",
+  "@providerDeactivateTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "providerDeactivateMessage": "It will be hidden from the provider list when users add a wallet. Users' existing {name} wallets will keep working.",
+  "@providerDeactivateMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "providerDeactivateKeeps": "Stays in your admin list as Inactive",
+  "providerDeactivateUndo": "You can activate it again any time",
+  "providerDeactivateConfirm": "Deactivate",
+  "providerDeleteTitle": "Delete {name}?",
+  "@providerDeleteTitle": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "providerDeleteMessage": "It will disappear from the provider list. Users' existing {name} wallets will keep working.",
+  "@providerDeleteMessage": {
+    "placeholders": {"name": {"type": "String"}}
+  },
+  "providerDeleteAliases": "Its aliases become free for other providers",
+  "providerDeleteLogo": "The logo is kept so it can be restored",
+  "providerDeleteConfirm": "Delete",
+  "providerCancel": "Cancel",
+  "providerErrorNameRequired": "Enter a name.",
+  "providerErrorNameTooLong": "Use {max} characters or fewer.",
+  "@providerErrorNameTooLong": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "providerErrorAliasesTooMany": "Use {max} aliases or fewer.",
+  "@providerErrorAliasesTooMany": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "providerErrorAliasTooLong": "Each alias can be at most {max} characters.",
+  "@providerErrorAliasTooLong": {
+    "placeholders": {"max": {"type": "int"}}
+  },
+  "providerErrorAliasesInvalid": "Remove blank or invalid aliases.",
+  "providerErrorConflict": "Another provider already uses this name or one of these aliases.",
+  "providerErrorLocked": "System providers can't be deactivated or deleted.",
+  "providerErrorForbidden": "Your account can't make this change anymore.",
+  "providerErrorNotFound": "This provider was already deleted.",
+  "providerErrorLogoTooLarge": "The logo is over 512 KB, even after shrinking. Try a smaller image.",
+  "providerErrorLogoUnsupported": "This image can't be used as a logo. Try a PNG or WebP.",
+  "providerErrorNetwork": "You're offline. Connect to the internet and try again.",
+  "providerErrorUnexpected": "Something went wrong. Try again in a moment."
 }

@@ -15,9 +15,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$SessionExpiredState {
 
-/// The server rejected the token; the dialog is shown until the user
-/// signs in again.
- bool get expired;
+/// The dialog to show until the user signs in again; null for none.
+ SignOutNotice? get notice;
 /// Create a copy of SessionExpiredState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -29,20 +28,20 @@ $SessionExpiredStateCopyWith<SessionExpiredState> get copyWith => _$SessionExpir
 @override
 bool operator ==(Object other) {
   final _this = this as SessionExpiredState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionExpiredState&&(identical(other.expired, _this.expired) || other.expired == _this.expired));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is SessionExpiredState&&(identical(other.notice, _this.notice) || other.notice == _this.notice));
 }
 
 
 @override
 int get hashCode {
   final _this = this as SessionExpiredState;
-  return Object.hash(runtimeType,_this.expired);
+  return Object.hash(runtimeType,_this.notice);
 }
 
 @override
 String toString() {
   final _this = this as SessionExpiredState;
-  return 'SessionExpiredState(expired: ${_this.expired})';
+  return 'SessionExpiredState(notice: ${_this.notice})';
 }
 
 
@@ -53,7 +52,7 @@ abstract mixin class $SessionExpiredStateCopyWith<$Res>  {
   factory $SessionExpiredStateCopyWith(SessionExpiredState value, $Res Function(SessionExpiredState) _then) = _$SessionExpiredStateCopyWithImpl;
 @useResult
 $Res call({
- bool expired
+ SignOutNotice? notice
 });
 
 
@@ -70,10 +69,10 @@ class _$SessionExpiredStateCopyWithImpl<$Res>
 
 /// Create a copy of SessionExpiredState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? expired = null,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? notice = freezed,}) {
   return _then(SessionExpiredState(
-expired: null == expired ? _self.expired : expired // ignore: cast_nullable_to_non_nullable
-as bool,
+notice: freezed == notice ? _self.notice : notice // ignore: cast_nullable_to_non_nullable
+as SignOutNotice?,
   ));
 }
 
@@ -158,10 +157,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( bool expired)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( SignOutNotice? notice)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _SessionExpiredState() when $default != null:
-return $default(_that.expired);case _:
+return $default(_that.notice);case _:
   return orElse();
 
 }
@@ -179,10 +178,10 @@ return $default(_that.expired);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( bool expired)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( SignOutNotice? notice)  $default,) {final _that = this;
 switch (_that) {
 case _SessionExpiredState():
-return $default(_that.expired);case _:
+return $default(_that.notice);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -199,10 +198,10 @@ return $default(_that.expired);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( bool expired)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( SignOutNotice? notice)?  $default,) {final _that = this;
 switch (_that) {
 case _SessionExpiredState() when $default != null:
-return $default(_that.expired);case _:
+return $default(_that.notice);case _:
   return null;
 
 }
@@ -214,12 +213,11 @@ return $default(_that.expired);case _:
 
 
 class _SessionExpiredState implements SessionExpiredState {
-  const _SessionExpiredState({this.expired = false});
+  const _SessionExpiredState({this.notice});
   
 
-/// The server rejected the token; the dialog is shown until the user
-/// signs in again.
-@override@JsonKey() final  bool expired;
+/// The dialog to show until the user signs in again; null for none.
+@override final  SignOutNotice? notice;
 
 /// Create a copy of SessionExpiredState
 /// with the given fields replaced by the non-null parameter values.
@@ -231,18 +229,18 @@ _$SessionExpiredStateCopyWith<_SessionExpiredState> get copyWith => __$SessionEx
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionExpiredState&&(identical(other.expired, expired) || other.expired == expired));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _SessionExpiredState&&(identical(other.notice, notice) || other.notice == notice));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,expired);
+    return Object.hash(runtimeType,notice);
 }
 
 @override
 String toString() {
-    return 'SessionExpiredState(expired: $expired)';
+    return 'SessionExpiredState(notice: $notice)';
 }
 
 
@@ -253,7 +251,7 @@ abstract mixin class _$SessionExpiredStateCopyWith<$Res> implements $SessionExpi
   factory _$SessionExpiredStateCopyWith(_SessionExpiredState value, $Res Function(_SessionExpiredState) _then) = __$SessionExpiredStateCopyWithImpl;
 @override @useResult
 $Res call({
- bool expired
+ SignOutNotice? notice
 });
 
 
@@ -270,10 +268,10 @@ class __$SessionExpiredStateCopyWithImpl<$Res>
 
 /// Create a copy of SessionExpiredState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? expired = null,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? notice = freezed,}) {
   return _then(_SessionExpiredState(
-expired: null == expired ? _self.expired : expired // ignore: cast_nullable_to_non_nullable
-as bool,
+notice: freezed == notice ? _self.notice : notice // ignore: cast_nullable_to_non_nullable
+as SignOutNotice?,
   ));
 }
 

@@ -22,6 +22,10 @@ abstract final class MonthFormat {
   static String dayMonth(DateTime date, String locale) =>
       DateFormat('d MMM', locale).format(date);
 
+  /// `2 Oct 2026`.
+  static String dayMonthYear(DateTime date, String locale) =>
+      DateFormat('d MMM y', locale).format(date);
+
   /// `12:40`.
   static String time(DateTime time) => DateFormat('HH:mm').format(time);
 }

@@ -167,3 +167,21 @@ DioException errorResponse(String path, int statusCode, String code) {
     ),
   );
 }
+
+Map<String, dynamic> adminProviderJson({
+  String id = 'p1',
+  String name = 'GoPay',
+  int sortOrder = 50,
+  bool isActive = true,
+}) => {
+  'id': id,
+  'slug': name.toLowerCase(),
+  'name': name,
+  'type': 'E_WALLET',
+  'logo_url': null,
+  'aliases': ['gopay', 'gpay'],
+  'sort_order': sortOrder,
+  'is_active': isActive,
+  'is_system': false,
+  'updated_at': timestampJson,
+};

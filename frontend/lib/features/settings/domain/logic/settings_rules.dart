@@ -2,6 +2,7 @@ import 'package:monai/core/error/failure.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/utils/monograms.dart';
 import 'package:monai/features/settings/domain/entity/settings_overview.dart';
+import 'package:monai/features/settings/domain/logic/provider_rules.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/user.dart';
@@ -12,9 +13,9 @@ const kDefaultRoleSlug = 'user';
 
 /// Any of these lets a user change the payment provider catalog.
 const kProviderManagePermissions = {
-  'payment_provider.create',
-  'payment_provider.update',
-  'payment_provider.delete',
+  kProviderCreatePermission,
+  kProviderUpdatePermission,
+  kProviderDeletePermission,
 };
 
 /// The Settings hub from the cached [user], [budget], [categories] and

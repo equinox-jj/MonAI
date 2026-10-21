@@ -5,9 +5,10 @@ import 'package:monai/core/di/injector.dart';
 import 'package:monai/core/l10n/l10n.dart';
 import 'package:monai/features/auth/presentation/pages/session_expired/cubit/session_expired_cubit.dart';
 
-/// Wraps the app and, once the server rejects the token, covers it with the
-/// session-expired dialog. The session is already cleared, so the only way
-/// out is to sign in again: outside taps don't dismiss it.
+/// Wraps the app and, once the server rejects the token or the password is
+/// changed, covers it with a dialog saying so. The session is already
+/// cleared, so the only way out is to sign in again: outside taps don't
+/// dismiss it.
 ///
 /// It sits above the router's navigator (`MaterialApp.router`'s `builder`),
 /// so it is drawn over every route without being one.
@@ -23,8 +24,9 @@ class SessionExpiredGate extends StatelessWidget {
       child: BlocBuilder<SessionExpiredCubit, SessionExpiredState>(
         builder: (context, state) => Stack(
           children: [
-            ExcludeSemantics(excluding: state.expired, child: child),
-            if (state.expired) const _SessionExpiredDialog(),
+            ExcludeSemantics(excluding: state.notice != null, child: child),
+            if (state.notice case final notice?)
+              _SignOutNoticeDialog(notice: notice),
           ],
         ),
       ),
@@ -32,23 +34,34 @@ class SessionExpiredGate extends StatelessWidget {
   }
 }
 
-class _SessionExpiredDialog extends StatelessWidget {
-  const _SessionExpiredDialog();
+class _SignOutNoticeDialog extends StatelessWidget {
+  const _SignOutNoticeDialog({required this.notice});
+
+  final SignOutNotice notice;
 
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
+    final expired = notice == .expired;
     return Stack(
       children: [
-        ModalBarrier(color: context.colors.scrim),
+        // Not dismissible: the session is gone, so only signing in closes
+        // it, and the gate sits above the navigator a dismiss would pop.
+        ModalBarrier(color: context.colors.scrim, dismissible: false),
         Center(
           child: MonAIAlertDialog(
-            title: l10n.sessionExpiredTitle,
-            message: l10n.sessionExpiredBody,
-            confirmLabel: l10n.sessionExpiredSignIn,
+            title: expired
+                ? l10n.sessionExpiredTitle
+                : l10n.passwordChangedTitle,
+            message: expired
+                ? l10n.sessionExpiredBody
+                : l10n.passwordChangedBody,
+            confirmLabel: expired
+                ? l10n.sessionExpiredSignIn
+                : l10n.passwordChangedSignIn,
             onConfirm: () =>
                 context.read<SessionExpiredCubit>().signInAgainPressed(),
-            icon: MonAIIcons.lockClock,
+            icon: expired ? MonAIIcons.lockClock : MonAIIcons.lock,
             tone: .info,
           ),
         ),

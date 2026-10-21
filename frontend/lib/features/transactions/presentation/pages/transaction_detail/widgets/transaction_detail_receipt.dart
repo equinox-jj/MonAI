@@ -87,34 +87,38 @@ class TransactionReceiptViewer extends StatelessWidget {
     final l10n = context.l10n;
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: InteractiveViewer(
-              maxScale: 5,
-              child: Center(
-                child: CachedNetworkImage(
-                  imageUrl: url,
-                  fit: .contain,
-                  placeholder: (_, _) =>
-                      const CircularProgressIndicator(color: Colors.white),
-                  errorWidget: (_, _, _) => Text(
-                    l10n.transactionDetailReceiptError,
-                    style: const TextStyle(color: Colors.white),
+      // The body's constraints are loose; without the expand the stack
+      // shrinks to the close button and the photo with it.
+      body: SizedBox.expand(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: InteractiveViewer(
+                maxScale: 5,
+                child: Center(
+                  child: CachedNetworkImage(
+                    imageUrl: url,
+                    fit: .contain,
+                    placeholder: (_, _) =>
+                        const CircularProgressIndicator(color: Colors.white),
+                    errorWidget: (_, _, _) => Text(
+                      l10n.transactionDetailReceiptError,
+                      style: const TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
-          SafeArea(
-            child: MonAIIconButton(
-              icon: MonAIIcons.close,
-              tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-              color: Colors.white,
-              onPressed: () => Navigator.pop(context),
+            SafeArea(
+              child: MonAIIconButton(
+                icon: MonAIIcons.close,
+                tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
+                color: Colors.white,
+                onPressed: () => Navigator.pop(context),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -6,9 +6,10 @@ class ApiEndpoints {
 
   /// Base URL for all requests. Override per build with
   /// `--dart-define=API_BASE_URL=http://localhost:8080/api/v1`.
+  /// `--dart-define=API_BASE_URL=https://monai.my.id/api/v1`.
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://monai.my.id/api/v1',
+    defaultValue: 'http://localhost:8080/api/v1',
   );
 
   /// `extra` flag: skip attaching the access token (login/register).

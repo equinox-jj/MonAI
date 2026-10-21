@@ -71,8 +71,8 @@ class AuthRepositoryImpl extends AuthRepository with BaseRepository {
         newPassword: newPassword,
       ),
     );
-    await _session.endSession();
-    return SessionStatus.signedOut;
+    await _session.endSessionAfterPasswordChange();
+    return SessionStatus.passwordChanged;
   });
 
   @override

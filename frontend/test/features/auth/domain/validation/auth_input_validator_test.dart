@@ -240,4 +240,74 @@ void main() {
       expect(errors.single.params, {'other': 'current_password'});
     });
   });
+
+  group('changeCurrentPassword', () {
+    test('an empty current password is required', () {
+      // Arrange
+      const empty = '';
+
+      // Act
+      final error = AuthInputValidator.changeCurrentPassword(empty);
+
+      // Assert
+      expect(error?.code, 'required');
+      expect(error?.field, 'current_password');
+    });
+
+    test('any typed current password is valid', () {
+      // Arrange
+      const typed = 'x';
+
+      // Act
+      final error = AuthInputValidator.changeCurrentPassword(typed);
+
+      // Assert
+      expect(error, isNull);
+    });
+  });
+
+  group('changeNewPassword', () {
+    test('a short new password reports its minimum', () {
+      // Arrange
+      const short = 'short';
+
+      // Act
+      final error = AuthInputValidator.changeNewPassword(
+        short,
+        currentPassword: 'old-secret',
+      );
+
+      // Assert
+      expect(error?.code, 'min_length');
+      expect(error?.params, {'min': 8});
+    });
+
+    test('the same password as the current one is rejected', () {
+      // Arrange
+      const same = 'same-secret';
+
+      // Act
+      final error = AuthInputValidator.changeNewPassword(
+        same,
+        currentPassword: same,
+      );
+
+      // Assert
+      expect(error?.code, 'not_equal');
+    });
+
+    test('a different long enough password is valid', () {
+      // Arrange
+      const next = 'new-secret';
+
+      // Act
+      final error = AuthInputValidator.changeNewPassword(
+        next,
+        currentPassword: 'old-secret',
+      );
+
+      // Assert
+      expect(error, isNull);
+    });
+  });
 }

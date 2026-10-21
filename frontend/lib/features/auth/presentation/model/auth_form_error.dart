@@ -6,7 +6,7 @@ import 'package:monai/core/error/failure.dart';
 part 'auth_form_error.freezed.dart';
 
 /// A form field, used to move focus to the first one with an error.
-enum AuthField { name, email, password }
+enum AuthField { name, email, password, currentPassword, newPassword }
 
 /// A problem with the whole attempt rather than one field, shown as a
 /// banner above the form.

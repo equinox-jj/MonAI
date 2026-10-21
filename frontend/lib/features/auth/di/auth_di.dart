@@ -9,6 +9,7 @@ import 'package:monai/features/auth/domain/usecase/is_onboarding_completed_useca
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/register_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/restore_session_usecase.dart';
+import 'package:monai/features/auth/presentation/pages/change_password/bloc/change_password_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/register/bloc/register_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/session_expired/cubit/session_expired_cubit.dart';
@@ -47,6 +48,7 @@ class AuthDI {
       ..registerFactory(() => OnboardingBloc(sl()))
       ..registerFactory(() => SignInBloc(sl()))
       ..registerFactory(() => RegisterBloc(sl()))
+      ..registerFactory(() => ChangePasswordBloc(sl()))
       ..registerFactory(() => SessionExpiredCubit(sl()));
   }
 }

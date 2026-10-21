@@ -20,6 +20,14 @@ abstract class ImageCompressorService {
   /// file can't be decoded, or `photo_too_large` when it stays over the
   /// limit.
   Future<Uint8List> compressAvatar(String path);
+
+  /// The image file at [path] as a payment provider logo: a WebP at most
+  /// 256 px a side, under the logo limit, without EXIF data.
+  ///
+  /// Throws an [UnknownException] with `code` `unreadable_image` when the
+  /// file can't be decoded, or `photo_too_large` when it stays over the
+  /// limit.
+  Future<Uint8List> compressLogo(String path);
 }
 
 /// Compresses [path] to a JPEG at [quality] (0 to 100), scaled down so its
@@ -31,7 +39,7 @@ typedef CompressImage = Future<Uint8List?> Function(
 });
 
 /// Compresses [path] to a WebP at [quality] (0 to 100), scaled down to
-/// [side] pixels square; null when the image can't be read.
+/// [side] pixels; null when the image can't be read.
 typedef CompressAvatar = Future<Uint8List?> Function(
   String path, {
   required int quality,
@@ -68,6 +76,17 @@ class ImageCompressorServiceImpl implements ImageCompressorService {
 
   /// The WebP quality of a profile photo.
   static const avatarQuality = 85;
+
+  /// The upload limit of `PUT /admin/payment-providers/{id}/logo`.
+  static const logoMaxBytes = 512 * 1024;
+
+  /// A logo's longest side, in pixels; logos show at most 48 dp, so this
+  /// stays sharp on any screen.
+  static const logoSide = 256;
+
+  /// The WebP quality of a logo: the highest, since logos are small and
+  /// flat.
+  static const logoQuality = 100;
 
   final CompressImage _compress;
   final CompressAvatar _compressAvatar;
@@ -114,19 +133,31 @@ class ImageCompressorServiceImpl implements ImageCompressorService {
   }
 
   @override
-  Future<Uint8List> compressAvatar(String path) async {
-    final bytes = await _compressAvatar(
-      path,
-      quality: avatarQuality,
-      side: avatarSide,
-    );
+  Future<Uint8List> compressAvatar(String path) => _webp(
+    path,
+    quality: avatarQuality,
+    side: avatarSide,
+    max: avatarMaxBytes,
+  );
+
+  @override
+  Future<Uint8List> compressLogo(String path) =>
+      _webp(path, quality: logoQuality, side: logoSide, max: logoMaxBytes);
+
+  Future<Uint8List> _webp(
+    String path, {
+    required int quality,
+    required int side,
+    required int max,
+  }) async {
+    final bytes = await _compressAvatar(path, quality: quality, side: side);
     if (bytes == null) {
       throw const UnknownException(
         message: "The photo couldn't be read",
         code: 'unreadable_image',
       );
     }
-    if (bytes.length > avatarMaxBytes) {
+    if (bytes.length > max) {
       throw const UnknownException(
         message: 'The photo is too large',
         code: 'photo_too_large',

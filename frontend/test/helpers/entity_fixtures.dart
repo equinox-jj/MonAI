@@ -4,6 +4,7 @@ import 'package:monai/core/model/transaction_source.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/wallet_type.dart';
 import 'package:monai/features/auth/domain/entity/auth_session.dart';
+import 'package:monai/features/settings/domain/entity/admin_payment_provider.dart';
 import 'package:monai/features/shared/domain/entity/budget.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/entity/monthly_report.dart';
@@ -163,3 +164,29 @@ PaymentProvider paymentProvider({
   aliases: aliases,
   sortOrder: 0,
 );
+
+AdminPaymentProvider adminProvider({
+  String id = 'p1',
+  String name = 'GoPay',
+  WalletType type = WalletType.eWallet,
+  List<String> aliases = const ['gopay', 'gpay'],
+  int sortOrder = 50,
+  bool isActive = true,
+  bool isSystem = false,
+  String? logoUrl,
+}) => AdminPaymentProvider(
+  id: id,
+  slug: name.toLowerCase(),
+  name: name,
+  type: type,
+  aliases: aliases,
+  sortOrder: sortOrder,
+  isActive: isActive,
+  isSystem: isSystem,
+  updatedAt: _timestamp,
+  logoUrl: logoUrl,
+);
+
+/// A user holding [permissions], e.g. `payment_provider.create`.
+User userWith(Set<String> permissions) =>
+    user().copyWith(permissions: permissions);

@@ -16,15 +16,38 @@ void main() {
     sessionManager.dispose();
   });
 
-  test('shows the dialog once the session expires', () {
+  test('shows the expired notice once the session expires', () {
     // Arrange
-    expect(cubit.state.expired, isFalse);
+    expect(cubit.state.notice, isNull);
 
     // Act
     sessionManager.notifyExpired();
 
     // Assert
-    expect(cubit.state.expired, isTrue);
+    expect(cubit.state.notice, SignOutNotice.expired);
+  });
+
+  test('shows the password-changed notice after a password change', () {
+    // Arrange
+    expect(cubit.state.notice, isNull);
+
+    // Act
+    sessionManager.notifyPasswordChanged();
+
+    // Assert
+    expect(cubit.state.notice, SignOutNotice.passwordChanged);
+  });
+
+  test('starts with the notice of a session already ended', () async {
+    // Arrange
+    sessionManager.notifyPasswordChanged();
+
+    // Act
+    final restarted = SessionExpiredCubit(sessionManager);
+    addTearDown(restarted.close);
+
+    // Assert
+    expect(restarted.state.notice, SignOutNotice.passwordChanged);
   });
 
   test('Sign in again signs out and hides the dialog', () {
@@ -36,6 +59,18 @@ void main() {
 
     // Assert
     expect(sessionManager.status.value, SessionStatus.signedOut);
-    expect(cubit.state.expired, isFalse);
+    expect(cubit.state.notice, isNull);
+  });
+
+  test('Sign in after a password change signs out and hides it', () {
+    // Arrange
+    sessionManager.notifyPasswordChanged();
+
+    // Act
+    cubit.signInAgainPressed();
+
+    // Assert
+    expect(sessionManager.status.value, SessionStatus.signedOut);
+    expect(cubit.state.notice, isNull);
   });
 }

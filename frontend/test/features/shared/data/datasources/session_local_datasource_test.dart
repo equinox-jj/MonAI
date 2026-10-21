@@ -70,4 +70,44 @@ void main() {
       expect(sessionManager.status.value, SessionStatus.signedIn);
     });
   });
+
+  group('endSessionAfterPasswordChange', () {
+    test('clears the token and cache and shows the notice', () async {
+      // Arrange
+      sessionManager.signedIn();
+
+      // Act
+      await dataSource.endSessionAfterPasswordChange();
+
+      // Assert
+      verify(() => tokenStorage.clear()).called(1);
+      verify(() => localCache.clear()).called(1);
+      expect(sessionManager.status.value, SessionStatus.passwordChanged);
+    });
+
+    test('shows the notice even when the cache fails to clear', () async {
+      // Arrange
+      sessionManager.signedIn();
+      when(() => localCache.clear()).thenThrow(StateError('disk'));
+
+      // Act
+      await dataSource.endSessionAfterPasswordChange();
+
+      // Assert
+      expect(sessionManager.status.value, SessionStatus.passwordChanged);
+    });
+
+    test('stays signed in when the token cannot be removed', () async {
+      // Arrange
+      sessionManager.signedIn();
+      when(() => tokenStorage.clear()).thenThrow(StateError('keystore'));
+
+      // Act
+      final call = dataSource.endSessionAfterPasswordChange();
+
+      // Assert
+      await expectLater(call, throwsA(isA<CacheException>()));
+      expect(sessionManager.status.value, SessionStatus.signedIn);
+    });
+  });
 }

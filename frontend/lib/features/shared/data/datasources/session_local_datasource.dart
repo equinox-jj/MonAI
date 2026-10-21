@@ -8,6 +8,10 @@ abstract class SessionLocalDataSource {
   /// Only a token that fails to clear throws: once it is gone the user is
   /// signed out, and the next sign-in clears a cache left behind.
   Future<void> endSession();
+
+  /// Ends the session like [endSession], after a password change: the app
+  /// shows the password-changed dialog instead of going straight to Sign in.
+  Future<void> endSessionAfterPasswordChange();
 }
 
 class SessionLocalDataSourceImpl extends SessionLocalDataSource
@@ -24,10 +28,20 @@ class SessionLocalDataSourceImpl extends SessionLocalDataSource
 
   @override
   Future<void> endSession() => safeCacheCall(() async {
+    await _clear();
+    _sessionManager.signedOut();
+  });
+
+  @override
+  Future<void> endSessionAfterPasswordChange() => safeCacheCall(() async {
+    await _clear();
+    _sessionManager.notifyPasswordChanged();
+  });
+
+  Future<void> _clear() async {
     await _tokenStorage.clear();
     try {
       await _localCache.clear();
     } on Object catch (_) {}
-    _sessionManager.signedOut();
-  });
+  }
 }

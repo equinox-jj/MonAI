@@ -158,4 +158,68 @@ void main() {
       );
     });
   });
+
+  group('compressLogo', () {
+    ImageCompressorServiceImpl logoService(int? size) =>
+        ImageCompressorServiceImpl(
+          compressAvatar: (path, {required quality, required side}) async {
+            calls.add(side);
+            return size == null ? null : Uint8List(size);
+          },
+        );
+
+    test('gives a 256 px logo under the logo limit', () async {
+      // Arrange
+      final compressor = logoService(30000);
+
+      // Act
+      final bytes = await compressor.compressLogo('/tmp/logo.png');
+
+      // Assert
+      expect(bytes.length, 30000);
+      expect(calls, [ImageCompressorServiceImpl.logoSide]);
+    });
+
+    test('a logo over 512 KB is too large', () async {
+      // Arrange
+      final compressor = logoService(
+        ImageCompressorServiceImpl.logoMaxBytes + 1,
+      );
+
+      // Act
+      final result = compressor.compressLogo('/tmp/logo.png');
+
+      // Assert
+      await expectLater(
+        result,
+        throwsA(
+          isA<UnknownException>().having(
+            (e) => e.code,
+            'code',
+            'photo_too_large',
+          ),
+        ),
+      );
+    });
+
+    test('an unreadable logo says so', () async {
+      // Arrange
+      final compressor = logoService(null);
+
+      // Act
+      final result = compressor.compressLogo('/tmp/logo.png');
+
+      // Assert
+      await expectLater(
+        result,
+        throwsA(
+          isA<UnknownException>().having(
+            (e) => e.code,
+            'code',
+            'unreadable_image',
+          ),
+        ),
+      );
+    });
+  });
 }

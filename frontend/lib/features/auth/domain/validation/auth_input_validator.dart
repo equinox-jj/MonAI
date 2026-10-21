@@ -82,16 +82,37 @@ abstract final class AuthInputValidator {
     required String currentPassword,
     required String newPassword,
   }) => [
-    if (currentPassword.isEmpty) _required(currentPasswordField),
-    ?_passwordError(newPassword, min: passwordMin, field: newPasswordField),
-    if (newPassword.isNotEmpty && newPassword == currentPassword)
-      const FieldError(
+    ?changeCurrentPassword(currentPassword),
+    ?changeNewPassword(newPassword, currentPassword: currentPassword),
+  ];
+
+  /// The problem with a change-password form's current password; null when
+  /// valid. Lets the screen re-check one field as it is edited.
+  static FieldError? changeCurrentPassword(String currentPassword) =>
+      currentPassword.isEmpty ? _required(currentPasswordField) : null;
+
+  /// The problem with a change-password form's new password, which must
+  /// differ from [currentPassword]; null when valid.
+  static FieldError? changeNewPassword(
+    String newPassword, {
+    required String currentPassword,
+  }) {
+    final error = _passwordError(
+      newPassword,
+      min: passwordMin,
+      field: newPasswordField,
+    );
+    if (error != null) return error;
+    if (newPassword == currentPassword) {
+      return const FieldError(
         field: newPasswordField,
         code: 'not_equal',
         message: 'must differ from current_password',
         params: {'other': currentPasswordField},
-      ),
-  ];
+      );
+    }
+    return null;
+  }
 
   static FieldError? _nameError(String name) {
     if (name.isEmpty) return _required(nameField);

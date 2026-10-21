@@ -19,6 +19,8 @@ extension AuthErrorText on AppLocalizations {
       'min_length' when min != null => authFieldTooShort(min),
       'max_length' when max != null => authFieldTooLong(max),
       'invalid_format' => authFieldEmailInvalid,
+      'not_equal' => authFieldSameAsCurrent,
+      'invalid_password' => changePasswordWrongCurrent,
       _ => authFieldInvalid,
     };
   }

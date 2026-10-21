@@ -69,7 +69,7 @@ class _RegisterUIState extends State<RegisterUI> {
         _emailFocus.requestFocus();
       case .password:
         _passwordFocus.requestFocus();
-      case null:
+      case .currentPassword || .newPassword || null:
     }
   }
 

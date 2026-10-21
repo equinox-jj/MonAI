@@ -48,6 +48,28 @@ void main() {
     expect(changes, [SessionStatus.signedIn, SessionStatus.expired]);
   });
 
+  test('a signed-in session ends on a password change', () {
+    // Arrange
+    sessionManager.signedIn();
+
+    // Act
+    sessionManager.notifyPasswordChanged();
+
+    // Assert
+    expect(sessionManager.status.value, SessionStatus.passwordChanged);
+  });
+
+  test('a password change is ignored unless signed in', () {
+    // Arrange
+    // (signed out, from setUp)
+
+    // Act
+    sessionManager.notifyPasswordChanged();
+
+    // Assert
+    expect(sessionManager.status.value, SessionStatus.signedOut);
+  });
+
   test('signing out leaves an expired session', () {
     // Arrange
     sessionManager

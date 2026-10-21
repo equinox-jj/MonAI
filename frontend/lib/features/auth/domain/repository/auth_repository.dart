@@ -29,7 +29,8 @@ abstract class AuthRepository {
 
   /// Changes the password, which revokes every token, then signs out here so
   /// the user signs in again with the new one. A wrong [currentPassword]
-  /// fails with code `invalid_password`. Gives [SessionStatus.signedOut].
+  /// fails with code `invalid_password`. Gives
+  /// [SessionStatus.passwordChanged].
   Future<Either<Failure, SessionStatus>> changePassword({
     required String currentPassword,
     required String newPassword,

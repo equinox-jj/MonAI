@@ -5,6 +5,7 @@ import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/network/session_manager.dart';
 import 'package:monai/core/utils/month_format.dart';
+import 'package:monai/features/auth/presentation/pages/change_password/change_password_page.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/onboarding_page.dart';
 import 'package:monai/features/auth/presentation/pages/register/register_page.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
@@ -22,6 +23,8 @@ import 'package:monai/features/reports/presentation/pages/report/report_page.dar
 import 'package:monai/features/receipt/presentation/model/receipt_review_args.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/receipt_review_page.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/scan_receipt_page.dart';
+import 'package:monai/features/settings/presentation/pages/manage_providers/manage_providers_page.dart';
+import 'package:monai/features/settings/presentation/pages/provider_form/provider_form_page.dart';
 import 'package:monai/features/settings/presentation/pages/settings/settings_page.dart';
 import 'package:monai/features/shared/domain/entity/quick_add_draft.dart';
 import 'package:monai/features/transactions/presentation/pages/search/search_page.dart';
@@ -67,6 +70,18 @@ abstract final class AppRoutes {
 
   /// Edit profile; reached from Settings.
   static const profile = '/settings/profile';
+
+  /// Change password; reached from Settings.
+  static const changePassword = '/settings/password';
+
+  /// The payment provider catalog for admins; reached from Settings.
+  static const providers = '/settings/providers';
+
+  /// The add-provider form.
+  static const providerNew = '$providers/new';
+
+  /// The edit form of provider [id].
+  static String providerEdit(String id) => '$providers/$id/edit';
 
   /// The query parameter Edit profile opens scrolled to a section by.
   static const focusParam = 'focus';
@@ -426,6 +441,39 @@ GoRouter createAppRouter({
                     ),
                   ),
                   GoRoute(
+                    path: 'password',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, _) => const ChangePasswordPage(),
+                  ),
+                  GoRoute(
+                    path: 'providers',
+                    parentNavigatorKey: rootKey,
+                    builder: (_, _) => const ManageProvidersPage(),
+                    routes: [
+                      GoRoute(
+                        path: 'new',
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (context, state) => _formPage(
+                          context,
+                          state,
+                          (placement) => ProviderFormPage(placement: placement),
+                        ),
+                      ),
+                      GoRoute(
+                        path: ':id/edit',
+                        parentNavigatorKey: rootKey,
+                        pageBuilder: (context, state) => _formPage(
+                          context,
+                          state,
+                          (placement) => ProviderFormPage(
+                            providerId: state.pathParameters['id'],
+                            placement: placement,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  GoRoute(
                     path: 'categories',
                     parentNavigatorKey: rootKey,
                     builder: (_, _) => const CategoriesPage(),
@@ -546,7 +594,7 @@ String? sessionRedirect(SessionStatus status, String location) {
   return switch (status) {
     .signedIn when onSignedOutRoute => AppRoutes.home,
     .signedOut when !onSignedOutRoute => AppRoutes.signIn,
-    .signedIn || .signedOut || .expired => null,
+    .signedIn || .signedOut || .expired || .passwordChanged => null,
   };
 }
 
@@ -559,6 +607,8 @@ Future<String> launchRedirect(
   Future<bool> Function() isOnboardingCompleted,
 ) async => switch (status) {
   .signedIn => AppRoutes.home,
-  .signedOut || .expired when await isOnboardingCompleted() => AppRoutes.signIn,
-  .signedOut || .expired => AppRoutes.onboarding,
+  .signedOut ||
+  .expired ||
+  .passwordChanged when await isOnboardingCompleted() => AppRoutes.signIn,
+  .signedOut || .expired || .passwordChanged => AppRoutes.onboarding,
 };

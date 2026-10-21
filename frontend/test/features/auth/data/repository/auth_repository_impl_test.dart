@@ -79,6 +79,8 @@ void main() {
     when(() => local.clearCache()).thenAnswer((_) async {});
     when(() => local.startSession(any())).thenAnswer((_) async {});
     when(() => session.endSession()).thenAnswer((_) async {});
+    when(() => session.endSessionAfterPasswordChange())
+        .thenAnswer((_) async {});
   });
 
   group('isOnboardingCompleted', () {
@@ -294,7 +296,7 @@ void main() {
       // Assert
       expect(
         result,
-        const Right<Failure, SessionStatus>(SessionStatus.signedOut),
+        const Right<Failure, SessionStatus>(SessionStatus.passwordChanged),
       );
       verify(
         () => remote.changePassword(
@@ -304,7 +306,8 @@ void main() {
           ),
         ),
       ).called(1);
-      verify(() => session.endSession()).called(1);
+      verify(() => session.endSessionAfterPasswordChange()).called(1);
+      verifyNever(() => session.endSession());
       verifyNever(() => local.startSession(any()));
     });
 
@@ -321,7 +324,7 @@ void main() {
 
       // Assert
       expect(result.getLeft().toNullable()?.code, 'invalid_password');
-      verifyNever(() => session.endSession());
+      verifyNever(() => session.endSessionAfterPasswordChange());
     });
   });
 }

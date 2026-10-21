@@ -62,7 +62,7 @@ class _SignInUIState extends State<SignInUI> {
         _emailFocus.requestFocus();
       case .password:
         _passwordFocus.requestFocus();
-      case .name || null:
+      case .name || .currentPassword || .newPassword || null:
     }
   }
 
