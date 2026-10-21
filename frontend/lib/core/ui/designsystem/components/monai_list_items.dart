@@ -20,10 +20,16 @@ class MonAIListItem extends StatelessWidget {
     this.trailing,
     this.onTap,
     this.showDivider = false,
+    this.titleSpan,
+    this.supportingSpan,
   });
 
   final String title;
   final String? supporting;
+
+  /// Replaces [title] / [supporting] when set, e.g. to mark search matches.
+  final InlineSpan? titleSpan;
+  final InlineSpan? supportingSpan;
   final Widget? leading;
   final Widget? trailing;
   final VoidCallback? onTap;
@@ -51,15 +57,15 @@ class MonAIListItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: .start,
                     children: [
-                      Text(
-                        title,
+                      Text.rich(
+                        titleSpan ?? TextSpan(text: title),
                         style: t.titleMedium?.copyWith(color: c.textPrimary),
                         maxLines: 1,
                         overflow: .ellipsis,
                       ),
-                      if (supporting case final supporting?)
-                        Text(
-                          supporting,
+                      if (supportingSpan != null || supporting != null)
+                        Text.rich(
+                          supportingSpan ?? TextSpan(text: supporting),
                           style: t.bodySmall?.copyWith(color: c.textTertiary),
                           maxLines: 1,
                           overflow: .ellipsis,
@@ -107,10 +113,14 @@ class MonAITransactionRow extends StatelessWidget {
     super.key,
     this.onTap,
     this.showDivider = false,
+    this.titleSpan,
+    this.metaSpan,
   });
 
   final String title;
   final String meta;
+  final InlineSpan? titleSpan;
+  final InlineSpan? metaSpan;
   final String amount;
   final MoneyDirection direction;
   final MonAIIconData categoryIcon;
@@ -124,6 +134,8 @@ class MonAITransactionRow extends StatelessWidget {
     return MonAIListItem(
       title: title,
       supporting: meta,
+      titleSpan: titleSpan,
+      supportingSpan: metaSpan,
       onTap: onTap,
       showDivider: showDivider,
       leading: MonAICategoryIcon(icon: categoryIcon, color: categoryColor),

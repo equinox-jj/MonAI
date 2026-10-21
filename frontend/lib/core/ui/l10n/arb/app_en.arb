@@ -411,6 +411,14 @@
   "@transactionErrorTooLong": {
     "placeholders": {"max": {"type": "int"}}
   },
+  "searchMerchant": "at {merchant}",
+  "@searchMerchant": {
+    "placeholders": {
+      "merchant": {
+        "type": "String"
+      }
+    }
+  },
   "searchClear": "Clear search",
   "searchRecentTitle": "Recent searches",
   "searchPromptTitle": "Search your transactions",

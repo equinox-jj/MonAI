@@ -291,6 +291,7 @@
   "transactionErrorCategoryRequired": "Pilih kategori",
   "transactionErrorFutureDate": "Tanggal tidak boleh di masa depan",
   "transactionErrorTooLong": "Maksimal {max} karakter",
+  "searchMerchant": "di {merchant}",
   "searchClear": "Hapus pencarian",
   "searchRecentTitle": "Pencarian terakhir",
   "searchPromptTitle": "Cari transaksimu",

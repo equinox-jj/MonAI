@@ -17,6 +17,7 @@ typedef _Results = ({
   bool hasMore,
   bool allMonths,
   DateTime month,
+  String query,
 });
 
 class SearchResults extends StatelessWidget {
@@ -39,6 +40,7 @@ class SearchResults extends StatelessWidget {
         hasMore: state.hasMore,
         allMonths: state.allMonths,
         month: state.month,
+        query: state.query,
       ),
       builder: (context, data) => ListView.builder(
         padding: const .only(bottom: MonAISpacing.x6),
@@ -73,6 +75,7 @@ class SearchResults extends StatelessWidget {
             transaction: transaction,
             lookups: data.lookups,
             showDate: true,
+            highlight: data.query,
             showDivider: index < data.results.length,
             onTap: onOpen,
           );
