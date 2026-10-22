@@ -1,6 +1,6 @@
 # MonAI Backend
 
-The Go REST API for [MonAI](../README.md). It handles accounts, wallets, categories, transactions, budgets, reports, the payment provider catalog, file uploads and AI-drafted transactions.
+The Go REST API for [MonAI](../README.md), consumed by the [Flutter app](../frontend/README.md). It handles accounts, wallets, categories, transactions, budgets, reports, the payment provider catalog, file uploads and AI-drafted transactions.
 
 - **Stack:** Go 1.27.2, Fiber v3, Uber fx, GORM (pgx), PostgreSQL 18, MinIO, Gemini Flash-Lite (`google.golang.org/genai`), golang-migrate, Viper
 - **Contract:** [`api/api-spec.yaml`](api/api-spec.yaml) (OpenAPI 3.1). Every path in it is implemented.
@@ -63,8 +63,7 @@ You can also run the API in a container. Run `docker compose -f docker-compose.d
 | `go run ./cmd/migrate [up \| down [N] \| version \| force V]` | Runs the SQL migrations embedded from `migrations/`. `up` is the default; `down` rolls back one step unless you pass N. |
 | `go run ./cmd/seed [--email] [--password] [--name] [--months]` | Development only. Creates a demo user (default `demo@monai.local` / `demo12345`) with Cash, BCA and GoPay wallets and 3 months of transactions. Does nothing if the email already exists, and refuses to run when `APP_ENV=production`. |
 | `go run ./cmd/seed-admin --email you@example.com` | Promotes an existing user to `admin`. Nobody can register as an admin. A running API picks up the change within 1 minute. |
-| `go build ./...` / `go vet ./...` | Builds or vets all packages |
-| `go run golang.org/x/vuln/cmd/govulncheck@latest ./...` | Scans for known vulnerabilities (run it after bumping Go or a dependency) |
+| `go build ./...` / `go vet ./...` | Builds or vets all packages || `go run golang.org/x/vuln/cmd/govulncheck@latest ./...` | Scans for known vulnerabilities (run it after bumping Go or a dependency) |
 
 ## Configuration
 
