@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
-import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/app_router.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_review_args.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/bloc/quick_add_bloc.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/model/quick_add_state_extension.dart';
@@ -13,6 +12,7 @@ import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/qui
 import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/quick_add_examples.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/quick_add_phrase.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add/widgets/quick_add_status.dart';
+import 'package:monai/route_path.dart';
 
 class QuickAddPage extends StatelessWidget {
   const QuickAddPage({super.key});
@@ -67,7 +67,7 @@ class _QuickAddUIState extends State<QuickAddUI> {
         if (saved && mounted) _close();
       case QuickAddReviewNavigation(:final args):
         final exit = await context.push<QuickAddReviewExit>(
-          AppRoutes.quickAddReview,
+          RoutePath.quickAddReview,
           extra: args,
         );
         if (!mounted) return;

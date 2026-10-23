@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/app_language.dart';
 import 'package:monai/core/model/app_theme_mode.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/export/presentation/pages/export_csv/export_csv_sheet.dart';
 import 'package:monai/features/settings/domain/logic/settings_rules.dart';
 import 'package:monai/features/settings/presentation/app_settings/cubit/app_settings_cubit.dart';
@@ -17,6 +16,7 @@ import 'package:monai/features/settings/presentation/pages/settings/widgets/sett
 import 'package:monai/features/settings/presentation/pages/settings/widgets/settings_profile_card.dart';
 import 'package:monai/features/settings/presentation/pages/settings/widgets/settings_sign_out_dialog.dart';
 import 'package:monai/features/settings/presentation/pages/settings/widgets/settings_theme_sheet.dart';
+import 'package:monai/route_path.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -34,25 +34,25 @@ class SettingsUI extends StatelessWidget {
   const SettingsUI({super.key});
   static const _maxContentWidth = 720.0;
 
-  void _openProfile(BuildContext context) => context.push(AppRoutes.profile);
+  void _openProfile(BuildContext context) => context.push(RoutePath.profile);
 
-  void _openBudget(BuildContext context) => context.push(AppRoutes.budgetFor());
+  void _openBudget(BuildContext context) => context.push(RoutePath.budgetFor());
 
   void _openCategories(BuildContext context) =>
-      context.push(AppRoutes.categories);
+      context.push(RoutePath.categories);
 
-  void _openWallets(BuildContext context) => context.go(AppRoutes.wallets);
+  void _openWallets(BuildContext context) => context.go(RoutePath.wallets);
 
   void _export(BuildContext context) => showExportCsvSheet(context);
 
   void _manageProviders(BuildContext context) =>
-      context.push(AppRoutes.providers);
+      context.push(RoutePath.providers);
 
   void _changePassword(BuildContext context) =>
-      context.push(AppRoutes.changePassword);
+      context.push(RoutePath.changePassword);
 
   void _deleteAccount(BuildContext context) =>
-      context.push(AppRoutes.profileDeleteAccount);
+      context.push(RoutePath.profileDeleteAccount);
 
   void _pickTheme(BuildContext context) {
     final appSettings = context.read<AppSettingsCubit>();

@@ -304,23 +304,33 @@ Future<T?> showMonAIBottomSheet<T>(
   BuildContext context, {
   required WidgetBuilder builder,
   String? title,
+  Widget? titleTrailing,
   bool isScrollControlled = true,
 }) {
   return showModalBottomSheet<T>(
     context: context,
     isScrollControlled: isScrollControlled,
     useSafeArea: true,
-    builder: (context) =>
-        MonAIBottomSheet(title: title, child: builder(context)),
+    builder: (context) => MonAIBottomSheet(
+      title: title,
+      titleTrailing: titleTrailing,
+      child: builder(context),
+    ),
   );
 }
 
 /// [showMonAIBottomSheet] wraps its builder in this; use it directly only for
 /// custom sheet routes.
 class MonAIBottomSheet extends StatelessWidget {
-  const MonAIBottomSheet({required this.child, super.key, this.title});
+  const MonAIBottomSheet({
+    required this.child,
+    super.key,
+    this.title,
+    this.titleTrailing,
+  });
   final Widget child;
   final String? title;
+  final Widget? titleTrailing;
 
   @override
   Widget build(BuildContext context) {
@@ -361,7 +371,18 @@ class MonAIBottomSheet extends StatelessWidget {
                   spacing: MonAISpacing.x3_5,
                   children: [
                     if (title case final title?)
-                      Text(title, style: context.textTheme.headlineSmall),
+                      Row(
+                        spacing: MonAISpacing.x3,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: context.textTheme.headlineSmall,
+                            ),
+                          ),
+                          ?titleTrailing,
+                        ],
+                      ),
                     Flexible(child: child),
                   ],
                 ),

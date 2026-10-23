@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/bloc/transaction_detail_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/widgets/transaction_detail_fields.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/widgets/transaction_detail_hero.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_detail/widgets/transaction_detail_receipt.dart';
+import 'package:monai/route_path.dart';
 
 class TransactionDetailPage extends StatelessWidget {
   const TransactionDetailPage({
@@ -47,7 +47,7 @@ class TransactionDetailUI extends StatelessWidget {
   final VoidCallback? onClosed;
 
   void _edit(BuildContext context) => context.push(
-    AppRoutes.transactionEdit(context.read<TransactionDetailBloc>().id),
+    RoutePath.transactionEdit(context.read<TransactionDetailBloc>().id),
   );
 
   void _delete(BuildContext context) => context

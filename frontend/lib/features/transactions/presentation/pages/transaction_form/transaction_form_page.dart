@@ -1,24 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/base/error/field_error.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_failure.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/bloc/transaction_form_bloc.dart';
-import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_field_error_text.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_mode.dart';
+import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_amount.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_category.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_fields.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_keypad.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_type_tabs.dart';
+import 'package:monai/route_path.dart';
 
 class TransactionFormPage extends StatelessWidget {
   const TransactionFormPage({
@@ -94,7 +94,7 @@ class _TransactionFormUIState extends State<TransactionFormUI> {
   void _finish(BuildContext context, TransactionFormState state) =>
       switch (state.outcome) {
         ScanReceiptFormOutcome() => context.pushReplacement(
-          AppRoutes.receiptScan,
+          RoutePath.receiptScan,
         ),
         final outcome => Navigator.pop(context, outcome),
       };

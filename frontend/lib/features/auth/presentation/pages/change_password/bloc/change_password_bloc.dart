@@ -32,6 +32,7 @@ class ChangePasswordBloc
   ) {
     emit(
       state.copyWith(
+        hasCurrentPassword: event.currentPassword.isNotEmpty,
         currentPasswordError: state.autovalidate
             ? AuthInputValidator.changeCurrentPassword(event.currentPassword)
             : state.currentPasswordError,
@@ -46,6 +47,7 @@ class ChangePasswordBloc
   ) {
     emit(
       state.copyWith(
+        hasNewPassword: event.newPassword.isNotEmpty,
         newPasswordLongEnough: AuthInputValidator.isPasswordLongEnough(
           event.newPassword,
         ),

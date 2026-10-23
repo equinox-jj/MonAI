@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/base/error/field_error.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
 import 'package:monai/core/model/wallet_type.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/extension/wallet_type_extension.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/rupiah_input_formatter.dart';
@@ -16,15 +15,16 @@ import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/domain/validation/wallet_input_validator.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/bloc/wallet_form_bloc.dart';
-import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_state_extension.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_field_error_text.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_mode.dart';
+import 'package:monai/features/wallets/presentation/pages/wallet_form/model/wallet_form_state_extension.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_balance_shift.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_color_picker.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_default_row.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_preview_card.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_provider_grid.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_form/widgets/wallet_form_type_picker.dart';
+import 'package:monai/route_path.dart';
 
 class WalletFormPage extends StatelessWidget {
   const WalletFormPage({
@@ -153,17 +153,17 @@ class _WalletFormUIState extends State<WalletFormUI> {
       case SavedWalletOutcome() || null:
         Navigator.pop(context, state.outcome);
       case ArchivedWalletOutcome(:final name):
-        final router = GoRouter.of(context)..go(AppRoutes.wallets);
+        final router = GoRouter.of(context)..go(RoutePath.wallets);
         showMonAISnackBar(
           context,
           message: l10n.walletArchivedSnack(name),
           icon: MonAIIcons.checkCircle,
           iconColor: c.success,
           actionLabel: l10n.walletsViewArchived,
-          onAction: () => router.push(AppRoutes.walletsArchived),
+          onAction: () => router.push(RoutePath.walletsArchived),
         );
       case DeletedWalletOutcome(:final name):
-        context.go(AppRoutes.wallets);
+        context.go(RoutePath.wallets);
         showMonAISnackBar(
           context,
           message: l10n.walletDeletedSnack(name),

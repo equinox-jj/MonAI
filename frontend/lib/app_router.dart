@@ -46,7 +46,7 @@ import 'package:monai/route_path.dart';
 GoRouter createAppRouter({
   required SessionManager sessionManager,
   required Future<bool> Function() isOnboardingCompleted,
-  String initialLocation = AppRoutes.launch,
+  String initialLocation = RoutePath.launch,
 }) {
   // Screens above the tabs, covering the navigation bar.
   final rootKey = GlobalKey<NavigatorState>();
@@ -58,32 +58,32 @@ GoRouter createAppRouter({
         sessionRedirect(sessionManager.status.value, state.matchedLocation),
     routes: [
       GoRoute(
-        path: AppRoutes.launch,
+        path: RoutePath.launch,
         redirect: (_, _) =>
             launchRedirect(sessionManager.status.value, isOnboardingCompleted),
       ),
       GoRoute(
-        path: AppRoutes.onboarding,
+        path: RoutePath.onboarding,
         pageBuilder: _page((_, _) => const OnboardingPage()),
       ),
       GoRoute(
-        path: AppRoutes.signIn,
+        path: RoutePath.signIn,
         pageBuilder: _page(
           (_, state) => SignInPage(
-            initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+            initialEmail: state.uri.queryParameters[RoutePath.emailParam] ?? '',
           ),
         ),
       ),
       GoRoute(
-        path: AppRoutes.register,
+        path: RoutePath.register,
         pageBuilder: _page(
           (_, state) => RegisterPage(
-            initialEmail: state.uri.queryParameters[AppRoutes.emailParam] ?? '',
+            initialEmail: state.uri.queryParameters[RoutePath.emailParam] ?? '',
           ),
         ),
       ),
       GoRoute(
-        path: AppRoutes.quickAdd,
+        path: RoutePath.quickAdd,
         pageBuilder: (_, state) => MaterialPage(
           key: state.pageKey,
           fullscreenDialog: true,
@@ -94,7 +94,7 @@ GoRouter createAppRouter({
             path: 'review',
             // The drafts only live in memory: without them, start over.
             redirect: (_, state) =>
-                state.extra is QuickAddReviewArgs ? null : AppRoutes.quickAdd,
+                state.extra is QuickAddReviewArgs ? null : RoutePath.quickAdd,
             pageBuilder: _page(
               (_, state) =>
                   QuickAddReviewPage(args: state.extra! as QuickAddReviewArgs),
@@ -103,7 +103,7 @@ GoRouter createAppRouter({
         ],
       ),
       GoRoute(
-        path: AppRoutes.receiptScan,
+        path: RoutePath.receiptScan,
         pageBuilder: (_, state) => MaterialPage(
           key: state.pageKey,
           fullscreenDialog: true,
@@ -111,34 +111,34 @@ GoRouter createAppRouter({
         ),
       ),
       GoRoute(
-        path: AppRoutes.receiptReview,
+        path: RoutePath.receiptReview,
         // The draft only lives in memory: without it, scan again.
         redirect: (_, state) =>
-            state.extra is ReceiptReviewArgs ? null : AppRoutes.receiptScan,
+            state.extra is ReceiptReviewArgs ? null : RoutePath.receiptScan,
         pageBuilder: _page(
           (_, state) =>
               ReceiptReviewPage(args: state.extra! as ReceiptReviewArgs),
         ),
       ),
       GoRoute(
-        path: AppRoutes.budget,
+        path: RoutePath.budget,
         pageBuilder: _page(
           (_, state) => BudgetPage(
             month:
                 parseMonthParam(
-                  state.uri.queryParameters[AppRoutes.monthParam],
+                  state.uri.queryParameters[RoutePath.monthParam],
                 ) ??
                 monthOf(DateTime.now()),
           ),
         ),
       ),
       GoRoute(
-        path: AppRoutes.report,
+        path: RoutePath.report,
         pageBuilder: _page(
           (_, state) => ReportPage(
             month:
                 parseMonthParam(
-                  state.uri.queryParameters[AppRoutes.monthParam],
+                  state.uri.queryParameters[RoutePath.monthParam],
                 ) ??
                 monthOf(DateTime.now()),
           ),
@@ -161,7 +161,7 @@ GoRouter createAppRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.home,
+                path: RoutePath.home,
                 pageBuilder: _page((_, _) => const HomePage()),
               ),
             ],
@@ -169,7 +169,7 @@ GoRouter createAppRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.transactions,
+                path: RoutePath.transactions,
                 pageBuilder: _page((_, _) => const TransactionsPage()),
                 routes: [
                   GoRoute(
@@ -178,7 +178,7 @@ GoRouter createAppRouter({
                     pageBuilder: _page(
                       (_, state) => SearchPage(
                         initialMonth: parseMonthParam(
-                          state.uri.queryParameters[AppRoutes.monthParam],
+                          state.uri.queryParameters[RoutePath.monthParam],
                         ),
                       ),
                     ),
@@ -198,11 +198,11 @@ GoRouter createAppRouter({
                             type:
                                 TransactionType.values.asNameMap()[state
                                     .uri
-                                    .queryParameters[AppRoutes.typeParam]] ??
+                                    .queryParameters[RoutePath.typeParam]] ??
                                 TransactionType.expense,
                             walletId: state
                                 .uri
-                                .queryParameters[AppRoutes.walletParam],
+                                .queryParameters[RoutePath.walletParam],
                           ),
                         },
                       ),
@@ -240,7 +240,7 @@ GoRouter createAppRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.wallets,
+                path: RoutePath.wallets,
                 pageBuilder: _page((_, _) => const WalletsPage()),
                 routes: [
                   GoRoute(
@@ -291,7 +291,7 @@ GoRouter createAppRouter({
           StatefulShellBranch(
             routes: [
               GoRoute(
-                path: AppRoutes.settings,
+                path: RoutePath.settings,
                 pageBuilder: _page((_, _) => const SettingsPage()),
                 routes: [
                   GoRoute(
@@ -300,7 +300,7 @@ GoRouter createAppRouter({
                     pageBuilder: _page(
                       (_, state) => EditProfilePage(
                         focusDelete:
-                            state.uri.queryParameters[AppRoutes.focusParam] ==
+                            state.uri.queryParameters[RoutePath.focusParam] ==
                             'delete',
                       ),
                     ),
@@ -354,7 +354,7 @@ GoRouter createAppRouter({
                             mode: CategoryFormMode.create(
                               CategoryType.values.asNameMap()[state
                                       .uri
-                                      .queryParameters[AppRoutes.typeParam]] ??
+                                      .queryParameters[RoutePath.typeParam]] ??
                                   CategoryType.expense,
                             ),
                           ),
@@ -391,7 +391,7 @@ Future<bool> pushQuickAddForm(
   BuildContext context,
   QuickAddDraft draft,
 ) async => await context.push<TransactionFormOutcome>(
-  AppRoutes.transactionNew,
+  RoutePath.transactionNew,
   extra: draft,
 ) is SavedFormOutcome;
 
@@ -457,14 +457,14 @@ DateTime? parseMonthParam(String? value) {
   return DateTime(int.parse(match.group(1)!), month);
 }
 
-/// [AppRoutes.launch] is left alone: go_router runs this before the route's
+/// [RoutePath.launch] is left alone: go_router runs this before the route's
 /// own [launchRedirect], which picks the first screen.
 String? sessionRedirect(SessionStatus status, String location) {
-  if (location == AppRoutes.launch) return null;
-  final onSignedOutRoute = AppRoutes.signedOutRoutes.contains(location);
+  if (location == RoutePath.launch) return null;
+  final onSignedOutRoute = RoutePath.signedOutRoutes.contains(location);
   return switch (status) {
-    .signedIn when onSignedOutRoute => AppRoutes.home,
-    .signedOut when !onSignedOutRoute => AppRoutes.signIn,
+    .signedIn when onSignedOutRoute => RoutePath.home,
+    .signedOut when !onSignedOutRoute => RoutePath.signIn,
     .signedIn || .signedOut || .expired || .passwordChanged => null,
   };
 }
@@ -473,9 +473,9 @@ Future<String> launchRedirect(
   SessionStatus status,
   Future<bool> Function() isOnboardingCompleted,
 ) async => switch (status) {
-  .signedIn => AppRoutes.home,
+  .signedIn => RoutePath.home,
   .signedOut ||
   .expired ||
-  .passwordChanged when await isOnboardingCompleted() => AppRoutes.signIn,
-  .signedOut || .expired || .passwordChanged => AppRoutes.onboarding,
+  .passwordChanged when await isOnboardingCompleted() => RoutePath.signIn,
+  .signedOut || .expired || .passwordChanged => RoutePath.onboarding,
 };

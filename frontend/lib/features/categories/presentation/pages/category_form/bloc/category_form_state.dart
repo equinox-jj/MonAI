@@ -13,6 +13,7 @@ abstract class CategoryFormState with _$CategoryFormState {
     @Default(false) bool autovalidate,
     @Default(false) bool isSaving,
     @Default(false) bool done,
+    String? savedId,
     CategoryFailure? actionFailure,
   }) = _CategoryFormState;
 }

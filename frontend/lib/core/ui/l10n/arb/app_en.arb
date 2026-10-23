@@ -300,7 +300,6 @@
   "filterWalletsTitle": "Wallets",
   "filterCategoriesTitle": "Categories",
   "filterTypeTitle": "Transaction type",
-  "filterAllWallets": "All wallets",
   "filterAllCategories": "All categories",
   "filterTransferNote": "Transfers move money between your wallets. They never count as income or spending.",
   "filterArchived": "Archived · still in history",
@@ -352,6 +351,7 @@
   "@transactionFormUseCategory": {
     "placeholders": {"name": {"type": "String"}}
   },
+  "transactionFormNewCategory": "New",
   "transactionFormNoCategories": "No categories of this type yet.",
   "transactionFormWallet": "Wallet",
   "transactionFormPayFrom": "Pay from",

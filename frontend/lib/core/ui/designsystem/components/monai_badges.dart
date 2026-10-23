@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-
+import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/ui/designsystem/icons/monai_icon.dart';
 import 'package:monai/core/ui/designsystem/icons/monai_icons.dart';
 import 'package:monai/core/ui/designsystem/theme/monai_category_colors.dart';
@@ -91,6 +91,32 @@ class MonAIPill extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class MonAICategoryTypePill extends StatelessWidget {
+  const MonAICategoryTypePill({
+    required this.type,
+    required this.label,
+    super.key,
+  });
+
+  final CategoryType type;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    final (container, content, arrow) = switch (type) {
+      .expense => (c.expenseContainer, c.expense, MonAIIcons.northEast),
+      .income => (c.incomeContainer, c.income, MonAIIcons.southWest),
+    };
+    return MonAIPill(
+      text: label,
+      icon: arrow,
+      containerColor: container,
+      contentColor: content,
     );
   }
 }

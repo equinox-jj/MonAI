@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:go_router/go_router.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
+import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
+import 'package:monai/core/utils/extension/category_type_extension.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/quickadd/presentation/model/quick_add_field.dart';
@@ -14,6 +17,7 @@ import 'package:monai/features/quickadd/presentation/pages/quick_add_review/mode
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/widgets/quick_add_review_fields.dart';
 import 'package:monai/features/quickadd/presentation/pages/quick_add_review/widgets/quick_add_review_summary.dart';
 import 'package:monai/features/quickadd/presentation/widgets/quick_add_pickers.dart';
+import 'package:monai/route_path.dart';
 
 class QuickAddReviewPage extends StatelessWidget {
   const QuickAddReviewPage({required this.args, super.key});
@@ -95,9 +99,12 @@ class _QuickAddReviewUIState extends State<QuickAddReviewUI> {
 
   void _openCategory() {
     final bloc = _bloc;
+    final l10n = context.l10n;
+    final type = bloc.state.categoryType;
     showMonAIBottomSheet<void>(
       context,
-      title: context.l10n.transactionFormChooseCategory,
+      title: l10n.transactionFormChooseCategory,
+      titleTrailing: MonAICategoryTypePill(type: type, label: type.label(l10n)),
       builder: (sheetContext) => MonAICategoryPickerSheet(
         options: bloc.state.categories.map((c) => c.pickerOption).toList(),
         selectedId: bloc.state.current.categoryId,
@@ -105,8 +112,18 @@ class _QuickAddReviewUIState extends State<QuickAddReviewUI> {
         doneLabel: sheetContext.l10n.transactionFormDone,
         useLabel: sheetContext.l10n.transactionFormUseCategory,
         emptyLabel: sheetContext.l10n.transactionFormNoCategories,
+        newLabel: sheetContext.l10n.transactionFormNewCategory,
+        onNew: () => _newCategory(type),
       ),
     );
+  }
+
+  Future<void> _newCategory(CategoryType type) async {
+    final bloc = _bloc;
+    final id = await context.push<String>(RoutePath.categoryNew(type));
+    if (id != null && !bloc.isClosed) {
+      bloc.add(QuickAddReviewEvent.categoryPicked(id));
+    }
   }
 
   void _openWallet(QuickAddField field) {

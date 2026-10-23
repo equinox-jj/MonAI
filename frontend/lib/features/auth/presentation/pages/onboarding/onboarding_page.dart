@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/model/onboarding_step.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/widgets/onboarding_footer.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/widgets/onboarding_step_content.dart';
+import 'package:monai/route_path.dart';
 
 /// Keeps the phone layout readable on tablets, where there is no separate
 /// onboarding design.
@@ -44,8 +44,8 @@ class _OnboardingUIState extends State<OnboardingUI> {
   void _onStateChanged(BuildContext context, OnboardingState state) {
     if (state.exit case final exit?) {
       context.go(switch (exit) {
-        .register => AppRoutes.register,
-        .signIn => AppRoutes.signIn,
+        .register => RoutePath.register,
+        .signIn => RoutePath.signIn,
       });
       return;
     }

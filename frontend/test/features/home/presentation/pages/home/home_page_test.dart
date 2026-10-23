@@ -3,14 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/app_router.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/base/error/failure.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/core/model/transaction_type.dart';
 import 'package:monai/core/data/network/session_manager.dart';
-import 'package:monai/app_router.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/model/transaction_type.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/home/domain/entity/home_dashboard.dart';
 import 'package:monai/features/home/domain/logic/home_dashboard_rules.dart';
 import 'package:monai/features/home/domain/usecase/refresh_home_usecase.dart';
@@ -24,6 +23,7 @@ import 'package:monai/features/shared/domain/entity/transaction.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/transactions_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
+import 'package:monai/route_path.dart';
 
 import '../../../../../helpers/entity_fixtures.dart';
 import '../../../../../helpers/settings_fakes.dart';
@@ -127,7 +127,7 @@ void main() {
     final router = createAppRouter(
       sessionManager: sessionManager,
       isOnboardingCompleted: () async => true,
-      initialLocation: AppRoutes.home,
+      initialLocation: RoutePath.home,
     );
     addTearDown(router.dispose);
     await tester.pumpWidget(

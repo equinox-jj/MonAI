@@ -111,8 +111,8 @@ class CategoryFormBloc extends Bloc<CategoryFormEvent, CategoryFormState> {
       null => await _create(input),
     };
     switch (result) {
-      case Right():
-        emit(state.copyWith(isSaving: false, done: true));
+      case Right(value: final category):
+        emit(state.copyWith(isSaving: false, done: true, savedId: category.id));
       case Left(value: final failure):
         emit(_failed(state.copyWith(isSaving: false), failure));
     }

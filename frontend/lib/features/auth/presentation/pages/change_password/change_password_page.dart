@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 import 'package:monai/features/auth/presentation/pages/change_password/bloc/change_password_bloc.dart';
+import 'package:monai/features/auth/presentation/pages/change_password/model/change_password_state_extension.dart';
 import 'package:monai/features/auth/presentation/widgets/auth_error_text.dart';
 
 /// A successful change needs no navigation here: the session ends and the
@@ -92,7 +93,8 @@ class _ChangePasswordUIState extends State<ChangePasswordUI> {
         ),
         body: SafeArea(
           top: false,
-          child: Center(
+          child: Align(
+            alignment: .topCenter,
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: _readableWidth),
               child: SingleChildScrollView(
@@ -144,15 +146,19 @@ class _SaveAction extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const .only(right: MonAISpacing.x2),
-      child: BlocSelector<ChangePasswordBloc, ChangePasswordState, bool>(
-        selector: (state) => state.status.isSubmitting,
-        builder: (context, submitting) => MonAIButton(
-          label: context.l10n.changePasswordSave,
-          size: .small,
-          loading: submitting,
-          onPressed: submitting ? null : onSave,
-        ),
-      ),
+      child:
+          BlocSelector<ChangePasswordBloc, ChangePasswordState, (bool, bool)>(
+            selector: (state) => (state.status.isSubmitting, state.canSubmit),
+            builder: (context, save) {
+              final (submitting, canSubmit) = save;
+              return MonAIButton(
+                label: context.l10n.changePasswordSave,
+                size: .small,
+                loading: submitting,
+                onPressed: canSubmit ? onSave : null,
+              );
+            },
+          ),
     );
   }
 }

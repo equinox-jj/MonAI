@@ -32,7 +32,7 @@ class _TransactionWalletFilterSheetState
     super.dispose();
   }
 
-  void _pick(String? id) => _selected.value = id;
+  void _pick(String id) => _selected.value = id;
 
   void _clear() => _selected.value = null;
 
@@ -54,18 +54,11 @@ class _TransactionWalletFilterSheetState
           Flexible(
             child: ListView.separated(
               shrinkWrap: true,
-              itemCount: widget.wallets.length + 1,
+              itemCount: widget.wallets.length,
               separatorBuilder: (_, _) =>
                   const SizedBox(height: MonAISpacing.x2),
               itemBuilder: (context, index) {
-                if (index == 0) {
-                  return MonAIRadioOption(
-                    title: l10n.filterAllWallets,
-                    selected: selected == null,
-                    onTap: () => _pick(null),
-                  );
-                }
-                final wallet = widget.wallets[index - 1];
+                final wallet = widget.wallets[index];
                 return Opacity(
                   opacity: wallet.isArchived ? 0.75 : 1,
                   child: MonAIRadioOption(

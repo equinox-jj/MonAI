@@ -8,6 +8,7 @@ import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/features/auth/domain/usecase/change_password_usecase.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 import 'package:monai/features/auth/presentation/pages/change_password/bloc/change_password_bloc.dart';
+import 'package:monai/features/auth/presentation/pages/change_password/model/change_password_state_extension.dart';
 
 class _MockChangePasswordUseCase extends Mock
     implements ChangePasswordUseCase {}
@@ -190,6 +191,30 @@ void main() {
 
     // Assert
     expect(bloc.state.newPasswordLongEnough, isTrue);
+  });
+
+  test('saving needs both passwords filled in', () async {
+    // Arrange
+    final canSubmit = [bloc.state.canSubmit];
+
+    // Act
+    bloc.add(const ChangePasswordEvent.currentPasswordEdited('old-secret'));
+    await pumpEventQueue();
+    canSubmit.add(bloc.state.canSubmit);
+    bloc.add(
+      const ChangePasswordEvent.newPasswordEdited(
+        newPassword: 'new-secret',
+        currentPassword: 'old-secret',
+      ),
+    );
+    await pumpEventQueue();
+    canSubmit.add(bloc.state.canSubmit);
+    bloc.add(const ChangePasswordEvent.currentPasswordEdited(''));
+    await pumpEventQueue();
+    canSubmit.add(bloc.state.canSubmit);
+
+    // Assert
+    expect(canSubmit, [false, false, true, false]);
   });
 
   test('after a failed submit each edit re-checks its field', () async {

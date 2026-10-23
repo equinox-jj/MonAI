@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/model/wallet_failure.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/bloc/wallet_detail_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/model/wallet_detail_state_extension.dart';
@@ -14,6 +13,7 @@ import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/wallet_detail_chart.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/wallet_detail_hero.dart';
 import 'package:monai/features/wallets/presentation/pages/wallet_detail/widgets/wallet_detail_transactions.dart';
+import 'package:monai/route_path.dart';
 
 class WalletDetailPage extends StatelessWidget {
   const WalletDetailPage({
@@ -48,10 +48,10 @@ class WalletDetailUI extends StatelessWidget {
   String _id(BuildContext context) => context.read<WalletDetailBloc>().state.id;
 
   void _edit(BuildContext context) =>
-      context.push(AppRoutes.walletEdit(_id(context)));
+      context.push(RoutePath.walletEdit(_id(context)));
 
   void _transfer(BuildContext context) => context.push(
-    AppRoutes.newTransaction(type: 'transfer', walletId: _id(context)),
+    RoutePath.newTransaction(type: 'transfer', walletId: _id(context)),
   );
 
   void _archive(BuildContext context) => context.read<WalletDetailBloc>().add(
@@ -63,7 +63,7 @@ class WalletDetailUI extends StatelessWidget {
       .add(const WalletDetailEvent.setDefaultRequested());
 
   void _openTransaction(BuildContext context, String id) =>
-      context.push(AppRoutes.transactionDetail(id));
+      context.push(RoutePath.transactionDetail(id));
 
   void _retry(BuildContext context) =>
       context.read<WalletDetailBloc>().add(const WalletDetailEvent.refreshed());
@@ -88,7 +88,7 @@ class WalletDetailUI extends StatelessWidget {
       icon: MonAIIcons.checkCircle,
       iconColor: context.colors.success,
       actionLabel: l10n.walletsViewArchived,
-      onAction: () => router?.push(AppRoutes.walletsArchived),
+      onAction: () => router?.push(RoutePath.walletsArchived),
     );
     _leave(context);
   }

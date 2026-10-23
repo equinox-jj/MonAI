@@ -130,7 +130,12 @@ class MonAICategoryPickerSheet extends StatefulWidget {
     required this.useLabel,
     required this.emptyLabel,
     super.key,
-  });
+    this.newLabel,
+    this.onNew,
+  }) : assert(
+         (newLabel == null) == (onNew == null),
+         'newLabel and onNew go together',
+       );
 
   final List<MonAICategoryOption> options;
   final String? selectedId;
@@ -138,6 +143,10 @@ class MonAICategoryPickerSheet extends StatefulWidget {
   final String doneLabel;
   final String Function(String name) useLabel;
   final String emptyLabel;
+  final String? newLabel;
+
+  /// Adds a trailing "new category" tile; called after the sheet closes.
+  final VoidCallback? onNew;
 
   @override
   State<MonAICategoryPickerSheet> createState() =>
@@ -160,9 +169,15 @@ class _MonAICategoryPickerSheetState extends State<MonAICategoryPickerSheet> {
     Navigator.pop(context);
   }
 
+  void _new() {
+    Navigator.pop(context);
+    widget.onNew?.call();
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (widget.options.isEmpty) {
+    final newLabel = widget.newLabel;
+    if (widget.options.isEmpty && newLabel == null) {
       return Padding(
         padding: const .symmetric(vertical: MonAISpacing.x6),
         child: Text(widget.emptyLabel, textAlign: .center),
@@ -179,10 +194,12 @@ class _MonAICategoryPickerSheetState extends State<MonAICategoryPickerSheet> {
           crossAxisAlignment: .stretch,
           spacing: MonAISpacing.x4,
           children: [
+            if (widget.options.isEmpty)
+              Text(widget.emptyLabel, textAlign: .center),
             Flexible(
               child: GridView.builder(
                 shrinkWrap: true,
-                itemCount: widget.options.length,
+                itemCount: widget.options.length + (newLabel == null ? 0 : 1),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 4,
                   mainAxisSpacing: MonAISpacing.x4,
@@ -190,6 +207,9 @@ class _MonAICategoryPickerSheetState extends State<MonAICategoryPickerSheet> {
                   mainAxisExtent: 84,
                 ),
                 itemBuilder: (context, index) {
+                  if (index == widget.options.length) {
+                    return _NewCategoryTile(label: newLabel!, onTap: _new);
+                  }
                   final option = widget.options[index];
                   return _CategoryTile(
                     option: option,
@@ -268,6 +288,91 @@ class _CategoryTile extends StatelessWidget {
       ),
     );
   }
+}
+
+class _NewCategoryTile extends StatelessWidget {
+  const _NewCategoryTile({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final c = context.colors;
+    const size = MonAISizes.avatarLarge - MonAISpacing.x2;
+    return Semantics(
+      button: true,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: MonAIRadius.mdAll,
+        child: Column(
+          spacing: MonAISpacing.x1_5,
+          children: [
+            Padding(
+              padding: const .all(MonAISpacing.x0_5 + MonAISizes.borderFocused),
+              child: CustomPaint(
+                painter: _DashedCirclePainter(color: c.borderStrong),
+                child: SizedBox.square(
+                  dimension: size,
+                  child: Center(
+                    child: MonAIIcon(
+                      MonAIIcons.add,
+                      size: MonAISizes.iconSm,
+                      color: c.textSecondary,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Text(
+              label,
+              textAlign: .center,
+              maxLines: 2,
+              overflow: .ellipsis,
+              style: context.textTheme.labelMedium?.copyWith(color: c.primary),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _DashedCirclePainter extends CustomPainter {
+  _DashedCirclePainter({required this.color});
+
+  static const _dash = 4.0;
+  static const _space = 3.0;
+
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const half = MonAISizes.border / 2;
+    final outline = Path()
+      ..addOval(
+        Rect.fromLTWH(
+          half,
+          half,
+          size.width - half * 2,
+          size.height - half * 2,
+        ),
+      );
+    final paint = Paint()
+      ..color = color
+      ..style = .stroke
+      ..strokeWidth = MonAISizes.border;
+    for (final metric in outline.computeMetrics()) {
+      var distance = 0.0;
+      while (distance < metric.length) {
+        canvas.drawPath(metric.extractPath(distance, distance + _dash), paint);
+        distance += _dash + _space;
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashedCirclePainter old) => old.color != color;
 }
 
 @immutable

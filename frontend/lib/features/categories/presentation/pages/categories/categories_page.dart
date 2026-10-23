@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/categories/domain/logic/category_rules.dart';
 import 'package:monai/features/categories/presentation/model/category_failure.dart';
 import 'package:monai/features/categories/presentation/pages/categories/bloc/categories_bloc.dart';
@@ -15,6 +14,7 @@ import 'package:monai/features/categories/presentation/pages/categories/widgets/
 import 'package:monai/features/categories/presentation/pages/categories/widgets/category_move_sheet.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
+import 'package:monai/route_path.dart';
 
 class CategoriesPage extends StatelessWidget {
   const CategoriesPage({super.key});
@@ -43,11 +43,11 @@ class CategoriesUI extends StatelessWidget {
       _bloc(context).add(CategoriesEvent.hiddenToggled(category.id));
 
   void _add(BuildContext context) =>
-      context.push(AppRoutes.categoryNew(_bloc(context).state.type));
+      context.push(RoutePath.categoryNew(_bloc(context).state.type));
 
   Future<void> _edit(BuildContext context, Category category) async {
     final outcome = await context.push<CategoryFormOutcome>(
-      AppRoutes.categoryEdit(category.id),
+      RoutePath.categoryEdit(category.id),
     );
     if (outcome == .deleteRequested && context.mounted) {
       await _confirmDelete(context, category);

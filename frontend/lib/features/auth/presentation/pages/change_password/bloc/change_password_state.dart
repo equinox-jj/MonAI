@@ -6,6 +6,8 @@ abstract class ChangePasswordState with _$ChangePasswordState {
     @Default(UiStatus.initial) UiStatus status,
     FieldError? currentPasswordError,
     FieldError? newPasswordError,
+    @Default(false) bool hasCurrentPassword,
+    @Default(false) bool hasNewPassword,
     @Default(false) bool newPasswordLongEnough,
     AuthFormError? formError,
     @Default(false) bool autovalidate,

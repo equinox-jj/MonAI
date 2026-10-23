@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
+import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/model/transaction_type.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
+import 'package:monai/core/utils/extension/category_type_extension.dart';
 import 'package:monai/core/utils/money_format.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
@@ -17,6 +18,7 @@ import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_fields.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_items.dart';
 import 'package:monai/features/receipt/presentation/pages/receipt_review/widgets/receipt_review_photo.dart';
+import 'package:monai/route_path.dart';
 
 class ReceiptReviewPage extends StatelessWidget {
   const ReceiptReviewPage({required this.args, super.key});
@@ -105,9 +107,11 @@ class _ReceiptReviewUIState extends State<ReceiptReviewUI> {
   void _openCategoryPicker() {
     final bloc = _bloc;
     final l10n = context.l10n;
+    final type = bloc.state.categoryType;
     showMonAIBottomSheet<void>(
       context,
       title: l10n.transactionFormChooseCategory,
+      titleTrailing: MonAICategoryTypePill(type: type, label: type.label(l10n)),
       builder: (_) => MonAICategoryPickerSheet(
         options: bloc.state.categories.map((c) => c.pickerOption).toList(),
         selectedId: bloc.state.categoryId,
@@ -115,8 +119,18 @@ class _ReceiptReviewUIState extends State<ReceiptReviewUI> {
         doneLabel: l10n.transactionFormDone,
         useLabel: l10n.transactionFormUseCategory,
         emptyLabel: l10n.transactionFormNoCategories,
+        newLabel: l10n.transactionFormNewCategory,
+        onNew: () => _newCategory(type),
       ),
     );
+  }
+
+  Future<void> _newCategory(CategoryType type) async {
+    final bloc = _bloc;
+    final id = await context.push<String>(RoutePath.categoryNew(type));
+    if (id != null && !bloc.isClosed) {
+      bloc.add(ReceiptReviewEvent.categoryPicked(id));
+    }
   }
 
   void _openWalletPicker() {
@@ -160,7 +174,7 @@ class _ReceiptReviewUIState extends State<ReceiptReviewUI> {
 
   void _openSaved(BuildContext context, ReceiptReviewState state) {
     if (state.savedId case final id?) {
-      context.go(AppRoutes.transactionDetail(id));
+      context.go(RoutePath.transactionDetail(id));
     }
   }
 

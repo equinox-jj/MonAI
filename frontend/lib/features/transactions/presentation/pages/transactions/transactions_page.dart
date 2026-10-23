@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/bloc/transactions_bloc.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/model/transactions_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transactions/widgets/transactions_actions.dart';
@@ -19,6 +18,7 @@ import 'package:monai/features/transactions/presentation/widgets/transaction_fil
 import 'package:monai/features/transactions/presentation/widgets/transaction_month_picker_sheet.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_type_filter_sheet.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_wallet_filter_sheet.dart';
+import 'package:monai/route_path.dart';
 
 class TransactionsPage extends StatelessWidget {
   const TransactionsPage({super.key});
@@ -39,17 +39,17 @@ class TransactionsUI extends StatelessWidget {
   static const _listPaneWidth = 420.0;
 
   void _openSearch(BuildContext context) => context.push(
-    AppRoutes.transactionSearchIn(context.read<TransactionsBloc>().state.month),
+    RoutePath.transactionSearchIn(context.read<TransactionsBloc>().state.month),
   );
 
   void _addTransaction(BuildContext context) =>
-      context.push(AppRoutes.transactionNew);
+      context.push(RoutePath.transactionNew);
 
   void _openTransaction(BuildContext context, String id) {
     if (context.widthClass == .expanded) {
       context.read<TransactionsBloc>().add(TransactionsEvent.selected(id));
     } else {
-      context.push(AppRoutes.transactionDetail(id));
+      context.push(RoutePath.transactionDetail(id));
     }
   }
 

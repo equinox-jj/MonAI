@@ -6,10 +6,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
 import 'package:monai/core/base/error/failure.dart';
+import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/route_path.dart';
 import 'package:monai/features/receipt/domain/entity/receipt_draft.dart';
 import 'package:monai/features/receipt/domain/usecase/parse_receipt_usecase.dart';
 import 'package:monai/features/receipt/domain/usecase/read_receipt_text_usecase.dart';
@@ -18,6 +17,7 @@ import 'package:monai/features/receipt/presentation/pages/scan_receipt/bloc/scan
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/camera/receipt_camera.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_phase.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/scan_receipt_page.dart';
+import 'package:monai/route_path.dart';
 
 class _MockReadText extends Mock implements ReadReceiptTextUseCase {}
 
@@ -80,12 +80,12 @@ void main() {
         GoRoute(
           path: '/launcher',
           builder: (context, _) => TextButton(
-            onPressed: () => context.push(AppRoutes.receiptScan),
+            onPressed: () => context.push(RoutePath.receiptScan),
             child: const Text('open'),
           ),
         ),
         GoRoute(
-          path: AppRoutes.receiptScan,
+          path: RoutePath.receiptScan,
           builder: (_, _) => BlocProvider.value(
             value: bloc,
             child: ScanReceiptUI(
@@ -95,13 +95,13 @@ void main() {
           ),
         ),
         GoRoute(
-          path: AppRoutes.receiptReview,
+          path: RoutePath.receiptReview,
           builder: (_, state) => Text(
             'review ${(state.extra! as ReceiptReviewArgs).draft.merchant}',
           ),
         ),
         GoRoute(
-          path: AppRoutes.transactionNew,
+          path: RoutePath.transactionNew,
           builder: (_, _) => const Text('add form'),
         ),
       ],

@@ -14,12 +14,13 @@ extension ReceiptReviewStateX on ReceiptReviewState {
 
   int get itemsTotal => items.fold(0, (sum, item) => sum + (item.amount ?? 0));
 
-  List<Category> get categories {
-    final type = this.type == TransactionType.income
-        ? CategoryType.income
-        : CategoryType.expense;
-    return allCategories.where((c) => c.type == type && !c.isHidden).toList();
-  }
+  CategoryType get categoryType => type == TransactionType.income
+      ? CategoryType.income
+      : CategoryType.expense;
+
+  List<Category> get categories => allCategories
+      .where((c) => c.type == categoryType && !c.isHidden)
+      .toList();
 
   Category? get category =>
       allCategories.where((c) => c.id == categoryId).firstOrNull;

@@ -19,12 +19,13 @@ extension QuickAddReviewStateX on QuickAddReviewState {
 
   int get savedCount => results.whereType<SavedQuickAddResult>().length;
 
-  List<Category> get categories {
-    final type = current.type == TransactionType.income
-        ? CategoryType.income
-        : CategoryType.expense;
-    return allCategories.where((c) => c.type == type && !c.isHidden).toList();
-  }
+  CategoryType get categoryType => current.type == TransactionType.income
+      ? CategoryType.income
+      : CategoryType.expense;
+
+  List<Category> get categories => allCategories
+      .where((c) => c.type == categoryType && !c.isHidden)
+      .toList();
 
   Category? categoryOf(String? id) =>
       allCategories.where((c) => c.id == id).firstOrNull;

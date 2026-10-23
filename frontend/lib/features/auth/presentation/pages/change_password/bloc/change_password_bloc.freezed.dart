@@ -425,7 +425,7 @@ as String,
 /// @nodoc
 mixin _$ChangePasswordState {
 
- UiStatus get status; FieldError? get currentPasswordError; FieldError? get newPasswordError; bool get newPasswordLongEnough; AuthFormError? get formError; bool get autovalidate; AuthField? get focusField;
+ UiStatus get status; FieldError? get currentPasswordError; FieldError? get newPasswordError; bool get hasCurrentPassword; bool get hasNewPassword; bool get newPasswordLongEnough; AuthFormError? get formError; bool get autovalidate; AuthField? get focusField;
 /// Create a copy of ChangePasswordState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -437,20 +437,20 @@ $ChangePasswordStateCopyWith<ChangePasswordState> get copyWith => _$ChangePasswo
 @override
 bool operator ==(Object other) {
   final _this = this as ChangePasswordState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChangePasswordState&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.currentPasswordError, _this.currentPasswordError) || other.currentPasswordError == _this.currentPasswordError)&&(identical(other.newPasswordError, _this.newPasswordError) || other.newPasswordError == _this.newPasswordError)&&(identical(other.newPasswordLongEnough, _this.newPasswordLongEnough) || other.newPasswordLongEnough == _this.newPasswordLongEnough)&&(identical(other.formError, _this.formError) || other.formError == _this.formError)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.focusField, _this.focusField) || other.focusField == _this.focusField));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is ChangePasswordState&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.currentPasswordError, _this.currentPasswordError) || other.currentPasswordError == _this.currentPasswordError)&&(identical(other.newPasswordError, _this.newPasswordError) || other.newPasswordError == _this.newPasswordError)&&(identical(other.hasCurrentPassword, _this.hasCurrentPassword) || other.hasCurrentPassword == _this.hasCurrentPassword)&&(identical(other.hasNewPassword, _this.hasNewPassword) || other.hasNewPassword == _this.hasNewPassword)&&(identical(other.newPasswordLongEnough, _this.newPasswordLongEnough) || other.newPasswordLongEnough == _this.newPasswordLongEnough)&&(identical(other.formError, _this.formError) || other.formError == _this.formError)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.focusField, _this.focusField) || other.focusField == _this.focusField));
 }
 
 
 @override
 int get hashCode {
   final _this = this as ChangePasswordState;
-  return Object.hash(runtimeType,_this.status,_this.currentPasswordError,_this.newPasswordError,_this.newPasswordLongEnough,_this.formError,_this.autovalidate,_this.focusField);
+  return Object.hash(runtimeType,_this.status,_this.currentPasswordError,_this.newPasswordError,_this.hasCurrentPassword,_this.hasNewPassword,_this.newPasswordLongEnough,_this.formError,_this.autovalidate,_this.focusField);
 }
 
 @override
 String toString() {
   final _this = this as ChangePasswordState;
-  return 'ChangePasswordState(status: ${_this.status}, currentPasswordError: ${_this.currentPasswordError}, newPasswordError: ${_this.newPasswordError}, newPasswordLongEnough: ${_this.newPasswordLongEnough}, formError: ${_this.formError}, autovalidate: ${_this.autovalidate}, focusField: ${_this.focusField})';
+  return 'ChangePasswordState(status: ${_this.status}, currentPasswordError: ${_this.currentPasswordError}, newPasswordError: ${_this.newPasswordError}, hasCurrentPassword: ${_this.hasCurrentPassword}, hasNewPassword: ${_this.hasNewPassword}, newPasswordLongEnough: ${_this.newPasswordLongEnough}, formError: ${_this.formError}, autovalidate: ${_this.autovalidate}, focusField: ${_this.focusField})';
 }
 
 
@@ -461,7 +461,7 @@ abstract mixin class $ChangePasswordStateCopyWith<$Res>  {
   factory $ChangePasswordStateCopyWith(ChangePasswordState value, $Res Function(ChangePasswordState) _then) = _$ChangePasswordStateCopyWithImpl;
 @useResult
 $Res call({
- UiStatus status, FieldError? currentPasswordError, FieldError? newPasswordError, bool newPasswordLongEnough, AuthFormError? formError, bool autovalidate, AuthField? focusField
+ UiStatus status, FieldError? currentPasswordError, FieldError? newPasswordError, bool hasCurrentPassword, bool hasNewPassword, bool newPasswordLongEnough, AuthFormError? formError, bool autovalidate, AuthField? focusField
 });
 
 
@@ -478,12 +478,14 @@ class _$ChangePasswordStateCopyWithImpl<$Res>
 
 /// Create a copy of ChangePasswordState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? currentPasswordError = freezed,Object? newPasswordError = freezed,Object? newPasswordLongEnough = null,Object? formError = freezed,Object? autovalidate = null,Object? focusField = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? status = null,Object? currentPasswordError = freezed,Object? newPasswordError = freezed,Object? hasCurrentPassword = null,Object? hasNewPassword = null,Object? newPasswordLongEnough = null,Object? formError = freezed,Object? autovalidate = null,Object? focusField = freezed,}) {
   return _then(ChangePasswordState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as UiStatus,currentPasswordError: freezed == currentPasswordError ? _self.currentPasswordError : currentPasswordError // ignore: cast_nullable_to_non_nullable
 as FieldError?,newPasswordError: freezed == newPasswordError ? _self.newPasswordError : newPasswordError // ignore: cast_nullable_to_non_nullable
-as FieldError?,newPasswordLongEnough: null == newPasswordLongEnough ? _self.newPasswordLongEnough : newPasswordLongEnough // ignore: cast_nullable_to_non_nullable
+as FieldError?,hasCurrentPassword: null == hasCurrentPassword ? _self.hasCurrentPassword : hasCurrentPassword // ignore: cast_nullable_to_non_nullable
+as bool,hasNewPassword: null == hasNewPassword ? _self.hasNewPassword : hasNewPassword // ignore: cast_nullable_to_non_nullable
+as bool,newPasswordLongEnough: null == newPasswordLongEnough ? _self.newPasswordLongEnough : newPasswordLongEnough // ignore: cast_nullable_to_non_nullable
 as bool,formError: freezed == formError ? _self.formError : formError // ignore: cast_nullable_to_non_nullable
 as AuthFormError?,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
 as bool,focusField: freezed == focusField ? _self.focusField : focusField // ignore: cast_nullable_to_non_nullable
@@ -584,10 +586,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? currentPasswordError,  FieldError? newPasswordError,  bool newPasswordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? currentPasswordError,  FieldError? newPasswordError,  bool hasCurrentPassword,  bool hasNewPassword,  bool newPasswordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _ChangePasswordState() when $default != null:
-return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_that.newPasswordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
+return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_that.hasCurrentPassword,_that.hasNewPassword,_that.newPasswordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
   return orElse();
 
 }
@@ -605,10 +607,10 @@ return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? currentPasswordError,  FieldError? newPasswordError,  bool newPasswordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( UiStatus status,  FieldError? currentPasswordError,  FieldError? newPasswordError,  bool hasCurrentPassword,  bool hasNewPassword,  bool newPasswordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)  $default,) {final _that = this;
 switch (_that) {
 case _ChangePasswordState():
-return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_that.newPasswordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
+return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_that.hasCurrentPassword,_that.hasNewPassword,_that.newPasswordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -625,10 +627,10 @@ return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UiStatus status,  FieldError? currentPasswordError,  FieldError? newPasswordError,  bool newPasswordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( UiStatus status,  FieldError? currentPasswordError,  FieldError? newPasswordError,  bool hasCurrentPassword,  bool hasNewPassword,  bool newPasswordLongEnough,  AuthFormError? formError,  bool autovalidate,  AuthField? focusField)?  $default,) {final _that = this;
 switch (_that) {
 case _ChangePasswordState() when $default != null:
-return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_that.newPasswordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
+return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_that.hasCurrentPassword,_that.hasNewPassword,_that.newPasswordLongEnough,_that.formError,_that.autovalidate,_that.focusField);case _:
   return null;
 
 }
@@ -640,12 +642,14 @@ return $default(_that.status,_that.currentPasswordError,_that.newPasswordError,_
 
 
 class _ChangePasswordState implements ChangePasswordState {
-  const _ChangePasswordState({this.status = UiStatus.initial, this.currentPasswordError, this.newPasswordError, this.newPasswordLongEnough = false, this.formError, this.autovalidate = false, this.focusField});
+  const _ChangePasswordState({this.status = UiStatus.initial, this.currentPasswordError, this.newPasswordError, this.hasCurrentPassword = false, this.hasNewPassword = false, this.newPasswordLongEnough = false, this.formError, this.autovalidate = false, this.focusField});
   
 
 @override@JsonKey() final  UiStatus status;
 @override final  FieldError? currentPasswordError;
 @override final  FieldError? newPasswordError;
+@override@JsonKey() final  bool hasCurrentPassword;
+@override@JsonKey() final  bool hasNewPassword;
 @override@JsonKey() final  bool newPasswordLongEnough;
 @override final  AuthFormError? formError;
 @override@JsonKey() final  bool autovalidate;
@@ -661,18 +665,18 @@ _$ChangePasswordStateCopyWith<_ChangePasswordState> get copyWith => __$ChangePas
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChangePasswordState&&(identical(other.status, status) || other.status == status)&&(identical(other.currentPasswordError, currentPasswordError) || other.currentPasswordError == currentPasswordError)&&(identical(other.newPasswordError, newPasswordError) || other.newPasswordError == newPasswordError)&&(identical(other.newPasswordLongEnough, newPasswordLongEnough) || other.newPasswordLongEnough == newPasswordLongEnough)&&(identical(other.formError, formError) || other.formError == formError)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.focusField, focusField) || other.focusField == focusField));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _ChangePasswordState&&(identical(other.status, status) || other.status == status)&&(identical(other.currentPasswordError, currentPasswordError) || other.currentPasswordError == currentPasswordError)&&(identical(other.newPasswordError, newPasswordError) || other.newPasswordError == newPasswordError)&&(identical(other.hasCurrentPassword, hasCurrentPassword) || other.hasCurrentPassword == hasCurrentPassword)&&(identical(other.hasNewPassword, hasNewPassword) || other.hasNewPassword == hasNewPassword)&&(identical(other.newPasswordLongEnough, newPasswordLongEnough) || other.newPasswordLongEnough == newPasswordLongEnough)&&(identical(other.formError, formError) || other.formError == formError)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.focusField, focusField) || other.focusField == focusField));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,status,currentPasswordError,newPasswordError,newPasswordLongEnough,formError,autovalidate,focusField);
+    return Object.hash(runtimeType,status,currentPasswordError,newPasswordError,hasCurrentPassword,hasNewPassword,newPasswordLongEnough,formError,autovalidate,focusField);
 }
 
 @override
 String toString() {
-    return 'ChangePasswordState(status: $status, currentPasswordError: $currentPasswordError, newPasswordError: $newPasswordError, newPasswordLongEnough: $newPasswordLongEnough, formError: $formError, autovalidate: $autovalidate, focusField: $focusField)';
+    return 'ChangePasswordState(status: $status, currentPasswordError: $currentPasswordError, newPasswordError: $newPasswordError, hasCurrentPassword: $hasCurrentPassword, hasNewPassword: $hasNewPassword, newPasswordLongEnough: $newPasswordLongEnough, formError: $formError, autovalidate: $autovalidate, focusField: $focusField)';
 }
 
 
@@ -683,7 +687,7 @@ abstract mixin class _$ChangePasswordStateCopyWith<$Res> implements $ChangePassw
   factory _$ChangePasswordStateCopyWith(_ChangePasswordState value, $Res Function(_ChangePasswordState) _then) = __$ChangePasswordStateCopyWithImpl;
 @override @useResult
 $Res call({
- UiStatus status, FieldError? currentPasswordError, FieldError? newPasswordError, bool newPasswordLongEnough, AuthFormError? formError, bool autovalidate, AuthField? focusField
+ UiStatus status, FieldError? currentPasswordError, FieldError? newPasswordError, bool hasCurrentPassword, bool hasNewPassword, bool newPasswordLongEnough, AuthFormError? formError, bool autovalidate, AuthField? focusField
 });
 
 
@@ -700,12 +704,14 @@ class __$ChangePasswordStateCopyWithImpl<$Res>
 
 /// Create a copy of ChangePasswordState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? currentPasswordError = freezed,Object? newPasswordError = freezed,Object? newPasswordLongEnough = null,Object? formError = freezed,Object? autovalidate = null,Object? focusField = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? status = null,Object? currentPasswordError = freezed,Object? newPasswordError = freezed,Object? hasCurrentPassword = null,Object? hasNewPassword = null,Object? newPasswordLongEnough = null,Object? formError = freezed,Object? autovalidate = null,Object? focusField = freezed,}) {
   return _then(_ChangePasswordState(
 status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
 as UiStatus,currentPasswordError: freezed == currentPasswordError ? _self.currentPasswordError : currentPasswordError // ignore: cast_nullable_to_non_nullable
 as FieldError?,newPasswordError: freezed == newPasswordError ? _self.newPasswordError : newPasswordError // ignore: cast_nullable_to_non_nullable
-as FieldError?,newPasswordLongEnough: null == newPasswordLongEnough ? _self.newPasswordLongEnough : newPasswordLongEnough // ignore: cast_nullable_to_non_nullable
+as FieldError?,hasCurrentPassword: null == hasCurrentPassword ? _self.hasCurrentPassword : hasCurrentPassword // ignore: cast_nullable_to_non_nullable
+as bool,hasNewPassword: null == hasNewPassword ? _self.hasNewPassword : hasNewPassword // ignore: cast_nullable_to_non_nullable
+as bool,newPasswordLongEnough: null == newPasswordLongEnough ? _self.newPasswordLongEnough : newPasswordLongEnough // ignore: cast_nullable_to_non_nullable
 as bool,formError: freezed == formError ? _self.formError : formError // ignore: cast_nullable_to_non_nullable
 as AuthFormError?,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
 as bool,focusField: freezed == focusField ? _self.focusField : focusField // ignore: cast_nullable_to_non_nullable

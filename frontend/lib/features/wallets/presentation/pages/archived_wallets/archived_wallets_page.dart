@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/shared/domain/entity/wallet.dart';
 import 'package:monai/features/wallets/presentation/pages/archived_wallets/bloc/archived_wallets_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/archived_wallets/widgets/archived_wallet_row.dart';
+import 'package:monai/route_path.dart';
 
 class ArchivedWalletsPage extends StatelessWidget {
   const ArchivedWalletsPage({super.key});
@@ -42,7 +42,7 @@ class ArchivedWalletsUI extends StatelessWidget {
       icon: MonAIIcons.checkCircle,
       iconColor: context.colors.success,
       actionLabel: l10n.archivedWalletsView,
-      onAction: () => router?.push(AppRoutes.walletDetail(wallet.id)),
+      onAction: () => router?.push(RoutePath.walletDetail(wallet.id)),
     );
   }
 

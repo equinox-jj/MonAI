@@ -17,7 +17,7 @@ class DashboardPage extends StatelessWidget {
   );
 
   void _addTransaction(BuildContext context) =>
-      context.push(AppRoutes.transactionNew);
+      context.push(RoutePath.transactionNew);
 
   @override
   Widget build(BuildContext context) {

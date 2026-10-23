@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:go_router/go_router.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
-import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/app_router.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/sign_in_page.dart';
+import 'package:monai/route_path.dart';
 
 import '../../helpers/transaction_fakes.dart';
 import '../../helpers/wallet_fakes.dart';
@@ -27,9 +27,9 @@ void main() {
     test('a signed-in user leaves the auth screens for Home', () {
       // Arrange
       const locations = [
-        AppRoutes.onboarding,
-        AppRoutes.signIn,
-        AppRoutes.register,
+        RoutePath.onboarding,
+        RoutePath.signIn,
+        RoutePath.register,
       ];
 
       // Act
@@ -38,23 +38,23 @@ void main() {
       );
 
       // Assert
-      expect(targets, everyElement(AppRoutes.home));
+      expect(targets, everyElement(RoutePath.home));
     });
 
     test('a signed-out user is sent from Home to Sign in', () {
       // Arrange
-      const location = AppRoutes.home;
+      const location = RoutePath.home;
 
       // Act
       final target = sessionRedirect(.signedOut, location);
 
       // Assert
-      expect(target, AppRoutes.signIn);
+      expect(target, RoutePath.signIn);
     });
 
     test('a signed-out user may stay on the auth screens', () {
       // Arrange
-      const location = AppRoutes.register;
+      const location = RoutePath.register;
 
       // Act
       final target = sessionRedirect(.signedOut, location);
@@ -65,7 +65,7 @@ void main() {
 
     test('leaves the launch route to pick the first screen', () {
       // Arrange
-      const location = AppRoutes.launch;
+      const location = RoutePath.launch;
 
       // Act
       final target = sessionRedirect(.signedOut, location);
@@ -76,7 +76,7 @@ void main() {
 
     test('an expired session stays put under the dialog', () {
       // Arrange
-      const location = AppRoutes.home;
+      const location = RoutePath.home;
 
       // Act
       final target = sessionRedirect(SessionStatus.expired, location);
@@ -87,7 +87,7 @@ void main() {
 
     test('a changed password stays put under the dialog', () {
       // Arrange
-      const location = AppRoutes.changePassword;
+      const location = RoutePath.changePassword;
 
       // Act
       final target = sessionRedirect(SessionStatus.passwordChanged, location);
@@ -107,7 +107,7 @@ void main() {
       final target = await launchRedirect(.signedIn, isOnboardingCompleted);
 
       // Assert
-      expect(target, AppRoutes.home);
+      expect(target, RoutePath.home);
       expect(flagRead, isFalse);
     });
 
@@ -121,7 +121,7 @@ void main() {
         final target = await launchRedirect(.signedOut, isOnboardingCompleted);
 
         // Assert
-        expect(target, AppRoutes.signIn);
+        expect(target, RoutePath.signIn);
       },
     );
 
@@ -133,7 +133,7 @@ void main() {
       final target = await launchRedirect(.signedOut, isOnboardingCompleted);
 
       // Assert
-      expect(target, AppRoutes.onboarding);
+      expect(target, RoutePath.onboarding);
     });
   });
 
@@ -186,7 +186,7 @@ void main() {
       // Assert
       expect(
         router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.onboarding,
+        RoutePath.onboarding,
       );
     });
 
@@ -205,7 +205,7 @@ void main() {
       // Assert
       expect(
         router.routerDelegate.currentConfiguration.uri.path,
-        AppRoutes.signIn,
+        RoutePath.signIn,
       );
     });
 
@@ -231,11 +231,11 @@ void main() {
       const email = 'ana+1@b.co';
 
       // Act
-      final location = AppRoutes.registerWith(email: email);
+      final location = RoutePath.registerWith(email: email);
 
       // Assert
       expect(Uri.parse(location).queryParameters['email'], email);
-      expect(Uri.parse(location).path, AppRoutes.register);
+      expect(Uri.parse(location).path, RoutePath.register);
     });
 
     test('an empty email adds no parameter', () {
@@ -243,10 +243,10 @@ void main() {
       // (no email typed)
 
       // Act
-      final location = AppRoutes.signInWith();
+      final location = RoutePath.signInWith();
 
       // Assert
-      expect(location, AppRoutes.signIn);
+      expect(location, RoutePath.signIn);
     });
   });
 
@@ -256,7 +256,7 @@ void main() {
       final month = DateTime(2026, 9);
 
       // Act
-      final location = AppRoutes.transactionSearchIn(month);
+      final location = RoutePath.transactionSearchIn(month);
 
       // Assert
       expect(location, '/transactions/search?month=2026-09');
@@ -279,11 +279,11 @@ void main() {
       // (no arguments, then both)
 
       // Act
-      final plain = AppRoutes.newTransaction();
-      final preset = AppRoutes.newTransaction(type: 'transfer', walletId: 'w1');
+      final plain = RoutePath.newTransaction();
+      final preset = RoutePath.newTransaction(type: 'transfer', walletId: 'w1');
 
       // Assert
-      expect(plain, AppRoutes.transactionNew);
+      expect(plain, RoutePath.transactionNew);
       expect(preset, '/transactions/new?type=transfer&wallet=w1');
     });
 
@@ -292,8 +292,8 @@ void main() {
       const id = 't1';
 
       // Act
-      final detail = AppRoutes.transactionDetail(id);
-      final edit = AppRoutes.transactionEdit(id);
+      final detail = RoutePath.transactionDetail(id);
+      final edit = RoutePath.transactionEdit(id);
 
       // Assert
       expect(detail, '/transactions/t1');

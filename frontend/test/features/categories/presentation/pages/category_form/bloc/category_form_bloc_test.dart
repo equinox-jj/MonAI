@@ -95,6 +95,7 @@ void main() {
       ),
     ).called(1);
     expect(bloc.state.done, isTrue);
+    expect(bloc.state.savedId, kopi.id);
   });
 
   test('a taken name shows under the field and keeps the form', () async {

@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/route_path.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/bloc/scan_receipt_bloc.dart';
-import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_receipt_state_extension.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/camera/receipt_camera.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_phase.dart';
+import 'package:monai/features/receipt/presentation/pages/scan_receipt/model/scan_receipt_state_extension.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_camera_view.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_no_text.dart';
 import 'package:monai/features/receipt/presentation/pages/scan_receipt/widgets/scan_receipt_processing.dart';
+import 'package:monai/route_path.dart';
 
 class ScanReceiptPage extends StatelessWidget {
   const ScanReceiptPage({super.key, this.camera, this.pickPhoto});
@@ -119,7 +119,7 @@ class _ScanReceiptUIState extends State<ScanReceiptUI>
 
   void _retake() => _bloc.add(const ScanReceiptEvent.retakeRequested());
 
-  void _typeInstead() => context.pushReplacement(AppRoutes.transactionNew);
+  void _typeInstead() => context.pushReplacement(RoutePath.transactionNew);
 
   void _close() => context.pop();
 
@@ -129,7 +129,7 @@ class _ScanReceiptUIState extends State<ScanReceiptUI>
     _reviewOpen = true;
     await _parkCamera();
     if (!context.mounted) return;
-    await context.push<void>(AppRoutes.receiptReview, extra: review);
+    await context.push<void>(RoutePath.receiptReview, extra: review);
     _reviewOpen = false;
     // A save leaves the scanner too; only Back or Retake land here.
     if (mounted) await _openCamera();

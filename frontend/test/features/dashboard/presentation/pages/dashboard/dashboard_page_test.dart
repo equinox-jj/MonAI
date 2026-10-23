@@ -2,17 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
-import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/app_router.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/app/injector.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/home/domain/usecase/refresh_home_usecase.dart';
 import 'package:monai/features/home/domain/usecase/watch_home_dashboard_usecase.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
 import 'package:monai/features/home/presentation/pages/home/home_page.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/wallets_page.dart';
+import 'package:monai/route_path.dart';
 
 import '../../../../../helpers/transaction_fakes.dart';
 import '../../../../../helpers/wallet_fakes.dart';
@@ -51,7 +51,7 @@ void main() {
     final router = createAppRouter(
       sessionManager: sessionManager,
       isOnboardingCompleted: () async => true,
-      initialLocation: AppRoutes.home,
+      initialLocation: RoutePath.home,
     );
     addTearDown(router.dispose);
     await tester.pumpWidget(

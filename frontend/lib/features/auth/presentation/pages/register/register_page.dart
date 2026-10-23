@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/base/error/field_error.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/route_path.dart';
 import 'package:monai/features/auth/domain/validation/auth_input_validator.dart';
 import 'package:monai/features/auth/presentation/model/auth_form_error.dart';
 import 'package:monai/features/auth/presentation/pages/register/bloc/register_bloc.dart';
 import 'package:monai/features/auth/presentation/widgets/auth_error_text.dart';
 import 'package:monai/features/auth/presentation/widgets/auth_scaffold.dart';
+import 'package:monai/route_path.dart';
 
 /// A successful register needs no navigation here: the saved session sends
 /// the router to Home.
@@ -79,7 +79,7 @@ class _RegisterUIState extends State<RegisterUI> {
     );
   }
 
-  void _goToSignIn() => context.go(AppRoutes.signInWith(email: _email.text));
+  void _goToSignIn() => context.go(RoutePath.signInWith(email: _email.text));
 
   @override
   Widget build(BuildContext context) {

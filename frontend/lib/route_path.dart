@@ -1,6 +1,6 @@
 import 'package:monai/core/model/category_type.dart';
 
-abstract final class AppRoutes {
+abstract final class RoutePath {
   static const launch = '/';
   static const onboarding = '/onboarding';
   static const signIn = '/sign-in';
@@ -24,6 +24,7 @@ abstract final class AppRoutes {
     queryParameters: {focusParam: 'delete'},
   ).toString();
 
+  /// Pops with the new category's id, or null when closed without saving.
   static String categoryNew(CategoryType type) => Uri(
     path: '$categories/new',
     queryParameters: {typeParam: type.name},

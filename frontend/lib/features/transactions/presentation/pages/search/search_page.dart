@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/shared/domain/entity/transaction_filter.dart';
 import 'package:monai/features/transactions/domain/entity/transaction_lookups.dart';
@@ -20,6 +19,7 @@ import 'package:monai/features/transactions/presentation/widgets/transaction_fil
 import 'package:monai/features/transactions/presentation/widgets/transaction_month_picker_sheet.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_type_filter_sheet.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_wallet_filter_sheet.dart';
+import 'package:monai/route_path.dart';
 
 class SearchPage extends StatelessWidget {
   const SearchPage({super.key, this.initialMonth});
@@ -62,7 +62,7 @@ class _SearchUIState extends State<SearchUI> {
     _send(SearchEvent.recentUsed(query));
   }
 
-  void _open(String id) => context.push(AppRoutes.transactionDetail(id));
+  void _open(String id) => context.push(RoutePath.transactionDetail(id));
 
   bool _onScroll(ScrollNotification notification) {
     if (notification.metrics.axis == .vertical &&

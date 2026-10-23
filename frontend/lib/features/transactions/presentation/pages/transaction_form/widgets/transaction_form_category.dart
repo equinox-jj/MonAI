@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:monai/core/model/category_type.dart';
 import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/ui/l10n/l10n.dart';
+import 'package:monai/core/utils/extension/category_type_extension.dart';
 import 'package:monai/features/shared/domain/entity/category.dart';
 import 'package:monai/features/shared/domain/validation/transaction_input_validator.dart';
 import 'package:monai/features/transactions/presentation/model/transaction_picker_options.dart';
@@ -9,6 +12,7 @@ import 'package:monai/features/transactions/presentation/pages/transaction_form/
 import 'package:monai/features/transactions/presentation/pages/transaction_form/model/transaction_form_state_extension.dart';
 import 'package:monai/features/transactions/presentation/pages/transaction_form/widgets/transaction_form_field_error.dart';
 import 'package:monai/features/transactions/presentation/widgets/transaction_category_filter_sheet.dart';
+import 'package:monai/route_path.dart';
 
 class TransactionFormCategory extends StatelessWidget {
   const TransactionFormCategory({super.key});
@@ -19,18 +23,34 @@ class TransactionFormCategory extends StatelessWidget {
 
   void _openPicker(BuildContext context) {
     final bloc = context.read<TransactionFormBloc>();
+    final l10n = context.l10n;
+    final type = bloc.state.categoryType;
     showMonAIBottomSheet<void>(
       context,
-      title: context.l10n.transactionFormChooseCategory,
-      builder: (context) => MonAICategoryPickerSheet(
+      title: l10n.transactionFormChooseCategory,
+      titleTrailing: MonAICategoryTypePill(type: type, label: type.label(l10n)),
+      builder: (_) => MonAICategoryPickerSheet(
         options: bloc.state.categories.map((c) => c.pickerOption).toList(),
         selectedId: bloc.state.draft.categoryId,
         onPick: (id) => bloc.add(TransactionFormEvent.categoryPicked(id)),
-        doneLabel: context.l10n.transactionFormDone,
-        useLabel: context.l10n.transactionFormUseCategory,
-        emptyLabel: context.l10n.transactionFormNoCategories,
+        doneLabel: l10n.transactionFormDone,
+        useLabel: l10n.transactionFormUseCategory,
+        emptyLabel: l10n.transactionFormNoCategories,
+        newLabel: l10n.transactionFormNewCategory,
+        onNew: () => _newCategory(context, bloc, type),
       ),
     );
+  }
+
+  Future<void> _newCategory(
+    BuildContext context,
+    TransactionFormBloc bloc,
+    CategoryType type,
+  ) async {
+    final id = await context.push<String>(RoutePath.categoryNew(type));
+    if (id != null && !bloc.isClosed) {
+      bloc.add(TransactionFormEvent.categoryPicked(id));
+    }
   }
 
   @override

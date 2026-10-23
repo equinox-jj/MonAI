@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/bloc/wallets_bloc.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_actions.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_detail_pane.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_header.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_list.dart';
 import 'package:monai/features/wallets/presentation/pages/wallets/widgets/wallets_states.dart';
+import 'package:monai/route_path.dart';
 
 class WalletsPage extends StatelessWidget {
   const WalletsPage({super.key});
@@ -29,18 +29,18 @@ class WalletsUI extends StatelessWidget {
   const WalletsUI({super.key});
   static const _listPaneWidth = 420.0;
 
-  void _addWallet(BuildContext context) => context.push(AppRoutes.walletNew);
+  void _addWallet(BuildContext context) => context.push(RoutePath.walletNew);
 
   void _openWallet(BuildContext context, String id) {
     if (context.widthClass == .expanded) {
       context.read<WalletsBloc>().add(WalletsEvent.selected(id));
     } else {
-      context.push(AppRoutes.walletDetail(id));
+      context.push(RoutePath.walletDetail(id));
     }
   }
 
   void _showArchived(BuildContext context) =>
-      context.push(AppRoutes.walletsArchived);
+      context.push(RoutePath.walletsArchived);
 
   void _retry(BuildContext context) =>
       context.read<WalletsBloc>().add(const WalletsEvent.refreshed());

@@ -497,7 +497,7 @@ as String,
 /// @nodoc
 mixin _$CategoryFormState {
 
- CategoryFormMode get mode; UiStatus get status; CategoryType get type; Category? get original; String get icon; String get color; FieldError? get nameError; bool get autovalidate; bool get isSaving; bool get done; CategoryFailure? get actionFailure;
+ CategoryFormMode get mode; UiStatus get status; CategoryType get type; Category? get original; String get icon; String get color; FieldError? get nameError; bool get autovalidate; bool get isSaving; bool get done; String? get savedId; CategoryFailure? get actionFailure;
 /// Create a copy of CategoryFormState
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -509,20 +509,20 @@ $CategoryFormStateCopyWith<CategoryFormState> get copyWith => _$CategoryFormStat
 @override
 bool operator ==(Object other) {
   final _this = this as CategoryFormState;
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoryFormState&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.original, _this.original) || other.original == _this.original)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.color, _this.color) || other.color == _this.color)&&(identical(other.nameError, _this.nameError) || other.nameError == _this.nameError)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.done, _this.done) || other.done == _this.done)&&(identical(other.actionFailure, _this.actionFailure) || other.actionFailure == _this.actionFailure));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is CategoryFormState&&(identical(other.mode, _this.mode) || other.mode == _this.mode)&&(identical(other.status, _this.status) || other.status == _this.status)&&(identical(other.type, _this.type) || other.type == _this.type)&&(identical(other.original, _this.original) || other.original == _this.original)&&(identical(other.icon, _this.icon) || other.icon == _this.icon)&&(identical(other.color, _this.color) || other.color == _this.color)&&(identical(other.nameError, _this.nameError) || other.nameError == _this.nameError)&&(identical(other.autovalidate, _this.autovalidate) || other.autovalidate == _this.autovalidate)&&(identical(other.isSaving, _this.isSaving) || other.isSaving == _this.isSaving)&&(identical(other.done, _this.done) || other.done == _this.done)&&(identical(other.savedId, _this.savedId) || other.savedId == _this.savedId)&&(identical(other.actionFailure, _this.actionFailure) || other.actionFailure == _this.actionFailure));
 }
 
 
 @override
 int get hashCode {
   final _this = this as CategoryFormState;
-  return Object.hash(runtimeType,_this.mode,_this.status,_this.type,_this.original,_this.icon,_this.color,_this.nameError,_this.autovalidate,_this.isSaving,_this.done,_this.actionFailure);
+  return Object.hash(runtimeType,_this.mode,_this.status,_this.type,_this.original,_this.icon,_this.color,_this.nameError,_this.autovalidate,_this.isSaving,_this.done,_this.savedId,_this.actionFailure);
 }
 
 @override
 String toString() {
   final _this = this as CategoryFormState;
-  return 'CategoryFormState(mode: ${_this.mode}, status: ${_this.status}, type: ${_this.type}, original: ${_this.original}, icon: ${_this.icon}, color: ${_this.color}, nameError: ${_this.nameError}, autovalidate: ${_this.autovalidate}, isSaving: ${_this.isSaving}, done: ${_this.done}, actionFailure: ${_this.actionFailure})';
+  return 'CategoryFormState(mode: ${_this.mode}, status: ${_this.status}, type: ${_this.type}, original: ${_this.original}, icon: ${_this.icon}, color: ${_this.color}, nameError: ${_this.nameError}, autovalidate: ${_this.autovalidate}, isSaving: ${_this.isSaving}, done: ${_this.done}, savedId: ${_this.savedId}, actionFailure: ${_this.actionFailure})';
 }
 
 
@@ -533,7 +533,7 @@ abstract mixin class $CategoryFormStateCopyWith<$Res>  {
   factory $CategoryFormStateCopyWith(CategoryFormState value, $Res Function(CategoryFormState) _then) = _$CategoryFormStateCopyWithImpl;
 @useResult
 $Res call({
- CategoryFormMode mode, UiStatus status, CategoryType type, Category? original, String icon, String color, FieldError? nameError, bool autovalidate, bool isSaving, bool done, CategoryFailure? actionFailure
+ CategoryFormMode mode, UiStatus status, CategoryType type, Category? original, String icon, String color, FieldError? nameError, bool autovalidate, bool isSaving, bool done, String? savedId, CategoryFailure? actionFailure
 });
 
 
@@ -550,7 +550,7 @@ class _$CategoryFormStateCopyWithImpl<$Res>
 
 /// Create a copy of CategoryFormState
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? status = null,Object? type = null,Object? original = freezed,Object? icon = null,Object? color = null,Object? nameError = freezed,Object? autovalidate = null,Object? isSaving = null,Object? done = null,Object? actionFailure = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? mode = null,Object? status = null,Object? type = null,Object? original = freezed,Object? icon = null,Object? color = null,Object? nameError = freezed,Object? autovalidate = null,Object? isSaving = null,Object? done = null,Object? savedId = freezed,Object? actionFailure = freezed,}) {
   return _then(CategoryFormState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as CategoryFormMode,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -562,7 +562,8 @@ as String,nameError: freezed == nameError ? _self.nameError : nameError // ignor
 as FieldError?,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,done: null == done ? _self.done : done // ignore: cast_nullable_to_non_nullable
-as bool,actionFailure: freezed == actionFailure ? _self.actionFailure : actionFailure // ignore: cast_nullable_to_non_nullable
+as bool,savedId: freezed == savedId ? _self.savedId : savedId // ignore: cast_nullable_to_non_nullable
+as String?,actionFailure: freezed == actionFailure ? _self.actionFailure : actionFailure // ignore: cast_nullable_to_non_nullable
 as CategoryFailure?,
   ));
 }
@@ -669,10 +670,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CategoryFormMode mode,  UiStatus status,  CategoryType type,  Category? original,  String icon,  String color,  FieldError? nameError,  bool autovalidate,  bool isSaving,  bool done,  CategoryFailure? actionFailure)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( CategoryFormMode mode,  UiStatus status,  CategoryType type,  Category? original,  String icon,  String color,  FieldError? nameError,  bool autovalidate,  bool isSaving,  bool done,  String? savedId,  CategoryFailure? actionFailure)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _CategoryFormState() when $default != null:
-return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_that.color,_that.nameError,_that.autovalidate,_that.isSaving,_that.done,_that.actionFailure);case _:
+return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_that.color,_that.nameError,_that.autovalidate,_that.isSaving,_that.done,_that.savedId,_that.actionFailure);case _:
   return orElse();
 
 }
@@ -690,10 +691,10 @@ return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CategoryFormMode mode,  UiStatus status,  CategoryType type,  Category? original,  String icon,  String color,  FieldError? nameError,  bool autovalidate,  bool isSaving,  bool done,  CategoryFailure? actionFailure)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( CategoryFormMode mode,  UiStatus status,  CategoryType type,  Category? original,  String icon,  String color,  FieldError? nameError,  bool autovalidate,  bool isSaving,  bool done,  String? savedId,  CategoryFailure? actionFailure)  $default,) {final _that = this;
 switch (_that) {
 case _CategoryFormState():
-return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_that.color,_that.nameError,_that.autovalidate,_that.isSaving,_that.done,_that.actionFailure);case _:
+return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_that.color,_that.nameError,_that.autovalidate,_that.isSaving,_that.done,_that.savedId,_that.actionFailure);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -710,10 +711,10 @@ return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_th
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CategoryFormMode mode,  UiStatus status,  CategoryType type,  Category? original,  String icon,  String color,  FieldError? nameError,  bool autovalidate,  bool isSaving,  bool done,  CategoryFailure? actionFailure)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( CategoryFormMode mode,  UiStatus status,  CategoryType type,  Category? original,  String icon,  String color,  FieldError? nameError,  bool autovalidate,  bool isSaving,  bool done,  String? savedId,  CategoryFailure? actionFailure)?  $default,) {final _that = this;
 switch (_that) {
 case _CategoryFormState() when $default != null:
-return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_that.color,_that.nameError,_that.autovalidate,_that.isSaving,_that.done,_that.actionFailure);case _:
+return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_that.color,_that.nameError,_that.autovalidate,_that.isSaving,_that.done,_that.savedId,_that.actionFailure);case _:
   return null;
 
 }
@@ -725,7 +726,7 @@ return $default(_that.mode,_that.status,_that.type,_that.original,_that.icon,_th
 
 
 class _CategoryFormState implements CategoryFormState {
-  const _CategoryFormState({required this.mode, this.status = UiStatus.initial, required this.type, this.original, this.icon = defaultCategoryIcon, this.color = defaultCategoryColor, this.nameError, this.autovalidate = false, this.isSaving = false, this.done = false, this.actionFailure});
+  const _CategoryFormState({required this.mode, this.status = UiStatus.initial, required this.type, this.original, this.icon = defaultCategoryIcon, this.color = defaultCategoryColor, this.nameError, this.autovalidate = false, this.isSaving = false, this.done = false, this.savedId, this.actionFailure});
   
 
 @override final  CategoryFormMode mode;
@@ -738,6 +739,7 @@ class _CategoryFormState implements CategoryFormState {
 @override@JsonKey() final  bool autovalidate;
 @override@JsonKey() final  bool isSaving;
 @override@JsonKey() final  bool done;
+@override final  String? savedId;
 @override final  CategoryFailure? actionFailure;
 
 /// Create a copy of CategoryFormState
@@ -750,18 +752,18 @@ _$CategoryFormStateCopyWith<_CategoryFormState> get copyWith => __$CategoryFormS
 
 @override
 bool operator ==(Object other) {
-    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoryFormState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.status, status) || other.status == status)&&(identical(other.type, type) || other.type == type)&&(identical(other.original, original) || other.original == original)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.color, color) || other.color == color)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.done, done) || other.done == done)&&(identical(other.actionFailure, actionFailure) || other.actionFailure == actionFailure));
+    return identical(this, other) || (other.runtimeType == runtimeType&&other is _CategoryFormState&&(identical(other.mode, mode) || other.mode == mode)&&(identical(other.status, status) || other.status == status)&&(identical(other.type, type) || other.type == type)&&(identical(other.original, original) || other.original == original)&&(identical(other.icon, icon) || other.icon == icon)&&(identical(other.color, color) || other.color == color)&&(identical(other.nameError, nameError) || other.nameError == nameError)&&(identical(other.autovalidate, autovalidate) || other.autovalidate == autovalidate)&&(identical(other.isSaving, isSaving) || other.isSaving == isSaving)&&(identical(other.done, done) || other.done == done)&&(identical(other.savedId, savedId) || other.savedId == savedId)&&(identical(other.actionFailure, actionFailure) || other.actionFailure == actionFailure));
 }
 
 
 @override
 int get hashCode {
-    return Object.hash(runtimeType,mode,status,type,original,icon,color,nameError,autovalidate,isSaving,done,actionFailure);
+    return Object.hash(runtimeType,mode,status,type,original,icon,color,nameError,autovalidate,isSaving,done,savedId,actionFailure);
 }
 
 @override
 String toString() {
-    return 'CategoryFormState(mode: $mode, status: $status, type: $type, original: $original, icon: $icon, color: $color, nameError: $nameError, autovalidate: $autovalidate, isSaving: $isSaving, done: $done, actionFailure: $actionFailure)';
+    return 'CategoryFormState(mode: $mode, status: $status, type: $type, original: $original, icon: $icon, color: $color, nameError: $nameError, autovalidate: $autovalidate, isSaving: $isSaving, done: $done, savedId: $savedId, actionFailure: $actionFailure)';
 }
 
 
@@ -772,7 +774,7 @@ abstract mixin class _$CategoryFormStateCopyWith<$Res> implements $CategoryFormS
   factory _$CategoryFormStateCopyWith(_CategoryFormState value, $Res Function(_CategoryFormState) _then) = __$CategoryFormStateCopyWithImpl;
 @override @useResult
 $Res call({
- CategoryFormMode mode, UiStatus status, CategoryType type, Category? original, String icon, String color, FieldError? nameError, bool autovalidate, bool isSaving, bool done, CategoryFailure? actionFailure
+ CategoryFormMode mode, UiStatus status, CategoryType type, Category? original, String icon, String color, FieldError? nameError, bool autovalidate, bool isSaving, bool done, String? savedId, CategoryFailure? actionFailure
 });
 
 
@@ -789,7 +791,7 @@ class __$CategoryFormStateCopyWithImpl<$Res>
 
 /// Create a copy of CategoryFormState
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? status = null,Object? type = null,Object? original = freezed,Object? icon = null,Object? color = null,Object? nameError = freezed,Object? autovalidate = null,Object? isSaving = null,Object? done = null,Object? actionFailure = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? mode = null,Object? status = null,Object? type = null,Object? original = freezed,Object? icon = null,Object? color = null,Object? nameError = freezed,Object? autovalidate = null,Object? isSaving = null,Object? done = null,Object? savedId = freezed,Object? actionFailure = freezed,}) {
   return _then(_CategoryFormState(
 mode: null == mode ? _self.mode : mode // ignore: cast_nullable_to_non_nullable
 as CategoryFormMode,status: null == status ? _self.status : status // ignore: cast_nullable_to_non_nullable
@@ -801,7 +803,8 @@ as String,nameError: freezed == nameError ? _self.nameError : nameError // ignor
 as FieldError?,autovalidate: null == autovalidate ? _self.autovalidate : autovalidate // ignore: cast_nullable_to_non_nullable
 as bool,isSaving: null == isSaving ? _self.isSaving : isSaving // ignore: cast_nullable_to_non_nullable
 as bool,done: null == done ? _self.done : done // ignore: cast_nullable_to_non_nullable
-as bool,actionFailure: freezed == actionFailure ? _self.actionFailure : actionFailure // ignore: cast_nullable_to_non_nullable
+as bool,savedId: freezed == savedId ? _self.savedId : savedId // ignore: cast_nullable_to_non_nullable
+as String?,actionFailure: freezed == actionFailure ? _self.actionFailure : actionFailure // ignore: cast_nullable_to_non_nullable
 as CategoryFailure?,
   ));
 }

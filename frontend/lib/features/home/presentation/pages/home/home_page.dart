@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/home/presentation/pages/home/bloc/home_bloc.dart';
 import 'package:monai/features/home/presentation/pages/home/model/home_state_extension.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_actions.dart';
@@ -18,6 +17,7 @@ import 'package:monai/features/home/presentation/pages/home/widgets/home_recent.
 import 'package:monai/features/home/presentation/pages/home/widgets/home_skeleton.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_spending_card.dart';
 import 'package:monai/features/home/presentation/pages/home/widgets/home_wallets.dart';
+import 'package:monai/route_path.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -34,35 +34,35 @@ class HomePage extends StatelessWidget {
 class HomeUI extends StatelessWidget {
   const HomeUI({super.key});
 
-  void _openWallets(BuildContext context) => context.go(AppRoutes.wallets);
+  void _openWallets(BuildContext context) => context.go(RoutePath.wallets);
 
   void _openTransactions(BuildContext context) =>
-      context.go(AppRoutes.transactions);
+      context.go(RoutePath.transactions);
 
-  void _openSettings(BuildContext context) => context.go(AppRoutes.settings);
+  void _openSettings(BuildContext context) => context.go(RoutePath.settings);
 
   void _openSearch(BuildContext context) =>
-      context.push(AppRoutes.transactionSearchIn());
+      context.push(RoutePath.transactionSearchIn());
 
-  void _openQuickAdd(BuildContext context) => context.push(AppRoutes.quickAdd);
+  void _openQuickAdd(BuildContext context) => context.push(RoutePath.quickAdd);
 
   void _openScanReceipt(BuildContext context) =>
-      context.push(AppRoutes.receiptScan);
+      context.push(RoutePath.receiptScan);
 
   void _openWallet(BuildContext context, String walletId) =>
-      context.push(AppRoutes.walletDetail(walletId));
+      context.push(RoutePath.walletDetail(walletId));
 
-  void _addWallet(BuildContext context) => context.push(AppRoutes.walletNew);
+  void _addWallet(BuildContext context) => context.push(RoutePath.walletNew);
 
-  void _openBudget(BuildContext context) => context.push(AppRoutes.budgetFor());
+  void _openBudget(BuildContext context) => context.push(RoutePath.budgetFor());
 
-  void _openReport(BuildContext context) => context.push(AppRoutes.reportFor());
+  void _openReport(BuildContext context) => context.push(RoutePath.reportFor());
 
   void _openTransaction(BuildContext context, String transactionId) =>
-      context.push(AppRoutes.transactionDetail(transactionId));
+      context.push(RoutePath.transactionDetail(transactionId));
 
   void _addTransaction(BuildContext context) =>
-      context.push(AppRoutes.transactionNew);
+      context.push(RoutePath.transactionNew);
 
   void _refresh(BuildContext context) =>
       context.read<HomeBloc>().add(const HomeEvent.refreshed());

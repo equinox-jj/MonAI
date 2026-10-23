@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
-import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
-import 'package:monai/core/data/network/session_manager.dart';
 import 'package:monai/app_router.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/app/injector.dart';
 import 'package:monai/core/base/usecase.dart';
+import 'package:monai/core/data/network/session_manager.dart';
+import 'package:monai/core/ui/designsystem/theme/monai_theme.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/auth/domain/usecase/complete_onboarding_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/login_usecase.dart';
 import 'package:monai/features/auth/domain/usecase/register_usecase.dart';
 import 'package:monai/features/auth/presentation/pages/onboarding/bloc/onboarding_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/register/bloc/register_bloc.dart';
 import 'package:monai/features/auth/presentation/pages/sign_in/bloc/sign_in_bloc.dart';
+import 'package:monai/route_path.dart';
 
 import '../../../../../helpers/transaction_fakes.dart';
 import '../../../../../helpers/wallet_fakes.dart';
@@ -59,7 +59,7 @@ void main() {
         routerConfig: createAppRouter(
           sessionManager: SessionManager(),
           isOnboardingCompleted: () async => false,
-          initialLocation: AppRoutes.onboarding,
+          initialLocation: RoutePath.onboarding,
         ),
       ),
     );

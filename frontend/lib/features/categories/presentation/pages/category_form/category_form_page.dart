@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/bloc/category_form_bloc.dart';
-import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_state_extension.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_mode.dart';
+import 'package:monai/features/categories/presentation/pages/category_form/model/category_form_state_extension.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/widgets/category_form_color_grid.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/widgets/category_form_icon_grid.dart';
 import 'package:monai/features/categories/presentation/pages/category_form/widgets/category_form_name_field.dart';
@@ -88,7 +88,10 @@ class _CategoryFormUIState extends State<CategoryFormUI> {
       Navigator.pop(context);
       return;
     }
-    Navigator.pop(context, CategoryFormOutcome.saved);
+    Navigator.pop<Object>(context, switch (state.mode) {
+      CreateCategoryMode() => state.savedId,
+      EditCategoryMode() => CategoryFormOutcome.saved,
+    });
   }
 
   void _showActionFailure(BuildContext context, CategoryFormState state) {

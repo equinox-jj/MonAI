@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:monai/core/ui/designsystem/designsystem.dart';
 import 'package:monai/core/app/injector.dart';
-import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/model/ui_status.dart';
-import 'package:monai/route_path.dart';
+import 'package:monai/core/ui/designsystem/designsystem.dart';
+import 'package:monai/core/ui/l10n/l10n.dart';
 import 'package:monai/core/utils/month_format.dart';
 import 'package:monai/features/reports/presentation/model/report_failure.dart';
 import 'package:monai/features/reports/presentation/pages/report/bloc/report_bloc.dart';
@@ -14,6 +13,7 @@ import 'package:monai/features/reports/presentation/pages/report/widgets/report_
 import 'package:monai/features/reports/presentation/pages/report/widgets/report_budget_card.dart';
 import 'package:monai/features/reports/presentation/pages/report/widgets/report_skeleton.dart';
 import 'package:monai/features/reports/presentation/pages/report/widgets/report_totals.dart';
+import 'package:monai/route_path.dart';
 
 class ReportPage extends StatelessWidget {
   const ReportPage({required this.month, super.key});
@@ -42,7 +42,7 @@ class ReportUI extends StatelessWidget {
       context.read<ReportBloc>().add(const ReportEvent.retried());
 
   void _openBudget(BuildContext context) =>
-      context.push(AppRoutes.budgetFor(context.read<ReportBloc>().state.month));
+      context.push(RoutePath.budgetFor(context.read<ReportBloc>().state.month));
 
   void _showRefreshFailure(BuildContext context, ReportState state) {
     if (state.refreshFailure case final failure?) {

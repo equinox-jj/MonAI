@@ -15,14 +15,15 @@ extension TransactionFormStateX on TransactionFormState {
 
   bool isUnsure(String field) => unsure.contains(field);
 
+  CategoryType get categoryType => switch (draft.type) {
+    .income => CategoryType.income,
+    .expense || .transfer => CategoryType.expense,
+  };
+
   List<Category> get categories {
-    final type = switch (draft.type) {
-      .income => CategoryType.income,
-      .expense || .transfer => CategoryType.expense,
-    };
     final keep = original?.categoryId;
     return lookups.categories.values
-        .where((c) => c.type == type && (!c.isHidden || c.id == keep))
+        .where((c) => c.type == categoryType && (!c.isHidden || c.id == keep))
         .toList();
   }
 
